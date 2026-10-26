@@ -1,0 +1,217 @@
+{
+  "address.loading": {
+    "message": "पते लोड हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "4edf9c73"
+  },
+  "address.pick": {
+    "message": "यहाँ भेजें",
+    "review": "reviewed",
+    "enHash": "c229c05a"
+  },
+  "address.none": {
+    "message": "आपका कोई सेव किया हुआ पता नहीं है।",
+    "review": "reviewed",
+    "enHash": "550f2dc7"
+  },
+  "address.outside": {
+    "message": "डिलीवरी क्षेत्र से बाहर ({distance})",
+    "review": "reviewed",
+    "enHash": "d3042935"
+  },
+  "address.add": {
+    "message": "नया पता जोड़ें",
+    "review": "reviewed",
+    "enHash": "c3cb8829"
+  },
+  "address.form.title": {
+    "message": "नया पता",
+    "review": "reviewed",
+    "enHash": "262e89de"
+  },
+  "address.form.labelDefault": {
+    "message": "घर",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "address.form.label": {
+    "message": "नाम",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "address.form.line1": {
+    "message": "मकान और सड़क",
+    "review": "reviewed",
+    "enHash": "61c82324"
+  },
+  "address.form.line1Help": {
+    "message": "फ़्लैट या मकान नंबर, इमारत, सड़क",
+    "review": "reviewed",
+    "enHash": "dbc52ba6"
+  },
+  "address.form.line2": {
+    "message": "इलाका (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "9701514b"
+  },
+  "address.form.landmark": {
+    "message": "पास की पहचान (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "7f3d6f2e"
+  },
+  "address.form.pincode": {
+    "message": "पिन कोड",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "address.form.required": {
+    "message": "इसे भरें",
+    "review": "reviewed",
+    "enHash": "3dfbc7c1"
+  },
+  "address.form.pincodeError": {
+    "message": "6 अंकों का पिन कोड डालें",
+    "review": "reviewed",
+    "enHash": "cab7855b"
+  },
+  "address.form.pinError": {
+    "message": "पहले पिन लगाएँ",
+    "review": "reviewed",
+    "enHash": "e6b78edd"
+  },
+  "address.form.invalid": {
+    "message": "इस जगह को जाँचें",
+    "review": "reviewed",
+    "enHash": "a606b403"
+  },
+  "address.form.failed": {
+    "message": "पता सेव नहीं हो सका। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "b95c0890"
+  },
+  "address.form.pinTitle": {
+    "message": "नक्शे पर पिन",
+    "review": "reviewed",
+    "enHash": "8dd1eed8"
+  },
+  "address.form.pinDevice": {
+    "message": "पिन वहाँ है जहाँ अभी आपका फ़ोन है।",
+    "review": "reviewed",
+    "enHash": "04a3b444"
+  },
+  "address.form.pinArea": {
+    "message": "पिन आपके चुने हुए इलाके में है। सही जगह के लिए अपनी लोकेशन इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "4b00790b"
+  },
+  "address.form.pinNone": {
+    "message": "अभी कोई पिन नहीं है। लगाने के लिए अपनी लोकेशन इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "0477ec69"
+  },
+  "address.form.inside": {
+    "message": "दुकान के डिलीवरी क्षेत्र के अंदर ({distance})।",
+    "review": "reviewed",
+    "enHash": "42b57f7f"
+  },
+  "address.form.outside": {
+    "message": "दुकान के डिलीवरी क्षेत्र से बाहर ({distance})।",
+    "review": "reviewed",
+    "enHash": "eb07fb3d"
+  },
+  "address.form.locate": {
+    "message": "मेरी लोकेशन इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "0132375d"
+  },
+  "address.form.locateFailed": {
+    "message": "आपकी लोकेशन नहीं मिल सकी। अनुमति जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "8c9881b6"
+  },
+  "address.form.save": {
+    "message": "पता सेव करें",
+    "review": "reviewed",
+    "enHash": "c08b67b2"
+  },
+  "address.form.cancel": {
+    "message": "कैंसल",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "address.map.label": {
+    "message": "पते का पिन और डिलीवरी क्षेत्र",
+    "review": "reviewed",
+    "enHash": "c0de6d5e"
+  },
+  "address.map.mapLabel": {
+    "message": "नक्शा: आपका पिन और {shop}, जो {distance} के अंदर डिलीवरी करती है",
+    "review": "reviewed",
+    "enHash": "61c53df5"
+  },
+  "address.map.radius": {
+    "message": "डिलीवरी क्षेत्र",
+    "review": "reviewed",
+    "enHash": "1dbe7804"
+  },
+  "address.map.cluster": {
+    "message": "{count} जगहें",
+    "review": "reviewed",
+    "enHash": "88d52f88"
+  },
+  "address.map.pin": {
+    "message": "आपका पिन",
+    "review": "reviewed",
+    "enHash": "c84462cb"
+  },
+  "address.map.legend.shop": {
+    "message": "दुकान",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "address.saved.title": {
+    "message": "पते",
+    "review": "reviewed",
+    "enHash": "4ca7b966"
+  },
+  "address.saved.empty": {
+    "message": "कोई सेव किया हुआ पता नहीं। यहाँ या चेकआउट पर जोड़ें।",
+    "review": "reviewed",
+    "enHash": "6d9b5c5c"
+  },
+  "address.saved.default": {
+    "message": "डिफ़ॉल्ट",
+    "review": "reviewed",
+    "enHash": "808d7dca"
+  },
+  "address.saved.makeDefault": {
+    "message": "डिफ़ॉल्ट बनाएँ",
+    "review": "reviewed",
+    "enHash": "7b2628d1"
+  },
+  "address.saved.delete": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "f6fdbe48"
+  },
+  "address.saved.deleteLabel": {
+    "message": "{label} हटाएँ",
+    "review": "reviewed",
+    "enHash": "214d4859"
+  },
+  "address.saved.loadError": {
+    "message": "आपके पते लोड नहीं हो सके।",
+    "review": "reviewed",
+    "enHash": "3608b559"
+  },
+  "address.saved.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "address.saved.actionError": {
+    "message": "यह नहीं हो सका। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "13555662"
+  }
+}

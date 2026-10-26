@@ -1,0 +1,217 @@
+{
+  "address.loading": {
+    "message": "ವಿಳಾಸಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "4edf9c73"
+  },
+  "address.pick": {
+    "message": "ಇಲ್ಲಿಗೆ ತಲುಪಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c229c05a"
+  },
+  "address.none": {
+    "message": "ನಿಮ್ಮ ಬಳಿ ಉಳಿಸಿದ ವಿಳಾಸ ಇನ್ನೂ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "550f2dc7"
+  },
+  "address.outside": {
+    "message": "ಡೆಲಿವರಿ ಪ್ರದೇಶದ ಹೊರಗೆ ({distance})",
+    "review": "reviewed",
+    "enHash": "d3042935"
+  },
+  "address.add": {
+    "message": "ಹೊಸ ವಿಳಾಸ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c3cb8829"
+  },
+  "address.form.title": {
+    "message": "ಹೊಸ ವಿಳಾಸ",
+    "review": "reviewed",
+    "enHash": "262e89de"
+  },
+  "address.form.labelDefault": {
+    "message": "ಮನೆ",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "address.form.label": {
+    "message": "ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "address.form.line1": {
+    "message": "ಮನೆ ಮತ್ತು ರಸ್ತೆ",
+    "review": "reviewed",
+    "enHash": "61c82324"
+  },
+  "address.form.line1Help": {
+    "message": "ಫ್ಲಾಟ್ ಅಥವಾ ಮನೆ ಸಂಖ್ಯೆ, ಕಟ್ಟಡ, ರಸ್ತೆ",
+    "review": "reviewed",
+    "enHash": "dbc52ba6"
+  },
+  "address.form.line2": {
+    "message": "ಪ್ರದೇಶ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "9701514b"
+  },
+  "address.form.landmark": {
+    "message": "ಗುರುತು ಸ್ಥಳ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "7f3d6f2e"
+  },
+  "address.form.pincode": {
+    "message": "ಪಿನ್ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "address.form.required": {
+    "message": "ಇದನ್ನು ತುಂಬಿ",
+    "review": "reviewed",
+    "enHash": "3dfbc7c1"
+  },
+  "address.form.pincodeError": {
+    "message": "6 ಅಂಕಿಗಳ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "cab7855b"
+  },
+  "address.form.pinError": {
+    "message": "ಮೊದಲು ಪಿನ್ ಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "e6b78edd"
+  },
+  "address.form.invalid": {
+    "message": "ಇದನ್ನು ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "a606b403"
+  },
+  "address.form.failed": {
+    "message": "ವಿಳಾಸ ಉಳಿಸಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "b95c0890"
+  },
+  "address.form.pinTitle": {
+    "message": "ನಕ್ಷೆಯಲ್ಲಿ ಪಿನ್",
+    "review": "reviewed",
+    "enHash": "8dd1eed8"
+  },
+  "address.form.pinDevice": {
+    "message": "ಪಿನ್ ಈಗ ನಿಮ್ಮ ಫೋನ್ ಇರುವ ಜಾಗದಲ್ಲಿದೆ.",
+    "review": "reviewed",
+    "enHash": "04a3b444"
+  },
+  "address.form.pinArea": {
+    "message": "ಪಿನ್ ನೀವು ಆರಿಸಿದ ಪ್ರದೇಶದಲ್ಲಿದೆ. ನಿಖರ ಸ್ಥಳಕ್ಕಾಗಿ ನಿಮ್ಮ ಲೊಕೇಶನ್ ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "4b00790b"
+  },
+  "address.form.pinNone": {
+    "message": "ಇನ್ನೂ ಪಿನ್ ಇಲ್ಲ. ಹೊಂದಿಸಲು ನಿಮ್ಮ ಲೊಕೇಶನ್ ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "0477ec69"
+  },
+  "address.form.inside": {
+    "message": "ಅಂಗಡಿಯ ಡೆಲಿವರಿ ಪ್ರದೇಶದ ಒಳಗೆ ({distance}).",
+    "review": "reviewed",
+    "enHash": "42b57f7f"
+  },
+  "address.form.outside": {
+    "message": "ಅಂಗಡಿಯ ಡೆಲಿವರಿ ಪ್ರದೇಶದ ಹೊರಗೆ ({distance}).",
+    "review": "reviewed",
+    "enHash": "eb07fb3d"
+  },
+  "address.form.locate": {
+    "message": "ನನ್ನ ಲೊಕೇಶನ್ ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "0132375d"
+  },
+  "address.form.locateFailed": {
+    "message": "ನಿಮ್ಮ ಲೊಕೇಶನ್ ಸಿಗಲಿಲ್ಲ. ಅನುಮತಿ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "8c9881b6"
+  },
+  "address.form.save": {
+    "message": "ವಿಳಾಸ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c08b67b2"
+  },
+  "address.form.cancel": {
+    "message": "ಕ್ಯಾನ್ಸಲ್",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "address.map.label": {
+    "message": "ವಿಳಾಸದ ಪಿನ್ ಮತ್ತು ಡೆಲಿವರಿ ಪ್ರದೇಶ",
+    "review": "reviewed",
+    "enHash": "c0de6d5e"
+  },
+  "address.map.mapLabel": {
+    "message": "ನಕ್ಷೆ: ನಿಮ್ಮ ಪಿನ್ ಮತ್ತು {shop}, ಅದು {distance} ಒಳಗೆ ಡೆಲಿವರಿ ಮಾಡುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "61c53df5"
+  },
+  "address.map.radius": {
+    "message": "ಡೆಲಿವರಿ ಪ್ರದೇಶ",
+    "review": "reviewed",
+    "enHash": "1dbe7804"
+  },
+  "address.map.cluster": {
+    "message": "{count} ಸ್ಥಳಗಳು",
+    "review": "reviewed",
+    "enHash": "88d52f88"
+  },
+  "address.map.pin": {
+    "message": "ನಿಮ್ಮ ಪಿನ್",
+    "review": "reviewed",
+    "enHash": "c84462cb"
+  },
+  "address.map.legend.shop": {
+    "message": "ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "address.saved.title": {
+    "message": "ವಿಳಾಸಗಳು",
+    "review": "reviewed",
+    "enHash": "4ca7b966"
+  },
+  "address.saved.empty": {
+    "message": "ಉಳಿಸಿದ ವಿಳಾಸಗಳಿಲ್ಲ. ಇಲ್ಲಿ ಅಥವಾ ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6d9b5c5c"
+  },
+  "address.saved.default": {
+    "message": "ಡೀಫಾಲ್ಟ್",
+    "review": "reviewed",
+    "enHash": "808d7dca"
+  },
+  "address.saved.makeDefault": {
+    "message": "ಡೀಫಾಲ್ಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "7b2628d1"
+  },
+  "address.saved.delete": {
+    "message": "ಅಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f6fdbe48"
+  },
+  "address.saved.deleteLabel": {
+    "message": "{label} ಅಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "214d4859"
+  },
+  "address.saved.loadError": {
+    "message": "ನಿಮ್ಮ ವಿಳಾಸಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3608b559"
+  },
+  "address.saved.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "address.saved.actionError": {
+    "message": "ಅದು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  }
+}

@@ -128,5 +128,20 @@
     "message": "ಕನೆಕ್ಷನ್ ಇಲ್ಲ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ; ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "review": "reviewed",
     "enHash": "392cd811"
+  },
+  "checkout.fulfilment.label": {
+    "message": "ಪಿಕಪ್ ಅಥವಾ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "8a9547f9"
+  },
+  "checkout.delivery.title": {
+    "message": "ಅಂಗಡಿಯಿಂದ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "e3a8b49c"
+  },
+  "checkout.payNote.delivery": {
+    "message": "ಬಂದಾಗ ಹಣ ಕೊಡಿ: ನಗದು ಅಥವಾ UPI. ಈಗ ಏನೂ ಕಡಿತವಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "156b35cb"
   }
 }

@@ -1,0 +1,142 @@
+{
+  "info.how.meta.title": {
+    "message": "TodayZ ఎలా పనిచేస్తుంది",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.meta.description": {
+    "message": "దుకాణాలు తమ స్టాక్‌ను TodayZ లో ఎలా పెడతాయి, దగ్గరలోని వారు దాన్ని ఎలా వెతికి, బుక్ చేసి, పికప్ లేదా డెలివరీలో తీసుకుంటారు.",
+    "review": "reviewed",
+    "enHash": "443cd6cb"
+  },
+  "info.how.title": {
+    "message": "TodayZ ఎలా పనిచేస్తుంది",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.intro": {
+    "message": "TodayZ దుకాణం షెల్ఫ్‌లోని స్టాక్‌ను దగ్గరలో నివసించే వారితో కలుపుతుంది.",
+    "review": "reviewed",
+    "enHash": "10acfac6"
+  },
+  "info.how.shops.title": {
+    "message": "దుకాణాల కోసం",
+    "review": "reviewed",
+    "enHash": "673d17e5"
+  },
+  "info.how.shoppers.title": {
+    "message": "కొనుగోలుదారుల కోసం",
+    "review": "reviewed",
+    "enHash": "b88dfd14"
+  },
+  "info.pricing.meta.title": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "a0d9bbad"
+  },
+  "info.pricing.meta.description": {
+    "message": "ప్రస్తుతానికి దుకాణాలకు TodayZ ఉచితం. ఈ పేజీ ఎప్పుడూ ప్రస్తుత ధరను చూపిస్తుంది, కాబట్టి చేరే ముందు మీరు చూడవచ్చు.",
+    "review": "reviewed",
+    "enHash": "d35642a1"
+  },
+  "info.pricing.title": {
+    "message": "ప్రస్తుతానికి ఉచితం",
+    "review": "reviewed",
+    "enHash": "a73052fa"
+  },
+  "info.pricing.intro": {
+    "message": "ప్రారంభ సమయంలో దుకాణాలకు TodayZ ఉచితం. ఈ పేజీ ఎప్పుడూ ప్రస్తుత ధరను చూపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "52e5a9d4"
+  },
+  "info.pricing.point.1": {
+    "message": "చేరడానికి ఎలాంటి రుసుము లేదు.",
+    "review": "reviewed",
+    "enHash": "40587f97"
+  },
+  "info.pricing.point.2": {
+    "message": "POS (కౌంటర్ బిల్లింగ్), ఆన్‌లైన్ ఆర్డర్లు మరియు డిమాండ్ ఇన్‌సైట్స్ చేర్చబడ్డాయి.",
+    "review": "reviewed",
+    "enHash": "5229ae66"
+  },
+  "info.pricing.point.3": {
+    "message": "క్రెడిట్‌లు మరియు రీఫండ్‌లు ఎలా పనిచేస్తాయో తెలుసుకోవడానికి రీఫండ్ మరియు క్రెడిట్ పేజీని చదవండి.",
+    "review": "reviewed",
+    "enHash": "8b40934f"
+  },
+  "info.about.meta.title": {
+    "message": "TodayZ గురించి",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.meta.description": {
+    "message": "దగ్గరలోని దుకాణాల్లో ఏం స్టాక్‌లో ఉందో వెతికే మార్గాన్ని TodayZ నిర్మిస్తోంది.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.title": {
+    "message": "TodayZ గురించి",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.1": {
+    "message": "దగ్గరలోని దుకాణాల్లో ఏం స్టాక్‌లో ఉందో వెతికే మార్గాన్ని TodayZ నిర్మిస్తోంది.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.2": {
+    "message": "దుకాణాలకు తమ కౌంటర్ మరియు స్టాక్ నడిపే సాధనాలు దొరుకుతాయి. కొనుగోలుదారులకు దగ్గరలో కావాల్సినవి వెతికి పొందడానికి సులభమైన మార్గం దొరుకుతుంది.",
+    "review": "reviewed",
+    "enHash": "915d2131"
+  },
+  "info.about.3": {
+    "message": "ఈ ప్రొడక్ట్ కొత్తది, చేరే దుకాణాలతో కలిసి మేము దీన్ని నిర్మిస్తున్నాం.",
+    "review": "reviewed",
+    "enHash": "6fd82bec"
+  },
+  "info.contact.meta.title": {
+    "message": "సంప్రదించండి",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.meta.description": {
+    "message": "TodayZ బృందాన్ని సంప్రదించండి, లేదా మీ దుకాణం వివరాలు ఇవ్వండి, మేము మిమ్మల్ని సంప్రదిస్తాం.",
+    "review": "reviewed",
+    "enHash": "b744c7df"
+  },
+  "info.contact.title": {
+    "message": "సంప్రదించండి",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.intro": {
+    "message": "మమ్మల్ని చేరడానికి వేగవంతమైన మార్గం కింద మీ వివరాలు ఇవ్వడం.",
+    "review": "reviewed",
+    "enHash": "270aeb1d"
+  },
+  "info.contact.email": {
+    "message": "ఇమెయిల్",
+    "review": "reviewed",
+    "enHash": "84add5b2"
+  },
+  "info.404.meta.title": {
+    "message": "పేజీ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "info.404.title": {
+    "message": "మాకు ఆ పేజీ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "2f03df8a"
+  },
+  "info.404.body": {
+    "message": "లింక్ పాతది కావచ్చు లేదా తప్పుగా టైప్ చేసి ఉండవచ్చు.",
+    "review": "reviewed",
+    "enHash": "d69f363a"
+  },
+  "info.404.cta": {
+    "message": "హోమ్ పేజీకి తిరిగి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "bc5fe132"
+  }
+}

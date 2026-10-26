@@ -1,0 +1,52 @@
+{
+  "site.title": {
+    "message": "TodayZ: ಹತ್ತಿರದ ಎಲ್ಲವೂ, ಇಂದೇ",
+    "review": "reviewed",
+    "enHash": "e514d77d"
+  },
+  "site.description": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಏನು ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ ಎಂದು ನೋಡಿ, ಬುಕ್ ಮಾಡಿ, ಪಿಕಪ್ ಅಥವಾ ಡೆಲಿವರಿಯಲ್ಲಿ ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "7e3e5251"
+  },
+  "site.skipToContent": {
+    "message": "ನೇರವಾಗಿ ಮುಖ್ಯ ಭಾಗಕ್ಕೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "site.logoAlt": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "site.hero.title": {
+    "message": "ಹತ್ತಿರದ ಎಲ್ಲವೂ, ಇಂದೇ.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "site.hero.sub": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳು ತಮ್ಮ ಸ್ಟಾಕ್ ಅನ್ನು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಹಾಕುತ್ತವೆ. ನಿಮ್ಮ ಹತ್ತಿರ ಏನು ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ ಎಂದು ನೋಡಿ, ಬುಕ್ ಮಾಡಿ, ಪಿಕಪ್ ಅಥವಾ ಡೆಲಿವರಿಯಲ್ಲಿ ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "ecee0988"
+  },
+  "site.soon.tag": {
+    "message": "ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "site.soon.title": {
+    "message": "ನಾವು ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಾಗುತ್ತಿದ್ದೇವೆ",
+    "review": "reviewed",
+    "enHash": "6c48ef38"
+  },
+  "site.soon.body": {
+    "message": "TodayZ ಕಟ್ಟುವಾಗ ಈ ಸೈಟ್ ತಾತ್ಕಾಲಿಕ ಪುಟ. ಅಂಗಡಿ ಮಾಲೀಕರು ಶೀಘ್ರದಲ್ಲೇ ಇಲ್ಲಿ ಸೈನ್ ಅಪ್ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "dc1f1b4f"
+  },
+  "site.footer": {
+    "message": "© {year} TodayZ",
+    "review": "reviewed",
+    "enHash": "04b1a988"
+  }
+}

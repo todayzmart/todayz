@@ -1,0 +1,147 @@
+{
+  "delivery.mode.label": {
+    "message": "இதை எப்படிப் பெறுவீர்கள்",
+    "review": "reviewed",
+    "enHash": "f110690b"
+  },
+  "delivery.mode.pickup": {
+    "message": "பிக்அப்",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "delivery.mode.delivery": {
+    "message": "டெலிவரி",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.terms.fee": {
+    "message": "{amount} டெலிவரி",
+    "review": "reviewed",
+    "enHash": "f9040a0b"
+  },
+  "delivery.terms.noFee": {
+    "message": "இலவச டெலிவரி",
+    "review": "reviewed",
+    "enHash": "98aa5831"
+  },
+  "delivery.terms.minimum": {
+    "message": "குறைந்தது {amount}",
+    "review": "reviewed",
+    "enHash": "c0e9a0f0"
+  },
+  "delivery.terms.freeAbove": {
+    "message": "{amount}+ மேல் இலவச டெலிவரி",
+    "review": "reviewed",
+    "enHash": "1e2ec5e1"
+  },
+  "delivery.terms.radius": {
+    "message": "{distance} தூரத்திற்குள் டெலிவரி",
+    "review": "reviewed",
+    "enHash": "e1ea5144"
+  },
+  "delivery.freeGap": {
+    "message": "இலவச டெலிவரிக்கு இன்னும் {amount} சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "f0a48c32"
+  },
+  "delivery.feeRow": {
+    "message": "டெலிவரி",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.free": {
+    "message": "இலவசம்",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "delivery.switchToPickup": {
+    "message": "பிக்அப்புக்கு மாற்று",
+    "review": "reviewed",
+    "enHash": "ea865bdf"
+  },
+  "delivery.closed.title": {
+    "message": "டெலிவரி இப்போது மூடப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "3ca0294b"
+  },
+  "delivery.closed.next": {
+    "message": "அடுத்த டெலிவரி: {window}. உங்கள் கார்ட் அப்படியே இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "15488068"
+  },
+  "delivery.closed.none": {
+    "message": "கடைக்கு வரவிருக்கும் டெலிவரி நேரங்கள் இல்லை. உங்கள் கார்ட் அப்படியே இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "24816ea3"
+  },
+  "delivery.window.today": {
+    "message": "இன்று {time}",
+    "review": "reviewed",
+    "enHash": "7f3aa7f4"
+  },
+  "delivery.window.tomorrow": {
+    "message": "நாளை {time}",
+    "review": "reviewed",
+    "enHash": "e32ff926"
+  },
+  "delivery.window.day": {
+    "message": "{day} {time}",
+    "review": "reviewed",
+    "enHash": "6b4b9e45"
+  },
+  "delivery.minimum.title": {
+    "message": "டெலிவரிக்கு குறைந்தது {amount} வேண்டும்",
+    "review": "reviewed",
+    "enHash": "13bf9b3c"
+  },
+  "delivery.minimum.addMore": {
+    "message": "டெலிவரி பெற இன்னும் {amount} சேர்க்கவும், அல்லது நீங்களே எடுத்துக்கொள்ளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "bbf459a5"
+  },
+  "delivery.minimum.body": {
+    "message": "டெலிவரி பெற இன்னும் பொருட்களைச் சேர்க்கவும், அல்லது நீங்களே எடுத்துக்கொள்ளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "d1656b99"
+  },
+  "delivery.outside.title": {
+    "message": "இந்த முகவரி டெலிவரி பகுதிக்கு வெளியே உள்ளது",
+    "review": "reviewed",
+    "enHash": "5d959cef"
+  },
+  "delivery.outside.body": {
+    "message": "வேறு முகவரியைத் தேர்ந்தெடுக்கவும் அல்லது கடையிலிருந்து நீங்களே எடுத்துக்கொள்ளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "d82b3936"
+  },
+  "delivery.cart.signIn": {
+    "message": "டெலிவரி முகவரியைத் தேர்ந்தெடுக்க செக்அவுட்டில் உள்நுழையவும்.",
+    "review": "reviewed",
+    "enHash": "6b7dcc29"
+  },
+  "delivery.cart.to": {
+    "message": "{label} க்கு டெலிவரி: {address}",
+    "review": "reviewed",
+    "enHash": "2b76e932"
+  },
+  "delivery.cart.change": {
+    "message": "மாற்று",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "delivery.cart.noAddress": {
+    "message": "டெலிவரி விலையைப் பார்க்க முகவரியைச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "560b0973"
+  },
+  "delivery.cart.noneInside": {
+    "message": "உங்கள் முகவரிகள் எதுவும் டெலிவரி பகுதிக்குள் இல்லை.",
+    "review": "reviewed",
+    "enHash": "8d41bf45"
+  },
+  "delivery.cart.add": {
+    "message": "முகவரியைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "d46fa3ca"
+  }
+}

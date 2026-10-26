@@ -1,0 +1,147 @@
+{
+  "delivery.mode.label": {
+    "message": "आप इसे कैसे लेंगे",
+    "review": "reviewed",
+    "enHash": "f110690b"
+  },
+  "delivery.mode.pickup": {
+    "message": "पिकअप",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "delivery.mode.delivery": {
+    "message": "डिलीवरी",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.terms.fee": {
+    "message": "{amount} डिलीवरी",
+    "review": "reviewed",
+    "enHash": "f9040a0b"
+  },
+  "delivery.terms.noFee": {
+    "message": "मुफ़्त डिलीवरी",
+    "review": "reviewed",
+    "enHash": "98aa5831"
+  },
+  "delivery.terms.minimum": {
+    "message": "कम से कम {amount}",
+    "review": "reviewed",
+    "enHash": "c0e9a0f0"
+  },
+  "delivery.terms.freeAbove": {
+    "message": "{amount}+ पर मुफ़्त डिलीवरी",
+    "review": "reviewed",
+    "enHash": "1e2ec5e1"
+  },
+  "delivery.terms.radius": {
+    "message": "{distance} के अंदर डिलीवरी",
+    "review": "reviewed",
+    "enHash": "e1ea5144"
+  },
+  "delivery.freeGap": {
+    "message": "मुफ़्त डिलीवरी के लिए {amount} और जोड़ें",
+    "review": "reviewed",
+    "enHash": "f0a48c32"
+  },
+  "delivery.feeRow": {
+    "message": "डिलीवरी",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.free": {
+    "message": "मुफ़्त",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "delivery.switchToPickup": {
+    "message": "पिकअप पर जाएँ",
+    "review": "reviewed",
+    "enHash": "ea865bdf"
+  },
+  "delivery.closed.title": {
+    "message": "डिलीवरी अभी बंद है",
+    "review": "reviewed",
+    "enHash": "3ca0294b"
+  },
+  "delivery.closed.next": {
+    "message": "अगली डिलीवरी: {window}। आपका कार्ट सुरक्षित है।",
+    "review": "reviewed",
+    "enHash": "15488068"
+  },
+  "delivery.closed.none": {
+    "message": "दुकान के आगे डिलीवरी के घंटे नहीं हैं। आपका कार्ट सुरक्षित है।",
+    "review": "reviewed",
+    "enHash": "24816ea3"
+  },
+  "delivery.window.today": {
+    "message": "आज {time}",
+    "review": "reviewed",
+    "enHash": "7f3aa7f4"
+  },
+  "delivery.window.tomorrow": {
+    "message": "कल {time}",
+    "review": "reviewed",
+    "enHash": "e32ff926"
+  },
+  "delivery.window.day": {
+    "message": "{day} {time}",
+    "review": "reviewed",
+    "enHash": "6b4b9e45"
+  },
+  "delivery.minimum.title": {
+    "message": "डिलीवरी के लिए कम से कम {amount} चाहिए",
+    "review": "reviewed",
+    "enHash": "13bf9b3c"
+  },
+  "delivery.minimum.addMore": {
+    "message": "डिलीवरी के लिए {amount} और जोड़ें, या खुद लेने आएँ।",
+    "review": "reviewed",
+    "enHash": "bbf459a5"
+  },
+  "delivery.minimum.body": {
+    "message": "डिलीवरी के लिए और सामान जोड़ें, या खुद लेने आएँ।",
+    "review": "reviewed",
+    "enHash": "d1656b99"
+  },
+  "delivery.outside.title": {
+    "message": "यह पता डिलीवरी क्षेत्र से बाहर है",
+    "review": "reviewed",
+    "enHash": "5d959cef"
+  },
+  "delivery.outside.body": {
+    "message": "दूसरा पता चुनें या दुकान से खुद ले लें।",
+    "review": "reviewed",
+    "enHash": "d82b3936"
+  },
+  "delivery.cart.signIn": {
+    "message": "डिलीवरी का पता चुनने के लिए चेकआउट पर साइन इन करें।",
+    "review": "reviewed",
+    "enHash": "6b7dcc29"
+  },
+  "delivery.cart.to": {
+    "message": "{label} पर डिलीवरी: {address}",
+    "review": "reviewed",
+    "enHash": "2b76e932"
+  },
+  "delivery.cart.change": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "delivery.cart.noAddress": {
+    "message": "डिलीवरी का दाम देखने के लिए पता जोड़ें।",
+    "review": "reviewed",
+    "enHash": "560b0973"
+  },
+  "delivery.cart.noneInside": {
+    "message": "आपका कोई भी पता डिलीवरी क्षेत्र के अंदर नहीं है।",
+    "review": "reviewed",
+    "enHash": "8d41bf45"
+  },
+  "delivery.cart.add": {
+    "message": "पता जोड़ें",
+    "review": "reviewed",
+    "enHash": "d46fa3ca"
+  }
+}

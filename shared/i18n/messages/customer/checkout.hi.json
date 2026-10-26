@@ -128,5 +128,20 @@
     "message": "इंटरनेट नहीं है। आपका कार्ट सेव है; ऑनलाइन होने पर फिर से कोशिश करें।",
     "review": "reviewed",
     "enHash": "392cd811"
+  },
+  "checkout.fulfilment.label": {
+    "message": "पिकअप या डिलीवरी",
+    "review": "reviewed",
+    "enHash": "8a9547f9"
+  },
+  "checkout.delivery.title": {
+    "message": "दुकान से डिलीवरी",
+    "review": "reviewed",
+    "enHash": "e3a8b49c"
+  },
+  "checkout.payNote.delivery": {
+    "message": "सामान आने पर पैसे दें: नकद या UPI। अभी कोई पैसा नहीं कटेगा।",
+    "review": "reviewed",
+    "enHash": "156b35cb"
   }
 }

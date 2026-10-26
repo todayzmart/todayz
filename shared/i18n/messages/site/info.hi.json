@@ -1,0 +1,142 @@
+{
+  "info.how.meta.title": {
+    "message": "TodayZ कैसे काम करता है",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.meta.description": {
+    "message": "दुकानें अपना स्टॉक TodayZ पर कैसे डालती हैं, और पास के लोग उसे कैसे ढूँढते हैं, बुक करते हैं और पिकअप या डिलीवरी से लेते हैं।",
+    "review": "reviewed",
+    "enHash": "443cd6cb"
+  },
+  "info.how.title": {
+    "message": "TodayZ कैसे काम करता है",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.intro": {
+    "message": "TodayZ दुकान की शेल्फ़ पर रखे स्टॉक को आसपास रहने वाले लोगों से जोड़ता है।",
+    "review": "reviewed",
+    "enHash": "10acfac6"
+  },
+  "info.how.shops.title": {
+    "message": "दुकानों के लिए",
+    "review": "reviewed",
+    "enHash": "673d17e5"
+  },
+  "info.how.shoppers.title": {
+    "message": "खरीदारों के लिए",
+    "review": "reviewed",
+    "enHash": "b88dfd14"
+  },
+  "info.pricing.meta.title": {
+    "message": "कीमत",
+    "review": "reviewed",
+    "enHash": "a0d9bbad"
+  },
+  "info.pricing.meta.description": {
+    "message": "अभी दुकानों के लिए TodayZ मुफ़्त है। यह पेज हमेशा मौजूदा कीमत दिखाता है, ताकि आप जुड़ने से पहले देख सकें।",
+    "review": "reviewed",
+    "enHash": "d35642a1"
+  },
+  "info.pricing.title": {
+    "message": "अभी मुफ़्त",
+    "review": "reviewed",
+    "enHash": "a73052fa"
+  },
+  "info.pricing.intro": {
+    "message": "शुरुआत के दौरान दुकानों के लिए TodayZ मुफ़्त है। यह पेज हमेशा मौजूदा कीमत दिखाएगा।",
+    "review": "reviewed",
+    "enHash": "52e5a9d4"
+  },
+  "info.pricing.point.1": {
+    "message": "जुड़ने की कोई फ़ीस नहीं।",
+    "review": "reviewed",
+    "enHash": "40587f97"
+  },
+  "info.pricing.point.2": {
+    "message": "POS (काउंटर बिलिंग), ऑनलाइन ऑर्डर और माँग की जानकारी शामिल हैं।",
+    "review": "reviewed",
+    "enHash": "5229ae66"
+  },
+  "info.pricing.point.3": {
+    "message": "क्रेडिट और रिफ़ंड कैसे काम करते हैं, यह जानने के लिए रिफ़ंड और क्रेडिट पेज पढ़ें।",
+    "review": "reviewed",
+    "enHash": "8b40934f"
+  },
+  "info.about.meta.title": {
+    "message": "TodayZ के बारे में",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.meta.description": {
+    "message": "TodayZ यह खोजने का तरीका बना रहा है कि आसपास की दुकानों में क्या स्टॉक में है।",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.title": {
+    "message": "TodayZ के बारे में",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.1": {
+    "message": "TodayZ यह खोजने का तरीका बना रहा है कि आसपास की दुकानों में क्या स्टॉक में है।",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.2": {
+    "message": "दुकानों को अपना काउंटर और स्टॉक चलाने के औज़ार मिलते हैं। खरीदारों को आसपास जो चाहिए, उसे ढूँढने और पाने का आसान तरीका मिलता है।",
+    "review": "reviewed",
+    "enHash": "915d2131"
+  },
+  "info.about.3": {
+    "message": "प्रोडक्ट नया है, और हम इसे जुड़ने वाली दुकानों के साथ मिलकर बना रहे हैं।",
+    "review": "reviewed",
+    "enHash": "6fd82bec"
+  },
+  "info.contact.meta.title": {
+    "message": "संपर्क करें",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.meta.description": {
+    "message": "TodayZ टीम से संपर्क करें, या अपनी दुकान का ब्योरा छोड़ें और हम आपसे संपर्क करेंगे।",
+    "review": "reviewed",
+    "enHash": "b744c7df"
+  },
+  "info.contact.title": {
+    "message": "संपर्क करें",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.intro": {
+    "message": "हम तक पहुँचने का सबसे तेज़ तरीका है नीचे अपना ब्योरा छोड़ना।",
+    "review": "reviewed",
+    "enHash": "270aeb1d"
+  },
+  "info.contact.email": {
+    "message": "ईमेल",
+    "review": "reviewed",
+    "enHash": "84add5b2"
+  },
+  "info.404.meta.title": {
+    "message": "पेज नहीं मिला",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "info.404.title": {
+    "message": "हमें वह पेज नहीं मिला",
+    "review": "reviewed",
+    "enHash": "2f03df8a"
+  },
+  "info.404.body": {
+    "message": "लिंक पुराना हो सकता है या उसमें गलती हो सकती है।",
+    "review": "reviewed",
+    "enHash": "d69f363a"
+  },
+  "info.404.cta": {
+    "message": "होम पेज पर वापस जाएँ",
+    "review": "reviewed",
+    "enHash": "bc5fe132"
+  }
+}

@@ -185,7 +185,7 @@
     "enHash": "e941ef9c"
   },
   "settings.rewards.example": {
-    "message": "{amount} బిల్లుపై కస్టమర్‌కు {credits, plural, one {# క్రెడిట్} other {# క్రెడిట్లు}} వస్తాయి.",
+    "message": "{amount} బిల్లుపై కస్టమర్‌కు {credits, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} వస్తాయి.",
     "review": "reviewed",
     "enHash": "a9c2e28b"
   },

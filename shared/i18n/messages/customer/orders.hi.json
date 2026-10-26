@@ -513,5 +513,45 @@
     "message": "दुकान को कॉल करें",
     "review": "reviewed",
     "enHash": "b605f7d5"
+  },
+  "orders.step.out_for_delivery": {
+    "message": "रास्ते में",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.step.delivered": {
+    "message": "डिलीवर हो गया",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.code.deliveryLabel": {
+    "message": "डिलीवरी कोड",
+    "review": "reviewed",
+    "enHash": "ff5c3ad0"
+  },
+  "orders.code.riderNote": {
+    "message": "ऑर्डर पहुँचने पर यह कोड डिलीवरी वाले को बताएँ।",
+    "review": "reviewed",
+    "enHash": "400b0567"
+  },
+  "orders.delivery.accepted": {
+    "message": "{shop} ने आपका ऑर्डर मंज़ूर कर लिया है और {time} तक भेज देगी।",
+    "review": "reviewed",
+    "enHash": "f1b3c175"
+  },
+  "orders.delivery.acceptedNoTime": {
+    "message": "{shop} ने आपका ऑर्डर मंज़ूर कर लिया है और जल्दी ही भेज देगी।",
+    "review": "reviewed",
+    "enHash": "b8f95b32"
+  },
+  "orders.delivery.onTheWay": {
+    "message": "{shop} से आपका ऑर्डर रास्ते में है।",
+    "review": "reviewed",
+    "enHash": "5c7cbe84"
+  },
+  "orders.delivery.to": {
+    "message": "{label} पर डिलीवरी: {address}",
+    "review": "reviewed",
+    "enHash": "f4a4eb85"
   }
 }
