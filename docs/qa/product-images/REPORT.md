@@ -64,10 +64,26 @@ Refresh with `TZ_QA_DIR=docs/qa/product-images pnpm exec playwright test e2e/ima
 - Customer: tsc, eslint, stylelint, and all of vitest (207 tests).
 - Admin: tsc, eslint, stylelint, and all of vitest (293 tests). Playwright `e2e/images.spec.ts`.
 
+## Item-type photos (D-253)
+
+The open databases cover few of our products, so every kind of item ("toor dal", "toothpaste", one per category) can get one free-licence photo from Wikimedia Commons, shown on every product of that kind until its own pack photo is approved.
+
+| Area | What | Where |
+|---|---|---|
+| Schema | `item_type_key(name, brand)`, `type_photos` (pending, approved, rejected; rank; licence; author), `product_images.type_photo_id` and source `type` | migration `49602_w4-96_type_photos.sql` |
+| Importer | `todayz images types [--dry-run] [--limit N] [--contact URL] [--report FILE]`: up to 3 Commons candidates per kind, free licences only, 800 px copies in the private bucket | `internal/imageimport/types.go` |
+| API | `GET /v1/admin/type-photos`, `POST …/{id}/approve` (fills the kind), `POST …/{id}/reject` (a candidate, or take-down of the picked photo) | `internal/admin/type_photos.go` |
+| Admin (A-08) | "Item photos" tab: one card per kind with candidates, licence, credit and Commons page; Use this photo, Not right, and Take down under "In use" | `admin/src/catalogue/TypePhotosTab.tsx` |
+| Business | Add item shows thumbnails and the brand once; a shop may photograph any active master-list product | `business/src/stock/AddItem.tsx`, `internal/catalogue/photos.go` |
+
+**Local run** (`types-run.md`): 244 kinds searched, 227 with candidates (679 files), 9 with none, 8 medicine kinds skipped, 0 failures, about 18 minutes. The first attempt stored nothing because Commons now serves resized files from `thumb.wikimedia.org`; that host is allowed since 05d0c498.
+
+**Quality.** The search matches file titles, so a vague kind finds the wrong thing: "conditioner" finds air conditioners, "buttermilk" Buttermilk Falls, "butter" a painting, "maida" Maida Vale, "sugar" a sugar factory, "face wash" a car wash sign. Many dal and flour candidates show a cooked dish rather than the grain. Roughly a third of the kinds look right at first sight. Nothing reaches a customer before an admin picks it.
+
 ## What is left
 
 1. **The full import** was tried on the local stack on 26 Oct (`full-run.md`). Open Food Facts refused nearly every name search (503, high demand), and the two finds were wrong. Those finds led to three fixes: in-store barcodes are skipped, a lone unit word no longer matches, and a 503 stops the run. Rerun it when the search answers, then bulk-approve in A-08, checking every "Name and brand" match by eye. On the local database, reject the two wrong drafts (Rajdhani atta 5 kg, India Gate basmati) in A-08.
-2. **Another store's product.** A shop sends a photo only for a product it created, from the add flow or later from the item sheet. A product another store created gets its image from the import or an admin.
+2. **Item photos to pick.** 227 kinds wait in A-08 → Item photos. A kind whose three candidates are all turned down is never searched again, and a kind with no result is searched again on every run. A better search (adding the category's words to a vague kind) would raise the hit rate. Customers are not told that a kind photo is representative rather than the exact pack.
 3. **Admin uploads skip review.** An admin's own upload goes live when it is confirmed. This is intended, but there is no second pair of eyes.
 4. **Translations.** The business `stock.photo.*` keys in hi, kn, te and ta are machine-written and marked reviewed, with a line in `docs/qa/business-i18n/REVIEW.md`. The customer `product.photoCredit` key is translated the same way. Neither has had a native-speaker review.
 5. **Take-down.** An approved image is replaced by approving or uploading another. Taking an approved image down, back to the initials, is in the API (reject on the approved image, audited), but A-08 has no button for it yet, because the Images tab lists only pending images.
