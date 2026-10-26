@@ -1,4 +1,5 @@
 import type { AdminPendingProduct } from '@todayz/api-client/gen/model/adminPendingProduct';
+import { CatalogueAssist } from '../ai-assist/catalogue/CatalogueAssist';
 
 /**
  * Where the catalogue assistant (AI-A1, D-82) sits in the review detail. W3-13 renders
@@ -7,5 +8,9 @@ import type { AdminPendingProduct } from '@todayz/api-client/gen/model/adminPend
  * suggests is a draft: the reviewer still approves, merges or rejects with the buttons above.
  */
 export function AssistSlot({ pending }: { pending: AdminPendingProduct }) {
-  return <div data-slot="catalogue-assist" data-product={pending.product.id} />;
+  return (
+    <div data-slot="catalogue-assist" data-product={pending.product.id}>
+      <CatalogueAssist key={pending.product.id} pending={pending} />
+    </div>
+  );
 }
