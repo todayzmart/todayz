@@ -414,6 +414,21 @@
     "review": "machine",
     "enHash": "c8f5eda8"
   },
+  "account.photo.sheet.title": {
+    "message": "ಪ್ರೊಫೈಲ್ ಫೋಟೋ",
+    "review": "machine",
+    "enHash": "33f385bb"
+  },
+  "account.photo.choose": {
+    "message": "ಹೊಸ ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "machine",
+    "enHash": "21cf25fa"
+  },
+  "account.photo.sheet.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "machine",
+    "enHash": "bbfa773e"
+  },
   "account.photo.uploading": {
     "message": "ನಿಮ್ಮ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ",
     "review": "machine",

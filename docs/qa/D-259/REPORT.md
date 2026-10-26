@@ -49,7 +49,8 @@ A signed-in customer can add, change and remove a profile photo. It shows on Acc
 - **`src/account/ProfilePhoto.tsx`**:
   - `PhotoImage` falls back to the initial when the signed link no longer loads;
   - `PhotoAvatar` has a camera badge, a hidden file input and a spinner;
-  - `PhotoActions` has "Remove photo", a polite status line and an error line.
+  - With a photo, the camera badge opens a sheet: "Choose a new photo" or "Remove photo". The card has no remove button (founder, 26 Oct: "dont keep remove photo").
+  - `PhotoActions` has a polite status line and an error line.
 - **Wiring:**
   - `routes/account.tsx` keeps the photo state in `SignedIn`, so it outlives the Profile remount after a reload;
   - `home/Header.tsx` shows the photo in the avatar link.
@@ -95,7 +96,8 @@ The unit tests cover:
 
 - `customer-c18-photo-initial-360.png`: initial and camera badge
 - `customer-c18-photo-refused-360.png`: a GIF refused
-- `customer-c18-photo-set-360.png`: the photo and "Remove photo"
+- `customer-c18-photo-set-360.png`: the photo on the card, no remove button
+- `customer-c18-photo-sheet-360.png`: the badge's sheet, "Choose a new photo" and "Remove photo"
 - `customer-c03-header-photo-360.png`: the photo in the Home header
 
 ## Risks and follow-ups

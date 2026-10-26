@@ -1,7 +1,8 @@
-// C-18 profile photo (D-259): the avatar shows the photo, else the initial; the camera badge picks a
-// new one (JPEG, PNG or WebP, at most 5 MB after the in-browser shrink) and "Remove photo" takes it
-// away. The server re-encodes it without metadata and shows it only to its owner.
-import { Button } from '@todayz/ui';
+// C-18 profile photo (D-259): the avatar shows the photo, else the initial. Without a photo the camera
+// badge opens the picker (JPEG, PNG or WebP, at most 5 MB after the in-browser shrink); with one it
+// opens a sheet to choose a new photo or remove it. The server re-encodes it without metadata and
+// shows it only to its owner.
+import { Button, Sheet } from '@todayz/ui';
 import { Camera, LoaderCircle, Trash2, UserRound } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
@@ -17,10 +18,11 @@ export function PhotoImage({ url, fallback, className }: { url: string | null | 
   return <img src={url} alt="" className={className ?? p.img} onError={() => setBroken(url)} />;
 }
 
-/** The account avatar with its camera badge and the hidden file picker. */
+/** The account avatar with its camera badge, the hidden file picker and, with a photo, its sheet. */
 export function PhotoAvatar({ me, photo }: { me: Me; photo: PhotoState }) {
   const intl = useIntl();
   const input = useRef<HTMLInputElement>(null);
+  const [sheet, setSheet] = useState(false);
   const initial = [...(me.name?.trim() ?? '')][0]?.toUpperCase();
   const has = Boolean(me.photoUrl);
 
@@ -46,7 +48,9 @@ export function PhotoAvatar({ me, photo }: { me: Me; photo: PhotoState }) {
         aria-label={intl.formatMessage({ id: has ? 'account.photo.change' : 'account.photo.add' })}
         aria-disabled={photo.busy !== null}
         onClick={() => {
-          if (photo.busy === null) input.current?.click();
+          if (photo.busy !== null) return;
+          if (has) setSheet(true);
+          else input.current?.click();
         }}
       >
         <Icon icon={Camera} />
@@ -59,12 +63,43 @@ export function PhotoAvatar({ me, photo }: { me: Me; photo: PhotoState }) {
         data-testid="photo-input"
         onChange={chosen}
       />
+      <Sheet
+        open={sheet}
+        onClose={() => setSheet(false)}
+        title={intl.formatMessage({ id: 'account.photo.sheet.title' })}
+        closeLabel={intl.formatMessage({ id: 'account.photo.sheet.close' })}
+      >
+        <div className={p.sheet}>
+          <Button
+            variant="soft"
+            block
+            icon={Camera}
+            onClick={() => {
+              setSheet(false);
+              input.current?.click();
+            }}
+          >
+            {intl.formatMessage({ id: 'account.photo.choose' })}
+          </Button>
+          <Button
+            variant="soft-danger"
+            block
+            icon={Trash2}
+            onClick={() => {
+              setSheet(false);
+              void photo.remove();
+            }}
+          >
+            {intl.formatMessage({ id: 'account.photo.remove' })}
+          </Button>
+        </div>
+      </Sheet>
     </span>
   );
 }
 
-/** "Remove photo" (only with a photo) and the upload state, spoken politely. */
-export function PhotoActions({ me, photo }: { me: Me; photo: PhotoState }) {
+/** The upload or remove state, spoken politely, and any error. */
+export function PhotoActions({ photo }: { photo: PhotoState }) {
   const intl = useIntl();
   const status =
     photo.busy === 'upload'
@@ -74,11 +109,6 @@ export function PhotoActions({ me, photo }: { me: Me; photo: PhotoState }) {
         : null;
   return (
     <div className={p.actions}>
-      {me.photoUrl && (
-        <Button size="sm" variant="ghost" icon={Trash2} disabled={photo.busy !== null} onClick={() => void photo.remove()}>
-          {intl.formatMessage({ id: 'account.photo.remove' })}
-        </Button>
-      )}
       <p role="status" className={p.status}>
         {status}
       </p>

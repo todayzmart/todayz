@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 // C-18 profile photo (D-259) at 360 px on the e2e build with a faked API (no stack): the initial,
 // adding a photo (register, PUT to storage with only Content-Type, confirm), the photo on Account
-// and in the Home header, a refused file, and removing it.
+// and in the Home header, a refused file, and removing it from the badge's sheet.
 // `TZ_QA_DIR=docs/qa/D-259 pnpm exec playwright test profile-photo.spec.ts` refreshes the committed shots.
 
 const PHONE = { width: 360, height: 780 } as const;
@@ -105,7 +105,7 @@ test('360: add, show and remove a profile photo (C-18, D-259)', async ({ page })
   await page.locator('input[type=file]').setInputFiles({ name: 'me.jpg', mimeType: 'image/jpeg', buffer: PORTRAIT });
   await expect(page.getByRole('button', { name: 'Change profile photo' })).toBeVisible();
   await expect(card.locator('img')).toHaveAttribute('src', GET_URL);
-  await expect(page.getByRole('button', { name: 'Remove photo' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove photo' })).toHaveCount(0);
   expect(api.puts).toHaveLength(1);
   expect(api.puts[0]?.['content-type']).toBe('image/jpeg');
   await shot(page, 'customer-c18-photo-set-360.png');
@@ -114,8 +114,13 @@ test('360: add, show and remove a profile photo (C-18, D-259)', async ({ page })
   await expect(page.locator('header a[href="/account"] img')).toHaveAttribute('src', GET_URL);
   await shot(page, 'customer-c03-header-photo-360.png');
 
+  // With a photo, the badge opens a sheet: choose a new one or remove it.
   await page.goto('/account');
-  await page.getByRole('button', { name: 'Remove photo' }).click();
+  await page.getByRole('button', { name: 'Change profile photo' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Profile photo' });
+  await expect(sheet.getByRole('button', { name: 'Choose a new photo' })).toBeVisible();
+  await shot(page, 'customer-c18-photo-sheet-360.png');
+  await sheet.getByRole('button', { name: 'Remove photo' }).click();
   await expect(page.getByRole('button', { name: 'Add a profile photo' })).toBeVisible();
   await expect(card.locator('img')).toHaveCount(0);
   await expect(card.getByText('A', { exact: true })).toBeVisible();

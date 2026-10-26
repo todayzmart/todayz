@@ -163,7 +163,7 @@ function Profile({ me, note, setNote, editing, setEditing, photo }: ProfileProps
               {me.name || me.phoneMasked}
             </h2>
             {me.name && <p className="tz-card-desc">{me.phoneMasked}</p>}
-            <PhotoActions me={me} photo={photo} />
+            <PhotoActions photo={photo} />
           </div>
           {!editing && (
             <IconButton

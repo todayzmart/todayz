@@ -414,6 +414,21 @@
     "review": "machine",
     "enHash": "c8f5eda8"
   },
+  "account.photo.sheet.title": {
+    "message": "प्रोफ़ाइल फ़ोटो",
+    "review": "machine",
+    "enHash": "33f385bb"
+  },
+  "account.photo.choose": {
+    "message": "नई फ़ोटो चुनें",
+    "review": "machine",
+    "enHash": "21cf25fa"
+  },
+  "account.photo.sheet.close": {
+    "message": "बंद करें",
+    "review": "machine",
+    "enHash": "bbfa773e"
+  },
   "account.photo.uploading": {
     "message": "आपकी फ़ोटो अपलोड हो रही है",
     "review": "machine",

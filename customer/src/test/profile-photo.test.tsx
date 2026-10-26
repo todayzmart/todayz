@@ -82,7 +82,8 @@ describe('C-18 profile photo', () => {
     await act(async () => choose(jpeg()));
     await screen.findByRole('button', { name: 'Change profile photo' });
     expect(document.querySelector(`img[src="${PHOTO}"]`)).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Remove photo' })).toBeInTheDocument();
+    // Remove lives in the badge's sheet, not on the card.
+    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull();
 
     const reg = calls.find((c) => c.path === '/v1/me/photo/uploads');
     expect(reg?.body).toEqual({ contentType: 'image/jpeg', sizeBytes: 4 });
@@ -142,12 +143,25 @@ describe('C-18 profile photo', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent("We couldn't update your photo. Try again.");
   });
 
-  it('removes the photo', async () => {
+  it('with a photo, the badge opens a sheet to choose a new one', async () => {
+    renderAt('/account', { returning: true, handlers: photoHandlers(PHOTO) });
+    await screen.findByText('Asha');
+    const click = vi.spyOn(screen.getByTestId<HTMLInputElement>('photo-input'), 'click');
+    fireEvent.click(screen.getByRole('button', { name: 'Change profile photo' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Profile photo' });
+    expect(click).not.toHaveBeenCalled();
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Choose a new photo' }));
+    expect(click).toHaveBeenCalled();
+  });
+
+  it('removes the photo from the sheet', async () => {
     const { calls } = renderAt('/account', { returning: true, handlers: photoHandlers(PHOTO) });
     await screen.findByText('Asha');
     expect(document.querySelector(`img[src="${PHOTO}"]`)).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Change profile photo' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Profile photo' });
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Remove photo' }));
+      fireEvent.click(within(sheet).getByRole('button', { name: 'Remove photo' }));
     });
     await screen.findByRole('button', { name: 'Add a profile photo' });
     expect(document.querySelector('img')).toBeNull();

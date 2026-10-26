@@ -414,6 +414,21 @@
     "review": "machine",
     "enHash": "c8f5eda8"
   },
+  "account.photo.sheet.title": {
+    "message": "ప్రొఫైల్ ఫోటో",
+    "review": "machine",
+    "enHash": "33f385bb"
+  },
+  "account.photo.choose": {
+    "message": "కొత్త ఫోటోను ఎంచుకోండి",
+    "review": "machine",
+    "enHash": "21cf25fa"
+  },
+  "account.photo.sheet.close": {
+    "message": "మూసివేయండి",
+    "review": "machine",
+    "enHash": "bbfa773e"
+  },
   "account.photo.uploading": {
     "message": "మీ ఫోటో అప్‌లోడ్ అవుతోంది",
     "review": "machine",

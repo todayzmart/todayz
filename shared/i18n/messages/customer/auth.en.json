@@ -337,7 +337,19 @@
   },
   "account.photo.remove": {
     "defaultMessage": "Remove photo",
-    "description": "Small button under the name on Account; deletes the profile photo"
+    "description": "Sheet button that deletes the profile photo"
+  },
+  "account.photo.sheet.title": {
+    "defaultMessage": "Profile photo",
+    "description": "Title of the sheet the camera badge opens when there is a photo"
+  },
+  "account.photo.choose": {
+    "defaultMessage": "Choose a new photo",
+    "description": "Sheet button that opens the file picker to replace the profile photo"
+  },
+  "account.photo.sheet.close": {
+    "defaultMessage": "Close",
+    "description": "Close button of the profile photo sheet"
   },
   "account.photo.uploading": {
     "defaultMessage": "Uploading your photo",

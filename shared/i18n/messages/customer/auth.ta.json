@@ -414,6 +414,21 @@
     "review": "machine",
     "enHash": "c8f5eda8"
   },
+  "account.photo.sheet.title": {
+    "message": "சுயவிவரப் படம்",
+    "review": "machine",
+    "enHash": "33f385bb"
+  },
+  "account.photo.choose": {
+    "message": "புதிய படத்தைத் தேர்ந்தெடுக்கவும்",
+    "review": "machine",
+    "enHash": "21cf25fa"
+  },
+  "account.photo.sheet.close": {
+    "message": "மூடு",
+    "review": "machine",
+    "enHash": "bbfa773e"
+  },
   "account.photo.uploading": {
     "message": "உங்கள் படம் பதிவேற்றப்படுகிறது",
     "review": "machine",
