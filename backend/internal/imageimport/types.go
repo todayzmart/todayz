@@ -28,11 +28,11 @@ import (
 // searched again, so a turned-down file does not come back. The run also
 // gives an approved kind's photo to products added since it was approved.
 
-// CommonsAPI is the Wikimedia Commons API; CommonsHost serves its files.
-const (
-	CommonsAPI  = "https://commons.wikimedia.org/w/api.php"
-	CommonsHost = "upload.wikimedia.org"
-)
+// CommonsAPI is the Wikimedia Commons API.
+const CommonsAPI = "https://commons.wikimedia.org/w/api.php"
+
+// CommonsHosts serve its files: originals on upload, resized copies on thumb.
+var CommonsHosts = []string{"upload.wikimedia.org", "thumb.wikimedia.org"}
 
 // CommonsPace spaces calls to Commons (its API asks bots to call one at a time).
 const CommonsPace = 1 * time.Second
@@ -115,7 +115,7 @@ func NewTypes(d Deps, o TypeOptions) (*TypeImporter, error) {
 	}
 	hosts := o.FileHosts
 	if hosts == nil {
-		hosts = []string{CommonsHost}
+		hosts = CommonsHosts
 	}
 	t := &TypeImporter{d: d, o: o, hosts: map[string]bool{}, ids: ids.NewGenerator()}
 	for _, h := range hosts {

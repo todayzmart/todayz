@@ -659,6 +659,10 @@
     "defaultMessage": "Open Products Facts",
     "description": "Image source: the Open Products Facts database (proper name)"
   },
+  "catalogue.images.source.type": {
+    "defaultMessage": "Item photo",
+    "description": "Image source: the shared photo picked for a kind of item (D-253)"
+  },
   "catalogue.images.match.barcode": {
     "defaultMessage": "Same barcode",
     "description": "How an imported image was matched: the same barcode"
@@ -802,6 +806,110 @@
   "catalogue.images.rejected": {
     "defaultMessage": "Image rejected.",
     "description": "Toast after rejecting an image"
+  },
+  "catalogue.tab.types": {
+    "defaultMessage": "Item photos",
+    "description": "A-08 tab: one stock photo per kind of item (D-253)"
+  },
+  "catalogue.types.filter": {
+    "defaultMessage": "Show",
+    "description": "A-08 item photos: filter label"
+  },
+  "catalogue.types.filter.pending": {
+    "defaultMessage": "Waiting for a pick",
+    "description": "A-08 item photos filter: kinds with candidates waiting"
+  },
+  "catalogue.types.filter.approved": {
+    "defaultMessage": "In use",
+    "description": "A-08 item photos filter: kinds showing a picked photo"
+  },
+  "catalogue.types.help": {
+    "defaultMessage": "Free-licence photos from Wikimedia Commons, one per kind of item. The picked photo shows on every product of that kind until its own pack photo is approved, with the credit.",
+    "description": "A-08 item photos: what the tab is for"
+  },
+  "catalogue.types.loading": {
+    "defaultMessage": "Loading item photos…",
+    "description": "A-08 item photos: loading"
+  },
+  "catalogue.types.empty": {
+    "defaultMessage": "No kinds of item are waiting for a photo.",
+    "description": "A-08 item photos: nothing waiting"
+  },
+  "catalogue.types.emptyApproved": {
+    "defaultMessage": "No item photos are in use yet.",
+    "description": "A-08 item photos: nothing approved"
+  },
+  "catalogue.types.meta": {
+    "defaultMessage": "{category} · {n, plural, one {# product} other {# products}} · {showing, plural, =0 {none showing it} other {# showing it}}",
+    "description": "A-08 item photos: a kind's category, its product count and how many show the photo"
+  },
+  "catalogue.types.samples": {
+    "defaultMessage": "For example: {names}",
+    "description": "A-08 item photos: a few product names of this kind"
+  },
+  "catalogue.types.alt": {
+    "defaultMessage": "Candidate {rank} for {name}",
+    "description": "Alt text of a candidate item photo"
+  },
+  "catalogue.types.rank": {
+    "defaultMessage": "Match {rank}",
+    "description": "A-08 item photos: the search's order, 1 is best"
+  },
+  "catalogue.types.inUse": {
+    "defaultMessage": "In use",
+    "description": "A-08 item photos: the picked photo"
+  },
+  "catalogue.types.commonsPage": {
+    "defaultMessage": "Commons page",
+    "description": "Link to the photo's Wikimedia Commons page (licence and author)"
+  },
+  "catalogue.types.pick": {
+    "defaultMessage": "Use this photo",
+    "description": "A-08 item photos: pick a candidate"
+  },
+  "catalogue.types.turnDown": {
+    "defaultMessage": "Not right",
+    "description": "A-08 item photos: turn a candidate down"
+  },
+  "catalogue.types.takeDown": {
+    "defaultMessage": "Take down",
+    "description": "A-08 item photos: remove the picked photo"
+  },
+  "catalogue.types.pickTitle": {
+    "defaultMessage": "Use this photo for {name}?",
+    "description": "Dialog title"
+  },
+  "catalogue.types.pickBody": {
+    "defaultMessage": "It goes on the image host and shows on the {n, plural, one {# product} other {# products}} of this kind that have no photo of their own. The other candidates are turned down.",
+    "description": "Dialog body"
+  },
+  "catalogue.types.turnDownTitle": {
+    "defaultMessage": "Turn this photo down for {name}?",
+    "description": "Dialog title"
+  },
+  "catalogue.types.turnDownBody": {
+    "defaultMessage": "Customers never see it, and it is not offered again.",
+    "description": "Dialog body"
+  },
+  "catalogue.types.takeDownTitle": {
+    "defaultMessage": "Take the photo off {name}?",
+    "description": "Dialog title"
+  },
+  "catalogue.types.takeDownBody": {
+    "defaultMessage": "{n, plural, =0 {No product shows it now.} one {# product goes back to the placeholder.} other {# products go back to the placeholder.}} Pack photos are not touched.",
+    "description": "Dialog body"
+  },
+  "catalogue.types.picked": {
+    "defaultMessage": "Photo in use for {name} on {n, plural, one {# product} other {# products}}",
+    "description": "Toast"
+  },
+  "catalogue.types.turnedDown": {
+    "defaultMessage": "Photo turned down",
+    "description": "Toast"
+  },
+  "catalogue.types.takenDown": {
+    "defaultMessage": "Photo taken off {n, plural, one {# product} other {# products}}",
+    "description": "Toast"
   },
   "catalogue.product.noImage": {
     "defaultMessage": "No image yet. Customers see the initials.",

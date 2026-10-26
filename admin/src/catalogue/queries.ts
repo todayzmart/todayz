@@ -2,6 +2,7 @@ import {
   approveAdminPendingProduct,
   approveAdminProductImage,
   approveAdminProductImages,
+  approveAdminTypePhoto,
   confirmAdminProductImage,
   createAdminProductImage,
   createAdminCategory,
@@ -12,11 +13,13 @@ import {
   listAdminCategories,
   listAdminPendingProducts,
   listAdminProductImages,
+  listAdminTypePhotos,
   listAdminProducts,
   listAdminSynonyms,
   mergeAdminPendingProduct,
   rejectAdminPendingProduct,
   rejectAdminProductImage,
+  rejectAdminTypePhoto,
   updateAdminCategory,
   updateAdminProduct,
 } from '@todayz/api-client/gen/admin-catalogue/admin-catalogue';
@@ -40,6 +43,7 @@ export const productKey = (id: string) => ['admin', 'product', id] as const;
 export const pendingKey = ['admin', 'pending-products'] as const;
 export const categoriesKey = ['admin', 'categories'] as const;
 export const synonymsKey = (q: string) => ['admin', 'synonyms', q] as const;
+export const typeKindsKey = (status: 'pending' | 'approved') => ['admin', 'type-photos', status] as const;
 export const imagesKey = (source: AdminProductImageSource | undefined) => ['admin', 'product-images', source ?? ''] as const;
 
 export function useProducts(f: ProductFilter) {
@@ -202,6 +206,32 @@ export function useDecideImage(id: string, productId: string) {
   return useMutation({
     mutationFn: (d: ImageDecision) => (d.kind === 'approve' ? approveAdminProductImage(id, note(d.reason)) : rejectAdminProductImage(id, { reason: d.reason })),
     onSettled: () => refreshImages(qc, [productId]),
+  });
+}
+
+/** Kinds of item with Commons photos waiting for a pick, or showing their picked photo (D-253). */
+export function useTypeKinds(status: 'pending' | 'approved') {
+  return useInfiniteQuery({
+    queryKey: typeKindsKey(status),
+    queryFn: ({ pageParam }) => listAdminTypePhotos({ status, limit: PAGE, ...(pageParam ? { cursor: pageParam } : {}) }),
+    initialPageParam: '',
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
+/**
+ * Picks a kind's photo (it goes to the image host and onto every product of the kind without one)
+ * or turns one down; turning down the picked photo takes it off those products again.
+ */
+export function useDecideTypePhoto(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (d: ImageDecision) => (d.kind === 'approve' ? approveAdminTypePhoto(id, note(d.reason)) : rejectAdminTypePhoto(id, { reason: d.reason })),
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: ['admin', 'type-photos'] });
+      void qc.invalidateQueries({ queryKey: ['admin', 'products'] });
+      void qc.invalidateQueries({ queryKey: ['admin', 'product'] });
+    },
   });
 }
 
