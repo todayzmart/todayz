@@ -46,4 +46,17 @@ describe('StoreCard', () => {
     expect(screen.getByRole('link').tagName).toBe('A');
     expect(container.querySelector('.tz-ui-meta-tags')).toBeNull();
   });
+
+  it('feature layout puts the photo across the top, with no chevron', () => {
+    const { container } = render(
+      <StoreCard layout="feature" name="Sai Store" initials="SS" tint="green" imageUrl="https://img.example/stores/s/1.jpg" meta={['0.1 km']} href="/s/sai" />,
+    );
+    const link = screen.getByRole('link');
+    expect(link).toHaveClass('tz-scard', 'tz-scard-feature');
+    expect(container.querySelector('.tz-scard-photo img')).toHaveAttribute('src', 'https://img.example/stores/s/1.jpg');
+    expect(container.querySelector('.tz-ui-chevron')).toBeNull();
+    fireEvent.error(container.querySelector('img') as HTMLImageElement);
+    expect(screen.getByText('SS')).toHaveClass('tz-scard-photo');
+    expect(screen.getByText('SS')).toHaveAttribute('data-tint', 'green');
+  });
 });

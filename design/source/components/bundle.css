@@ -397,7 +397,8 @@ body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 2
 .tz-list-text b { font: 600 15px/20px var(--font-sans); color: var(--ink); }
 .tz-list-text small { font: 400 13px/18px var(--font-sans); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tz-list-row > .tz-ico:last-child { color: var(--ink-3); }
-a.tz-list-row:hover { background: var(--surface-subtle); margin: 0 calc(-1 * var(--space-4)); padding-inline: var(--space-4); }
+.tz-list.tz-list-row:hover { background: var(--surface-subtle); }
+.tz-list a.tz-list-row:hover { background: var(--surface-subtle); margin: 0 calc(-1 * var(--space-4)); padding-inline: var(--space-4); }
 /* Section label: letter-spaced, centred between hairlines that fade out */
 .tz-label-rule { display: flex; align-items: center; gap: var(--space-3); margin: 0; font: 700 12px/16px var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
 .tz-label-rule::before, .tz-label-rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--line-control)); }
@@ -408,7 +409,7 @@ a.tz-list-row:hover { background: var(--surface-subtle); margin: 0 calc(-1 * var
 [data-skin="bright"] :is(.tz-card, .tz-scard, .tz-pcard, .tz-ocard, .tz-map-card, .tz-list) { border-color: transparent; box-shadow: var(--shadow-card); }
 [data-skin="bright"] .tz-page-title { font: 800 26px/30px var(--font-display); letter-spacing: -0.01em; }
 [data-skin="bright"] .tz-card-title { font: 700 16px/22px var(--font-sans); }
-[data-skin="bright"] .tz-btn { font-weight: 600; }
+[data-skin="bright"] .tz-btn { font-weight: 600; text-decoration: none; }
 [data-skin="bright"] .tz-btn-primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
 [data-skin="bright"] .tz-btn-primary:hover { background: var(--brand-strong); border-color: var(--brand-strong); }
 [data-skin="bright"] .tz-btn-soft-danger { background: var(--surface); border-color: var(--line-control); box-shadow: var(--shadow-xs); }
@@ -420,3 +421,17 @@ a.tz-list-row:hover { background: var(--surface-subtle); margin: 0 calc(-1 * var
 [data-skin="bright"] .tz-bnav a { position: relative; color: var(--ink-2); font-weight: 600; }
 [data-skin="bright"] .tz-bnav a[aria-current="page"] { color: var(--brand); }
 [data-skin="bright"] .tz-bnav a[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 50%; width: 28px; height: 3px; margin-left: -14px; border-radius: 0 0 3px 3px; background: var(--brand); }
+[data-skin="bright"] .tz-search { min-height: 48px; border-radius: var(--radius-lg); border-color: var(--line); box-shadow: var(--shadow-card); color: var(--brand); }
+[data-skin="bright"] .tz-search input { font-weight: 500; }
+[data-skin="bright"] .tz-cats { padding: 2px 2px var(--space-2); gap: var(--space-2); }
+[data-skin="bright"] .tz-cat { width: 76px; font-weight: 600; color: var(--ink-2); }
+[data-skin="bright"] .tz-cat i { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: var(--shadow-card); }
+[data-skin="bright"] .tz-tag-offer { border-color: transparent; background: var(--info-soft); color: var(--info); font-weight: 600; }
+
+/* Feature shop card: the shop's photo across the top, then the name, meta and tags (customer Home, D-249). Without a photo, the initials sit on the category tint. */
+.tz-scard-feature { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; border-radius: var(--radius-xl); }
+.tz-scard-photo { height: 152px; display: grid; place-items: center; background: var(--t-bg, var(--surface-sunken)); color: var(--t-ink, var(--ink-2)); font: 800 40px/1 var(--font-display); }
+.tz-scard-photo:not(:has(img)) { height: 96px; }
+.tz-scard-photo img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.tz-scard-body { min-width: 0; padding: var(--space-3) var(--space-4) var(--space-4); }
+.tz-scard-feature .tz-scard-name { font: 800 18px/24px var(--font-display); letter-spacing: -0.01em; }

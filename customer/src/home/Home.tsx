@@ -5,7 +5,7 @@ import { getDiscoverSummary, listDiscoverStores } from '@todayz/api-client/gen/d
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
-import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
+import { ChevronRight, MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
@@ -52,7 +52,7 @@ export function Home({ category }: { category?: string | undefined }) {
 
   return (
     <>
-      <header className={`tz-hero-wash ${styles.hero}`}>
+      <header className={styles.hero}>
         <div className={styles.brandRow}>
           <span className="tz-side-brand">
             <img className={styles.mark} src="/icons/mark-96.png" alt="" width={28} height={28} />
@@ -67,6 +67,9 @@ export function Home({ category }: { category?: string | undefined }) {
         </div>
         <h1 className={styles.heroTitle}>{intl.formatMessage({ id: 'shell.hero.title' })}</h1>
         <p className={styles.heroSub}>{intl.formatMessage({ id: 'shell.hero.sub' })}</p>
+      </header>
+      {/* Sticky under the header, as the big delivery apps do: search stays one tap away while the list scrolls. */}
+      <div className={styles.searchBar}>
         <form
           role="search"
           onSubmit={(e) => {
@@ -83,15 +86,18 @@ export function Home({ category }: { category?: string | undefined }) {
             enterKeyHint="search"
           />
         </form>
-      </header>
+      </div>
       <div className={styles.body}>
         <LimitBanner />
-        <Link to="/baskets" className={`tz-card ${styles.basketEntry}`}>
-          <Icon icon={ShoppingBasket} />
-          <span className={styles.basketText}>
-            <span className="tz-card-title">{intl.formatMessage({ id: 'basket.entry' })}</span>
-            <span className="tz-meta">{intl.formatMessage({ id: 'basket.entry.body' })}</span>
+        <Link to="/baskets" className={`tz-list tz-list-row ${styles.basketEntry}`}>
+          <span className="tz-list-icon" data-tint="peach">
+            <Icon icon={ShoppingBasket} />
           </span>
+          <span className="tz-list-text">
+            <b>{intl.formatMessage({ id: 'basket.entry' })}</b>
+            <small>{intl.formatMessage({ id: 'basket.entry.body' })}</small>
+          </span>
+          <Icon icon={ChevronRight} />
         </Link>
         {coords.status === 'none' && (
           <EmptyState
@@ -186,7 +192,10 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
       />
 
       {categories.data && categories.data.items.length > 0 && (
-        <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.categories.label' })}>
+        <section className={styles.section} aria-labelledby="home-cats">
+          <h2 id="home-cats" className="tz-label-rule">
+            {intl.formatMessage({ id: 'home.categories.label' })}
+          </h2>
           <CategoryRow
             label={intl.formatMessage({ id: 'home.categories.label' })}
             LinkComponent={RouterLink}
@@ -235,7 +244,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
       </section>
 
       <section className={styles.section} aria-labelledby="home-shops">
-        <h2 id="home-shops" className={styles.sectionTitle}>
+        <h2 id="home-shops" className="tz-label-rule">
           {intl.formatMessage({ id: 'home.shops.title' })}
         </h2>
         <div aria-busy={stores.isPending} className={styles.list}>
@@ -247,7 +256,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
             </>
           )}
           {items.map((s) => (
-            <StoreCard key={s.storeSlug} {...cardProps(s)} />
+            <StoreCard key={s.storeSlug} layout="feature" {...cardProps(s)} />
           ))}
         </div>
         {stores.isError && (

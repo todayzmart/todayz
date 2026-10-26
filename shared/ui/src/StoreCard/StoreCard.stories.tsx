@@ -42,6 +42,8 @@ export const LongName: Story = {
   args: { ...lakshmi, name: 'Sri Venkateshwara Medical and General Stores', initials: 'SV', tint: 'rose' },
 };
 
+export const Feature: Story = { args: { ...lakshmi, layout: 'feature', tint: 'green' } };
+
 export const DesignReference: Story = {
   ...designRef('StoreCard', 196),
   render: () => (

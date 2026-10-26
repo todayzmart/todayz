@@ -51,6 +51,10 @@ The customer app sets `data-skin="bright"` on its root, and the skin in `compone
 - **Page titles** are Anek 800 at 26px.
 - **Settings lists** (`tz-list`, `tz-list-row`, `tz-list-icon`, `tz-list-text`) are a white card of rows. Each row has a round tinted icon (`data-tint`), a label with its value, and a chevron when it opens something.
 - **Section labels** (`tz-label-rule`) are letter-spaced capitals centred between hairlines that fade out.
+- **Search** is 48px tall with a 12px corner, a soft shadow and a `brand` search icon.
+- **Category tiles** are 64px circles with a white ring and a soft shadow.
+- **Offer tags** (cashback) are `info` text on `info-soft`.
+- **Home's shop cards** use the feature layout (`StoreCard layout="feature"`, `tz-scard-feature`): the shop's photo across the top, then the name in Anek 800. Without a photo, the initials sit on a shorter band in the category tint. Search and the map sheet keep the row layout.
 
 ## Typography
 

@@ -4,8 +4,20 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-4) var(--space-6);
+  padding: var(--space-4) var(--space-4) var(--space-2);
   padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  background: var(--surface);
+}
+
+/* White band under the header; it sticks to the top once the header scrolls away. */
+.searchBar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
 .brandRow {
@@ -24,6 +36,7 @@
 
 .placeChip :global(svg) {
   flex: none;
+  color: var(--brand);
 }
 
 .placeText {
@@ -47,6 +60,7 @@
 .heroTitle {
   margin: 0;
   font: var(--type-display);
+  font-weight: 800;
   letter-spacing: var(--type-display-tracking);
   color: var(--ink);
 }
@@ -69,24 +83,29 @@
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
   margin: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
+/* One card, three counts split by hairlines. */
 .stat {
   display: flex;
   flex-direction: column-reverse;
-  gap: var(--space-1);
-  padding: var(--space-3);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--line);
 }
 
 .statValue {
   margin: 0;
-  font: var(--type-kpi);
-  letter-spacing: var(--type-kpi-tracking);
+  font: 800 22px/26px var(--font-display);
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -102,13 +121,6 @@
   gap: var(--space-3);
 }
 
-.sectionTitle {
-  margin: 0;
-  font: var(--type-headline);
-  letter-spacing: var(--type-headline-tracking);
-  color: var(--ink);
-}
-
 .filterNote {
   display: flex;
   align-items: center;
@@ -118,20 +130,10 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
-/* C-22 entry (W2-14). */
+/* C-22 entry (W2-14): one settings-list row on its own. */
 .basketEntry {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.basketText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  padding-inline: var(--space-4);
 }

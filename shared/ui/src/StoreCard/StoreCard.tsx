@@ -24,43 +24,59 @@ export interface StoreCardProps {
   tags?: readonly StoreTag[] | undefined;
   href: string;
   LinkComponent?: LinkComponent | undefined;
+  /** row: avatar, text and chevron (search, map sheet). feature: the photo across the top, then the text (customer Home, D-249). */
+  layout?: 'row' | 'feature' | undefined;
   className?: string | undefined;
 }
 
 /** Shop row for search results and the map sheet (tz-scard); the whole card is one link. */
-export function StoreCard({ name, initials, tint, imageUrl, meta, tags = [], href, LinkComponent, className }: StoreCardProps) {
+export function StoreCard({ name, initials, tint, imageUrl, meta, tags = [], href, LinkComponent, layout = 'row', className }: StoreCardProps) {
   const Link = LinkComponent ?? 'a';
   const [failed, setFailed] = useState<string | undefined>();
   const photo = imageUrl !== undefined && imageUrl !== failed ? imageUrl : undefined;
+  const picture = photo ? (
+    <img className="tz-ui-thumb-img" src={photo} alt="" loading="lazy" decoding="async" onError={() => setFailed(photo)} />
+  ) : (
+    initials
+  );
+  const text = (
+    <div className={layout === 'feature' ? 'tz-scard-body' : 'tz-ui-minw0'}>
+      <div className="tz-scard-name">{name}</div>
+      <div className="tz-meta">
+        {meta.map((m, i) => (
+          <span key={i}>{m}</span>
+        ))}
+      </div>
+      {tags.length > 0 && (
+        <div className="tz-meta tz-ui-meta-tags">
+          {tags.map((t, i) => (
+            <span
+              key={i}
+              className={cx('tz-tag', t.kind === 'open' && 'tz-tag-open', t.kind === 'offer' && 'tz-tag-offer')}
+            >
+              {t.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+  if (layout === 'feature') {
+    return (
+      <Link href={href} className={cx('tz-scard', 'tz-scard-feature', 'tz-ui-plainlink', className)}>
+        <div className={cx('tz-scard-photo', photo && 'tz-ui-avatar-photo')} data-tint={tint} aria-hidden="true">
+          {picture}
+        </div>
+        {text}
+      </Link>
+    );
+  }
   return (
     <Link href={href} className={cx('tz-scard', 'tz-ui-plainlink', className)}>
       <div className={cx('tz-avatar', photo && 'tz-ui-avatar-photo')} data-tint={tint} aria-hidden="true">
-        {photo ? (
-          <img className="tz-ui-thumb-img" src={photo} alt="" loading="lazy" decoding="async" onError={() => setFailed(photo)} />
-        ) : (
-          initials
-        )}
+        {picture}
       </div>
-      <div className="tz-ui-minw0">
-        <div className="tz-scard-name">{name}</div>
-        <div className="tz-meta">
-          {meta.map((m, i) => (
-            <span key={i}>{m}</span>
-          ))}
-        </div>
-        {tags.length > 0 && (
-          <div className="tz-meta tz-ui-meta-tags">
-            {tags.map((t, i) => (
-              <span
-                key={i}
-                className={cx('tz-tag', t.kind === 'open' && 'tz-tag-open', t.kind === 'offer' && 'tz-tag-offer')}
-              >
-                {t.label}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+      {text}
       <span className="tz-ui-chevron">
         <Icon icon={ChevronRight} />
       </span>
