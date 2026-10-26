@@ -51,6 +51,8 @@ type searchReq struct {
 	Cursor    *string
 	// Parse is false when the customer turned the refine-chip parser off (parse=false).
 	Parse bool
+	// skipMiss is set by refine when the query was only chips, so it has no words to miss.
+	skipMiss bool
 }
 
 func searchReqFrom(p discoverapi.SearchDiscoverParams) searchReq {
@@ -151,9 +153,18 @@ func (s *Service) Search(ctx context.Context, p discoverapi.SearchDiscoverParams
 	if err != nil {
 		return out, internal(err)
 	}
-	stores, found, err := s.find(ctx, q, req, norm, rs, start)
+	stores, found, miss, err := s.find(ctx, q, req, norm, rs, start)
 	if err != nil {
 		return out, internal(err)
+	}
+	if !out.RefineHint && miss.possible && req.Parse && !req.skipMiss && found {
+		// The last test of a synonym miss, asked only when nothing else recognised the words:
+		// is there an active master product with them, in stock nearby or not (D-238).
+		known, err := q.CatalogueKnows(ctx, miss.tsq)
+		if err != nil {
+			return out, internal(err)
+		}
+		out.RefineHint = !known
 	}
 	m := modes{pickup: req.Pickup, delivery: req.Delivery}
 	if found {
@@ -199,18 +210,30 @@ func (s *Service) Search(ctx context.Context, p discoverapi.SearchDiscoverParams
 	return out, nil
 }
 
+// synonymMiss is what find knows of refineHint's second half (01 §11.1, D-238). possible is
+// true when the synonym table matched none of the query's phrases and nothing else in the
+// search recognised the words: no listing, no trigram product, no category name, not a
+// barcode and not one product's page. The caller makes the last test, whether the master
+// catalogue holds the words (CatalogueKnows with tsq), so only a search that gets that
+// far pays for it.
+type synonymMiss struct {
+	possible bool
+	tsq      string
+}
+
 // find runs the filter-first query and the request's filters. found is false
 // when a filter names a brand or category that does not exist (no results).
-func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, norm string, rs rankSettings, now time.Time) ([]*candStore, bool, error) {
+func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, norm string, rs rankSettings, now time.Time) ([]*candStore, bool, synonymMiss, error) {
+	var miss synonymMiss
 	pq := parse(norm)
 	core := pq.core()
-	slots, err := expand(ctx, q, pq.words)
+	slots, hit, err := expand(ctx, q, pq.words)
 	if err != nil {
-		return nil, false, err
+		return nil, false, miss, err
 	}
 	cats, err := loadCategories(ctx, q)
 	if err != nil {
-		return nil, false, err
+		return nil, false, miss, err
 	}
 	params := searchdb.SearchItemsParams{
 		Tsq: tsquery(slots), Q: core, Lng: req.Lng, Lat: req.Lat, RadiusM: float64(req.RadiusM),
@@ -222,31 +245,31 @@ func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, 
 	if req.Category != "" {
 		tree, ok := cats.slugTree(req.Category)
 		if !ok {
-			return nil, false, nil
+			return nil, false, miss, nil
 		}
 		params.CategoryIds = tree
 	}
 	if req.Brand != "" {
 		id, err := q.BrandBySlug(ctx, req.Brand)
 		if db.IsNoRows(err) {
-			return nil, false, nil
+			return nil, false, miss, nil
 		}
 		if err != nil {
-			return nil, false, err
+			return nil, false, miss, err
 		}
 		params.BrandID = id
 	}
 	if req.ProductID != nil {
 		id, perr := ids.Parse(*req.ProductID)
 		if perr != nil { // a product id that is no id names no product: no results
-			return nil, false, nil //nolint:nilerr // no results is the answer
+			return nil, false, miss, nil //nolint:nilerr // no results is the answer
 		}
 		params.ProductID = ids.UUID(id)
 	}
 	if utf8.RuneCountInString(core) >= typoMinRunes {
 		typo, err := q.TypoProducts(ctx, searchdb.TypoProductsParams{Q: core, Lim: typoLimit})
 		if err != nil {
-			return nil, false, err
+			return nil, false, miss, err
 		}
 		params.TypoIds = typo
 	}
@@ -256,7 +279,7 @@ func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, 
 	if isBarcode(norm) {
 		codes, err := q.ProductsByBarcode(ctx, norm)
 		if err != nil {
-			return nil, false, err
+			return nil, false, miss, err
 		}
 		for _, id := range codes {
 			exact[id.Bytes] = true
@@ -265,14 +288,17 @@ func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, 
 	}
 	rows, err := q.SearchItems(ctx, params)
 	if err != nil {
-		return nil, false, err
+		return nil, false, miss, err
 	}
 	named := make(map[[16]byte]bool, len(params.TypoIds))
 	for _, id := range params.TypoIds {
 		named[id.Bytes] = true
 	}
+	miss.possible = !hit && len(rows) == 0 && len(params.TypoIds) == 0 && len(params.MatchCategoryIds) == 0 &&
+		req.ProductID == nil && !isBarcode(norm)
+	miss.tsq = params.Tsq
 	stores, err := s.group(ctx, rows, req, pq, core, exact, named, rs, now)
-	return stores, true, err
+	return stores, true, miss, err
 }
 
 // group turns the rows into stores with their items, applying the filters

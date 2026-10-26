@@ -137,6 +137,8 @@ func checkIndexes(t *testing.T, f *qa) {
 	ctx := f.ctx
 	_, err := svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "Amul Butter 100 g", Lat: qaLat, Lng: qaLng})
 	require.NoError(t, err)
+	_, err = svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "kuch meetha", Lat: qaLat, Lng: qaLng}) // a synonym miss: CatalogueKnows
+	require.NoError(t, err)
 	_, err = svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "8901262150019", Lat: qaLat, Lng: qaLng})
 	require.NoError(t, err)
 	_, err = svc.Summary(ctx, discoverapi.GetDiscoverSummaryParams{Lat: qaLat, Lng: qaLng})
@@ -165,6 +167,7 @@ func checkIndexes(t *testing.T, f *qa) {
 		"TypoProducts":          {"ix_products_name_trgm"},
 		"SuggestProducts":       {"ix_products_name_trgm"},
 		"ProductsByWords":       {"ix_products_search"},
+		"CatalogueKnows":        {"ix_products_search"},
 		"ProductsByBarcode":     {"ix_products_barcodes"},
 		"StoreItemsPage":        {"store_items_store"},
 	}

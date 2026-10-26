@@ -190,6 +190,14 @@ SELECT id, parent_id, slug, names FROM categories ORDER BY sort, slug;
 -- name: BrandBySlug :one
 SELECT id FROM brands WHERE slug = @slug;
 
+-- name: CatalogueKnows :one
+-- Whether any active master product's name or variant holds the words of tsq (the
+-- catalogue, not the stock nearby). Search asks it only for a query the synonym
+-- table missed and that found no listing, to decide refineHint (D-238).
+SELECT EXISTS (
+  SELECT 1 FROM products WHERE status = 'active' AND search @@ to_tsquery('simple', @tsq::text)
+)::bool AS known;
+
 -- name: SynonymsFor :many
 -- Synonym rows touching any of the phrases, either way round.
 SELECT term, synonym, product_id FROM product_synonyms

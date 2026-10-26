@@ -262,7 +262,7 @@ DiscoverSearchResult:
         $ref: "#/DiscoverChip"
     refineHint:
       type: boolean
-      description: True when the app may offer search assist (D-101).
+      description: True when the app may offer search assist (D-101, D-231, D-238).
     nextCursor:
       $ref: ./common.yaml#/NextCursor
     serverNow:
