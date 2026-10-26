@@ -42,8 +42,9 @@ WHERE p.id = @product_id
 
 -- name: TypeKinds :many
 -- Kinds of item (category, item_type_key) with a product that has no image,
--- and no type photo yet in any state (a kind is searched once, so a
--- turned-down candidate does not come back), most products first.
+-- and no type photo waiting or picked, most products first. A kind whose
+-- candidates were all turned down is searched again; its turned-down files
+-- are skipped (TypeKindSources).
 SELECT p.category_id, item_type_key(p.name, br.name)::text AS type_key, c.slug AS category_slug,
   coalesce(pc.slug, '')::text AS parent_slug, count(*)::int AS products
 FROM products p
@@ -53,10 +54,26 @@ LEFT JOIN brands br ON br.id = p.brand_id
 WHERE p.status IN ('active', 'pending_review') AND p.image_id IS NULL
   AND item_type_key(p.name, br.name) IS NOT NULL
   AND NOT EXISTS (SELECT 1 FROM type_photos tp
-    WHERE tp.category_id = p.category_id AND tp.type_key = item_type_key(p.name, br.name))
+    WHERE tp.category_id = p.category_id AND tp.type_key = item_type_key(p.name, br.name)
+      AND tp.status IN ('pending', 'approved'))
 GROUP BY p.category_id, item_type_key(p.name, br.name), c.slug, pc.slug
 ORDER BY count(*) DESC, 2, 1
 LIMIT @lim;
+
+-- name: TypeKindSources :many
+-- Commons files a kind already has in any state, so a turned-down file is
+-- not offered again.
+SELECT source_ref FROM type_photos WHERE category_id = @category_id AND type_key = @type_key::text;
+
+-- name: ClearPendingTypePhotos :many
+-- `images types --again`: drops the candidates nobody has decided on, of
+-- kinds with no picked photo, so those kinds are searched again. Turned-down
+-- rows stay, so their files still do not come back.
+DELETE FROM type_photos tp
+WHERE tp.status = 'pending'
+  AND NOT EXISTS (SELECT 1 FROM type_photos a
+    WHERE a.category_id = tp.category_id AND a.type_key = tp.type_key AND a.status = 'approved')
+RETURNING tp.object_key;
 
 -- name: InsertTypePhoto :execrows
 INSERT INTO type_photos (id, category_id, type_key, rank, object_key, content_type, size_bytes,

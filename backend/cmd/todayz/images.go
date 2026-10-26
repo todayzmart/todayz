@@ -110,11 +110,12 @@ func runImageTypes(ctx context.Context, args []string, getenv func(string) strin
 	fs := flag.NewFlagSet("images types", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	dry := fs.Bool("dry-run", false, "search only; copy and store nothing")
+	again := fs.Bool("again", false, "first drop waiting candidates, so their kinds are searched again")
 	limit := fs.Int("limit", 20, "kinds to search")
 	contact := fs.String("contact", "https://todayz.in", "contact in the User-Agent")
 	report := fs.String("report", "", "write a Markdown report to this file")
 	if err := fs.Parse(args); err != nil || fs.NArg() > 0 {
-		return usageError{msg: "images types takes [--dry-run] [--limit N] [--contact URL] [--report FILE]"}
+		return usageError{msg: "images types takes [--dry-run] [--again] [--limit N] [--contact URL] [--report FILE]"}
 	}
 	if *limit < 1 || *limit > maxImportLimit {
 		return usageError{msg: "--limit must be between 1 and 20000"}
@@ -147,14 +148,14 @@ func runImageTypes(ctx context.Context, args []string, getenv func(string) strin
 		deps.Store = st
 	}
 	ti, err := imageimport.NewTypes(deps, imageimport.TypeOptions{
-		UserAgent: imageimport.UserAgent(buildinfo.Get().Version, *contact), Limit: *limit, DryRun: *dry,
+		UserAgent: imageimport.UserAgent(buildinfo.Get().Version, *contact), Limit: *limit, DryRun: *dry, Again: *again,
 	})
 	if err != nil {
 		return err
 	}
 	log.InfoContext(ctx, "type photos started", slog.Int("limit", *limit), slog.Bool("dry_run", *dry))
 	rep, runErr := ti.Run(ctx)
-	log.InfoContext(ctx, "type photos done", slog.Int("filled", rep.Filled), slog.Int("searched", rep.Searched),
+	log.InfoContext(ctx, "type photos done", slog.Int("filled", rep.Filled), slog.Int("cleared", rep.Cleared), slog.Int("searched", rep.Searched),
 		slog.Int("found", len(rep.Found)), slog.Int("not_found", len(rep.Missed)),
 		slog.Int("medicines", len(rep.Medicines)), slog.Int("failed", len(rep.Failed)))
 	if *report != "" {
