@@ -24,7 +24,13 @@ not this one.
 
 Ticks before the jobs platform first ran on this database are never reported.
 
-## First three checks
+## First five minutes
+
+1. A-21 Jobs: which kind is *Missed*, and was it paused?
+2. Dashboard 15: one kind or many? Many means the worker is down or not leader.
+3. Check the worker is up (`/readyz`, Beanstalk health in the cloud). If it is down, see [Worker unhealthy](worker-unhealthy.md).
+
+## Diagnosis
 
 1. **A-21 Jobs** (https://admin.todayz.localhost/jobs): the kind shows *Missed*. Check:
    - its schedule and the last run
@@ -39,7 +45,7 @@ Ticks before the jobs platform first ran on this database are never reported.
    - Is it the leader? River's periodic scheduling runs on the elected leader only.
    - Did a deploy or restart happen at the tick?
 
-## Likely causes
+### Likely causes
 
 - **The worker was down, restarting or draining at the tick**, so no instance enqueued it. This
   is the most common cause, for example a deploy at 02:30 for a daily kind.
@@ -53,7 +59,7 @@ Ticks before the jobs platform first ran on this database are never reported.
 - **The clock moved.** In local and test, the test clock was advanced past ticks; the watchdog
   sees the injected time. This is expected there; do not page.
 
-## Fix
+## Mitigation
 
 - Restore the worker and the queue first: restart it, scale it, or free database connections.
 - Then **Run now** on A-21 with the missed period key, so the period is covered:
@@ -73,9 +79,17 @@ Ticks before the jobs platform first ran on this database are never reported.
 
 The alert clears once a run of the kind succeeds (the next tick or your Run now).
 
-## Who to tell
+## Escalation
+
+**Level:** `money` kinds: SEV2 (SEV1 if payouts or the ledger are due today). Other kinds: SEV3 ([Severity levels](../ops/severity.md)).
 
 - **The kind's owner** (A-21) if the cause was in the kind.
 - **The lead**, if the worker or the database was the cause.
 - **critical** (`money`): the finance admin, with the periods that were run late, because
   settlement and payout reports for those periods may have gone out late.
+
+## Follow-up
+
+- If a deploy hit the tick, move deploys away from that time or check the kind catches up on its own.
+- If the queue was backed up, see [Job backlog](queue-job-backlog.md) follow-ups.
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.

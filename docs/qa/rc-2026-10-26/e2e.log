@@ -1,0 +1,6 @@
+==> gen: gen-backend
+/bin/bash: sqlc: command not found
+make[3]: *** [gen-backend] Error 127
+make gen: step gen-backend failed (exit 2)
+make[2]: *** [gen] Error 2
+make[1]: *** [e2e] Error 2

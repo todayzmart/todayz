@@ -1,0 +1,104 @@
+==> security: security-gitleaks
+5:46AM INF 753 commits scanned.
+5:46AM INF scanned ~29612286 bytes (29.61 MB) in 5.3s
+5:46AM INF no leaks found
+ci: gitleaks: history clean
+==> security: security-trivy
+ci: trivy fs: gate on HIGH, CRITICAL with a fix available
+2026-10-26T00:16:24Z	INFO	[vulndb] Need to update DB
+2026-10-26T00:16:24Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-10-26T00:16:24Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-10-26T00:17:25Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-10-26T00:17:25Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-26T00:17:25Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-26T00:17:25Z	INFO	[checks-client] Need to update the checks bundle
+2026-10-26T00:17:25Z	INFO	[checks-client] Downloading the checks bundle...
+143.25 KiB / 234.57 KiB [------------------------------------>______________________] 61.07% ? p/s ?234.57 KiB / 234.57 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.57 KiB / 234.57 KiB [---------------------------------------------] 100.00% 746.22 KiB p/s 500ms2026-10-26T00:17:28Z	INFO	[secret] Secret scanning is enabled
+2026-10-26T00:17:28Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln,misconfig' to disable secret scanning
+2026-10-26T00:17:28Z	INFO	[secret] Please see https://trivy.dev/docs/v0.75/guide/scanner/secret#recommendation for faster secret detection
+2026-10-26T00:17:30Z	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="unable to find path to Python executable"
+2026-10-26T00:17:30Z	INFO	[terraform scanner] Scanning root module	file_path="infra/cloudflare"
+2026-10-26T00:17:30Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="account_id, api_origin_hostname, zone_id"
+2026-10-26T00:17:30Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/account"
+2026-10-26T00:17:30Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="budget_alert_emails"
+2026-10-26T00:17:30Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/prod"
+2026-10-26T00:17:30Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="ecr_repository_arn, ecr_repository_url"
+2026-10-26T00:17:30Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/staging"
+2026-10-26T00:17:30Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="ecr_repository_arn, ecr_repository_url"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-sns-topic-encryption-use-cmk" range="infra/terraform/modules/stack/alarms.tf:8"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-ec2-no-public-egress-sgr" range="infra/terraform/modules/stack/main.tf:55"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/edge/main.tf:132-139"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-ec2-no-public-egress-sgr" range="infra/terraform/modules/stack/main.tf:55"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/edge/main.tf:132-139"
+2026-10-26T00:17:30Z	INFO	[terraform executor] Ignore finding	rule="aws-sns-topic-encryption-use-cmk" range="infra/terraform/modules/stack/alarms.tf:8"
+2026-10-26T00:17:30Z	INFO	[pnpm] Run "pnpm install" to collect the license information of packages	dir="node_modules"
+2026-10-26T00:17:30Z	INFO	Suppressing dependencies for development and testing. To display them, try the '--include-dev-deps' flag.
+2026-10-26T00:17:30Z	INFO	Number of language-specific files	num=7
+2026-10-26T00:17:30Z	INFO	[gomod] Detecting vulnerabilities...
+2026-10-26T00:17:30Z	INFO	[pip] Detecting vulnerabilities...
+2026-10-26T00:17:30Z	INFO	[pnpm] Detecting vulnerabilities...
+2026-10-26T00:17:30Z	INFO	Detected config files	num=12
+2026-10-26T00:17:30Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.75/guide/scanner/vulnerability#severity-selection for details.
+2026-10-26T00:17:30Z	INFO	Some vulnerabilities have been ignored/suppressed. Use the "--show-suppressed" flag to display them.
+
+Report Summary
+
+┌──────────────────────────────────────────┬────────────┬─────────────────┬─────────┬───────────────────┐
+│                  Target                  │    Type    │ Vulnerabilities │ Secrets │ Misconfigurations │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/go.mod                           │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/tools/go.mod                     │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ e2e/contract/requirements.txt            │    pip     │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ e2e/mocks/go.mod                         │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ pnpm-lock.yaml                           │    pnpm    │        1        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ scripts/ci/wflint/go.mod                 │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ scripts/envtool/go.mod                   │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/Dockerfile                       │ dockerfile │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/cloudflare                         │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/account             │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/prod                │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/staging             │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/database/main.tf │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/ecr/main.tf      │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/edge/main.tf     │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/network/main.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/secrets/main.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/alarms.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/main.tf    │ terraform  │        -        │    -    │         0         │
+└──────────────────────────────────────────┴────────────┴─────────────────┴─────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+pnpm-lock.yaml (pnpm)
+=====================
+Total: 1 (HIGH: 1, CRITICAL: 0)
+
+┌─────────┬────────────────┬──────────┬────────┬───────────────────┬───────────────┬────────────────────────────────────────────────────────────┐
+│ Library │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                           Title                            │
+├─────────┼────────────────┼──────────┼────────┼───────────────────┼───────────────┼────────────────────────────────────────────────────────────┤
+│ zod     │ CVE-2023-54404 │ HIGH     │ fixed  │ 4.6.5             │ 4.6.6         │ zod: zod: Denial of service via unbounded array validation │
+│         │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2023-54404                 │
+└─────────┴────────────────┴──────────┴────────┴───────────────────┴───────────────┴────────────────────────────────────────────────────────────┘
+make[2]: *** [security-trivy] Error 1
+make security: step security-trivy failed (exit 2)
+make[1]: *** [security] Error 2

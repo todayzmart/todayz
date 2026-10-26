@@ -19,7 +19,13 @@ as every handler must be. The run shows `cancelled` on A-21, followed by the ret
 D-98 caps a non-batched attempt at 60 s and makes long kinds `Batched`, calling `Yield` between
 batches. A hard cancel therefore means a kind did not keep to that contract.
 
-## First three checks
+## First five minutes
+
+1. A-21 Jobs: which kind, and did the next run succeed?
+2. Was a deploy or scale-in happening at that time?
+3. If the kind is idempotent and its next run succeeded, there is nothing to fix now.
+
+## Diagnosis
 
 1. **Dashboard 15 · Jobs** (https://grafana.todayz.localhost/d/tz-jobs/15-jobs?var-kind=KIND):
    - *Hard-cancelled at shutdown (24 h)*: how many, and which kinds?
@@ -33,7 +39,7 @@ batches. A hard cancel therefore means a kind did not keep to that contract.
    - `queue: jobs did not return after the hard cancel` means a handler ignores its context.
      This is worse: it can hold a database connection until the process exits.
 
-## Likely causes
+### Likely causes
 
 - **A non-batched kind ran longer than expected**: a slow query, a slow provider, or a lock
   wait. Its `Timeout` should have cut it first. Check that the handler passes `ctx` to every
@@ -45,7 +51,7 @@ batches. A hard cancel therefore means a kind did not keep to that contract.
 - **The drain was shortened**: a container stop timeout below 180 s, or `SHUTDOWN_DRAIN`
   changed. Check the deploy config.
 
-## Fix
+## Mitigation
 
 - Check that the retried run succeeded and did not double-apply:
   - For money and stock kinds, compare the run's summary counts with the ledger or stock rows.
@@ -60,9 +66,17 @@ batches. A hard cancel therefore means a kind did not keep to that contract.
 
 The alert clears 10 minutes after the last hard cancel.
 
-## Who to tell
+## Escalation
+
+**Level:** Warning: SEV3. SEV2 if it is a `money` or `timer` kind that did not catch up after the deploy ([Severity levels](../ops/severity.md)).
 
 - **The kind's owner** (A-21): they must make the kind drain-safe.
 - **The lead**, if the retry double-applied anything, or if `did not return after the hard
   cancel` appeared.
 - **The finance admin**, for a `money` kind, with the run ids.
+
+## Follow-up
+
+- If the kind runs longer than the shutdown grace, split it into smaller batches.
+- If it is not idempotent, that is a bug: tell its owner.
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.
