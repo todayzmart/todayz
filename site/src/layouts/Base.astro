@@ -87,7 +87,7 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
     {jsonLd.map((data) => <script is:inline type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />)}
     {page.leadForm && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />}
   </head>
-  <body>
+  <body data-skin="bright">
     <a class="skip" href="#main">{t('a11y.skip')}</a>
     <Header page={page} locale={locale} />
     {
@@ -131,7 +131,7 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
     display: flex;
     flex-direction: column;
     margin: 0;
-    background: var(--bg);
+    background: var(--page);
     color: var(--ink);
   }
 

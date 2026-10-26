@@ -37,6 +37,12 @@ for (const [size, viewport] of Object.entries(SIZES)) {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);
+      // A full-page shot does not scroll, so lazy images (the shop-type photos) would stay empty.
+      await page.evaluate(async () => {
+        const imgs = [...document.images];
+        for (const img of imgs) img.loading = 'eager';
+        await Promise.all(imgs.map((img) => img.decode().catch(() => undefined)));
+      });
       await shot(page, `${name}-${size === 'phone' ? '390' : '1440'}.png`, { fullPage: true });
       expect(guard.external).toEqual([]);
     });
