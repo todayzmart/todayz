@@ -15,7 +15,8 @@ export interface Call {
   body: unknown;
 }
 
-export type Handler = (call: Call) => Response | undefined;
+/** A Promise answer lets a test hold a request open (a loading state). */
+export type Handler = (call: Call) => Response | Promise<Response> | undefined;
 
 export function json(status: number, body: unknown, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {

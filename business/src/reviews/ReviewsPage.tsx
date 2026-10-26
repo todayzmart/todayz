@@ -40,7 +40,7 @@ export function ReviewsPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'reviews.error.title' })}
           description={intl.formatMessage({ id: 'reviews.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'reviews.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'reviews.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -80,7 +80,7 @@ function ReviewsDesk({ store }: { store: CurrentStore }) {
         icon={Inbox}
         title={intl.formatMessage({ id: 'reviews.error.title' })}
         description={intl.formatMessage({ id: 'reviews.error.body' })}
-        action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'reviews.error.retry' })}</Button>}
+        action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'reviews.error.retry' })}</Button>}
       />
     );
   }

@@ -34,7 +34,7 @@ export function InvitePage({ token }: { token: string }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'stores.invite.failed.title' })}
           description={intl.formatMessage({ id: 'stores.loadFailed.body' })}
-          action={<Button onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'stores.retry' })}</Button>}
+          action={<Button loading={q.isFetching} onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'stores.retry' })}</Button>}
         />
       )}
       {q.data && invitations.length === 0 && (

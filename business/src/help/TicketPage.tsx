@@ -37,7 +37,7 @@ export function TicketPage({ ticketId }: { ticketId: string }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'help.error.title' })}
           description={intl.formatMessage({ id: 'help.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && <Banner tone="info">{intl.formatMessage({ id: 'help.noBusiness' })}</Banner>}
@@ -79,7 +79,7 @@ function Thread({ bid, ticketId }: { bid: string; ticketId: string }) {
         icon={Inbox}
         title={intl.formatMessage({ id: 'help.ticket.error.title' })}
         description={intl.formatMessage({ id: 'help.error.body' })}
-        action={<Button onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
+        action={<Button loading={q.isFetching} onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
       />
     );
   }

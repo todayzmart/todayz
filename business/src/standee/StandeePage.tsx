@@ -30,7 +30,7 @@ export function StandeePage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'standee.error.title' })}
           description={intl.formatMessage({ id: 'standee.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -100,6 +100,8 @@ function Standee({ store }: { store: CurrentStore }) {
         </div>
         <div className={styles.stack}>
           <p className={styles.sub}>{intl.formatMessage({ id: 'standee.card.body' })}</p>
+
+          {code.isPending && <Skeleton width="10ch" />}
           {code.data && (
             <p>
               <span className={styles.sub}>{intl.formatMessage({ id: 'standee.shortCode' })} </span>
@@ -107,7 +109,7 @@ function Standee({ store }: { store: CurrentStore }) {
             </p>
           )}
           {failed && (
-            <Banner tone="warning" action={<Button onClick={() => void fetchPdf(busy ?? 'preview')}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
+            <Banner tone="warning" action={<Button loading={busy !== null} onClick={() => void fetchPdf(busy ?? 'preview')}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
               {intl.formatMessage({ id: 'standee.pdfError' })}
             </Banner>
           )}

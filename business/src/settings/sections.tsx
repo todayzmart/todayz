@@ -2,7 +2,7 @@ import type { StoreHours } from '@todayz/api-client/gen/model/storeHours';
 import type { StoreSettings } from '@todayz/api-client/gen/model/storeSettings';
 import { getKyc, getStore, putKyc, updateStore } from '@todayz/api-client/gen/business/business';
 import type { Store } from '@todayz/api-client/gen/model/store';
-import { Banner, Button, TextField, useToast } from '@todayz/ui';
+import { Banner, Button, Skeleton, TextField, useToast } from '@todayz/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -258,6 +258,7 @@ export function PayoutSection({ bid, canEdit }: { bid: string; canEdit: boolean 
         {intl.formatMessage({ id: 'settings.payout.title' })}
       </h2>
       {!canEdit && <p className="tz-card-desc">{intl.formatMessage({ id: 'settings.payout.managerNote' })}</p>}
+      {kyc.isPending && <Skeleton height="4rem" />}
       {kyc.isError && <BizError error={kyc.error} />}
       {kyc.data && (
         <dl className={styles.stack}>

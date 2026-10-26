@@ -50,7 +50,7 @@ export function OnboardingPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'onboarding.loadFailed.title' })}
           description={intl.formatMessage({ id: 'onboarding.loadFailed.body' })}
-          action={<Button onClick={cur.retry}>{intl.formatMessage({ id: 'onboarding.retry' })}</Button>}
+          action={<Button loading={cur.retrying} onClick={cur.retry}>{intl.formatMessage({ id: 'onboarding.retry' })}</Button>}
         />
       )}
       {cur.status === 'none' && <Wizard business={null} refetchList={() => void list.refetch()} />}

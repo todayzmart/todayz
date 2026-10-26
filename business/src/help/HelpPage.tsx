@@ -34,7 +34,7 @@ export function HelpPage({ tab }: { tab: HelpTab }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'help.error.title' })}
           description={intl.formatMessage({ id: 'help.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && <Guide tickets={false} />}
@@ -70,7 +70,7 @@ function TicketList({ bid }: { bid: string }) {
         icon={Inbox}
         title={intl.formatMessage({ id: 'help.tickets.error.title' })}
         description={intl.formatMessage({ id: 'help.error.body' })}
-        action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
+        action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
       />
     );
   }

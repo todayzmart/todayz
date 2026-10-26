@@ -33,7 +33,7 @@ export function OffersPage({ search = {} }: { search?: OffersSearch }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'offers.error.title' })}
           description={intl.formatMessage({ id: 'offers.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'offers.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'offers.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (

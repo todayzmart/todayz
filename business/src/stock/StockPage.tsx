@@ -39,7 +39,7 @@ export function StockPage({ search }: { search: StockSearch }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'stock.error.title' })}
           description={intl.formatMessage({ id: 'stock.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -197,7 +197,7 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
           icon={Inbox}
           title={intl.formatMessage({ id: 'stock.error.title' })}
           description={intl.formatMessage({ id: 'stock.error.body' })}
-          action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
+          action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
         />
       ) : (
         <ItemTable

@@ -28,6 +28,7 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
   const { records, sync, engine, online, settings, now, items } = usePos();
   const [confirm, setConfirm] = useState<SaleRecord | null>(null);
   const [busy, setBusy] = useState(false);
+  const [retrying, setRetrying] = useState<string | null>(null);
   const [done, setDone] = useState<{ ack: ReverseAck } | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const [reason, setReason] = useState('');
@@ -35,6 +36,15 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
   const attention = records.filter(needsAttention).length;
 
   const nameOf = (id: string) => items.find((i) => i.id === id)?.name ?? id;
+
+  const retry = async (clientId: string) => {
+    setRetrying(clientId);
+    try {
+      await engine.retry(clientId);
+    } finally {
+      setRetrying(null);
+    }
+  };
 
   const reverse = async () => {
     if (!confirm || busy || reason.trim() === '') return;
@@ -59,7 +69,7 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
           <section aria-label={intl.formatMessage({ id: 'pos.sync.title' })}>
             <div className={styles.saleTop}>
               <b>{intl.formatMessage({ id: `pos.sync.status.${online ? sync.status : 'offline'}` })}</b>
-              <Button size="sm" icon={RefreshCw} disabled={!online} onClick={() => void engine.flush({ force: true })}>
+              <Button size="sm" icon={RefreshCw} disabled={!online} loading={online && sync.status === 'syncing'} onClick={() => void engine.flush({ force: true })}>
                 {intl.formatMessage({ id: 'pos.sync.now' })}
               </Button>
             </div>
@@ -124,7 +134,7 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
                       )}
                       {rec.state === 'rejected' && (
                         <>
-                          <Button size="sm" onClick={() => void engine.retry(rec.sale.clientId)}>
+                          <Button size="sm" loading={retrying === rec.sale.clientId} onClick={() => void retry(rec.sale.clientId)}>
                             {intl.formatMessage({ id: 'pos.sync.retry' })}
                           </Button>
                           <Button size="sm" variant="ghost" onClick={() => void engine.dismiss(rec.sale.clientId)}>

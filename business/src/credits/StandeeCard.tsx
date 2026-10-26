@@ -1,4 +1,4 @@
-import { Button, useToast } from '@todayz/ui';
+import { Button, Skeleton, useToast } from '@todayz/ui';
 import { Link } from '@tanstack/react-router';
 import { Download, Eye } from 'lucide-react';
 import { useState } from 'react';
@@ -50,6 +50,8 @@ export function StandeeCard({ store }: { store: CurrentStore }) {
       </div>
       <div className={styles.stack}>
         <p className={styles.sub}>{intl.formatMessage({ id: 'credits.standee.body' }, { store: store.name })}</p>
+
+        {code.isPending && <Skeleton width="10ch" />}
         {code.data && (
           <p>
             <span className={styles.sub}>{intl.formatMessage({ id: 'credits.standee.shortCode' })} </span>

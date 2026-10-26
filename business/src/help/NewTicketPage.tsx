@@ -40,7 +40,7 @@ export function NewTicketPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'help.error.title' })}
           description={intl.formatMessage({ id: 'help.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'help.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && <Banner tone="info">{intl.formatMessage({ id: 'help.noBusiness' })}</Banner>}

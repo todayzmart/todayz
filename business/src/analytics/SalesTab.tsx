@@ -46,7 +46,7 @@ export function SalesTab({ store }: { store: CurrentStore }) {
         <EmptyState
           icon={Inbox}
           title={intl.formatMessage({ id: 'analytics.error' })}
-          action={<Button onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
+          action={<Button loading={q.isFetching} onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
         />
       ) : q.data ? (
         <Report data={q.data} />

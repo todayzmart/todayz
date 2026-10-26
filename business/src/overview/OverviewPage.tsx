@@ -48,7 +48,7 @@ function OverviewContent({ store }: { store: CurrentStore }) {
           tone="warning"
           title={intl.formatMessage({ id: 'overview.error' })}
           action={
-            <Button size="sm" onClick={() => void query.refetch()}>
+            <Button size="sm" loading={query.isFetching} onClick={() => void query.refetch()}>
               {intl.formatMessage({ id: 'overview.retry' })}
             </Button>
           }

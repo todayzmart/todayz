@@ -36,7 +36,7 @@ export function useBusinesses() {
 
 export type CurrentBusiness =
   | { status: 'loading' }
-  | { status: 'error'; retry: () => void }
+  | { status: 'error'; retry: () => void; /** The retry is in flight: the retry button shows a spinner. */ retrying: boolean }
   | { status: 'none' }
   | { status: 'ready'; business: BusinessSummary; invitations: number };
 
@@ -47,7 +47,7 @@ export type CurrentBusiness =
  */
 export function useCurrentBusiness(): CurrentBusiness {
   const q = useBusinesses();
-  if (q.isError) return { status: 'error', retry: () => void q.refetch() };
+  if (q.isError) return { status: 'error', retry: () => void q.refetch(), retrying: q.isFetching };
   if (!q.data) return { status: 'loading' };
   const remembered = rememberedStore();
   const items = q.data.items;

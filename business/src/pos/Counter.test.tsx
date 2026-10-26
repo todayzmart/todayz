@@ -274,6 +274,20 @@ describe('B-05 counter', () => {
     expect(within(sales).getByText(/server refused this sale/)).toBeInTheDocument();
   });
 
+  it('Sync now shows a spinner while the device sends its sales', async () => {
+    const { user, server } = await mount({ online: false });
+    await user.click(tile(/Rice 1 kg/));
+    await user.click(charge());
+    await screen.findByText(/saved on this device/);
+    // The connection comes back and the send is held open.
+    server.api.sync = () => new Promise(() => {});
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    act(() => void window.dispatchEvent(new Event('online')));
+    await user.click(screen.getAllByRole('button', { name: /^Sales/ })[0] as HTMLElement);
+    const sales = await screen.findByRole('dialog', { name: 'Sales on this device' });
+    await waitFor(() => expect(within(sales).getByRole('button', { name: 'Sync now' })).toHaveAttribute('aria-busy', 'true'));
+  });
+
   it('opens the receipt of the sale just rung', async () => {
     const { user } = await mount();
     await user.click(tile(/Rice 1 kg/));

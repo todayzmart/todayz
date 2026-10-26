@@ -28,7 +28,7 @@ export function StoreGate({ next, children }: { next: string; children: (store: 
         <EmptyState
           icon={Inbox}
           title={intl.formatMessage({ id: 'overview.gate.error' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
         />
       </div>
     );

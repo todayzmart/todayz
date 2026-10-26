@@ -5,6 +5,7 @@ import { IntlProvider } from 'react-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { insights, overviewHandler, ownerApi, shops, STORE } from '../test/insightsApi';
 import { renderAt, type Handler } from '../test/render';
+import { holding } from '../test/held';
 import { NARROW_QUERY } from '../shell/useNarrow';
 import { SetupCard } from './SetupCard';
 import type { SetupProgress } from './types';
@@ -188,5 +189,17 @@ describe('B-03 Overview', () => {
       </IntlProvider>,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('B-03 Overview loading states', () => {
+  it('Accept shows a spinner on that order while the call runs, and holds the other orders', async () => {
+    renderOverview([holding((c) => c.method === 'POST' && c.path.endsWith('/accept')), ...ownerApi()]);
+    const accepts = await screen.findAllByRole('button', { name: /^Accept order/ });
+    expect(accepts.length).toBeGreaterThan(1);
+    fireEvent.click(accepts[0] as HTMLElement);
+    await waitFor(() => expect(accepts[0]).toHaveAttribute('aria-busy', 'true'));
+    expect(accepts[1]).not.toHaveAttribute('aria-busy');
+    expect(accepts[1]).toBeDisabled();
   });
 });
