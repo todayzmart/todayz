@@ -12,15 +12,16 @@
 #                  lint catches a seeded violation. See scripts/ci/check.sh.
 # check-tf-static  (offline) terraform fmt -check, validate, tflint, checkov on
 #                  infra/terraform; skips with a message while there are no .tf files
-# security-*       `make security`: gitleaks (history), Trivy, checkov, ZAP baseline.
-#                  security-zap runs only when the local stack answers its health
+# security-*       `make security`: gitleaks (history), Trivy, checkov, ZAP baseline,
+#                  the stack-only abuse suite (W4-03, e2e/security/abuse.stack.test.mjs).
+#                  security-zap and security-abuse run only when the local stack answers its health
 #                  check (make dev first) and otherwise prints why it skipped.
 
 SETUP_STEPS += setup-ci
 CHECK_STEPS += check-ci check-tf-static
-SECURITY_STEPS += security-gitleaks security-trivy security-checkov security-zap
+SECURITY_STEPS += security-gitleaks security-trivy security-checkov security-zap security-abuse
 
-.PHONY: setup-ci check-ci check-tf-static security-gitleaks security-trivy security-checkov security-zap
+.PHONY: setup-ci check-ci check-tf-static security-gitleaks security-trivy security-checkov security-zap security-abuse
 
 setup-ci:
 	@$(ROOT)/scripts/ci/install-tools.sh actionlint
@@ -46,3 +47,6 @@ security-checkov:
 
 security-zap:
 	@$(ROOT)/scripts/ci/scan.sh zap --if-up
+
+security-abuse:
+	@$(ROOT)/scripts/ci/scan.sh abuse --if-up

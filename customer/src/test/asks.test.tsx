@@ -313,6 +313,28 @@ describe('Share link /x/{code}', () => {
     expect(shareHtml({ ...preview, itemName: '<b>"x"</b>' }, 'https://app.todayz.in', CODE)).not.toContain('<b>');
   });
 
+  it('the Pages Function sends the hardening headers itself, since _headers do not apply to it (W4-03)', async () => {
+    const ok = (() => Promise.resolve(json(200, preview))) as typeof fetch;
+    const page = await renderShare(CODE, 'https://app.todayz.in', 'https://api.todayz.in', ok);
+    const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const moved = await onRequestGet({
+      request: new Request(`https://app.todayz.in/x/${CODE}`),
+      params: { code: CODE },
+      env: {},
+      next: () => Promise.resolve(new Response('app')),
+    });
+    err.mockRestore();
+    for (const r of [page, moved]) {
+      expect(r?.headers.get('content-security-policy')).toBe("default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
+      expect(r?.headers.get('x-content-type-options')).toBe('nosniff');
+      expect(r?.headers.get('x-frame-options')).toBe('DENY');
+      expect(r?.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
+      expect(r?.headers.get('strict-transport-security')).toBe('max-age=31536000');
+    }
+    expect(page?.headers.get('content-type')).toBe('text/html; charset=utf-8');
+    expect(moved.status).toBe(302);
+  });
+
   it('the Pages Function never follows a redirect, so the key stays with the API, and a 3xx is no preview', async () => {
     const inits: (RequestInit | undefined)[] = [];
     const moved = ((_: RequestInfo | URL, init?: RequestInit) => {

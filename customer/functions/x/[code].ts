@@ -24,6 +24,20 @@ export function itemPath(p: Pick<SharePreviewLike, 'storeSlug' | 'storeItemId'>)
   return `/s/${encodeURIComponent(p.storeSlug)}/i/${encodeURIComponent(p.storeItemId)}?ref=share`;
 }
 
+/**
+ * Pages applies `_headers` (scripts/deploy/pages.sh) to static assets only, not to a Function's own
+ * responses, so the preview page and the 302 carry the app's hardening headers themselves (W4-03).
+ * The page loads nothing: no script, style or image (og:image is only read by link-preview bots), and
+ * the meta refresh is a navigation, which `default-src 'none'` does not block.
+ */
+export const HARDENING_HEADERS: Readonly<Record<string, string>> = {
+  'content-security-policy': "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'strict-transport-security': 'max-age=31536000',
+};
+
 function esc(s: string): string {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
@@ -92,7 +106,12 @@ export async function renderShare(
     const p = (await r.json()) as SharePreviewLike;
     if (!p.storeSlug || !p.storeItemId) return null;
     return new Response(shareHtml(p, origin, code), {
-      headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', 'x-robots-tag': 'noindex' },
+      headers: {
+        ...HARDENING_HEADERS,
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+        'x-robots-tag': 'noindex',
+      },
     });
   } catch {
     return null;
@@ -123,7 +142,7 @@ export async function onRequestGet(ctx: PagesContext): Promise<Response> {
   const apiBase = (ctx.env.API_URL ?? '').replace(/\/$/, '');
   if (!apiBase) {
     console.error('share link: API_URL is not set on the Pages project; no preview, sending the link to the app');
-    return new Response(null, { status: 302, headers: { location: `/x/${code}?${APP_FLAG}=1`, 'cache-control': 'no-store' } });
+    return new Response(null, { status: 302, headers: { ...HARDENING_HEADERS, location: `/x/${code}?${APP_FLAG}=1`, 'cache-control': 'no-store' } });
   }
   const key = (ctx.env.SHARE_PREVIEW_KEY ?? '').trim();
   if (!key) console.warn('share link: SHARE_PREVIEW_KEY is not set on the Pages project; previews are counted per Cloudflare IP');
