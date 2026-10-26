@@ -144,6 +144,11 @@
     "review": "reviewed",
     "enHash": "a4b03af4"
   },
+  "home.map.show": {
+    "message": "नक्शा देखने के लिए टैप करें",
+    "review": "machine",
+    "enHash": "8e01ffa5"
+  },
   "home.map.pinOpen": {
     "message": "{name}, खुली",
     "review": "reviewed",

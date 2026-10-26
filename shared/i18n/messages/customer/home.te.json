@@ -144,6 +144,11 @@
     "review": "reviewed",
     "enHash": "a4b03af4"
   },
+  "home.map.show": {
+    "message": "మ్యాప్ చూడటానికి ట్యాప్ చేయండి",
+    "review": "machine",
+    "enHash": "8e01ffa5"
+  },
   "home.map.pinOpen": {
     "message": "{name}, తెరిచి ఉంది",
     "review": "reviewed",

@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
 import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
 import { LimitBanner } from '../orders/LimitBanner';
@@ -22,19 +22,10 @@ import styles from './home.module.css';
 // MapLibre stays out of the first load: the card is its own chunk.
 const StoreMapCard = lazy(() => import('./StoreMapCard'));
 
-/** True once the element is within 300 px of the viewport (always true where IntersectionObserver is missing): the map's JS and WebGL setup wait until then (W4-04, mobile TBT). */
-function useNearView<T extends Element>(): [React.RefObject<T | null>, boolean] {
-  const ref = useRef<T | null>(null);
-  const [near, setNear] = useState(typeof IntersectionObserver === 'undefined');
-  useEffect(() => {
-    const el = ref.current;
-    if (near || !el) return undefined;
-    const io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setNear(true), { rootMargin: '300px' });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [near]);
-  return [ref, near];
-}
+// MapLibre's JS and WebGL setup cost the phone home its Lighthouse score even when they waited for the
+// card to scroll near (W4-04): the card is a plain summary until a tap (D-246 B1). Once shown, it stays
+// shown for the rest of the visit.
+let mapShown = false;
 
 export function Home({ category }: { category?: string | undefined }) {
   const intl = useIntl();
@@ -124,7 +115,7 @@ export function Home({ category }: { category?: string | undefined }) {
 function Nearby({ coords, category }: { coords: Coords; category: string | undefined }) {
   const intl = useIntl();
   const router = useRouter();
-  const [mapRef, mapNear] = useNearView<HTMLDivElement>();
+  const [showMap, setShowMap] = useState(mapShown);
   const km = useRadiusKm();
   const cardProps = useStoreCardProps();
   const { lat, lng } = coords;
@@ -215,23 +206,39 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
       )}
 
       <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
-        <div ref={mapRef}>
-          {mapNear ? (
-            <Suspense fallback={<Skeleton shape="block" height="220px" />}>
-              <StoreMapCard
-                coords={coords}
-                km={km}
-                summary={summary.data}
-                names={names}
-                interactive={false}
-                onExpand={() => router.history.push('/map')}
-                onSelectShop={(slug) => router.history.push(storeHref(slug))}
-              />
-            </Suspense>
-          ) : (
-            <Skeleton shape="block" height="220px" />
-          )}
-        </div>
+        {showMap ? (
+          <Suspense fallback={<Skeleton shape="block" height="220px" />}>
+            <StoreMapCard
+              coords={coords}
+              km={km}
+              summary={summary.data}
+              names={names}
+              interactive={false}
+              onExpand={() => router.history.push('/map')}
+              onSelectShop={(slug) => router.history.push(storeHref(slug))}
+            />
+          </Suspense>
+        ) : (
+          <button
+            type="button"
+            className={`tz-card ${styles.mapEntry}`}
+            onClick={() => {
+              mapShown = true;
+              setShowMap(true);
+            }}
+          >
+            <Icon icon={MapPin} />
+            <span className={styles.basketText}>
+              <span className="tz-card-title">{intl.formatMessage({ id: 'home.map.show' })}</span>
+              <span className="tz-meta">
+                {intl.formatMessage(
+                  { id: 'home.map.mapLabel' },
+                  { shops: num(summary.data?.storesNearby ?? 0), km: String(km), open: num(summary.data?.openNow ?? 0) },
+                )}
+              </span>
+            </span>
+          </button>
+        )}
       </section>
 
       <section className={styles.section} aria-labelledby="home-shops">
