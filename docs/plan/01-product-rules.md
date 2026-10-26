@@ -223,6 +223,7 @@ Any non-terminal state
   - A referral the sale qualified: if the reward has not posted, the qualification is revoked; if it has posted, the reward stays and a risk flag is raised.
   - Stock: a `pos_reversal` movement puts the quantities back.
 - **Manual adjustments** (admin console): only `finance` and `super_admin`, with a reason. The threshold `admin_adjust_dual_approval_above_paise` (₹500) is compared with the absolute value of the amount, so it applies to debits and credits alike (D-73).
+  - The threshold is checked against the day's total, not each adjustment alone (D-237): the sum of the absolute amounts of the same admin's adjustments to the same customer in the current IST day, including this one. Posted at-once adjustments and that admin's pending or approved requests count; rejected and cancelled requests do not.
   - At or under the threshold: the adjustment posts immediately, with no request row.
   - Above it: it needs a second approver who is a different person; this applies to `super_admin` too.
 - Wallet history explains every line: "Spent at Sri Lakshmi · order TZ-024817", "Referral bonus for Ananya's first order", "5% back at MedPlus", "Expired".

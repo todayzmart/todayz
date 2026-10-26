@@ -1388,3 +1388,106 @@ func TestNotConfigured(t *testing.T) {
 	_, err = New(Deps{Clock: clock.NewFake(testNow)})
 	require.Error(t, err, "no ledger")
 }
+
+// fakeSelfLike stands in for risk's referral.self_like check: a referral in
+// match raises one open flag, ever, as risk.InsertFlagOnce does.
+type fakeSelfLike struct {
+	e     *env
+	match map[ids.ID]bool
+	err   error
+	calls int
+}
+
+func (f *fakeSelfLike) CheckReferralSelfLike(ctx context.Context, id ids.ID) (bool, error) {
+	f.calls++
+	if f.err != nil {
+		return false, f.err
+	}
+	if !f.match[id] || f.e.count(`SELECT count(*) FROM risk_flags WHERE subject_id = $1 AND rule = 'referral.self_like'`, ids.UUID(id)) > 0 {
+		return false, nil
+	}
+	f.e.exec(`INSERT INTO risk_flags (id, subject_type, subject_id, rule, score) VALUES ($1, 'referral', $2, 'referral.self_like', 70)`,
+		ids.UUID(ids.New(testNow)), ids.UUID(id))
+	return true, nil
+}
+
+// D-237: the reward pass runs the self-like check before it posts. A match
+// holds the reward (nothing posts, the sweep skips it) until a person clears
+// the flag; then the next pass posts, and the flag is not raised again.
+func TestSelfLikeHoldsTheReward(t *testing.T) {
+	e := newEnv(t)
+	check := &fakeSelfLike{e: e, match: map[ids.ID]bool{}}
+	e.svc.selfLike = check
+	// The referrer stands in for the reviewer (reviewed_by is a user).
+	reviewer, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+
+	// A referral that is not self-like posts as before.
+	u1, _ := e.newCustomer()
+	ok, err := e.claim(u1, ClaimInput{Code: code})
+	require.NoError(t, err)
+	e.complete(e.order(u1, store, 10_000, 0))
+	st, _, _ := e.referral(ok.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+	require.Len(t, e.ledger.posted, 2)
+
+	u2, _ := e.newCustomer()
+	res, err := e.claim(u2, ClaimInput{Code: code})
+	require.NoError(t, err)
+	check.match[res.ReferralID] = true
+	e.complete(e.order(u2, store, 10_000, 0))
+	st, a, b := e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.False(t, a || b, "held: neither side posts")
+	assert.Len(t, e.ledger.posted, 2)
+	assert.EqualValues(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE subject_id = $1 AND rule = 'referral.self_like' AND status = 'open'`, ids.UUID(res.ReferralID)))
+
+	// The sweep skips a held referral, however long it waits.
+	calls := check.calls
+	out := e.sweep(rewardRetryMax)
+	assert.Zero(t, out["rewarded"]+out["waiting"])
+	assert.Equal(t, calls, check.calls, "the sweep does not pick it up")
+	// The job running again holds it again.
+	got, err := e.svc.PostRewards(e.ctx, res.ReferralID)
+	require.NoError(t, err)
+	assert.True(t, got.Waiting)
+	assert.Zero(t, got.Posted)
+	assert.Len(t, e.ledger.posted, 2)
+
+	// A person clears the flag: the next sweep posts both sides, once.
+	e.exec(`UPDATE risk_flags SET status = 'cleared', reviewed_by = $2, reviewed_at = $3 WHERE subject_id = $1`,
+		ids.UUID(res.ReferralID), ids.UUID(reviewer), e.clk.Now())
+	out = e.sweep(time.Minute)
+	assert.EqualValues(t, 1, out["rewarded"])
+	st, a, b = e.referral(res.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+	assert.True(t, a && b)
+	assert.Len(t, e.ledger.posted, 4)
+	assert.EqualValues(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE subject_id = $1`, ids.UUID(res.ReferralID)), "not raised again")
+}
+
+// A check that fails posts nothing: the job retries and the sweep takes over.
+func TestSelfLikeCheckErrorPostsNothing(t *testing.T) {
+	e := newEnv(t)
+	check := &fakeSelfLike{e: e, err: errors.New("risk down")}
+	e.svc.selfLike = check
+	_, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+	u, _ := e.newCustomer()
+	res, err := e.claim(u, ClaimInput{Code: code})
+	require.NoError(t, err)
+	require.NoError(t, e.svc.OnPurchaseCompleted(e.ctx, e.order(u, store, 10_000, 0)))
+	for _, a := range e.jobs.take() {
+		_, err := e.svc.PostRewards(e.ctx, a.ReferralID)
+		require.ErrorContains(t, err, "risk down")
+	}
+	st, a, b := e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.False(t, a || b)
+	assert.Empty(t, e.ledger.posted)
+
+	check.err = nil
+	out := e.sweep(time.Minute)
+	assert.EqualValues(t, 1, out["rewarded"])
+	assert.Len(t, e.ledger.posted, 2)
+}

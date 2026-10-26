@@ -825,3 +825,45 @@ func TestReferralRewardRefusedFlagOnceDB(t *testing.T) {
 	require.JSONEq(t, `["referrer", "referee"]`, sides)
 	require.Equal(t, "qualified", e.referral(ref).status)
 }
+
+// Review of fcfaeb20: the real wiring (ReferralsService → risk's
+// CheckReferralSelfLike → SelfLikeHeld), not a fake. A shop's own cashier
+// claims the shop's code and buys there: the reward job raises one
+// referral.self_like flag and posts nothing, the sweep skips the referral,
+// and once a person clears the flag the job posts both sides with no second
+// flag.
+func TestReferralSelfLikeHeldThroughRiskDB(t *testing.T) {
+	e := newRefEnv(t, false)
+	store, code := e.shop()
+	var biz pgtype.UUID
+	e.scan(`SELECT business_id FROM stores WHERE id = $1`, []any{ids.UUID(store)}, &biz)
+	referee, ref := e.claim(code)
+	e.exec(`INSERT INTO staff (id, business_id, user_id, role, status) VALUES ($1, $2, $3, 'cashier', 'active')`,
+		ids.UUID(ids.New(refNow)), biz, ids.UUID(referee))
+	order := e.tdb.InsertOrder(t, ids.New(refNow), referee, store)
+	require.NoError(t, e.svc.OnPurchaseCompleted(e.ctx, referrals.Outcome{RefType: referrals.RefOrder, RefID: order,
+		CustomerID: referee, StoreID: store, EligiblePaise: 10_000}))
+	require.Equal(t, "qualified", e.referral(ref).status)
+	flags := func(status string) int {
+		return e.count(`SELECT count(*) FROM risk_flags WHERE rule = 'referral.self_like' AND subject_id = $1 AND status = $2`, ids.UUID(ref), status)
+	}
+
+	runs := e.runJobs()
+	require.Len(t, runs, 1)
+	require.Equal(t, map[string]int64{"posted": 0, "waiting": 1}, runs[0].Result.Summary)
+	require.Equal(t, 1, flags("open"))
+	require.Zero(t, e.rewardTxs(ref))
+	require.Zero(t, e.sweep(time.Hour), "the sweep skips a held referral")
+	require.Zero(t, e.rewardTxs(ref))
+
+	reviewer, _ := e.customer(refNow)
+	e.exec(`UPDATE risk_flags SET status = 'cleared', reviewed_by = $2, reviewed_at = $3 WHERE rule = 'referral.self_like' AND subject_id = $1`,
+		ids.UUID(ref), ids.UUID(reviewer), e.clk.Now())
+	res, err := e.jobs.RunEvent(e.ctx, referrals.KindReward, referrals.RewardArgs{ReferralID: ref})
+	require.NoError(t, err)
+	require.Equal(t, int64(2), res.Result.Summary["posted"], "%v", res.Err)
+	require.Equal(t, "rewarded", e.referral(ref).status)
+	require.Equal(t, 2, e.rewardTxs(ref))
+	require.Equal(t, 1, flags("cleared"))
+	require.Zero(t, flags("open"), "a cleared flag is not raised again")
+}

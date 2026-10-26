@@ -693,6 +693,48 @@ func TestFieldPhotoSweepHTTP(t *testing.T) {
 	require.Zero(t, res.Rejected, "a second sweep finds nothing")
 }
 
+// Review of fcfaeb20: the sweep claims and deletes without a row lock, so a
+// confirm whose bucket HEAD saw the object before the sweep took it must not
+// mark the photo uploaded once confirm_by has passed: it answers expired and
+// the photo stays pending for the sweep to reject.
+func TestFieldPhotoConfirmRacesSweepHTTP(t *testing.T) {
+	f := newFieldAPI(t)
+	tok := f.user(agentPhone, "field_agent").token()
+	bid, sid := f.onboard(tok, "Hampi Stores", shopOwnerPhone)
+	B := "/v1/admin/field/businesses/" + bid
+	r := f.call(tok, http.MethodPost, B+"/documents", map[string]any{"kind": "storefront", "contentType": "image/jpeg", "sizeBytes": 2048, "storeId": sid}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	id := r.body["document"].(map[string]any)["id"].(string)
+	f.bucket.put(t, r)
+
+	// While the confirm's HEAD is answered (the object still there):
+	// confirm_by passes and a sweep claims the row, as ClaimStaleFieldDocuments
+	// does; its delete of the object follows the claim.
+	f.bucket.mu.Lock()
+	f.bucket.onHead = func(string) {
+		f.bucket.mu.Lock()
+		f.bucket.onHead = nil
+		f.bucket.mu.Unlock()
+		f.clk.Advance(20*time.Minute + time.Second)
+		f.exec(`UPDATE business_documents SET sweep_retry_at = $2 WHERE id = $1 AND status = 'pending'`, uuidOf(t, id), f.clk.Now().Add(10*time.Minute))
+	}
+	f.bucket.mu.Unlock()
+	c := f.call(tok, http.MethodPost, B+"/documents/"+id+"/confirm", nil, nil)
+	require.Equal(t, http.StatusConflict, c.code, c.raw)
+	require.Equal(t, "invalid_transition", c.body["code"], c.raw)
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM business_documents WHERE id = $1 AND status = 'pending'`, uuidOf(t, id)))
+	require.Zero(t, f.count(`SELECT count(*) FROM audit_log WHERE action = 'document.uploaded' AND subject_id = $1`, id))
+
+	// The sweep rejects it once the claim's lease has passed.
+	f.clk.Advance(10*time.Minute + time.Second)
+	svc, err := business.New(business.Deps{Config: f.cfg, DB: db.New(f.tdb.Pool), Clock: f.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	require.NoError(t, err)
+	res, err := svc.SweepFieldPhotos(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, business.SweepResult{Rejected: 1}, res)
+	require.False(t, f.bucket.has(t, r))
+}
+
 // Lead review of b42d9ee: who may send and check the owner code, the caps
 // (per agent; per number with sign-in codes), blocked accounts, and a correct
 // code that cannot finish staying unused.

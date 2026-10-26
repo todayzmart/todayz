@@ -16,6 +16,7 @@ import (
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/pii"
 )
 
 // The admin side (A-x Reviews, 01 §10, D-41): list, hide, restore, hide or
@@ -36,6 +37,11 @@ func cleanModReason(r string) (string, error) {
 	r = strings.TrimSpace(r)
 	if r == "" || utf8.RuneCountInString(r) > 500 { //settings:ok contract bound (ModerationNote ≤ 500)
 		return "", fieldErr("body.reason", "1 to 500 characters")
+	}
+	// The reason is stored in the audit log and shown to other roles: never a
+	// phone number (the review already names the person).
+	if pii.ContainsPhone(r) {
+		return "", fieldErr("body.reason", "no phone numbers")
 	}
 	return r, nil
 }

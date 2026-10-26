@@ -214,10 +214,22 @@ func failCause(err error) string {
 }
 
 // raise inserts each finding unless its subject already has one (InsertFlagOnce).
+// A referral.self_like finding first locks its referral row, as the reward
+// pass does around the same check (D-237): risk_scan and the reward pass then
+// never both insert a flag for one referral. Findings come in referral id
+// order, the order a reversal locks referrals in.
 func (s *Service) raise(ctx context.Context, fs []Finding, now time.Time) (int64, error) {
 	var n int64
 	q := s.q(ctx)
 	for _, f := range fs {
+		if f.Rule == RuleSelfLike && f.SubjectType == "referral" {
+			if _, err := q.LockReferral(ctx, ids.UUID(f.SubjectID)); err != nil {
+				if db.IsNoRows(err) {
+					continue
+				}
+				return n, err
+			}
+		}
 		var day *string
 		if f.Day != "" {
 			day = &f.Day
@@ -302,7 +314,30 @@ func (s *Service) findReversals(ctx context.Context, now time.Time) ([]Finding, 
 }
 
 func (s *Service) findSelfLike(ctx context.Context, now time.Time) ([]Finding, error) {
-	rows, err := s.q(ctx).SelfLikeCandidates(ctx, ptr(now.Add(-selfLikeLookback)))
+	return s.selfLike(ctx, riskdb.SelfLikeCandidatesParams{Since: ptr(now.Add(-selfLikeLookback))})
+}
+
+// CheckReferralSelfLike runs referral.self_like on one referral now and
+// raises its flag when it matches. The referral reward pass calls it before
+// it posts, so a self-like reward is held, not paid (D-237); risk_scan keeps
+// the rule as a backstop. One flag per referral, ever: a referral already
+// flagged, in any status, raises nothing again, so a cleared flag lets the
+// reward post. It runs in the caller's transaction, if any. raised reports a
+// new flag.
+func (s *Service) CheckReferralSelfLike(ctx context.Context, referralID ids.ID) (raised bool, err error) {
+	if s.db == nil {
+		return false, errUnavailable
+	}
+	fs, err := s.selfLike(ctx, riskdb.SelfLikeCandidatesParams{ReferralID: ids.UUID(referralID)})
+	if err != nil {
+		return false, err
+	}
+	n, err := s.raise(ctx, fs, s.now())
+	return n > 0, err
+}
+
+func (s *Service) selfLike(ctx context.Context, arg riskdb.SelfLikeCandidatesParams) ([]Finding, error) {
+	rows, err := s.q(ctx).SelfLikeCandidates(ctx, arg)
 	if err != nil {
 		return nil, err
 	}

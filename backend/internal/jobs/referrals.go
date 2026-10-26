@@ -15,6 +15,7 @@ import (
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/referrals"
+	"github.com/todayz/backend/internal/risk"
 )
 
 // KindReferralSweep posts referral rewards that are due but not yet posted
@@ -116,6 +117,12 @@ func ReferralsService(d Deps, ns notice.Sender, enq platformjobs.Enqueuer) (*ref
 		return nil, err
 	}
 	rd.Ledger = ReferralsLedger(cs)
+	// The reward pass runs referral.self_like before it posts (D-237).
+	rs, err := risk.New(risk.Deps{DB: rd.DB, Clock: d.Clock, Settings: d.Settings})
+	if err != nil {
+		return nil, err
+	}
+	rd.SelfLike = rs
 	return referrals.New(rd)
 }
 
