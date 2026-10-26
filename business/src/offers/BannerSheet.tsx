@@ -12,6 +12,7 @@ import type { CurrentStore } from '../orders/store';
 import { useCategories } from '../stock/queries';
 import { checkSchedule, type PickedItem } from './form';
 import { ItemPicker } from './ItemPicker';
+import { OptionsGate } from './OptionsGate';
 import { BANNER_LIMITS } from './limits';
 import { addBanner, offersErrorKey, useOffers } from './queries';
 import styles from './offers.module.css';
@@ -122,23 +123,27 @@ export function BannerSheet({ store, onClose }: { store: CurrentStore; onClose: 
         {target === 'offer' && (
           <div className="tz-field">
             <label className="tz-field-label" htmlFor="banner-offer">{intl.formatMessage({ id: 'offers.banner.pickOffer' })}</label>
-            <select id="banner-offer" className="tz-input" value={offerId} onChange={(e) => setOfferId(e.target.value)}>
-              <option value="">{intl.formatMessage({ id: 'offers.banner.chooseOffer' })}</option>
-              {liveOffers.map((o) => (
-                <option key={o.id} value={o.id}>{o.title}</option>
-              ))}
-            </select>
+            <OptionsGate query={offers} loadingId="offers.loading" failedId="offers.error.title">
+              <select id="banner-offer" className="tz-input" value={offerId} onChange={(e) => setOfferId(e.target.value)}>
+                <option value="">{intl.formatMessage({ id: 'offers.banner.chooseOffer' })}</option>
+                {liveOffers.map((o) => (
+                  <option key={o.id} value={o.id}>{o.title}</option>
+                ))}
+              </select>
+            </OptionsGate>
           </div>
         )}
         {target === 'category' && (
           <div className="tz-field">
             <label className="tz-field-label" htmlFor="banner-category">{intl.formatMessage({ id: 'offers.category.label' })}</label>
-            <select id="banner-category" className="tz-input" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-              <option value="">{intl.formatMessage({ id: 'offers.category.choose' })}</option>
-              {flat.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <OptionsGate query={categories} loadingId="app.loading" failedId="offers.error.body">
+              <select id="banner-category" className="tz-input" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                <option value="">{intl.formatMessage({ id: 'offers.category.choose' })}</option>
+                {flat.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </OptionsGate>
           </div>
         )}
         {target === 'items' && <ItemPicker store={store} picked={items} max={BANNER_LIMITS.maxItems} onChange={setItems} />}
