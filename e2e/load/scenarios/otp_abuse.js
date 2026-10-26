@@ -11,8 +11,9 @@ import http from 'k6/http';
 import { Counter, Rate } from 'k6/metrics';
 import { API, MOCKS, fakeIp, randomNational, signIn, ulid, summary, metrics, rec, STATS } from '../lib/common.js';
 
-const ABUSER_IP = fakeIp(); // new per run, so an earlier run's hour does not count
-const HAMMERED = randomNational();
+// k6 runs this init code once per VU, so the abuser IP and the hammered number are picked in
+// setup() (once per run, shared by every VU) and come in as data; a new pair per run keeps an
+// earlier run's hour from counting.
 const DURATION = __ENV.LOAD_OTP_DURATION || '3m';
 const PER_IP = 20;
 const PER_PHONE = 5;
@@ -49,16 +50,20 @@ function send(phone, ip, name) {
   });
 }
 
-export function abuser() {
-  const r = send(randomNational(), ABUSER_IP, 'abuse_send');
+export function setup() {
+  return { abuserIp: fakeIp(), hammered: randomNational() };
+}
+
+export function abuser(data) {
+  const r = send(randomNational(), data.abuserIp, 'abuse_send');
   rec(M, 'abuse_send', r, [200, 429]);
   abuserSeen++;
   if (r.status === 200) abuserAccepted.add(1);
   if (abuserSeen > PER_IP) abuserBlocked.add(r.status === 429);
 }
 
-export function hammer() {
-  const r = send(HAMMERED, fakeIp(), 'hammer_send');
+export function hammer(data) {
+  const r = send(data.hammered, fakeIp(), 'hammer_send');
   rec(M, 'hammer_send', r, [200, 429]);
   if (r.status === 200) hammerAccepted.add(1);
 }

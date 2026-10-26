@@ -55,7 +55,7 @@ esac
 
 mkdir -p "$out"
 fixture="$out/fixture.json"
-if [ "$scenario" != otp_abuse ] && [ ! -s "$fixture" ]; then
+if [ "$scenario" != otp_abuse ] && [ "$scenario" != bootstrap ] && [ ! -s "$fixture" ]; then
   echo "run.sh: $fixture is missing; run make load-data first" >&2
   exit 1
 fi

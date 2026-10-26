@@ -10,7 +10,7 @@ make load                # every scenario; or one: make load-browse | load-order
 | Path | What |
 |---|---|
 | `run.sh` | Runs one scenario. Refuses an API or mocks origin that is not loopback or `*.todayz.localhost`. |
-| `data/generate.sql` | 1,000 shops (Bengaluru 400, Chennai 350, Hyderabad 250) with 20–300 items and stock each, 50,000 customers, 70k collected orders over 14 days and 350k POS sales over 7 days (`-v history=0` skips the history). Refuses unless `platform_environment.env` is `local` or `test`; a rerun is a no-op. Runs as the owner (`DATABASE_MIGRATE_URL`) because it uses temp tables. |
+| `data/generate.sql` | 1,000 shops (Bengaluru 400, Chennai 350, Hyderabad 250) with about 210 stocked items each on average (20 to about 300), 50,000 customers, 70k collected orders over 14 days and 350k POS sales over 7 days (`-v history=0` skips the history). Refuses unless `platform_environment.env` is `local` or `test`; a rerun is a no-op. Runs as the owner (`DATABASE_MIGRATE_URL`) because it uses temp tables. |
 | `scenarios/bootstrap.js` | Signs in the load shop people through the API (mock SMS) and names them, so `data/link_staff.sql` can make them owners and managers of the load shops. Phone identities are keyed and sealed, so SQL cannot create them. |
 | `data/export_fixture.sql` | Writes `out/fixture.json`: shop ids, coordinates, in-stock items, cities, search terms. No phones or codes. |
 | `scenarios/*.js` | k6: browse_peak, order_burst, pos_rush, otp_abuse, soak. Each writes `out/<scenario>-summary.json` (p50/p95/p99, error rates, threshold verdicts). |

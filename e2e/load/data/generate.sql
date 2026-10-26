@@ -1,4 +1,4 @@
--- W4-02 load data: 1,000 live stores (load-0001 … load-1000) with about 250 stocked items each,
+-- W4-02 load data: 1,000 live stores (load-0001 … load-1000) with about 210 stocked items each on average,
 -- 50,000 customers, and two weeks of history at the launch target (08 §6: 5,000 orders a day,
 -- 50,000 POS sales a day; 14 days of collected orders, 7 days of POS sales).
 --
@@ -102,7 +102,7 @@ SELECT s.store_id, s.business_id, 'load-' || lpad(s.n::text, 4, '0'), 'X' || pg_
 FROM load_store s JOIN businesses b ON b.id = s.business_id;
 
 ------------------------------------------------------------------------------
--- Catalogue and stock: about 250 items a store, mostly from its own category
+-- Catalogue and stock: about 210 items a store on average, mostly from its own category
 ------------------------------------------------------------------------------
 
 CREATE TEMP TABLE load_product ON COMMIT DROP AS

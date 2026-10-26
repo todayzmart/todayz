@@ -56,7 +56,7 @@ export function visit(m = M) {
 
   group('home', () => {
     rec(m, 'summary', get('/v1/discover/summary', null, 'summary', { lat, lng, radius }));
-    if (Math.random() < 0.3) rec(m, 'categories', get('/v1/discover/categories', null, 'categories', { lat, lng }));
+    if (Math.random() < 0.3) rec(m, 'categories', get('/v1/discover/categories', null, 'categories'));
     const list = get('/v1/discover/stores', null, 'stores', { lat, lng, radius, limit: 20 });
     rec(m, 'stores', list);
   });
@@ -69,8 +69,8 @@ export function visit(m = M) {
 
   const term = pick(F.terms);
   group('search', () => {
-    rec(m, 'suggest', get('/v1/discover/search/suggest', null, 'suggest', { q: term.slice(0, 2), lat, lng, limit: 8 }));
-    rec(m, 'suggest', get('/v1/discover/search/suggest', null, 'suggest', { q: term.slice(0, 4), lat, lng, limit: 8 }));
+    rec(m, 'suggest', get('/v1/discover/search/suggest', null, 'suggest', { q: term.slice(0, 2), limit: 8 }));
+    rec(m, 'suggest', get('/v1/discover/search/suggest', null, 'suggest', { q: term.slice(0, 4), limit: 8 }));
     rec(m, 'search', get('/v1/discover/search', null, 'search', { q: term, lat, lng, radius }));
   });
   think();
@@ -91,7 +91,7 @@ export function visit(m = M) {
   }
 
   const item = pick(s.items);
-  rec(m, 'substitutes', get(`/v1/discover/stores/${s.slug}/substitutes`, null, 'substitutes', { itemId: item.id }));
+  rec(m, 'substitutes', get(`/v1/discover/stores/${s.slug}/substitutes`, null, 'substitutes', { itemId: item.id, lat, lng }));
   think();
 }
 
