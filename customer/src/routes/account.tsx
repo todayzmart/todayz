@@ -5,12 +5,15 @@ import { NATIVE_NAMES, isLocale } from '@todayz/i18n';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { Button, Skeleton, TextField } from '@todayz/ui';
-import { useState, type FormEvent } from 'react';
+import { ChevronRight, Languages, LifeBuoy, LogOut, MapPin, ShoppingBasket, UserRound, type LucideIcon } from 'lucide-react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import { patchMe } from '../app/me';
 import { usePlace } from '../app/place';
 import { SavedAddresses } from '../address/SavedAddresses';
+import { Icon } from '../shell/Icon';
 import styles from '../shell/shell.module.css';
+import a from '../account/account.module.css';
 
 export const Route = createFileRoute('/account')({
   component: Account,
@@ -124,68 +127,108 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
         : intl.formatMessage({ id: 'location.set' });
   const lang = isLocale(me.preferredLang) ? NATIVE_NAMES[me.preferredLang] : me.preferredLang;
 
+  const initial = me.name?.trim().charAt(0).toUpperCase();
+
   return (
     <>
-      <form className={`tz-card ${styles.stack}`} onSubmit={(e) => void save(e)}>
-        <TextField
-          label={intl.formatMessage({ id: 'account.name.label' })}
-          value={name}
-          maxLength={80}
-          autoComplete="name"
-          onChange={(e) => {
-            setName(e.target.value);
-            setNote(null);
-          }}
-          error={
-            note === 'conflict'
-              ? intl.formatMessage({ id: 'account.name.conflict' })
-              : note === 'error'
-                ? intl.formatMessage({ id: 'account.name.error' })
-                : undefined
-          }
-        />
-        <Button type="submit" variant="primary" loading={saving}>
-          {intl.formatMessage({ id: 'account.name.save' })}
-        </Button>
-        {note === 'saved' && <p role="status">{intl.formatMessage({ id: 'account.name.saved' })}</p>}
-      </form>
+      <section className="tz-card" aria-labelledby="acct-me">
+        <div className={a.who}>
+          <span className={a.avatar} data-tint="sky" aria-hidden="true">
+            {initial || <Icon icon={UserRound} />}
+          </span>
+          <div className={a.whoText}>
+            <h2 id="acct-me" className="tz-card-title">
+              {me.name || me.phoneMasked}
+            </h2>
+            {me.name && <p className="tz-card-desc">{me.phoneMasked}</p>}
+          </div>
+        </div>
+        <form className={styles.stack} onSubmit={(e) => void save(e)}>
+          <TextField
+            label={intl.formatMessage({ id: 'account.name.label' })}
+            value={name}
+            maxLength={80}
+            autoComplete="name"
+            onChange={(e) => {
+              setName(e.target.value);
+              setNote(null);
+            }}
+            error={
+              note === 'conflict'
+                ? intl.formatMessage({ id: 'account.name.conflict' })
+                : note === 'error'
+                  ? intl.formatMessage({ id: 'account.name.error' })
+                  : undefined
+            }
+          />
+          <Button type="submit" variant="primary" loading={saving}>
+            {intl.formatMessage({ id: 'account.name.save' })}
+          </Button>
+          {note === 'saved' && <p role="status">{intl.formatMessage({ id: 'account.name.saved' })}</p>}
+        </form>
+      </section>
 
-      <dl className={`tz-card ${styles.stack}`}>
-        <div>
-          <dt>{intl.formatMessage({ id: 'account.phone' })}</dt>
-          <dd>{me.phoneMasked}</dd>
-        </div>
-        <div>
-          <dt>{intl.formatMessage({ id: 'account.language' })}</dt>
-          <dd>
-            {lang} <Link to="/language">{intl.formatMessage({ id: 'account.change' })}</Link>
-          </dd>
-        </div>
-        <div>
-          <dt>{intl.formatMessage({ id: 'account.location' })}</dt>
-          <dd>
-            {place_} <Link to="/location">{intl.formatMessage({ id: 'account.change' })}</Link>
-          </dd>
-        </div>
-        <div>
-          <dt>{intl.formatMessage({ id: 'basket.entry' })}</dt>
-          <dd>
-            <Link to="/baskets">{intl.formatMessage({ id: 'basket.entry.body' })}</Link>
-          </dd>
-        </div>
-        <div>
-          <dt>{intl.formatMessage({ id: 'help.title' })}</dt>
-          <dd>
-            <Link to="/help">{intl.formatMessage({ id: 'help.entry' })}</Link>
-          </dd>
-        </div>
-      </dl>
+      <ul className="tz-list">
+        <li>
+          <Link to="/language" className="tz-list-row">
+            <RowText icon={Languages} tint="lilac" label={intl.formatMessage({ id: 'account.language' })} value={lang} />
+            <Icon icon={ChevronRight} />
+          </Link>
+        </li>
+        <li>
+          <Link to="/location" className="tz-list-row">
+            <RowText icon={MapPin} tint="rose" label={intl.formatMessage({ id: 'account.location' })} value={place_} />
+            <Icon icon={ChevronRight} />
+          </Link>
+        </li>
+      </ul>
+
+      <ul className="tz-list">
+        <li>
+          <Link to="/baskets" className="tz-list-row">
+            <RowText
+              icon={ShoppingBasket}
+              tint="peach"
+              label={intl.formatMessage({ id: 'basket.entry' })}
+              value={intl.formatMessage({ id: 'basket.entry.body' })}
+            />
+            <Icon icon={ChevronRight} />
+          </Link>
+        </li>
+        <li>
+          <Link to="/help" className="tz-list-row">
+            <RowText
+              icon={LifeBuoy}
+              tint="amber"
+              label={intl.formatMessage({ id: 'help.title' })}
+              value={intl.formatMessage({ id: 'help.entry' })}
+            />
+            <Icon icon={ChevronRight} />
+          </Link>
+        </li>
+      </ul>
 
       <SavedAddresses />
 
       <Button variant="soft-danger" block onClick={() => void signOut()}>
+        <Icon icon={LogOut} />
         {intl.formatMessage({ id: 'account.signOut' })}
       </Button>
+    </>
+  );
+}
+
+/** One settings row's icon and text (the `tz-list` pieces of the bright skin, D-249). */
+function RowText({ icon, tint, label, value }: { icon: LucideIcon; tint: string; label: string; value: ReactNode }) {
+  return (
+    <>
+      <span className="tz-list-icon" data-tint={tint}>
+        <Icon icon={icon} />
+      </span>
+      <span className="tz-list-text">
+        <b>{label}</b>
+        <small>{value}</small>
+      </span>
     </>
   );
 }

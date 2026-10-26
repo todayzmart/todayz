@@ -38,6 +38,20 @@ White first, black and grey for structure, a pale mint and soft pastels for warm
 - **Light only.** TodayZ ships one theme: white. There is no dark mode at launch; every app stays light whatever the phone or computer is set to.
 - **Focus** is a 2px solid `focus` ring offset 2px, on every interactive element.
 
+### Bright skin (customer app, D-249)
+
+The customer app sets `data-skin="bright"` on its root, and the skin in `components/bundle.css` changes these rules for that app only. Business, admin and the design cards keep the rules above.
+
+- **The page is light grey `page` (#F4F5F7).** Cards stay white and lift off it with `shadow-card` instead of a `line` border. Only `ink` and `ink-2` text sits directly on the grey; `ink-3` would fall to 4.3:1.
+- **Primary buttons are `brand` green, not `inverse`.** Brand stays the one loud colour; secondary buttons stay white and outlined.
+- **Selected chips** are `brand-soft` with a `brand` border and `brand-strong` text.
+- **Plain links** (an `a` with no class) are `brand` at weight 600.
+- **The active tab** is `brand`, with a 3px brand bar on top.
+- **The soft danger button** is white and outlined, with `danger` text.
+- **Page titles** are Anek 800 at 26px.
+- **Settings lists** (`tz-list`, `tz-list-row`, `tz-list-icon`, `tz-list-text`) are a white card of rows. Each row has a round tinted icon (`data-tint`), a label with its value, and a chevron when it opens something.
+- **Section labels** (`tz-label-rule`) are letter-spaced capitals centred between hairlines that fade out.
+
 ## Typography
 
 - **Anek** (`display` family) for headlines and codes. It has Latin, Devanagari, Kannada, Telugu and Tamil cuts drawn as one family, so a Kannada heading feels as designed as an English one. Styles: `display-xl`, `display`, `headline`, `otp`.

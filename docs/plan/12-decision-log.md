@@ -1460,3 +1460,25 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **What is not copied.** Their logos, illustrations, exact colours or layouts. Text stays on our green, because their orange and red fail contrast for small text.
 - **Photos.** These are Openverse CC BY 2.0 photos in `design/trials/photos/`, credited in `CREDITS.md`, for the trials only.
 - **Scope.** Trials only. Tokens, `shared/ui`, the apps and the live site are unchanged, and no visual baselines move. If the founder keeps the look, the trial-only values become tokens first, and the screens follow.
+
+**D-249 · The bright look moves from the trial into the customer app as a skin (founder, 26 Oct, on the live `/account`: "too bad"; "i see every page in customer side"; answer: "Fix the source").**
+- **What.** The customer shell root sets `data-skin="bright"`. The skin lives in `design/source/components/bundle.css` and changes the default look for that app only:
+  - a light grey `page` (#F4F5F7) behind white cards, with `shadow-card` in place of the hairline border;
+  - the primary button is `brand` green instead of `inverse`, and selected chips are `brand-soft`;
+  - plain links are `brand` at weight 600, so no browser blue or purple, and `dd` has no indent;
+  - the active bottom-nav tab is `brand`, with a 3px bar on top;
+  - page titles are Anek 800 at 26px.
+- **New tokens.** `page` and `shadow-card`. Only `ink` and `ink-2` text sits directly on `page`; `ink-3` would fall to 4.3:1.
+- **New components.**
+  - `tz-list`: a settings list of rows, each with a tinted round icon, a label, a value and a chevron.
+  - `tz-label-rule`: a letter-spaced label between hairlines that fade out.
+- **Unchanged.** Business, admin and the design cards keep the white page, the borders and the `inverse` primary. The README's colour rules carry a "Bright skin" section for the exceptions.
+- **First screen.** Account is restyled:
+  - a profile card with a letter avatar;
+  - Language, Location, Baskets and Help as `tz-list` rows;
+  - Saved addresses;
+  - a white Sign out button.
+
+  The unused keys `account.phone` and `account.change` are removed.
+- **Next.** The other customer screens follow one at a time. Screenshots come from `customer/e2e/bright.shots.spec.ts`.
+- **Baselines.** The customer visual baselines in `e2e/visual/` will differ. They are refreshed only after the founder's yes.
