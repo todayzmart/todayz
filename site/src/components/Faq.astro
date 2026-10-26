@@ -33,9 +33,10 @@ const { items, openFirst = false } = Astro.props;
   }
 
   details {
-    border: 1px solid var(--line);
+    border: 1px solid transparent;
     border-radius: 18px;
-    background: var(--surface-subtle);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
   }
 
   details[open] {

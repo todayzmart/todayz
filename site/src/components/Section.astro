@@ -31,11 +31,11 @@ const headingId = id && title ? `${id}-title` : undefined;
   }
 
   .wash {
-    background: linear-gradient(180deg, var(--wash) 0%, var(--surface) 100%);
+    background: linear-gradient(180deg, var(--wash) 0%, var(--page) 100%);
   }
 
   .subtle {
-    background: var(--surface-subtle);
+    background: var(--surface);
   }
 
   .inner {
@@ -55,6 +55,7 @@ const headingId = id && title ? `${id}-title` : undefined;
   h2 {
     margin: 0;
     font: var(--type-headline);
+    font-weight: 800;
     letter-spacing: var(--type-headline-tracking);
     color: var(--ink);
   }

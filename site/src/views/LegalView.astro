@@ -69,6 +69,7 @@ const grievance = name && email ? t('legal.grievance.named', { name, email }) : 
   h1 {
     margin: 0;
     font: var(--type-display);
+    font-weight: 800;
     letter-spacing: var(--type-display-tracking);
     color: var(--ink);
   }
@@ -87,6 +88,10 @@ const grievance = name && email ? t('legal.grievance.named', { name, email }) : 
     display: grid;
     gap: var(--space-6);
     max-width: 760px;
+    padding: var(--space-8) var(--space-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
   }
 
   h2 {

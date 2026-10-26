@@ -1,6 +1,5 @@
 ---
-// Who it is for: the six shop types with a line each.
-import Icon from '../Icon.astro';
+// Who it is for: the six shop types with a round photo and a line each.
 import type { MessageKey, Translate } from '../../i18n/index.ts';
 import { SHOP_TYPES } from './data.ts';
 
@@ -29,9 +28,7 @@ const types = SHOP_TYPES.map((type, i) => ({
       {
         types.map((type) => (
           <li data-tint={type.tint}>
-            <span class="t-ico">
-              <Icon name={type.icon} />
-            </span>
+            <img class="t-photo" src={type.photo.src} width="64" height="64" alt="" loading="lazy" decoding="async" />
             <b>{type.name}</b>
             <p>{type.desc}</p>
           </li>
