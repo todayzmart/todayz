@@ -159,8 +159,7 @@ StoreItemCreate:
   description: >-
     List a master product in the store. `openingStock` above 0 writes an
     `opening` movement; with `expiresOn` or `costPaise` it also starts a
-    batch (03 stock rule 8). The price may not be above the MRP (the store's,
-    else the product's).
+    batch (03 stock rule 8). The price may be above the MRP (D-245).
   required: [productId, pricePaise]
   properties:
     productId: {$ref: ./common.yaml#/Ulid}

@@ -281,15 +281,6 @@ func (s *Service) listItems(ctx context.Context, bid, sid string, p catalogueapi
 	return out, nil
 }
 
-// effectiveMRP is the MRP the price may not exceed: the store's, else the
-// product's; nil when neither has one.
-func effectiveMRP(store, product *int64) *int64 {
-	if store != nil {
-		return store
-	}
-	return product
-}
-
 // istDate turns an API date into the IST calendar date as midnight UTC.
 func istDate(d *openapi_types.Date) *time.Time {
 	if d == nil {
@@ -351,9 +342,6 @@ func (s *Service) createItem(ctx context.Context, bid, sid string, b *cataloguea
 	}
 	price := int64(b.PricePaise)
 	mrp := int64p(b.MrpPaise)
-	if m := effectiveMRP(mrp, prod.MrpPaise); m != nil && price > *m {
-		return catalogueapi.StoreItem{}, 0, fieldErr("body.pricePaise", "must not be above the MRP")
-	}
 	listed := true
 	if b.IsListed != nil {
 		listed = *b.IsListed
@@ -462,22 +450,6 @@ func (s *Service) updateItem(ctx context.Context, bid, sid, itemID string, h *st
 		}
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
-		}
-		// The price may not pass the MRP that applies after the change
-		// (clearing the store MRP falls back to the product's).
-		price, mrp := cur.PricePaise, cur.MrpPaise
-		if setPrice {
-			price = arg.PricePaise
-		}
-		if setMrp {
-			mrp = arg.MrpPaise
-		}
-		if m := effectiveMRP(mrp, cur.ProductMrpPaise); m != nil && price > *m {
-			field := "body.pricePaise"
-			if !setPrice {
-				field = "body.mrpPaise"
-			}
-			return fieldErr(field, "the price must not be above the MRP")
 		}
 		if _, err := q.UpdateStoreItem(ctx, arg); err != nil {
 			if db.IsNoRows(err) {

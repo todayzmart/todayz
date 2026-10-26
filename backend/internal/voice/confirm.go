@@ -228,8 +228,6 @@ func stockErr(c change, err error) error {
 	switch {
 	case err == nil:
 		return nil
-	case errors.Is(err, ErrAboveMRP):
-		return fieldErr(c.valuePath("pricePaise"), "above_mrp")
 	case errors.Is(err, ErrItemGone):
 		return fieldErr(c.itemPath(), "not_found")
 	case errors.Is(err, ErrQuantity):

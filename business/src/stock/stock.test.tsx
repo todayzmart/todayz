@@ -119,7 +119,7 @@ describe('B-07 item sheet and movements', () => {
     expect(within(dialog).queryByRole('button', { name: 'Restock' })).not.toBeInTheDocument();
   });
 
-  it('a price change reads the item for its ETag, sends If-Match, and refuses a price above the MRP', async () => {
+  it('a price change reads the item for its ETag, sends If-Match, and may go above the MRP (D-245)', async () => {
     let patch: Call | undefined;
     renderAt('/stock?price=i1', {
       messages,
@@ -128,7 +128,7 @@ describe('B-07 item sheet and movements', () => {
         (c) => {
           if (c.method !== 'PATCH' || c.path !== `${BASE}/items/i1`) return undefined;
           patch = c;
-          return json(200, item('i1', { pricePaise: 5900 }), { ETag: '"v4"' });
+          return json(200, item('i1', { pricePaise: 7000 }), { ETag: '"v4"' });
         },
         ...stockHandlers([item('i1')]),
       ],
@@ -137,12 +137,8 @@ describe('B-07 item sheet and movements', () => {
     const price = await within(dialog).findByLabelText('Selling price');
     fireEvent.change(price, { target: { value: '70' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Save price' }));
-    expect(await within(dialog).findByText('The price cannot be above the MRP of ₹60.')).toBeInTheDocument();
-    expect(patch).toBeUndefined();
-    fireEvent.change(price, { target: { value: '59' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Save price' }));
     await waitFor(() => expect(patch).toBeDefined());
-    expect(patch?.body).toEqual({ pricePaise: 5900 });
+    expect(patch?.body).toEqual({ pricePaise: 7000 });
     expect(patch?.headers.get('if-match')).toBe('"v3"');
   });
 });
@@ -219,8 +215,9 @@ describe('B-07 import and create product (adapter endpoints)', () => {
     expect(calls.filter((c) => c.path === `${BASE}/item-imports`)).toHaveLength(1);
   });
 
-  it('creates a missing product, then asks for the price and opening stock', async () => {
+  it('creates a missing product, then asks for the price and opening stock; the price may be above the MRP (D-245)', async () => {
     let created: Call | undefined;
+    let added: Call | undefined;
     renderAt('/stock', {
       messages,
       handlers: [
@@ -231,6 +228,11 @@ describe('B-07 import and create product (adapter endpoints)', () => {
           if (c.method !== 'POST' || c.path !== '/v1/biz/businesses/b1/products') return undefined;
           created = c;
           return json(201, { id: 'p9', name: 'Jaggery', brand: null, variant: null, packSize: 500, unit: 'g', mrpPaise: 6000, categoryId: 'c1', barcodes: [], status: 'pending_review' });
+        },
+        (c) => {
+          if (c.method !== 'POST' || c.path !== `${BASE}/items`) return undefined;
+          added = c;
+          return json(201, item('i9', { pricePaise: 7500 }));
         },
         ...stockHandlers([item('i1')]),
       ],
@@ -248,6 +250,9 @@ describe('B-07 import and create product (adapter endpoints)', () => {
     await waitFor(() => expect(created).toBeDefined());
     expect(created?.body).toMatchObject({ name: 'Jaggery', packSize: 500, unit: 'g', categoryId: 'c1', mrpPaise: 6000 });
     expect(created?.headers.get('idempotency-key')).toBeTruthy();
-    expect(await within(dialog).findByLabelText('Selling price')).toBeInTheDocument();
+    fireEvent.change(await within(dialog).findByLabelText('Selling price'), { target: { value: '75' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add to my shop' }));
+    await waitFor(() => expect(added).toBeDefined());
+    expect(added?.body).toMatchObject({ productId: 'p9', pricePaise: 7500 });
   });
 });

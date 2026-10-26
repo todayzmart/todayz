@@ -301,8 +301,8 @@
     summary: Change an item's price, MRP, listing or low-stock threshold
     description: >-
       `pricePaise` and `mrpPaise` need `item.price.edit`; `isListed` and
-      `lowStockAt` need `item.manage` (manager and above). The price may not
-      be above the MRP (`422 validation_failed`).
+      `lowStockAt` need `item.manage` (manager and above). The price may be
+      above the MRP (D-245).
     x-idempotency: none
     parameters:
       - $ref: ../common/parameters.yaml#/IfMatch

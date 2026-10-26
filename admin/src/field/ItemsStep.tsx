@@ -121,9 +121,7 @@ function ItemRow({ item: it, bid, sid, editable, notMine }: { item: FieldItem; b
               paise === null
                 ? intl.formatMessage({ id: 'field.items.price.invalid' })
                 : update.isError
-                  ? update.error instanceof ApiError && update.error.code === 'validation_failed'
-                    ? intl.formatMessage({ id: 'field.items.price.aboveMrp' })
-                    : problemText(update.error)
+                  ? problemText(update.error)
                   : undefined
             }
           />
@@ -207,7 +205,6 @@ function useAddError() {
     if (err instanceof ApiError) {
       if (err.code === 'conflict') return intl.formatMessage({ id: 'field.items.already' });
       if (err.code === 'forbidden') return intl.formatMessage({ id: 'field.readOnly' });
-      if (err.code === 'validation_failed') return intl.formatMessage({ id: 'field.items.price.aboveMrp' });
     }
     return problemText(err);
   };
@@ -300,7 +297,7 @@ function NewProductForm({ bid, sid, name: initial, onDone }: { bid: string; sid:
     packSize: v.packSize.trim() && Number.isFinite(size) && size > 0 && size <= 100_000 ? undefined : t('field.items.pack.invalid'),
     mrp: mrp === null ? t('field.items.price.invalid') : undefined,
     barcode: v.barcode.trim() && !/^[0-9]{8,14}$/.test(v.barcode.trim()) ? t('field.items.barcode.invalid') : undefined,
-    price: price === null ? t('field.items.price.invalid') : mrp && price > mrp ? t('field.items.price.aboveMrp') : undefined,
+    price: price === null ? t('field.items.price.invalid') : undefined,
     stock: stock === null ? t('field.items.stock.invalid') : undefined,
   };
   const err = (k: keyof typeof errors) => (shown ? errors[k] : undefined);

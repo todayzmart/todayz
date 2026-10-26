@@ -133,12 +133,10 @@ func TestCatalogueHTTP(t *testing.T) {
 	require.Len(t, r.body["items"], 1)
 	require.Equal(t, c.butter, r.body["items"].([]any)[0].(map[string]any)["id"])
 
-	// --- create a store item from the master (SC-CT) -------------------------
-	item := map[string]any{"productId": c.butter, "pricePaise": 5800, "openingStock": 10, "expiresOn": day(3), "costPaise": 4800}
+	// --- create a store item from the master (SC-CT); above the MRP is allowed (D-245)
+	item := map[string]any{"productId": c.butter, "pricePaise": 6100, "openingStock": 10, "expiresOn": day(3), "costPaise": 4800}
 	r = a.call(c.cashier, http.MethodPost, c.S+"/items", item, nil)
 	require.Equal(t, http.StatusForbidden, r.code, "a cashier adds no items: %s", r.raw)
-	r = a.call(c.manager, http.MethodPost, c.S+"/items", map[string]any{"productId": c.butter, "pricePaise": 6100}, nil)
-	require.Equal(t, http.StatusUnprocessableEntity, r.code, "price above MRP: %s", r.raw)
 	r = a.call(c.manager, http.MethodPost, c.S+"/items", item, nil)
 	require.Equal(t, http.StatusCreated, r.code, r.raw)
 	butter := r.body["id"].(string)

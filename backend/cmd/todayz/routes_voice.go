@@ -113,8 +113,6 @@ func voiceStockErr(err error) error {
 	switch {
 	case err == nil:
 		return nil
-	case errors.Is(err, catalogue.ErrAboveMRP):
-		return voice.ErrAboveMRP
 	case errors.Is(err, catalogue.ErrItemNotFound):
 		return voice.ErrItemGone
 	case errors.Is(err, catalogue.ErrStale):
