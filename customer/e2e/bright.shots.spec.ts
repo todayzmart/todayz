@@ -137,6 +137,24 @@ DISCOVER['/v1/discover/search'] = {
 };
 DISCOVER['/v1/discover/search/suggest'] = { items: [] };
 
+const WEEK = Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => [d, [{ open: '08:00', close: '22:00' }]]));
+DISCOVER['/v1/discover/stores/sri-lakshmi-stores'] = {
+  ...shop('sri-lakshmi-stores', 'Sri Lakshmi Provision Stores', { photoKey: 'shop-grocery.jpg', cashbackPct: 5 }),
+  addressLine1: null, addressLine2: null, landmark: null, city: 'Bengaluru', pincode: '560038', lat: 12.97, lng: 77.64,
+  closedUntil: null, hours: { weekly: WEEK, holidays: [] }, categorySlug: 'grocery', categoryName: 'Grocery',
+  deliveryFeePaise: 2000, deliveryFreeAbovePaise: null, deliveryMinOrderPaise: 15000, deliveryRadiusM: 3000, serverNow: NOW,
+};
+DISCOVER['/v1/discover/stores/sri-lakshmi-stores/items'] = {
+  items: [
+    item('01', 'Nandini Toned Milk', { brand: 'Nandini', pricePaise: 2800, imageKey: 'p-milk.jpg' }),
+    item('02', 'Milk Bread', { brand: 'Modern', packSize: 400, unit: 'g', pricePaise: 4500, mrpPaise: 5000, hasOffer: true, imageKey: 'p-bread.jpg' }),
+    item('05', 'Maggi Noodles', { brand: 'Maggi', packSize: 280, unit: 'g', pricePaise: 5600, imageKey: 'p-noodles.jpg' }),
+    item('06', 'Surf Excel Matic', { brand: 'Surf Excel', packSize: 1, unit: 'kg', pricePaise: 23000, mrpPaise: 25000, hasOffer: true, imageKey: 'p-wash.jpg' }),
+  ],
+  nextCursor: null,
+  serverNow: NOW,
+};
+
 /** With TZ_AXE (a path to axe.min.js), the screen must have no WCAG 2.2 AA violations. */
 async function axe(page: Page) {
   const path = process.env['TZ_AXE'];
@@ -223,4 +241,16 @@ test('search results', async ({ page }) => {
   await axe(page);
   await shot(page, 'search-results.png');
   await shot(page, 'search-results-full.png', { fullPage: true });
+});
+
+test('shop', async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await signedIn(page);
+  await page.goto('/s/sri-lakshmi-stores');
+  await page.getByText('Surf Excel Matic').waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete));
+  await axe(page);
+  await shot(page, 'shop.png');
+  await shot(page, 'shop-full.png', { fullPage: true });
 });
