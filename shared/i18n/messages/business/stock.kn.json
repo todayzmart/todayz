@@ -978,5 +978,70 @@
     "message": "ಸಮಸ್ಯೆ ಇದೆ",
     "review": "reviewed",
     "enHash": "1547a58d"
+  },
+  "stock.photo.label": {
+    "message": "ಫೋಟೋ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "f60a5f04"
+  },
+  "stock.photo.add": {
+    "message": "ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "299dbac8"
+  },
+  "stock.photo.change": {
+    "message": "ಫೋಟೋ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ed5690c3"
+  },
+  "stock.photo.remove": {
+    "message": "ಫೋಟೋ ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "c8f5eda8"
+  },
+  "stock.photo.preview": {
+    "message": "ನೀವು ಆರಿಸಿದ ಫೋಟೋ",
+    "review": "reviewed",
+    "enHash": "867e61d1"
+  },
+  "stock.photo.help": {
+    "message": "ಪ್ಯಾಕ್‌ನ ಮುಂಭಾಗ, ಒಳ್ಳೆಯ ಬೆಳಕಿನಲ್ಲಿ. ಗ್ರಾಹಕರಿಗೆ ತೋರಿಸುವ ಮೊದಲು TodayZ ಇದನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "ae44451b"
+  },
+  "stock.photo.tooBig": {
+    "message": "ಈ ಫೋಟೋ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ. ಬೇರೆಯದನ್ನು ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "92c7b3ff"
+  },
+  "stock.photo.badType": {
+    "message": "ಈ ಫೈಲ್ ಅನ್ನು ಫೋಟೋ ಆಗಿ ಬಳಸಲು ಆಗುವುದಿಲ್ಲ. JPEG, PNG ಅಥವಾ WebP ಫೋಟೋ ಆರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4e364a1d"
+  },
+  "stock.photo.sent": {
+    "message": "ಫೋಟೋ ಕಳುಹಿಸಲಾಗಿದೆ. TodayZ ಇದನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "223bb430"
+  },
+  "stock.photo.failed": {
+    "message": "ಉತ್ಪನ್ನ ಸೇರಿಸಲಾಗಿದೆ, ಆದರೆ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "24f9cb0f"
+  },
+  "stock.photo.pending": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋ TodayZ ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "97d205ae"
+  },
+  "stock.photo.rejected": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋ ಸ್ವೀಕರಿಸಲಾಗಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "60e025e2"
+  },
+  "stock.photo.rejectedWhy": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋ ಸ್ವೀಕರಿಸಲಾಗಿಲ್ಲ: {reason}",
+    "review": "reviewed",
+    "enHash": "2af027fd"
   }
 }

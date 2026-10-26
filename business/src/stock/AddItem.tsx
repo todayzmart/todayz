@@ -2,14 +2,17 @@ import type { ProductMatch } from '@todayz/api-client/gen/model/productMatch';
 import { Unit } from '@todayz/api-client/gen/model/unit';
 import { formatMoney } from '@todayz/i18n';
 import { Button, SearchField, Sheet, Skeleton, TextField, useToast } from '@todayz/ui';
+import { Camera } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useIntl } from 'react-intl';
 import type { CurrentStore } from '../orders/store';
 import { useIdempotentAction } from './action';
 import { createProduct, type CreatedProduct } from './api';
 import { itemTitle, parseQuantity, parseRupees } from './format';
+import { PhotoError, shrinkPhoto, uploadProductPhoto } from './photo';
 import { addItem, useCategories, useProductSearch } from './queries';
+import { Icon } from '../shell/Icon';
 import { StockError } from './StockError';
 import styles from './stock.module.css';
 
@@ -177,6 +180,7 @@ function NewProductForm({
   onCancel: () => void;
 }) {
   const intl = useIntl();
+  const toast = useToast();
   const action = useIdempotentAction();
   const categories = useCategories();
   const [name, setName] = useState(initialName);
@@ -187,6 +191,8 @@ function NewProductForm({
   const [categoryId, setCategoryId] = useState('');
   const [barcode, setBarcode] = useState(initialBarcode ?? '');
   const [invalid, setInvalid] = useState<Record<string, string>>({});
+  const photo = usePhoto();
+  const [uploading, setUploading] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -211,7 +217,20 @@ function NewProductForm({
       ...(barcode.trim() ? { barcodes: [barcode.trim()] } : {}),
     };
     const out = await action.run(JSON.stringify(body), (key) => createProduct(store.bid, body, key));
-    if (out) onCreated(out);
+    if (!out) return;
+    if (photo.blob) {
+      // The product is made either way; a photo that does not upload only costs the picture.
+      setUploading(true);
+      try {
+        await uploadProductPhoto(store, out.id, photo.blob);
+        toast.show({ message: intl.formatMessage({ id: 'stock.photo.sent' }) });
+      } catch {
+        toast.show({ message: intl.formatMessage({ id: 'stock.photo.failed' }) });
+      } finally {
+        setUploading(false);
+      }
+    }
+    onCreated(out);
   };
 
   const err = (k: string) => (invalid[k] ? intl.formatMessage({ id: invalid[k] }) : undefined);
@@ -258,13 +277,100 @@ function NewProductForm({
       </div>
       <TextField label={intl.formatMessage({ id: 'stock.add.mrp' })} error={err('mrp')} inputMode="decimal" prefix="₹" value={mrp} onChange={(e) => setMrp(e.target.value)} />
       <TextField label={intl.formatMessage({ id: 'stock.add.barcode' })} error={err('barcode')} inputMode="numeric" value={barcode} onChange={(e) => setBarcode(e.target.value)} />
+      <PhotoPicker photo={photo} />
       <StockError error={action.error} />
       <div className={styles.formActions}>
         <Button onClick={onCancel}>{intl.formatMessage({ id: 'stock.form.back' })}</Button>
-        <Button type="submit" variant="primary" loading={action.pending}>
+        <Button type="submit" variant="primary" loading={action.pending || uploading}>
           {intl.formatMessage({ id: 'stock.add.createSave' })}
         </Button>
       </div>
     </form>
+  );
+}
+
+type Photo = ReturnType<typeof usePhoto>;
+
+/** The optional photo of a new product (D-252): shrunk on the device as soon as it is picked. */
+function usePhoto() {
+  const [blob, setBlob] = useState<Blob | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
+
+  const pick = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const out = await shrinkPhoto(file);
+      setBlob(out);
+      setPreview(typeof URL.createObjectURL === 'function' ? URL.createObjectURL(out) : null);
+    } catch (e) {
+      setBlob(null);
+      setPreview(null);
+      setError(e instanceof PhotoError && e.reason === 'size' ? 'stock.photo.tooBig' : 'stock.photo.badType');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const clear = () => {
+    setBlob(null);
+    setPreview(null);
+    setError(null);
+  };
+  return { blob, preview, error, busy, pick, clear };
+}
+
+function PhotoPicker({ photo }: { photo: Photo }) {
+  const intl = useIntl();
+  return (
+    <div className="tz-field">
+      <span className="tz-field-label">{intl.formatMessage({ id: 'stock.photo.label' })}</span>
+      <div className={styles.photoField}>
+        {photo.blob && (
+          <span className={`${styles.thumb} ${styles.thumbLarge}`}>
+            {photo.preview && <img src={photo.preview} alt={intl.formatMessage({ id: 'stock.photo.preview' })} />}
+          </span>
+        )}
+        <div className={styles.photoActions}>
+          <input
+            id="stock-add-photo"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className={styles.fileInput}
+            disabled={photo.busy}
+            onChange={(e) => {
+              void photo.pick(e.target.files?.[0]);
+              e.target.value = '';
+            }}
+          />
+          <label htmlFor="stock-add-photo" className="tz-btn tz-btn-sm">
+            <Icon icon={Camera} />
+            {intl.formatMessage({ id: photo.blob ? 'stock.photo.change' : 'stock.photo.add' })}
+          </label>
+          {photo.blob && (
+            <Button size="sm" variant="ghost" onClick={photo.clear}>
+              {intl.formatMessage({ id: 'stock.photo.remove' })}
+            </Button>
+          )}
+        </div>
+      </div>
+      {photo.error ? (
+        <span className="tz-field-error" role="alert">
+          {intl.formatMessage({ id: photo.error })}
+        </span>
+      ) : (
+        <span className="tz-field-help">{intl.formatMessage({ id: 'stock.photo.help' })}</span>
+      )}
+    </div>
   );
 }

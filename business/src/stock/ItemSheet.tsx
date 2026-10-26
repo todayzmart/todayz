@@ -16,6 +16,7 @@ import { canStock, type StockAction } from './permissions';
 import { patchItem, useBatches, useHistory, useItem } from './queries';
 import { StockError } from './StockError';
 import styles from './stock.module.css';
+import { Thumb } from './Thumb';
 import type { CurrentStore } from '../orders/store';
 
 export type SheetMode = 'view' | MovementFormKind | 'price' | 'threshold' | { batch: string };
@@ -72,11 +73,22 @@ export function ItemSheet({ store, item: row, initialMode = 'view', initialQty, 
   return (
     <Sheet open onClose={onClose} title={itemTitle(item)} closeLabel={intl.formatMessage({ id: 'stock.item.close' })}>
       <div className={styles.sheetBody}>
-        <StockTag
-          level={stockLevel(item)}
-          label={levelLabel(intl, stockLevel(item), item.available)}
-          {...freshnessProps(intl, item)}
-        />
+        <div className={styles.photoField}>
+          <Thumb item={item} large />
+          <StockTag
+            level={stockLevel(item)}
+            label={levelLabel(intl, stockLevel(item), item.available)}
+            {...freshnessProps(intl, item)}
+          />
+        </div>
+        {item.photo?.status === 'pending' && <p className={styles.sub}>{intl.formatMessage({ id: 'stock.photo.pending' })}</p>}
+        {item.photo?.status === 'rejected' && (
+          <p className={styles.sub}>
+            {item.photo.rejectReason
+              ? intl.formatMessage({ id: 'stock.photo.rejectedWhy' }, { reason: item.photo.rejectReason })
+              : intl.formatMessage({ id: 'stock.photo.rejected' })}
+          </p>
+        )}
         {refused && <p className={styles.note}>{intl.formatMessage({ id: 'stock.link.askManager' })}</p>}
         <dl className={styles.facts}>
           <Fact label={intl.formatMessage({ id: 'stock.item.onHand' })} value={String(item.onHand)} />

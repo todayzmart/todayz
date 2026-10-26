@@ -978,5 +978,70 @@
     "message": "సమస్య ఉంది",
     "review": "reviewed",
     "enHash": "1547a58d"
+  },
+  "stock.photo.label": {
+    "message": "ఫోటో (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "f60a5f04"
+  },
+  "stock.photo.add": {
+    "message": "ఫోటో తీయండి లేదా ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "299dbac8"
+  },
+  "stock.photo.change": {
+    "message": "ఫోటో మార్చండి",
+    "review": "reviewed",
+    "enHash": "ed5690c3"
+  },
+  "stock.photo.remove": {
+    "message": "ఫోటో తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "c8f5eda8"
+  },
+  "stock.photo.preview": {
+    "message": "మీరు ఎంచుకున్న ఫోటో",
+    "review": "reviewed",
+    "enHash": "867e61d1"
+  },
+  "stock.photo.help": {
+    "message": "ప్యాక్ ముందు భాగం, మంచి వెలుతురులో. కస్టమర్లకు చూపించే ముందు TodayZ దీన్ని తనిఖీ చేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "ae44451b"
+  },
+  "stock.photo.tooBig": {
+    "message": "ఈ ఫోటో చాలా పెద్దది. వేరొకటి ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "92c7b3ff"
+  },
+  "stock.photo.badType": {
+    "message": "ఈ ఫైల్‌ను ఫోటోగా వాడలేము. JPEG, PNG లేదా WebP ఫోటో ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "4e364a1d"
+  },
+  "stock.photo.sent": {
+    "message": "ఫోటో పంపబడింది. TodayZ దీన్ని తనిఖీ చేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "223bb430"
+  },
+  "stock.photo.failed": {
+    "message": "ప్రోడక్ట్ జోడించబడింది, కానీ ఫోటో అప్‌లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "24f9cb0f"
+  },
+  "stock.photo.pending": {
+    "message": "మీ ఫోటో TodayZ తనిఖీ కోసం వేచి ఉంది.",
+    "review": "reviewed",
+    "enHash": "97d205ae"
+  },
+  "stock.photo.rejected": {
+    "message": "మీ ఫోటో అంగీకరించబడలేదు.",
+    "review": "reviewed",
+    "enHash": "60e025e2"
+  },
+  "stock.photo.rejectedWhy": {
+    "message": "మీ ఫోటో అంగీకరించబడలేదు: {reason}",
+    "review": "reviewed",
+    "enHash": "2af027fd"
   }
 }

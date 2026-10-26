@@ -782,5 +782,57 @@
   "stock.import.code.other": {
     "defaultMessage": "has a problem",
     "description": "Import problem not known to this app"
+  },
+  "stock.photo.label": {
+    "defaultMessage": "Photo (optional)",
+    "description": "Label of the optional photo on the new product form"
+  },
+  "stock.photo.add": {
+    "defaultMessage": "Take or choose a photo",
+    "description": "Button that opens the camera or the file picker"
+  },
+  "stock.photo.change": {
+    "defaultMessage": "Change photo",
+    "description": "Button to pick another photo"
+  },
+  "stock.photo.remove": {
+    "defaultMessage": "Remove photo",
+    "description": "Button to drop the picked photo"
+  },
+  "stock.photo.preview": {
+    "defaultMessage": "The photo you picked",
+    "description": "Alt text of the picked photo"
+  },
+  "stock.photo.help": {
+    "defaultMessage": "The front of the pack, in good light. TodayZ checks it before customers see it.",
+    "description": "Help under the photo picker"
+  },
+  "stock.photo.tooBig": {
+    "defaultMessage": "This photo is too big. Try another one.",
+    "description": "Error when the photo is over the size limit even after shrinking"
+  },
+  "stock.photo.badType": {
+    "defaultMessage": "This file is not a photo we can use. Pick a JPEG, PNG or WebP photo.",
+    "description": "Error when the file is not a photo the app can use"
+  },
+  "stock.photo.sent": {
+    "defaultMessage": "Photo sent. TodayZ will check it.",
+    "description": "Toast after the photo uploaded"
+  },
+  "stock.photo.failed": {
+    "defaultMessage": "The product is added, but the photo did not upload.",
+    "description": "Toast when the product was made but its photo did not upload"
+  },
+  "stock.photo.pending": {
+    "defaultMessage": "Your photo is waiting for TodayZ to check it.",
+    "description": "Item sheet note while the store's photo waits for review"
+  },
+  "stock.photo.rejected": {
+    "defaultMessage": "Your photo was not accepted.",
+    "description": "Item sheet note when the store's photo was turned down"
+  },
+  "stock.photo.rejectedWhy": {
+    "defaultMessage": "Your photo was not accepted: {reason}",
+    "description": "Item sheet note when the store's photo was turned down, with the reviewer's reason"
   }
 }

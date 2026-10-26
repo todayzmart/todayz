@@ -17,6 +17,7 @@ import { ItemSheet, type SheetMode } from './ItemSheet';
 import { freshnessProps, levelLabel } from './labels';
 import { VoiceLink } from '../voice/VoiceLink';
 import { canStock } from './permissions';
+import { Thumb } from './Thumb';
 import { patchItem, sendMovement, useCategories, useItems, useItemsById, type ItemFilters } from './queries';
 import styles from './stock.module.css';
 
@@ -274,11 +275,14 @@ function ItemTable({
         cell: ({ row }) => {
           const i = row.original;
           return (
-            <span className={styles.cell}>
-              <button type="button" className={styles.nameButton} onClick={() => onOpen(i)}>
-                <span className={styles.name}>{itemTitle(i)}</span>
-              </button>
-              {!i.isListed && <span className={styles.sub}>{intl.formatMessage({ id: 'stock.item.hidden' })}</span>}
+            <span className={styles.itemCell}>
+              <Thumb item={i} />
+              <span className={styles.cell}>
+                <button type="button" className={styles.nameButton} onClick={() => onOpen(i)}>
+                  <span className={styles.name}>{itemTitle(i)}</span>
+                </button>
+                {!i.isListed && <span className={styles.sub}>{intl.formatMessage({ id: 'stock.item.hidden' })}</span>}
+              </span>
             </span>
           );
         },

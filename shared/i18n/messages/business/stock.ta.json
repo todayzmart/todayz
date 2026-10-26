@@ -978,5 +978,70 @@
     "message": "சிக்கல் உள்ளது",
     "review": "reviewed",
     "enHash": "1547a58d"
+  },
+  "stock.photo.label": {
+    "message": "புகைப்படம் (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "f60a5f04"
+  },
+  "stock.photo.add": {
+    "message": "புகைப்படம் எடுக்கவும் அல்லது தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "299dbac8"
+  },
+  "stock.photo.change": {
+    "message": "புகைப்படத்தை மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "ed5690c3"
+  },
+  "stock.photo.remove": {
+    "message": "புகைப்படத்தை நீக்கவும்",
+    "review": "reviewed",
+    "enHash": "c8f5eda8"
+  },
+  "stock.photo.preview": {
+    "message": "நீங்கள் தேர்ந்தெடுத்த புகைப்படம்",
+    "review": "reviewed",
+    "enHash": "867e61d1"
+  },
+  "stock.photo.help": {
+    "message": "பேக்கின் முன்பக்கம், நல்ல வெளிச்சத்தில். வாடிக்கையாளர்கள் பார்க்கும் முன் TodayZ இதைச் சரிபார்க்கும்.",
+    "review": "reviewed",
+    "enHash": "ae44451b"
+  },
+  "stock.photo.tooBig": {
+    "message": "இந்தப் புகைப்படம் மிகப் பெரியது. வேறொன்றை முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "92c7b3ff"
+  },
+  "stock.photo.badType": {
+    "message": "இந்தக் கோப்பை புகைப்படமாகப் பயன்படுத்த முடியாது. JPEG, PNG அல்லது WebP புகைப்படத்தைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "4e364a1d"
+  },
+  "stock.photo.sent": {
+    "message": "புகைப்படம் அனுப்பப்பட்டது. TodayZ இதைச் சரிபார்க்கும்.",
+    "review": "reviewed",
+    "enHash": "223bb430"
+  },
+  "stock.photo.failed": {
+    "message": "பொருள் சேர்க்கப்பட்டது, ஆனால் புகைப்படம் பதிவேறவில்லை.",
+    "review": "reviewed",
+    "enHash": "24f9cb0f"
+  },
+  "stock.photo.pending": {
+    "message": "உங்கள் புகைப்படம் TodayZ சரிபார்ப்புக்காகக் காத்திருக்கிறது.",
+    "review": "reviewed",
+    "enHash": "97d205ae"
+  },
+  "stock.photo.rejected": {
+    "message": "உங்கள் புகைப்படம் ஏற்கப்படவில்லை.",
+    "review": "reviewed",
+    "enHash": "60e025e2"
+  },
+  "stock.photo.rejectedWhy": {
+    "message": "உங்கள் புகைப்படம் ஏற்கப்படவில்லை: {reason}",
+    "review": "reviewed",
+    "enHash": "2af027fd"
   }
 }
