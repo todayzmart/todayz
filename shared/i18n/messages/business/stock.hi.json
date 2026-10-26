@@ -1043,5 +1043,15 @@
     "message": "आपकी फ़ोटो स्वीकार नहीं हुई: {reason}",
     "review": "reviewed",
     "enHash": "2af027fd"
+  },
+  "stock.photo.sending": {
+    "message": "फ़ोटो भेजी जा रही है…",
+    "review": "reviewed",
+    "enHash": "d00e83df"
+  },
+  "stock.photo.uploadFailed": {
+    "message": "फ़ोटो अपलोड नहीं हुई। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "52d84397"
   }
 }

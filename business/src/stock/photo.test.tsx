@@ -178,4 +178,64 @@ describe('B-07 product photo (D-252)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Toor dal/ }));
     expect(await screen.findByText('Your photo was not accepted: The pack is blurred')).toBeInTheDocument();
   });
+
+  it('the item sheet sends a new photo of a product the store created, and the item is read again', async () => {
+    let itemReads = 0;
+    let confirmed = false;
+    const mine = item('i3', 'Toor dal', { canAddPhoto: true, photo: { id: 'ph3', status: 'rejected', previewUrl: 'https://s3.test/get?sig=r', rejectReason: 'The pack is blurred' } });
+    renderAt('/stock', {
+      messages,
+      handlers: [
+        shops,
+        (c) => {
+          if (c.method === 'GET' && c.path === `${BASE}/items/i3`) itemReads++;
+          return undefined;
+        },
+        (c) => (c.method === 'POST' && c.path === `${BASE}/products/p-i3/photos` ? json(201, { ...upload, photo: { ...upload.photo, productId: 'p-i3' } }) : undefined),
+        (c) => {
+          if (c.method !== 'POST' || c.path !== `${BASE}/products/p-i3/photos/ph1/confirm`) return undefined;
+          confirmed = true;
+          return json(200, { ...upload.photo, productId: 'p-i3', status: 'pending', previewUrl: 'https://s3.test/get?sig=y' });
+        },
+        ...reads([mine, item('i1', 'Amul Butter', { canAddPhoto: false })]),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: /^Toor dal/ }));
+    const dialog = await screen.findByRole('dialog');
+    const input = await within(dialog).findByLabelText('Take or choose a photo');
+    expect(input).toHaveAttribute('capture', 'environment');
+    const before = itemReads;
+    fireEvent.change(input, { target: { files: [new File([new Uint8Array([1, 2, 3, 4])], 'dal.png', { type: 'image/png' })] } });
+    await waitFor(() => expect(confirmed).toBe(true));
+    const [url, init] = storage.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://s3.test/put?sig=x');
+    expect(init.headers).toEqual({ 'Content-Type': 'image/png' });
+    await waitFor(() => expect(screen.getByText('Photo sent. TodayZ will check it.')).toBeInTheDocument());
+    await waitFor(() => expect(itemReads).toBeGreaterThan(before));
+  });
+
+  it('the item sheet has no photo button for a product another store created, and says when the upload fails', async () => {
+    storage.mockImplementation(() => Promise.resolve(new Response(null, { status: 403 })));
+    renderAt('/stock', {
+      messages,
+      handlers: [
+        shops,
+        (c) => (c.method === 'POST' && c.path === `${BASE}/products/p-i3/photos` ? json(201, upload) : undefined),
+        ...reads([item('i1', 'Amul Butter', { canAddPhoto: false, imageKey: 'products/p-i1/a1.jpg' }), item('i3', 'Toor dal', { canAddPhoto: true })]),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: /^Amul Butter/ }));
+    let dialog = await screen.findByRole('dialog');
+    await within(dialog).findByText('On hand');
+    expect(within(dialog).queryByLabelText('Take or choose a photo')).toBeNull();
+    expect(within(dialog).queryByLabelText('Change photo')).toBeNull();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+
+    fireEvent.click(await screen.findByRole('button', { name: /^Toor dal/ }));
+    dialog = await screen.findByRole('dialog');
+    fireEvent.change(await within(dialog).findByLabelText('Take or choose a photo'), {
+      target: { files: [new File([new Uint8Array([1, 2, 3, 4])], 'dal.png', { type: 'image/png' })] },
+    });
+    expect(await within(dialog).findByText('The photo did not upload. Try again.')).toBeInTheDocument();
+  });
 });

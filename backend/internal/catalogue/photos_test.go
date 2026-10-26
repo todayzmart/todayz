@@ -107,6 +107,7 @@ func TestProductPhotoFlow(t *testing.T) {
 	// The shop sees its waiting photo on the item; the product has no image yet.
 	it, _, err := w.svc.item(w.ctx, w.store, w.item)
 	require.NoError(t, err)
+	require.True(t, *it.CanAddPhoto, "the store created the product")
 	require.Nil(t, it.ImageKey)
 	require.NotNil(t, it.Photo)
 	require.Equal(t, catalogueapi.StoreItemPhotoStatus("pending"), it.Photo.Status)
@@ -146,10 +147,13 @@ func TestProductPhotoRefusals(t *testing.T) {
 	_, err = w.svc.confirmPhoto(w.ctx, w.biz.String(), w.other.String(), w.product.String(), up.Photo.Id)
 	require.Equal(t, genproblems.NotFound, problemCode(t, err))
 
-	// A merged product takes no photo.
+	// A merged product takes no photo, and the item says so.
 	w.exec(`UPDATE products SET status = 'retired' WHERE id = $1`, ids.UUID(w.product))
 	_, err = w.create(w.store, []byte("x"))
 	require.Equal(t, genproblems.InvalidTransition, problemCode(t, err))
+	it, _, err := w.svc.item(w.ctx, w.store, w.item)
+	require.NoError(t, err)
+	require.False(t, *it.CanAddPhoto)
 
 	// Without storage the route is unavailable.
 	w.svc.storage = nil

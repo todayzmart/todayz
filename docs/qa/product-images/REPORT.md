@@ -10,7 +10,7 @@ Branch `claude/product-images-8828ec`, 26 Oct 2026. Products now have pictures. 
 | API | Shop photo: create, presigned PUT, confirm. Admin queue: list, approve, reject, bulk approve (≤ 50), upload, confirm. Credit on search items | `backend/api/paths/{catalogue,admin-catalogue}.yaml`, `internal/catalogue/photos.go`, `internal/admin/product_images.go`, `internal/search/credit.go` |
 | Storage | Presigned PUT into the private bucket. On approval the object is copied to the public images bucket | `internal/platform/storage` |
 | Importer | `todayz images import [--dry-run] [--limit N] [--source off\|obf\|opf] [--contact URL] [--report FILE]` | `cmd/todayz/images.go`, `internal/imageimport` |
-| Business (B-07) | Optional photo when creating a product (camera or file, shrunk to 1024 px JPEG in the browser). The stock list shows the approved image, else the shop's photo while it waits, else the initials. The item sheet shows the reason a photo was turned down | `business/src/stock/photo.ts`, `Thumb.tsx`, `AddItem.tsx` |
+| Business (B-07) | Optional photo when creating a product (camera or file, shrunk to 1024 px JPEG in the browser). The item sheet sends a new photo later for a product the shop created (`canAddPhoto` on the item, managers and owners). The stock list shows the approved image, else the shop's photo while it waits, else the initials. The item sheet shows the reason a photo was turned down | `business/src/stock/photo.ts`, `Thumb.tsx`, `AddItem.tsx`, `ItemSheet.tsx` |
 | Customer | Search and the product page show the image. An imported photo carries "Photo: Open Food Facts contributors, CC BY-SA 3.0", linking to the source page and the licence | `customer/src/product/ProductPage.tsx` |
 | Admin (A-08) | Images tab: the waiting image beside the current one, source filter, match, barcode, licence, credit, approve or reject (a shop sees the reason), bulk approve with failures listed. Admins upload or replace an image on the product card. Thumbnails in the product list | `admin/src/catalogue/ImagesTab.tsx`, `CataloguePage.tsx` |
 
@@ -50,6 +50,7 @@ Taken on the e2e builds with a faked API on a random local port (not the founder
 - `admin-a08-product-image.png`: a product card with its image and "Replace image"; the list shows a thumbnail and the initials.
 - `business-b07-stock-photos-360.png`: the stock list on a phone with an approved image, a photo waiting for review and the initials.
 - `business-b07-new-product-photo-360.png`: a new product with a photo picked.
+- `business-b07-item-sheet-photo-360.png`: the item sheet of a product the shop created, with its photo waiting and "Change photo".
 
 The customer credit line is covered by `customer/src/test/product.test.tsx`, but has no screenshot.
 
@@ -65,7 +66,7 @@ Refresh with `TZ_QA_DIR=docs/qa/product-images pnpm exec playwright test e2e/ima
 ## What is left
 
 1. **The full import** over the catalogue waits for the founder's go, and the lead runs it: `todayz images import --limit 20000 --report docs/qa/product-images/full-run.md`. Then bulk-approve in A-08, checking every "Name and brand" match by eye.
-2. **A photo after creation.** A shop can add a photo only while creating a product. Adding or changing one later from the item sheet is not built.
+2. **Another store's product.** A shop sends a photo only for a product it created, from the add flow or later from the item sheet. A product another store created gets its image from the import or an admin.
 3. **Admin uploads skip review.** An admin's own upload goes live when it is confirmed. This is intended, but there is no second pair of eyes.
 4. **Translations.** The business `stock.photo.*` keys in hi, kn, te and ta are machine-written and marked reviewed, with a line in `docs/qa/business-i18n/REVIEW.md`. The customer `product.photoCredit` key is translated the same way. Neither has had a native-speaker review.
 5. **Take-down.** An approved image is replaced by approving or uploading another. Taking an approved image down, back to the initials, is in the API (reject on the approved image, audited), but A-08 has no button for it yet, because the Images tab lists only pending images.

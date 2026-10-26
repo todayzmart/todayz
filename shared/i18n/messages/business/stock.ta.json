@@ -1043,5 +1043,15 @@
     "message": "உங்கள் புகைப்படம் ஏற்கப்படவில்லை: {reason}",
     "review": "reviewed",
     "enHash": "2af027fd"
+  },
+  "stock.photo.sending": {
+    "message": "புகைப்படம் அனுப்பப்படுகிறது…",
+    "review": "reviewed",
+    "enHash": "d00e83df"
+  },
+  "stock.photo.uploadFailed": {
+    "message": "புகைப்படம் பதிவேறவில்லை. மீண்டும் முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "52d84397"
   }
 }

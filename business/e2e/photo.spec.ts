@@ -4,7 +4,8 @@ import { overview } from '../src/test/insightsData';
 
 // B-07 product photos (D-252) on the production-shaped build with a faked API: the stock list with
 // an approved image, the shop's own photo waiting for review and the initials, and a new product
-// with a photo picked. The pictures are drawn here and served from the local image hosts.
+// with a photo picked, and the item sheet of a product the shop created, where it sends a new photo.
+// The pictures are drawn here and served from the local image hosts.
 // `TZ_QA_DIR=docs/qa/product-images pnpm exec playwright test photo.spec.ts` refreshes the shots.
 
 const BID = '01J9ZBBBBBBBBBBBBBBBBBBBBB';
@@ -50,7 +51,7 @@ function item(n: number, name: string, over: Record<string, unknown> = {}) {
 
 const ITEMS = [
   item(1, 'Amul Butter', { packSize: 100, unit: 'g', pricePaise: 5800, imageKey: `products/${id('P', 1)}/a1.jpg` }),
-  item(2, 'Jaggery', { packSize: 500, unit: 'g', pricePaise: 6500, photo: { id: 'ph2', status: 'pending', previewUrl: 'https://s3.todayz.localhost/private/jaggery.jpg', rejectReason: null } }),
+  item(2, 'Jaggery', { packSize: 500, unit: 'g', pricePaise: 6500, canAddPhoto: true, photo: { id: 'ph2', status: 'pending', previewUrl: 'https://s3.todayz.localhost/private/jaggery.jpg', rejectReason: null } }),
   item(3, 'Toor dal', { pricePaise: 18900 }),
 ];
 
@@ -93,6 +94,9 @@ async function fakeApi(page: Page) {
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: NOW() });
     if (url.pathname === `${base}/overview`) return ok(route, overview({ newOrders: [] }));
     if (url.pathname === `${base}/items`) return ok(route, { items: ITEMS, nextCursor: null });
+    const one = ITEMS.find((i) => url.pathname === `${base}/items/${i.id}`);
+    if (one) return ok(route, one);
+    if (url.pathname === `${base}/batches` || url.pathname.endsWith('/history')) return ok(route, { items: [], nextCursor: null });
     // Voice update is on for the shop, as on the stack; its link sits on the stock screen.
     if (url.pathname === `${base}/ai/voice-stock`) return ok(route, { maxSeconds: 15, maxBytes: 1_048_576, languages: ['en-IN'] });
     if (url.pathname === `/v1/biz/businesses/${BID}/products/search`) return ok(route, { items: [], nextCursor: null });
@@ -155,4 +159,14 @@ test('phone 360: a new product with a photo picked from the camera or files', as
   await expect(preview).toBeVisible();
   await preview.scrollIntoViewIfNeeded();
   await shot(page, 'business-b07-new-product-photo-360.png', { fullPage: true });
+});
+
+test('phone 360: the item sheet of a product the shop created offers a new photo', async ({ page }) => {
+  await page.goto('/stock');
+  await page.getByRole('button', { name: /^Jaggery/ }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Your photo is waiting for TodayZ to check it.')).toBeVisible();
+  await expect(dialog.getByText('Change photo')).toBeVisible();
+  await expect(dialog.getByText('No batches with stock left.')).toBeVisible();
+  await shot(page, 'business-b07-item-sheet-photo-360.png');
 });

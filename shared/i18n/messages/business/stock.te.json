@@ -1043,5 +1043,15 @@
     "message": "మీ ఫోటో అంగీకరించబడలేదు: {reason}",
     "review": "reviewed",
     "enHash": "2af027fd"
+  },
+  "stock.photo.sending": {
+    "message": "ఫోటో పంపుతోంది…",
+    "review": "reviewed",
+    "enHash": "d00e83df"
+  },
+  "stock.photo.uploadFailed": {
+    "message": "ఫోటో అప్‌లోడ్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "52d84397"
   }
 }

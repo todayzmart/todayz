@@ -211,6 +211,11 @@ StoreItem:
       oneOf:
         - $ref: '#/StoreItemPhoto'
         - type: "null"
+    canAddPhoto:
+      type: boolean
+      description: >-
+        This store created the product and it is not merged or retired, so it may send a photo
+        (`createProductPhoto`, manager and above).
     createdAt: {$ref: ./common.yaml#/Timestamp}
     updatedAt: {$ref: ./common.yaml#/Timestamp}
 StoreItemList:

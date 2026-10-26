@@ -1,8 +1,8 @@
 import type { StockBatch } from '@todayz/api-client/gen/model/stockBatch';
 import type { StoreItem } from '@todayz/api-client/gen/model/storeItem';
 import { formatMoney } from '@todayz/i18n';
-import { Button, Sheet, Skeleton, StockTag, Tabs } from '@todayz/ui';
-import { Eye, EyeOff } from 'lucide-react';
+import { Button, Sheet, Skeleton, StockTag, Tabs, useToast } from '@todayz/ui';
+import { Camera, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useSession } from '@todayz/auth';
@@ -13,11 +13,13 @@ import { effectiveMrp, itemTitle, stockLevel } from './format';
 import { dateText, freshnessProps, levelLabel, sourceLabel, whenText } from './labels';
 import { MovementForm, type MovementFormKind } from './MovementForm';
 import { canStock, type StockAction } from './permissions';
-import { patchItem, useBatches, useHistory, useItem } from './queries';
+import { PhotoError, shrinkPhoto, uploadProductPhoto } from './photo';
+import { itemKey, patchItem, stockKey, useBatches, useHistory, useItem } from './queries';
 import { StockError } from './StockError';
 import styles from './stock.module.css';
 import { Thumb } from './Thumb';
 import type { CurrentStore } from '../orders/store';
+import { Icon } from '../shell/Icon';
 
 export type SheetMode = 'view' | MovementFormKind | 'price' | 'threshold' | { batch: string };
 
@@ -89,6 +91,7 @@ export function ItemSheet({ store, item: row, initialMode = 'view', initialQty, 
               : intl.formatMessage({ id: 'stock.photo.rejected' })}
           </p>
         )}
+        {mode === 'view' && item.canAddPhoto === true && canStock(store.role, 'addItem') && <SendPhoto store={store} item={item} />}
         {refused && <p className={styles.note}>{intl.formatMessage({ id: 'stock.link.askManager' })}</p>}
         <dl className={styles.facts}>
           <Fact label={intl.formatMessage({ id: 'stock.item.onHand' })} value={String(item.onHand)} />
@@ -158,6 +161,67 @@ function Fact({ label, value }: { label: string; value: string }) {
     <div className={styles.fact}>
       <dt>{label}</dt>
       <dd>{value}</dd>
+    </div>
+  );
+}
+
+/**
+ * A new photo of a product this store created (D-252): shrunk on the device, uploaded as soon as it
+ * is picked, then it waits for review like the one sent with a new product.
+ */
+function SendPhoto({ store, item }: { store: CurrentStore; item: StoreItem }) {
+  const intl = useIntl();
+  const toast = useToast();
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const hasPhoto = item.imageKey !== null || item.photo?.status === 'pending';
+
+  const send = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const blob = await shrinkPhoto(file);
+      await uploadProductPhoto(store, item.productId, blob);
+      toast.show({ message: intl.formatMessage({ id: 'stock.photo.sent' }) });
+      void qc.invalidateQueries({ queryKey: itemKey(store.sid, item.id) });
+      void qc.invalidateQueries({ queryKey: [...stockKey(store.sid), 'items'] });
+    } catch (e) {
+      const reason = e instanceof PhotoError ? e.reason : 'upload';
+      setError(reason === 'size' ? 'stock.photo.tooBig' : reason === 'type' ? 'stock.photo.badType' : 'stock.photo.uploadFailed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="tz-field">
+      <div className={styles.photoActions}>
+        <input
+          id="stock-item-photo"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className={styles.fileInput}
+          disabled={busy}
+          onChange={(e) => {
+            void send(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
+        <label htmlFor="stock-item-photo" className="tz-btn tz-btn-sm" aria-disabled={busy || undefined}>
+          <Icon icon={Camera} />
+          {intl.formatMessage({ id: busy ? 'stock.photo.sending' : hasPhoto ? 'stock.photo.change' : 'stock.photo.add' })}
+        </label>
+      </div>
+      {error ? (
+        <span className="tz-field-error" role="alert">
+          {intl.formatMessage({ id: error })}
+        </span>
+      ) : (
+        <span className="tz-field-help">{intl.formatMessage({ id: 'stock.photo.help' })}</span>
+      )}
     </div>
   );
 }

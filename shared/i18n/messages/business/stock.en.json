@@ -834,5 +834,13 @@
   "stock.photo.rejectedWhy": {
     "defaultMessage": "Your photo was not accepted: {reason}",
     "description": "Item sheet note when the store's photo was turned down, with the reviewer's reason"
+  },
+  "stock.photo.sending": {
+    "defaultMessage": "Sending the photo…",
+    "description": "Item sheet button text while the photo is shrunk and uploaded"
+  },
+  "stock.photo.uploadFailed": {
+    "defaultMessage": "The photo did not upload. Try again.",
+    "description": "Item sheet error when the photo did not upload"
   }
 }

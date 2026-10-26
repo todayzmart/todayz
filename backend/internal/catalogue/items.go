@@ -298,7 +298,7 @@ func (s *Service) toItem(r cataloguedb.GetStoreItemRow, v view) catalogueapi.Sto
 		Available: int(avail), LowStock: LowStock(avail, r.LowStockAt, v.lowDefault), IsListed: r.IsListed,
 		StockUpdatedAt: r.StockUpdatedAt, Stale: Stale(r.StockUpdatedAt, v.now, v.staleAfter),
 		CreatedAt: r.CreatedAt.UTC(), UpdatedAt: r.UpdatedAt.UTC(),
-		ImageKey: r.ImageKey, Photo: s.itemPhoto(r, v.now),
+		ImageKey: r.ImageKey, Photo: s.itemPhoto(r, v.now), CanAddPhoto: ptr(r.CanAddPhoto),
 	}
 	if r.LowStockAt != nil {
 		it.LowStockAt = ptr(int(*r.LowStockAt))

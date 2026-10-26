@@ -1043,5 +1043,15 @@
     "message": "ನಿಮ್ಮ ಫೋಟೋ ಸ್ವೀಕರಿಸಲಾಗಿಲ್ಲ: {reason}",
     "review": "reviewed",
     "enHash": "2af027fd"
+  },
+  "stock.photo.sending": {
+    "message": "ಫೋಟೋ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ…",
+    "review": "reviewed",
+    "enHash": "d00e83df"
+  },
+  "stock.photo.uploadFailed": {
+    "message": "ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "52d84397"
   }
 }
