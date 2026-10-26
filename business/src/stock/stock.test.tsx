@@ -248,7 +248,7 @@ describe('B-07 import and create product (adapter endpoints)', () => {
     fireEvent.change(within(dialog).getByLabelText('MRP'), { target: { value: '60' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Create and continue' }));
     await waitFor(() => expect(created).toBeDefined());
-    expect(created?.body).toMatchObject({ name: 'Jaggery', packSize: 500, unit: 'g', categoryId: 'c1', mrpPaise: 6000 });
+    expect(created?.body).toMatchObject({ storeId: 's1', name: 'Jaggery', packSize: 500, unit: 'g', categoryId: 'c1', mrpPaise: 6000 });
     expect(created?.headers.get('idempotency-key')).toBeTruthy();
     fireEvent.change(await within(dialog).findByLabelText('Selling price'), { target: { value: '75' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Add to my shop' }));

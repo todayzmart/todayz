@@ -260,7 +260,7 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
-| POST | {B}/products | manager | W1-05 | create a missing master product (pending review) (D-37) |
+| POST | {B}/products | manager | W1-05 | create a missing master product (pending review) for the body's `storeId`, which can list it at once (D-37) |
 | GET | {B}/products/search?q=&barcode= | cashier | W1-05 | master catalogue (D-37) |
 | GET | {S}/items | cashier | W1-05 | |
 | POST | {S}/items | manager | W1-05 | list a product with price; opening stock writes an `opening` movement |

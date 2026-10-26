@@ -82,6 +82,66 @@ ProductMatch:
     inStore:
       type: boolean
       description: The store in the query already lists this product.
+ProductCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    A product the master catalogue does not have (D-37). `storeId` is the
+    store that creates it and may list it before review.
+  required: [storeId, name, packSize, unit, categoryId]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: string
+      minLength: 1
+      maxLength: 120
+    brand:
+      type: string
+      minLength: 1
+      maxLength: 80
+    variant:
+      type: string
+      minLength: 1
+      maxLength: 80
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+      maximum: 100000
+    unit: {$ref: '#/Unit'}
+    mrpPaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    barcodes:
+      type: array
+      maxItems: 10
+      items:
+        type: string
+        pattern: ^[0-9A-Za-z-]{4,32}$
+CreatedProduct:
+  type: object
+  description: A product a shop created; it waits for review (D-37).
+  required: [id, name, brand, variant, packSize, unit, mrpPaise, categoryId, barcodes, status]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    brand: {type: [string, "null"]}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {$ref: '#/Unit'}
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    barcodes:
+      type: array
+      items: {type: string}
+    status:
+      type: string
+      enum: [pending_review]
 ProductMatchList:
   type: object
   required: [items]

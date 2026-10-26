@@ -23,6 +23,10 @@ stock.damage kind=business step-up=false
 stock.damage owner allow
 stock.damage manager allow
 stock.damage cashier -
+product.create kind=business step-up=false
+product.create owner allow
+product.create manager allow
+product.create cashier -
 batches.manage kind=business step-up=false
 batches.manage owner allow
 batches.manage manager allow

@@ -201,6 +201,7 @@ function NewProductForm({
     setInvalid(errors);
     if (Object.keys(errors).length > 0) return;
     const body = {
+      storeId: store.sid,
       name: name.trim(),
       ...(brand.trim() ? { brand: brand.trim() } : {}),
       packSize: pack,

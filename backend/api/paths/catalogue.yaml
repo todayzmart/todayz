@@ -3,8 +3,7 @@
 # W1-05 weekend slice. `{B}` = /v1/biz/businesses/{bid}, `{S}` = {B}/stores/{sid};
 # the permission engine reads the scope from `bid` and `sid`. Roles per
 # operation are in internal/platform/authz/policy/catalogue.go (02 §3.3).
-# Deferred (W1-05 report): `POST {B}/products` (review queue), item imports,
-# the catalogue snapshot and delta feed.
+# Deferred (W1-05 report): item imports, the catalogue snapshot and delta feed.
 /v1/discover/categories:
   get:
     operationId: listCategories
@@ -39,6 +38,61 @@
                       names: {en: Staples}
                       tint: green
                       icon: wheat
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/products:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createProduct
+    tags: [catalogue]
+    summary: Create a product the master catalogue does not have
+    description: >-
+      Manager and above (`product.create`, D-37). The product is created
+      `pending_review` with `storeId` as its creator: that store can list it
+      at once (`POST {S}/items`), and it goes to the review queue (A-08). A
+      barcode another product has is `422 validation_failed`; search for it
+      instead.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/ProductCreate
+          example:
+            storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+            name: Jaggery
+            brand: Local
+            packSize: 500
+            unit: g
+            mrpPaise: 6000
+            categoryId: 01J43RW0000000000000000082
+            barcodes: ["8901234567890"]
+    responses:
+      "201":
+        description: The new product, waiting for review
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/CreatedProduct
+            example:
+              id: 01JB0S9P1R2D3C4T5M6A7S8T9S
+              name: Jaggery
+              brand: Local
+              variant: null
+              packSize: 500
+              unit: g
+              mrpPaise: 6000
+              categoryId: 01J43RW0000000000000000082
+              barcodes: ["8901234567890"]
+              status: pending_review
       default:
         $ref: ../common/responses.yaml#/Problem
 /v1/biz/businesses/{bid}/products/search:

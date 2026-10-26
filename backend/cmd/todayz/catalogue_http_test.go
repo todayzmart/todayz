@@ -364,3 +364,51 @@ func TestCatalogueTenancyHTTP(t *testing.T) {
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM stock_movements WHERE store_item_id = $1`, uuidOf(t, yItem)))
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE action = 'catalogue.batch_update'`))
 }
+
+// TestCatalogueCreateProductHTTP creates a missing product (D-37): manager
+// and above, pending review, listable at once in the store that created it
+// and nowhere else.
+func TestCatalogueCreateProductHTTP(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs the database")
+	}
+	c := newCatalogueShop(t)
+	a := c.a
+	r := a.call("", http.MethodGet, "/v1/discover/categories", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	category := r.body["items"].([]any)[0].(map[string]any)["id"].(string)
+
+	body := map[string]any{
+		"storeId": c.storeID(c.S), "name": "Jaggery", "brand": "Local Mill", "packSize": 500, "unit": "g",
+		"mrpPaise": 6000, "categoryId": category, "barcodes": []string{"8909876543210"},
+	}
+	r = a.call(c.cashier, http.MethodPost, c.B+"/products", body, idem(a))
+	require.Equal(t, http.StatusForbidden, r.code, "a cashier creates no products: %s", r.raw)
+	r = a.call(c.owner, http.MethodPost, c.B+"/products", map[string]any{
+		"storeId": c.storeID(c.SY), "name": "Jaggery", "packSize": 500, "unit": "g", "categoryId": category,
+	}, idem(a))
+	require.Equal(t, http.StatusForbidden, r.code, "another business's store: %s", r.raw)
+	r = a.call(c.manager, http.MethodPost, c.B+"/products", body, idem(a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, "pending_review", r.body["status"])
+	require.Equal(t, "Local Mill", r.body["brand"])
+	require.EqualValues(t, 6000, r.body["mrpPaise"])
+	product := r.body["id"].(string)
+
+	r = a.call(c.manager, http.MethodPost, c.B+"/products", body, idem(a))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, "the barcode is taken now: %s", r.raw)
+	r = a.call(c.manager, http.MethodPost, c.B+"/products", map[string]any{
+		"storeId": c.storeID(c.S), "name": "Jaggery", "packSize": 500, "unit": "g", "categoryId": ids.New(a.clk.Now()).String(),
+	}, idem(a))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, "unknown category: %s", r.raw)
+
+	// The creating store lists it at once, at any price (D-245); other stores
+	// wait for review.
+	r = a.call(c.manager, http.MethodPost, c.S+"/items", map[string]any{"productId": product, "pricePaise": 6500, "openingStock": 5}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, "Jaggery", r.body["name"])
+	r = a.call(c.owner, http.MethodPost, c.S2+"/items", map[string]any{"productId": product, "pricePaise": 6500}, nil)
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	r = a.call(c.ownerY, http.MethodPost, c.SY+"/items", map[string]any{"productId": product, "pricePaise": 6500}, nil)
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+}
