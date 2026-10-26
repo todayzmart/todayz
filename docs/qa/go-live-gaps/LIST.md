@@ -16,7 +16,7 @@ Tags: **(a)** fix now on this branch; **(b)** needs a founder decision (the ques
 
 | # | Size | Item | Source | Status |
 |---|---|---|---|---|
-| A1 | S | `e2e/fixtures/admins.yaml` says the mocks have a "TOTP now" panel. They don't: the journeys compute the code from the file (`e2e/fixtures/api.ts`). Fix the comment | lead | open |
+| A1 | S | `e2e/fixtures/admins.yaml` says the mocks have a "TOTP now" panel. They don't: the journeys compute the code from the file (`e2e/fixtures/api.ts`). Fix the comment | lead | **done** (comment names the real readers) |
 | A2 | S | `.tools/bin/envtool` is shared by worktrees through the `.tools` symlink. A build in one checkout is newer than another's sources, so make never rebuilds it, and main's SC-PL-03 smoke saw the wrong key list. Rebuild it on every make run (the Go build cache makes that ~0.3 s) | lead notes 26 Oct | open |
 | A3 | S | `cmd/todayz` TestPOSOfflineOfferMatchesEngine flake ("entry 9: linked, got failed"). The cause is not load. `codeAt` binds a 4-digit code to the *earliest* step in ±1 that matches. When a code also matches the step before (1 in 10,000), that sale takes the neighbour's step, and the neighbour's own sale later fails as "code used". 19 consecutive minutes make it about 0.2 % a run. Prefer the exact step, then the drift steps (the set of codes accepted is unchanged) | lead notes (load flakes) | open |
 | A4 | S | `internal/search` TestSearchAtScale p95 goes just over 300 ms when 2–3 sessions run checks at once. Keep the 300 ms budget; when the machine's load per CPU is high, log the p95 and skip only the latency gate (the index checks still gate). The lead asked not to change the budget | lead notes (load flakes) | open |
