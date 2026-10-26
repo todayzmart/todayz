@@ -9,10 +9,13 @@ Founder, 26 Oct: "current customer UI is getting better, lets do the same for re
 - Text sitting directly on the grey is `ink-2`: the stock, offers and customers sublines use `tz-page-sub`, and the orders sound row moved off `ink-3`.
 - POS: tiles fill their grid cells, so the columns are even. On a phone the search takes its own row, with Scan and Custom item below it; before, it was squashed to "Sea" at 360px. Tile size, density and the lack of photos are unchanged, and the offline counter is untouched.
 - Tabs and the segmented control are shared with the customer app and keep their look.
+- Stock on a phone (below 640px): the table is now a list, so nothing scrolls sideways. Each row has the photo, the name (opens the item sheet), the stock tag, and On hand and Price with their pencils side by side. Tablet and up keep the table.
+- Shop coach card: the action link sits under the tip's sentence, so the text is no longer squeezed into a thin column on a phone. Done and Not useful sit on one row, and "All tips" does not wrap.
+- DataTable (`shared/ui`): the scrolling wrap is a focusable group named like the table, so a keyboard can scroll it. Admin gets this too.
 
 ## Screens
 
-Phone 360×780 and tablet 768×1024: overview, Sell (4 items in the bill), stock, the stock item sheet with Change price open, orders, offers, customers and settings.
+Phone 360×780 and tablet 768×1024: overview, the shop coach card (`coach-*`), Sell (4 items in the bill), stock, the stock item sheet with Change price open, orders, offers, customers and settings.
 
 - `all-phone.png`, `all-tablet.png`: every screen in one image (the tablet one at half size).
 - `before-all-phone.png`: the same phone screens before the skin.
@@ -27,11 +30,11 @@ VITE_TURNSTILE_SITE_KEY=x VITE_API_URL=https://api.todayz.localhost TZ_QA_DIR=..
 
 ## Checks
 
-- Business: `typecheck`, `lint`, `lint:css`, `test` and `build` pass. `@todayz/tokens` tests pass.
-- axe (WCAG 2.2 AA) is clean on all 16 shots except one skipped rule. The ink-3 sound row it caught on the grey page is fixed.
+- Business: `typecheck`, `lint`, `lint:css`, `test` (544) and `build` pass. `@todayz/tokens` tests pass.
+- `@todayz/ui`: `typecheck`, `lint` and `test` (362) pass. Admin tests pass with the DataTable change.
+- axe (WCAG 2.2 AA) is clean on all 18 shots, with no rule skipped. The ink-3 sound row it caught on the grey page is fixed.
 
 ## Open
 
-- **DataTable focus (predates the skin).** On a phone, the customers table's scrolling wrap (`tz-table-wrap`, `shared/ui` DataTable) is not keyboard-focusable (axe `scrollable-region-focusable`). The fix is `tabIndex={0}`, `role="region"` and a label on the wrap. It is a `shared/ui` change that admin uses too, so it is left for its own change, and the spec skips that one rule until then.
 - **Visual baselines.** The business baselines in `e2e/visual/` will differ. They have not been refreshed, and wait for the founder's yes.
 - **Desktop.** The sidebar rule (≥1024px) is in place but has no screenshot here.

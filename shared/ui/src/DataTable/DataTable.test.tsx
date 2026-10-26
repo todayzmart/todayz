@@ -39,6 +39,14 @@ describe('DataTable', () => {
     expect(firstColumn()).toEqual(['Atta', 'Bread', 'Curd']);
   });
 
+  it('wraps the table in a focusable group with the same name, so a keyboard can scroll it sideways', () => {
+    render(<DataTable label="Stock" columns={columns} data={data} getRowId={(r) => r.id} emptyLabel="No items" />);
+    const wrap = screen.getByRole('group', { name: 'Stock' });
+    expect(wrap).toHaveClass('tz-table-wrap');
+    expect(wrap).toHaveAttribute('tabindex', '0');
+    expect(within(wrap).getByRole('table', { name: 'Stock' })).toBeInTheDocument();
+  });
+
   it('sorts locally: ascending, descending, then off', () => {
     render(<DataTable label="Stock" columns={columns} data={data} getRowId={(r) => r.id} emptyLabel="No items" />);
     const qtyHeader = screen.getAllByRole('columnheader')[1] as HTMLElement;

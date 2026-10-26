@@ -98,7 +98,7 @@ async function fakeApi(page: Page) {
     if (path.endsWith('/stream')) return route.fulfill({ status: 200, contentType: 'text/event-stream', headers: cors(route), body: 'retry: 600000\nevent: ready\ndata: {}\n\n' });
     if (path === `${BASE}/overview`) return ok(route, overview({ range: url.searchParams.get('range') ?? 'today' }));
     if (path === `${BASE}/insights`) return ok(route, { items: INSIGHTS, nextCursor: null, period: PERIOD, serverNow: SERVER_NOW });
-    if (path === `${BASE}/coach/cards`) return ok(route, { items: [], nextCursor: null, serverNow: SERVER_NOW });
+    if (path === `${BASE}/coach/cards`) return ok(route, { items: [COACH_CARD], nextCursor: null, serverNow: SERVER_NOW });
     if (path === `${BASE}/asks`) return ok(route, { asks: [], openCount: 0, nextCursor: null, serverNow: SERVER_NOW });
     if (path === `${BASE}/orders`) {
       const tab = url.searchParams.get('status') ?? 'new';
@@ -135,16 +135,32 @@ test.afterEach(() => {
   expect(guard.external, 'requests to non-local hosts').toEqual([]);
 });
 
+/** One live coach card at the foot of the overview, with the long text that crowded a phone. */
+const COACH_CARD = {
+  id: 'c1',
+  detector: 'missed_orders_rate',
+  subjectRef: 'store',
+  kind: 'high',
+  topic: 'orders',
+  title: 'Missed orders are lowering you in search',
+  body: '1 of 2 orders in the last 30 days expired unaccepted (50%, limit 30%). Turn on order sound and auto-accept.',
+  numbers: { missed: 1, total: 2 },
+  action: { type: 'turn_on_auto_accept', payload: { setting: 'auto_accept' } },
+  status: 'seen',
+  generatedBy: 'rule',
+  lang: 'en',
+  createdAt: '2026-01-05T00:30:00.000Z',
+  validUntil: '2026-01-07T00:30:00.000Z',
+  actedAt: null,
+  quietUntil: null,
+};
+
 async function settle(page: Page) {
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
 }
 
-/**
- * With TZ_AXE (a path to axe.min.js), the screen must have no WCAG 2.2 AA violations. One rule is
- * skipped: DataTable's scrolling wrap is not focusable on a phone, which predates the skin and is
- * a shared/ui fix (docs/qa/D-260/REPORT.md).
- */
+/** With TZ_AXE (a path to axe.min.js), the screen must have no WCAG 2.2 AA violations. */
 async function axe(page: Page) {
   const path = process.env['TZ_AXE'];
   if (!path) return;
@@ -152,7 +168,7 @@ async function axe(page: Page) {
   const found = await page.evaluate(async () => {
     const w = window as unknown as { axe: { run: (o: unknown) => Promise<{ violations: { id: string; nodes: { target: string[] }[] }[] }> } };
     const r = await w.axe.run({ runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] });
-    return r.violations.filter((v) => v.id !== 'scrollable-region-focusable').map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
+    return r.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
   });
   expect(found).toEqual([]);
 }
@@ -161,6 +177,7 @@ const tile = (page: Page, name: string) => page.getByRole('region', { name: 'Ite
 
 const SCREENS: [string, string, ((page: Page) => Promise<void>)?][] = [
   ['overview', '/'],
+  ['coach', '/', (page) => page.getByRole('region', { name: 'Shop coach' }).scrollIntoViewIfNeeded()],
   [
     'sell',
     '/sell',
