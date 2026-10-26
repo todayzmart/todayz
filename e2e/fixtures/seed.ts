@@ -28,6 +28,14 @@ export const PEOPLE = {
   cashier: { key: 'cashier', national: '9000000013', app: 'business' },
   support: { key: 'support', national: '9000000022', app: 'admin', admin: 'admin.support' },
   superAdmin: { key: 'superAdmin', national: '9000000028', app: 'admin', admin: 'admin.super_admin_1' },
+  // Wave 3 gate (W3-14): the other seeded admins (admins.yaml) and the people the new journeys create.
+  fieldAgent: { key: 'fieldAgent', national: '9000000021', app: 'admin', admin: 'admin.field_agent' },
+  finance1: { key: 'finance1', national: '9000000026', app: 'admin', admin: 'admin.finance_1' },
+  finance2: { key: 'finance2', national: '9000000027', app: 'admin', admin: 'admin.finance_2' },
+  // A shopkeeper the field agent onboards (E2E-08): a new number, so a new business-app account.
+  newOwner: { key: 'newOwner', national: '9000000048', app: 'business' },
+  // The shopper who scans the standee (E2E-01).
+  standee: { key: 'standee', national: '9000000047', app: 'customer' },
   // New customers (no account in the seed): each journey that changes a customer's standing gets its own.
   referee: { key: 'referee', national: '9000000041', app: 'customer' },
   noShow: { key: 'noShow', national: '9000000042', app: 'customer' },

@@ -1,0 +1,19 @@
+{
+  "description": "W3-14 (E2E-14): a one-line distributor bill for Amul Butter 100 g, no printed expiry (the journey sets it on confirm).",
+  "match": {"tool": "read_supplier_bill"},
+  "response": {
+    "content": [
+      {
+        "type": "tool_use",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Sri Lakshmi Agencies",
+          "bill_date": null,
+          "lines": [
+            {"name": "AMUL BUTTER 100G", "quantity": 12, "cost_rupees": 52, "mrp_rupees": 58, "expires_on": null, "confidence": 0.95}
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -90,6 +90,16 @@ async function latestOtp(request: APIRequestContext, national: string, since: st
   return ((await r.json()) as { otp: string }).otp;
 }
 
+/** The newest SMS code the mocks hold for a number sent since `since` (a code another flow sent, such as the field owner confirm). Never print it. */
+export async function smsCodeSince(national: string, since: string): Promise<string> {
+  const request = await newRequest();
+  try {
+    return await latestOtp(request, national, since);
+  } finally {
+    await request.dispose();
+  }
+}
+
 async function sendOtp(request: APIRequestContext, person: Person): Promise<{ requestId: string; since: string }> {
   for (let attempt = 0; ; attempt++) {
     const since = new Date(Date.now() - 1000).toISOString();
