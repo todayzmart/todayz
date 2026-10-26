@@ -19,7 +19,7 @@
     "lint": "eslint --max-warnings 0 ."
   },
   "dependencies": {
-    "zod": "4.6.5"
+    "zod": "4.6.6"
   },
   "peerDependencies": {
     "msw": "2.15.0"
