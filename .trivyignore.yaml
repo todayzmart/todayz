@@ -5,10 +5,6 @@
 # the day after its fixed version turns 14 days old; bump the package then (D-215).
 # Misconfigurations are ignored inline in the .tf files, next to their checkov skips.
 vulnerabilities:
-  - id: CVE-2023-54404
-    paths: ["pnpm-lock.yaml"]
-    expired_at: 2026-10-26
-    statement: zod 4.6.5 is pulled in only by codegen (orval, the TanStack router generator); 4.6.6 was released 11 Oct.
   - id: CVE-2026-109869
     paths: ["pnpm-lock.yaml"]
     expired_at: 2026-10-30

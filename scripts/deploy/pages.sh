@@ -36,7 +36,7 @@ app_headers() {
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Strict-Transport-Security: max-age=31536000
-  Permissions-Policy: camera=(self), geolocation=(self), microphone=(), payment=()
+  Permissions-Policy: camera=(self), geolocation=(self), microphone=(self), payment=()
 /sw.js
   Cache-Control: no-cache
 /assets/*

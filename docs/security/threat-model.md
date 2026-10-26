@@ -178,7 +178,7 @@ Handlers then load every resource through the store in the path (for example `of
 | Sev | Gap | Owner |
 |---|---|---|
 | medium | No CSP on the customer, business and admin Pages apps (`scripts/deploy/pages.sh:29-45`) | lead (deploy) and app owners |
-| medium | `Permissions-Policy: microphone=()` on the Pages apps blocks the shipped voice features (customer C-23, business voice) in prod (`scripts/deploy/pages.sh:39`). A functional break found during the header review | lead (deploy) |
+| medium | `Permissions-Policy: microphone=()` on the Pages apps blocks the shipped voice features (customer C-23, business voice) in prod (`scripts/deploy/pages.sh:39`). A functional break found during the header review. Fixed: `microphone=(self)` (lead, 26 Oct) | lead (deploy), fixed |
 | medium (known) | Referral same-device rule trusts a client-chosen deviceId | pending referrals branch |
 | low | Generic rate limiter: in-memory, off locally, numbers TODO(lead) | lead |
 | low (W5) | CF-Connecting-IP trusted from any peer; needs the ALB security group | infra W5 |

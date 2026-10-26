@@ -473,7 +473,7 @@ Target sizing for launch: 1,000 stores, 50,000 customers, 5,000 orders/day, 50,0
 - Static: gosec, govulncheck, `npm audit --production`, gitleaks (full history), Semgrep OWASP rules, Trivy on the Docker image, checkov on Terraform.
 - Dynamic: ZAP baseline on every app in `make security`; ZAP full + authenticated scan in wave 4.
 - Abuse suite (`e2e/security`): IDOR on every `{id}` route with another tenant's id; role escalation attempts; brute force of OTP, order codes and counter codes; replayed bill tokens and refresh tokens; mass referral sign-ups; CSV injection in exports (cells starting with `=+-@` escaped); XSS payloads in shop names, reviews and product names rendered in all apps; oversized/polyglot image uploads; SSE subscription to another store's channel; the order code requested through any `/v1/biz` route (BK-38); receipt token enumeration (POS-25); reserved test phone numbers in a `prod` build (§2 Test OTP); provider and generated key values absent from every response, log and trace (PL-03, PL-05); the `/v1/test/*` routes absent (404) in staging and prod builds (D-80).
-- ASVS L2 checklist with evidence links in `docs/security/asvs.md`.
+- ASVS L2 checklist with evidence links in `docs/security/asvs-l2.md`.
 
 ## 8. Release gates
 
