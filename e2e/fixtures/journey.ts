@@ -288,7 +288,15 @@ export async function customerFirstRun(page: Page) {
       // storage blocked: the journey's own checks fail with the screen they see
     }
   }, JSON.stringify({ kind: 'gps', lat: QA_POINT.lat, lng: QA_POINT.lng }));
+  // A signed-in page refreshes its session on load. The journey's next goto would abort that request
+  // after the server rotated the token: the page keeps the old cookie, gets 401 inside RotationGrace
+  // and, past it, the reuse revokes the whole session family. So wait for the refresh to land.
+  const signedIn = (await page.context().cookies()).some((c) => c.name === '__Secure-tz_rt_c');
+  const refreshed = signedIn
+    ? page.waitForResponse((r) => new URL(r.url()).pathname === '/v1/auth/refresh', { timeout: 15_000 })
+    : undefined;
   await page.goto('/');
+  if (refreshed) expect((await refreshed).status(), 'the page refreshes its session').toBe(200);
 }
 
 export interface AppPage {
