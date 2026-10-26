@@ -12,6 +12,8 @@
 #                             ZAP baseline (passive) through Caddy on *.todayz.localhost.
 #                             --if-up skips with a message when the local stack does not
 #                             answer its health check (infra/local/health.sh)
+#   scan.sh abuse [--if-up]   the stack-only abuse suite (W4-03): e2e/security/abuse.stack.test.mjs
+#                             with node:test, trusting the Caddy local CA; --if-up as for zap
 #
 # gitleaks in CI (CI or GITHUB_ACTIONS set):
 #   - fails when there is no .git or the clone is shallow (no silent fallback to a
@@ -249,12 +251,35 @@ scan_zap() {
   return $rc
 }
 
+# ---------------------------------------------------------------- abuse
+
+# scan_abuse: the stack-only abuse checks (headers through Caddy, refresh CSRF, OTP limits). The
+# in-process ones are Go tests in backend/cmd/todayz (security_abuse_http_test.go), run by make check.
+scan_abuse() {
+  local if_up=0
+  if [[ "${1:-}" == "--if-up" ]]; then if_up=1; shift; fi
+  if [[ $if_up -eq 1 ]] && ! "$ci_root/infra/local/health.sh" --no-html >/dev/null 2>&1; then
+    ci_log "abuse: skipped; the local stack does not answer its health check (make dev first)"
+    return 0
+  fi
+  local ca out
+  ca="$(caddy_ca)"
+  out="$(ci_out abuse)"
+  local -a env=()
+  if [[ -f "$ca" ]]; then env=(NODE_EXTRA_CA_CERTS="$ca"); fi
+  ci_log "abuse: e2e/security/abuse.stack.test.mjs"
+  env ${env[@]+"${env[@]}"} node --test --test-reporter=spec --test-reporter-destination=stdout \
+    --test-reporter=junit --test-reporter-destination="$out/abuse.xml" \
+    "$ci_root/e2e/security/abuse.stack.test.mjs"
+}
+
 cmd="${1:-}"; shift || true
 case "$cmd" in
   gitleaks) scan_gitleaks ;;
   trivy) scan_trivy ;;
   checkov) scan_checkov "$@" ;;
   zap) scan_zap "$@" ;;
+  abuse) scan_abuse "$@" ;;
   zap-target-ok) for t in "$@"; do zap_target_ok "$t" || { echo "refused: $t"; exit 1; }; done; echo "ok" ;;
-  *) echo "usage: scan.sh gitleaks|trivy|checkov [dir]|zap [--if-up] [url...]" >&2; exit 2 ;;
+  *) echo "usage: scan.sh gitleaks|trivy|checkov [dir]|zap [--if-up] [url...]|abuse [--if-up]" >&2; exit 2 ;;
 esac
