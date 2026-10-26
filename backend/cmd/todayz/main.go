@@ -32,6 +32,8 @@ commands:
   rollup --from D [--to D]  recompute the analytics rollups for IST days D (DATABASE_URL)
   rollup demo [--for 10m]   synthetic traffic against the local API for make demo (APP_ENV local)
   ai eval <feature|all> [--live]  run AI evals on recorded replies; --live calls the model (own key, make ai-eval)
+  images import [--dry-run] [--limit N] [--source off|obf|opf] [--report FILE]
+                            draft product images from Open Food/Beauty/Products Facts (D-252)
   version                   print build info
 `
 
@@ -86,6 +88,8 @@ func run(ctx context.Context, args []string, getenv config.Getenv, stdout, stder
 		err = runRollup(ctx, rest, getenv, stdout)
 	case "ai":
 		err = runAI(ctx, rest, getenv, stdout)
+	case "images":
+		err = runImages(ctx, rest, getenv, stdout)
 	case "help", "-h", "--help":
 		_, _ = fmt.Fprint(stdout, usage)
 		return 0

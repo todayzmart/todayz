@@ -234,3 +234,10 @@ sql:
         <<: *go
         package: asksdb
         out: ../gen/sqlc/asksdb
+  - <<: *pkg
+    queries: queries/imageimport
+    gen:
+      go:
+        <<: *go
+        package: imageimportdb
+        out: ../gen/sqlc/imageimportdb
