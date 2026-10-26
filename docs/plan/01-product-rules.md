@@ -227,6 +227,7 @@ Any non-terminal state
   - The threshold is checked against the day's total, not each adjustment alone (D-237): the sum of the absolute amounts of the same admin's adjustments to the same customer in the current IST day, including this one. Posted at-once adjustments and that admin's pending or approved requests count; rejected and cancelled requests do not.
   - At or under the threshold: the adjustment posts immediately, with no request row.
   - Above it: it needs a second approver who is a different person; this applies to `super_admin` too.
+  - Across customers (D-251): when one admin's adjustments in the current IST day, summed the same way over all customers, pass `admin_adjust_daily_total_alert_above_paise` (₹5,000), a risk alert fires for the ops team. Nothing is blocked.
 - Wallet history explains every line: "Spent at Sri Lakshmi · order TZ-024817", "Referral bonus for Ananya's first order", "5% back at MedPlus", "Expired".
 
 ## 8. Referrals
@@ -567,6 +568,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `credit_orders_per_month` | count | 10 | §7. Min 1, max 100. |
 | `store_credit_redemptions_per_day` | count | 200 | §7. Min 1, max 10000. |
 | `admin_adjust_dual_approval_above_paise` | paise | 50000 | §7. Min 0, max 500000. |
+| `admin_adjust_daily_total_alert_above_paise` | paise | 500000 | §7: risk alert on one admin's IST-day total across all customers (D-251). Min 0, max 10000000. |
 
 **Referrals**
 

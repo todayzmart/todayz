@@ -45,12 +45,12 @@
     "enHash": "dc9d4584"
   },
   "statements.payout.processing": {
-    "message": "{amount} பணம் வழங்கல் செயலாக்கத்தில் உள்ளது.",
+    "message": "{amount} பேஅவுட் செயலாக்கத்தில் உள்ளது.",
     "review": "reviewed",
     "enHash": "48a73a31"
   },
   "statements.payout.needsKyc": {
-    "message": "உங்கள் பணம் வழங்கல் விவரங்கள் முழுமையாகும் வரை {amount} நிறுத்திவைக்கப்பட்டுள்ளது.",
+    "message": "உங்கள் பேஅவுட் விவரங்கள் முழுமையாகும் வரை {amount} நிறுத்திவைக்கப்பட்டுள்ளது.",
     "review": "reviewed",
     "enHash": "c624cfec"
   },
@@ -65,7 +65,7 @@
     "enHash": "6103319e"
   },
   "statements.payout.none": {
-    "message": "இந்த மாதம் பணம் வழங்கல் இல்லை.",
+    "message": "இந்த மாதம் பேஅவுட் இல்லை.",
     "review": "reviewed",
     "enHash": "6e206087"
   },
@@ -110,7 +110,7 @@
     "enHash": "ce5b2f72"
   },
   "statements.totals.payoutsOut": {
-    "message": "பணம் வழங்கல்கள்",
+    "message": "பேஅவுட்கள்",
     "review": "reviewed",
     "enHash": "e0e7ea13"
   },
@@ -155,7 +155,7 @@
     "enHash": "d65c9a05"
   },
   "statements.payout.carried": {
-    "message": "{amount} பணம் வழங்கல் அடுத்த ஸ்டேட்மென்ட்டுக்கு மாற்றப்பட்டது.",
+    "message": "{amount} பேஅவுட் அடுத்த ஸ்டேட்மென்ட்டுக்கு மாற்றப்பட்டது.",
     "review": "reviewed",
     "enHash": "17e54cde"
   }

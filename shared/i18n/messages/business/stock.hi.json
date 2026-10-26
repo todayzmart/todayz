@@ -180,7 +180,7 @@
     "enHash": "319a2b6e"
   },
   "stock.col.price": {
-    "message": "क़ीमत",
+    "message": "दाम",
     "review": "reviewed",
     "enHash": "3e8248e3"
   },
@@ -230,7 +230,7 @@
     "enHash": "0a705d55"
   },
   "stock.inline.save": {
-    "message": "{item} की क़ीमत सेव करें",
+    "message": "{item} का दाम सेव करें",
     "review": "reviewed",
     "enHash": "2b9d7bee"
   },
@@ -240,7 +240,7 @@
     "enHash": "0ffca104"
   },
   "stock.inline.price": {
-    "message": "{item} की क़ीमत",
+    "message": "{item} का दाम",
     "review": "reviewed",
     "enHash": "f96e0600"
   },
@@ -275,7 +275,7 @@
     "enHash": "7c62a142"
   },
   "stock.item.price": {
-    "message": "क़ीमत",
+    "message": "दाम",
     "review": "reviewed",
     "enHash": "3e8248e3"
   },
@@ -330,7 +330,7 @@
     "enHash": "310c38b2"
   },
   "stock.act.price": {
-    "message": "क़ीमत बदलें",
+    "message": "दाम बदलें",
     "review": "reviewed",
     "enHash": "1eac205f"
   },
@@ -465,7 +465,7 @@
     "enHash": "465989a3"
   },
   "stock.form.title.price": {
-    "message": "क़ीमत बदलें",
+    "message": "दाम बदलें",
     "review": "reviewed",
     "enHash": "1eac205f"
   },
@@ -500,7 +500,7 @@
     "enHash": "b64c0a4d"
   },
   "stock.form.save.price": {
-    "message": "क़ीमत सेव करें",
+    "message": "दाम सेव करें",
     "review": "reviewed",
     "enHash": "6a897ddb"
   },
@@ -515,7 +515,7 @@
     "enHash": "1de2c092"
   },
   "stock.form.cancel": {
-    "message": "रद्द करें",
+    "message": "कैंसल करें",
     "review": "reviewed",
     "enHash": "77dfd213"
   },
@@ -590,7 +590,7 @@
     "enHash": "4f9ae67f"
   },
   "stock.form.costHelp": {
-    "message": "ज़रूरी नहीं। बिक्री क़ीमत {price} है।",
+    "message": "ज़रूरी नहीं। बिक्री दाम {price} है।",
     "review": "reviewed",
     "enHash": "f3898983"
   },
@@ -605,12 +605,12 @@
     "enHash": "2c924e30"
   },
   "stock.form.price": {
-    "message": "बिक्री क़ीमत",
+    "message": "बिक्री दाम",
     "review": "reviewed",
     "enHash": "7657ccd6"
   },
   "stock.form.priceMrp": {
-    "message": "MRP {mrp} है। क़ीमत इससे ज़्यादा नहीं हो सकती।",
+    "message": "MRP {mrp} है। दाम इससे ज़्यादा नहीं हो सकता।",
     "review": "reviewed",
     "enHash": "42107931"
   },
@@ -620,12 +620,12 @@
     "enHash": "1f25c621"
   },
   "stock.form.priceAboveMrp": {
-    "message": "क़ीमत {mrp} के MRP से ज़्यादा नहीं हो सकती।",
+    "message": "दाम {mrp} के MRP से ज़्यादा नहीं हो सकता।",
     "review": "reviewed",
     "enHash": "7a0650ec"
   },
   "stock.form.priceRef": {
-    "message": "सुझाव से संदर्भ क़ीमत: {price}। सेव करने तक कुछ नहीं बदलता।",
+    "message": "सुझाव से संदर्भ दाम: {price}। सेव करने तक कुछ नहीं बदलता।",
     "review": "reviewed",
     "enHash": "188c481e"
   },
@@ -665,7 +665,7 @@
     "enHash": "4494f38a"
   },
   "stock.toast.price": {
-    "message": "{item} की क़ीमत बदली",
+    "message": "{item} का दाम बदला",
     "review": "reviewed",
     "enHash": "b8e3449e"
   },
@@ -810,7 +810,7 @@
     "enHash": "6afd70c1"
   },
   "stock.add.priceTitle": {
-    "message": "क़ीमत और शुरुआती स्टॉक",
+    "message": "दाम और शुरुआती स्टॉक",
     "review": "reviewed",
     "enHash": "ef3f7094"
   },
@@ -920,7 +920,7 @@
     "enHash": "8e54dc53"
   },
   "stock.import.field.pricePaise": {
-    "message": "क़ीमत",
+    "message": "दाम",
     "review": "reviewed",
     "enHash": "3e8248e3"
   },

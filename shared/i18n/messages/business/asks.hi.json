@@ -1,11 +1,11 @@
 {
   "asks.loading": {
-    "message": "माँगें लोड हो रही हैं",
+    "message": "पूछताछ लोड हो रही है",
     "review": "reviewed",
     "enHash": "7d65f4f4"
   },
   "asks.error.load": {
-    "message": "माँगें लोड नहीं हो सकीं",
+    "message": "पूछताछ लोड नहीं हो सकी",
     "review": "reviewed",
     "enHash": "5222921f"
   },
@@ -15,7 +15,7 @@
     "enHash": "042c862e"
   },
   "asks.empty.title": {
-    "message": "अभी कोई माँग नहीं",
+    "message": "अभी कोई पूछताछ नहीं",
     "review": "reviewed",
     "enHash": "4a548cce"
   },
@@ -25,7 +25,7 @@
     "enHash": "423b8f7d"
   },
   "asks.muted": {
-    "message": "इस दुकान के लिए माँगें बंद हैं",
+    "message": "इस दुकान के लिए पूछताछ बंद है",
     "review": "reviewed",
     "enHash": "5f372058"
   },
@@ -50,7 +50,7 @@
     "enHash": "13f7aee7"
   },
   "asks.earlier.show": {
-    "message": "पहले की माँगें दिखाएँ",
+    "message": "पहले की पूछताछ दिखाएँ",
     "review": "reviewed",
     "enHash": "1d874682"
   },
@@ -115,7 +115,7 @@
     "enHash": "6c2bb735"
   },
   "asks.card.replyA11y": {
-    "message": "{item} की माँग का जवाब दें",
+    "message": "{item} की पूछताछ का जवाब दें",
     "review": "reviewed",
     "enHash": "d28b02ee"
   },
@@ -125,7 +125,7 @@
     "enHash": "ee45c303"
   },
   "asks.card.reportA11y": {
-    "message": "{item} की माँग रिपोर्ट करें",
+    "message": "{item} की पूछताछ रिपोर्ट करें",
     "review": "reviewed",
     "enHash": "5fcfbf10"
   },
@@ -255,12 +255,12 @@
     "enHash": "4792eee5"
   },
   "asks.report.title": {
-    "message": "यह माँग रिपोर्ट करें",
+    "message": "यह पूछताछ रिपोर्ट करें",
     "review": "reviewed",
     "enHash": "73f18a20"
   },
   "asks.report.body": {
-    "message": "आपकी दुकान को इस ग्राहक से फिर माँगें नहीं मिलेंगी। उन्हें बताया नहीं जाता।",
+    "message": "आपकी दुकान को इस ग्राहक से फिर पूछताछ नहीं मिलेगी। उन्हें बताया नहीं जाता।",
     "review": "reviewed",
     "enHash": "a5bd5e0b"
   },
@@ -280,7 +280,7 @@
     "enHash": "aa3921f5"
   },
   "asks.report.reason.not_a_real_ask": {
-    "message": "असली माँग नहीं",
+    "message": "असली पूछताछ नहीं",
     "review": "reviewed",
     "enHash": "d23bb509"
   },
@@ -300,7 +300,7 @@
     "enHash": "fb72842d"
   },
   "asks.error.ask_closed": {
-    "message": "यह माँग बंद हो गई है। ग्राहक अब इंतज़ार नहीं कर रहे।",
+    "message": "यह पूछताछ बंद हो गई है। ग्राहक अब इंतज़ार नहीं कर रहे।",
     "review": "reviewed",
     "enHash": "9de66d03"
   },

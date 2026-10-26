@@ -516,24 +516,193 @@
       }
     },
     {
-      "type": "text",
-      "title": "Statements, payouts and approvals — TODO(lead)",
-      "datasource": null,
+      "type": "table",
+      "title": "Statements by month and status",
+      "description": "The monthly statements of the last 12 months, whatever the range (they close on the 1st at 00:30 IST). Credits are whole credits; computed payout is what the close put into the business's payout.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
       "targets": [
         {
-          "refId": "A"
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT to_char(period, 'YYYY-MM') AS month, status, count(*) AS statements, sum(closing) AS closing_credits,\n  coalesce(sum(computed_payout), 0) AS computed_payout_credits, count(*) FILTER (WHERE closing < 0) AS negative_closing\nFROM payout_statements WHERE period >= date_trunc('month', now() AT TIME ZONE 'Asia/Kolkata')::date - interval '11 months'\nGROUP BY 1, 2 ORDER BY 1 DESC, 2"
         }
       ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
       "options": {
-        "mode": "markdown",
-        "content": "Statements by status, payouts paid and pending, two-person approval requests and their age (D-05) and wallet forfeits on account deletion (D-31) need the statements, payouts and approvals tables, which no migration has created yet. **TODO(lead):** add the panels with the WP that creates them."
+        "showHeader": true,
+        "cellHeight": "sm"
       },
       "id": 11,
       "gridPos": {
         "x": 0,
         "y": 31,
-        "w": 24,
-        "h": 3
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Payouts: open now and paid in range",
+      "description": "Pending and held payouts as they stand now (at most one open per business, D-09), by hold reason, with the oldest one's age; then the payouts marked paid in the range.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT status, coalesce(hold_reason, '') AS hold_reason, count(*) AS payouts, sum(amount) AS credits,\n  extract(epoch FROM now() - min(computed_at)) AS oldest_age\nFROM payouts WHERE status IN ('pending', 'held') GROUP BY 1, 2\nUNION ALL SELECT 'paid in range', '', count(*), coalesce(sum(amount), 0), NULL FROM payouts WHERE status = 'paid' AND $__timeFilter(paid_at)\nORDER BY 1, 2"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "oldest_age"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 29,
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Two-person approvals (D-05)",
+      "description": "Wallet adjustments above admin_adjust_dual_approval_above_paise that wait for a second finance or super_admin: every pending request, whatever its age, and the ones requested in range by outcome.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT status, count(*) AS requests, sum(abs(amount)) AS credits,\n  extract(epoch FROM max(now() - requested_at) FILTER (WHERE status = 'pending')) AS oldest_pending_age\nFROM admin_adjustment_requests WHERE status = 'pending' OR $__timeFilter(requested_at)\nGROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "oldest_pending_age"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 30,
+      "gridPos": {
+        "x": 0,
+        "y": 39,
+        "w": 12,
+        "h": 7
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Wallet forfeits on account deletion (range)",
+      "description": "Accounts deleted with credits left in the wallet, and the credits forfeited (D-31; ledger kind forfeit_deletion).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT t.id) AS forfeits, coalesce(sum(abs(e.amount)) / 2, 0) AS credits\nFROM ledger_transactions t JOIN ledger_entries e ON e.transaction_id = t.id\nWHERE t.kind = 'forfeit_deletion' AND $__timeFilter(t.created_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "id": 31,
+      "gridPos": {
+        "x": 12,
+        "y": 39,
+        "w": 12,
+        "h": 7
       }
     }
   ]

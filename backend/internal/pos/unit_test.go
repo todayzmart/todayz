@@ -112,6 +112,24 @@ func TestTOTPDrift(t *testing.T) {
 	require.Regexp(t, `^\d{4}$`, code)
 }
 
+// A code that is also right for the step before is bound to its own step, so
+// the sale rung a minute earlier with that step's code still links (the
+// TestPOSOfflineOfferMatchesEngine flake: 19 sales a minute apart).
+func TestTOTPExactStepWins(t *testing.T) {
+	at := time.Date(2026, 10, 24, 5, 0, 30, 0, time.UTC)
+	step := totpStep(at)
+	var secret []byte
+	for i := 0; secret == nil; i++ {
+		s := bytes.Repeat([]byte{byte(i), byte(i >> 8), byte(i >> 16), 1}, totpSecretLen/4)
+		if totp(s, step) == totp(s, step-1) {
+			secret = s
+		}
+	}
+	code := totp(secret, step)
+	require.Equal(t, step, codeAt(secret, code, at), "its own step, not the one before")
+	require.Equal(t, step-1, codeAt(secret, code, at.Add(-60*time.Second)), "the earlier sale keeps its own step too")
+}
+
 // A token verifies only against the row and key it was made for.
 func TestClaimTokenTamper(t *testing.T) {
 	s := &Service{clock: clock.NewFake(time.Date(2026, 10, 24, 5, 0, 0, 0, time.UTC)), billKey: bytes.Repeat([]byte{1}, 32)}

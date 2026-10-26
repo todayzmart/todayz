@@ -125,7 +125,7 @@
     "enHash": "a0df4ca0"
   },
   "stores.cancel": {
-    "message": "रद्द करें",
+    "message": "कैंसल करें",
     "review": "reviewed",
     "enHash": "77dfd213"
   },
@@ -385,7 +385,7 @@
     "enHash": "649fe57a"
   },
   "stores.staff.removeInvite": {
-    "message": "इससे आमंत्रण रद्द हो जाएगा।",
+    "message": "इससे आमंत्रण कैंसल हो जाएगा।",
     "review": "reviewed",
     "enHash": "79c14927"
   },

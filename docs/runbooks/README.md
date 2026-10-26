@@ -39,6 +39,7 @@ How to work an alert: [On-call basics](../ops/on-call.md). Levels: [Severity lev
 | [Store not accepting](marketplace-store-not-accepting.md) | `tz-store-not-accepting` | ops |
 | [Store strikes](risk-store-strikes.md) | `tz-risk-store-strikes` | ops |
 | [Unconfirmed returns](risk-unconfirmed-returns.md) | `tz-risk-unconfirmed-returns` | info |
+| [Admin adjustments in a day](risk-admin-adjust-day.md) | `tz-risk-admin-adjust-day` | ops |
 | [Zero-result spike](search-zero-result-spike.md) | `tz-search-zero-result-spike` | info |
 | [AI spend](ai-cost.md) | `tz-ai-cost-80`, `tz-ai-cost-cap-reached` | warning, critical |
 

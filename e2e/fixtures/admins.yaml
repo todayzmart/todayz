@@ -2,8 +2,10 @@
 #
 # TEST VALUES, NOT SECRETS. Read by the backend seed only through
 # SEED_ADMINS_FILE (infra/local/local.env), which refuses unless APP_ENV is
-# local or test; staging and prod never run the seed. The mocks' "TOTP now"
-# panel reads the same file. Never copy these into docs or logs.
+# local or test; staging and prod never run the seed. The journeys
+# (e2e/fixtures/api.ts adminTotpSecret) and admin/e2e/sign-in.stack.spec.ts read
+# the same file and compute the code themselves; the mocks have no TOTP panel.
+# Never copy these into docs or logs.
 #
 # One enrolled admin per D-64 role, two each of finance and super_admin (the
 # two-person approval tests), and admin.unenrolled with no totp_secret, so A-01

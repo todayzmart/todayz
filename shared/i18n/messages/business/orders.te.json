@@ -310,7 +310,7 @@
     "enHash": "e3ff275a"
   },
   "orders.part.body": {
-    "message": "మీరు ఎన్ని ఇవ్వగలరో సెట్ చేయండి. కస్టమర్ మార్చిన ఆర్డర్ తీసుకుంటారు లేదా రద్దు చేస్తారు. వారు తీసుకునే వరకు ఏదీ ఉంచబడదు.",
+    "message": "మీరు ఎన్ని ఇవ్వగలరో సెట్ చేయండి. కస్టమర్ మార్చిన ఆర్డర్ తీసుకుంటారు లేదా క్యాన్సిల్ చేస్తారు. వారు తీసుకునే వరకు ఏదీ ఉంచబడదు.",
     "review": "reviewed",
     "enHash": "557cf769"
   },
@@ -350,7 +350,7 @@
     "enHash": "37a27bbf"
   },
   "orders.part.waiting": {
-    "message": "{customer} మార్చిన ఆర్డర్ తీసుకోవడానికి లేదా రద్దు చేయడానికి ఎదురుచూస్తున్నాం.",
+    "message": "{customer} మార్చిన ఆర్డర్ తీసుకోవడానికి లేదా క్యాన్సిల్ చేయడానికి ఎదురుచూస్తున్నాం.",
     "review": "reviewed",
     "enHash": "ef6bbe9e"
   },
@@ -530,7 +530,7 @@
     "enHash": "3f825b9d"
   },
   "orders.cancel.title": {
-    "message": "ఆర్డర్ {number} రద్దు చేయండి",
+    "message": "ఆర్డర్ {number} క్యాన్సిల్ చేయండి",
     "review": "reviewed",
     "enHash": "225bf193"
   },
@@ -540,12 +540,12 @@
     "enHash": "24d10967"
   },
   "orders.cancel.confirm": {
-    "message": "ఆర్డర్ రద్దు చేయండి",
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయండి",
     "review": "reviewed",
     "enHash": "5ae39c4a"
   },
   "orders.cancel.open": {
-    "message": "ఆర్డర్ రద్దు చేయండి",
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయండి",
     "review": "reviewed",
     "enHash": "5ae39c4a"
   },
@@ -940,7 +940,7 @@
     "enHash": "d4bce752"
   },
   "orders.action.cancelled": {
-    "message": "ఆర్డర్ రద్దు చేశాం.",
+    "message": "ఆర్డర్ క్యాన్సిల్ చేశాం.",
     "review": "reviewed",
     "enHash": "c3ca8f89"
   },

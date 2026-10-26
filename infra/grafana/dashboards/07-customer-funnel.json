@@ -616,24 +616,201 @@
       "panels": []
     },
     {
-      "type": "text",
-      "title": "Asks panels — TODO(lead)",
-      "datasource": null,
+      "type": "table",
+      "title": "Ask funnel per city",
+      "description": "Asks created in range, by the city they were sent in: at least one shop said Yes, an order was placed from a Yes reply, and closed asks no shop answered at all.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
       "targets": [
         {
-          "refId": "A"
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(c.name, 'Unknown') AS city, count(*) AS asks,\n  count(*) FILTER (WHERE EXISTS (SELECT 1 FROM ask_recipients r WHERE r.ask_id = a.id AND r.answer = 'yes')) AS with_yes,\n  count(*) FILTER (WHERE EXISTS (SELECT 1 FROM ask_recipients r JOIN orders o ON o.ask_reply_id = r.id WHERE r.ask_id = a.id)) AS booked_from_reply,\n  count(*) FILTER (WHERE a.status = 'closed' AND NOT EXISTS (SELECT 1 FROM ask_recipients r WHERE r.ask_id = a.id AND r.answer IS NOT NULL)) AS closed_no_reply\nFROM asks a LEFT JOIN places c ON c.id = a.city_place_id\nWHERE $__timeFilter(a.created_at) GROUP BY 1 ORDER BY 2 DESC"
         }
       ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
       "options": {
-        "mode": "markdown",
-        "content": "The ask funnel per city (created → at least one Yes → booked from a reply), reply rate, median time to reply, asks closed with no reply, asks per store per day against `ask_daily_limit_store`, shares, voice searches, search assist outcomes and refine chips removed come from W3-16's `shared/telemetry/events/asks.yaml` and its `asks` table, which do not exist yet. **TODO(lead):** add the panels when W3-16 lands; they read `events` and `asks`, never per customer."
+        "showHeader": true,
+        "cellHeight": "sm"
       },
       "id": 17,
       "gridPos": {
         "x": 0,
         "y": 43,
-        "w": 24,
-        "h": 4
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Reply rate per city",
+      "description": "Asks sent to shops in range: the share answered, the Yes share of the answers, and the median time from sending to the answer.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(c.name, 'Unknown') AS city, count(*) AS sent, count(r.replied_at) AS replies,\n  count(r.replied_at)::float8 / nullif(count(*), 0) AS reply_rate,\n  count(*) FILTER (WHERE r.answer = 'yes')::float8 / nullif(count(r.replied_at), 0) AS yes_share,\n  percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM r.replied_at - r.sent_at)) AS median_time_to_reply\nFROM ask_recipients r JOIN asks a ON a.id = r.ask_id LEFT JOIN places c ON c.id = a.city_place_id\nWHERE $__timeFilter(r.sent_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reply_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "yes_share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "median_time_to_reply"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 26,
+      "gridPos": {
+        "x": 12,
+        "y": 43,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Asks per store per day vs the daily limit",
+      "description": "Per IST day: the median and the most asks one store received, and ask_daily_limit_store (platform_settings). A busiest store at the line means shops near it stop getting asks until midnight.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH per AS (\n  SELECT (r.sent_at AT TIME ZONE 'Asia/Kolkata')::date AS day, r.store_id, count(*) AS n\n  FROM ask_recipients r WHERE $__timeFilter(r.sent_at) GROUP BY 1, 2)\nSELECT per.day::timestamp AT TIME ZONE 'Asia/Kolkata' AS time,\n  percentile_cont(0.5) WITHIN GROUP (ORDER BY per.n) AS median_per_store, max(per.n) AS busiest_store,\n  max((ps.value #>> '{}')::int) AS daily_limit\nFROM per, platform_settings ps WHERE ps.key = 'ask_daily_limit_store' GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 27,
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Shares, voice search and search assist",
+      "description": "Events in range by outcome. Refine chips removed have no event of their own yet (search_performed carries only the chips applied).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT 'Share created' AS what, count(*) AS events FROM events WHERE name = 'share_created' AND $__timeFilter(occurred_at)\nUNION ALL SELECT 'Share link opened', count(*) FROM events WHERE name = 'share_opened' AND $__timeFilter(occurred_at)\nUNION ALL (SELECT 'Voice search: ' || (props->>'outcome'), count(*) FROM events WHERE name = 'voice_search_used' AND $__timeFilter(occurred_at) GROUP BY props->>'outcome')\nUNION ALL (SELECT 'Search assist: ' || (props->>'outcome'), count(*) FROM events WHERE name = 'search_assist_used' AND $__timeFilter(occurred_at) GROUP BY props->>'outcome')\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 28,
+      "gridPos": {
+        "x": 12,
+        "y": 51,
+        "w": 12,
+        "h": 8
       }
     },
     {
@@ -643,7 +820,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 47,
+        "y": 59,
         "w": 24,
         "h": 1
       },
@@ -688,7 +865,7 @@
       "id": 19,
       "gridPos": {
         "x": 0,
-        "y": 48,
+        "y": 60,
         "w": 12,
         "h": 8
       }
@@ -732,7 +909,7 @@
       "id": 20,
       "gridPos": {
         "x": 12,
-        "y": 48,
+        "y": 60,
         "w": 6,
         "h": 8
       }
@@ -779,7 +956,7 @@
       "id": 21,
       "gridPos": {
         "x": 18,
-        "y": 48,
+        "y": 60,
         "w": 6,
         "h": 8
       }
@@ -817,7 +994,7 @@
       "id": 22,
       "gridPos": {
         "x": 0,
-        "y": 56,
+        "y": 68,
         "w": 6,
         "h": 8
       }
@@ -864,7 +1041,7 @@
       "id": 23,
       "gridPos": {
         "x": 6,
-        "y": 56,
+        "y": 68,
         "w": 6,
         "h": 4
       }
@@ -911,7 +1088,7 @@
       "id": 24,
       "gridPos": {
         "x": 12,
-        "y": 56,
+        "y": 68,
         "w": 6,
         "h": 4
       }
@@ -950,7 +1127,7 @@
       "id": 25,
       "gridPos": {
         "x": 0,
-        "y": 64,
+        "y": 76,
         "w": 12,
         "h": 8
       }

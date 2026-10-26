@@ -286,6 +286,7 @@ Routing: local → console + a local Grafana contact point (no paging). Cloud �
 | AI cost | AI spend today (IST day) ≥ 80% of `ai_daily_cost_cap_paise` (D-70); at 100% AI calls stop for the rest of the day | warning (owner W3-10) |
 | Store strikes | a store reaches `store_strike_risk_threshold` (5) strikes in 30 days; a risk flag is raised, no automatic pause (D-67) | ops warning (to the risk queue, not paging) |
 | Unconfirmed returns | a delivery-failed return is still unconfirmed after 72 h and is auto-confirmed (D-69) | ops info (risk flag raised) |
+| Admin adjustments in a day | one admin's wallet adjustments in the IST day, across all customers, pass `admin_adjust_daily_total_alert_above_paise` (₹5,000; counted as D-237 counts them per customer) (D-251) | ops warning (risk queue, not paging) |
 | Certificate / uptime (cloud) | synthetic check fails 2 of 3 locations | critical |
 
 ## 6. SLOs

@@ -70,7 +70,7 @@
     "enHash": "31fd2b2b"
   },
   "pos.search.none.body": {
-    "message": "इसे क़ीमत के साथ इस बिल में एक बार के आइटम की तरह जोड़ें।",
+    "message": "इसे दाम के साथ इस बिल में एक बार के आइटम की तरह जोड़ें।",
     "review": "reviewed",
     "enHash": "84cd59bd"
   },
@@ -355,7 +355,7 @@
     "enHash": "2da821a4"
   },
   "pos.add.unknownBody": {
-    "message": "कोड {code} आपके आइटम में नहीं है। इसे नाम और क़ीमत के साथ इस बिल में जोड़ें।",
+    "message": "कोड {code} आपके आइटम में नहीं है। इसे नाम और दाम के साथ इस बिल में जोड़ें।",
     "review": "reviewed",
     "enHash": "7131a281"
   },
@@ -370,12 +370,12 @@
     "enHash": "7e5fe97f"
   },
   "pos.add.price": {
-    "message": "क़ीमत",
+    "message": "दाम",
     "review": "reviewed",
     "enHash": "3e8248e3"
   },
   "pos.add.priceInvalid": {
-    "message": "शून्य से ज़्यादा क़ीमत डालें",
+    "message": "शून्य से ज़्यादा दाम डालें",
     "review": "reviewed",
     "enHash": "8d0c1181"
   },

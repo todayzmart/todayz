@@ -310,7 +310,7 @@
     "enHash": "f26e079e"
   },
   "pos.cart.link.counterCode": {
-    "message": "குறியீடு மூலம் இணைக்கப்பட்டது · {phone}",
+    "message": "கோடு மூலம் இணைக்கப்பட்டது · {phone}",
     "review": "reviewed",
     "enHash": "81e24f8e"
   },
@@ -355,7 +355,7 @@
     "enHash": "2da821a4"
   },
   "pos.add.unknownBody": {
-    "message": "குறியீடு {code} உங்கள் பொருட்களில் இல்லை. பெயர் மற்றும் விலையுடன் இந்த பில்லில் சேர்க்கவும்.",
+    "message": "கோடு {code} உங்கள் பொருட்களில் இல்லை. பெயர் மற்றும் விலையுடன் இந்த பில்லில் சேர்க்கவும்.",
     "review": "reviewed",
     "enHash": "7131a281"
   },
@@ -430,7 +430,7 @@
     "enHash": "7276e973"
   },
   "pos.scan.unsupported": {
-    "message": "இந்த உலாவியால் கேமராவில் ஸ்கேன் செய்ய முடியாது. பார்கோடு ஸ்கேனரைப் பயன்படுத்தவும் அல்லது குறியீட்டைத் தட்டச்சு செய்யவும்.",
+    "message": "இந்த உலாவியால் கேமராவில் ஸ்கேன் செய்ய முடியாது. பார்கோடு ஸ்கேனரைப் பயன்படுத்தவும் அல்லது கோடைத் தட்டச்சு செய்யவும்.",
     "review": "reviewed",
     "enHash": "5c26f8e7"
   },
@@ -485,12 +485,12 @@
     "enHash": "1e270e64"
   },
   "pos.link.code": {
-    "message": "வாடிக்கையாளர் குறியீட்டைச் சொல்வார்",
+    "message": "வாடிக்கையாளர் கோடைச் சொல்வார்",
     "review": "reviewed",
     "enHash": "3f13bff1"
   },
   "pos.link.codeHelp": {
-    "message": "வாடிக்கையாளர் தங்கள் ஆப்பிலிருந்து 4 இலக்கக் குறியீட்டைக் காட்டுவார். அவர்கள் கிரெடிட் சம்பாதிப்பார்கள்.",
+    "message": "வாடிக்கையாளர் தங்கள் ஆப்பிலிருந்து 4 இலக்கக் கோடைக் காட்டுவார். அவர்கள் கிரெடிட் சம்பாதிப்பார்கள்.",
     "review": "reviewed",
     "enHash": "e9acea8e"
   },
@@ -510,7 +510,7 @@
     "enHash": "3f114e30"
   },
   "pos.link.qrLabel": {
-    "message": "வாடிக்கையாளர் ஸ்கேன் செய்ய வேண்டிய QR குறியீடு",
+    "message": "வாடிக்கையாளர் ஸ்கேன் செய்ய வேண்டிய QR கோடு",
     "review": "reviewed",
     "enHash": "1457d7c6"
   },
@@ -560,7 +560,7 @@
     "enHash": "63c5f1b7"
   },
   "pos.link.codeLabel": {
-    "message": "வாடிக்கையாளர் ஆப்பில் உள்ள குறியீடு",
+    "message": "வாடிக்கையாளர் ஆப்பில் உள்ள கோடு",
     "review": "reviewed",
     "enHash": "dd3257a4"
   },
@@ -570,32 +570,32 @@
     "enHash": "a970a484"
   },
   "pos.link.codeInvalid": {
-    "message": "4 இலக்கக் குறியீட்டை உள்ளிடவும்",
+    "message": "4 இலக்கக் கோடை உள்ளிடவும்",
     "review": "reviewed",
     "enHash": "d99fedc4"
   },
   "pos.link.codeMismatch": {
-    "message": "அந்தக் குறியீடு பொருந்தவில்லை.",
+    "message": "அந்தக் கோடு பொருந்தவில்லை.",
     "review": "reviewed",
     "enHash": "d8ae7e1c"
   },
   "pos.link.codeMismatchTries": {
-    "message": "அந்தக் குறியீடு பொருந்தவில்லை. {count, plural, one {# முயற்சி மீதம்} other {# முயற்சிகள் மீதம்}}.",
+    "message": "அந்தக் கோடு பொருந்தவில்லை. {count, plural, one {# முயற்சி மீதம்} other {# முயற்சிகள் மீதம்}}.",
     "review": "reviewed",
     "enHash": "21be7fcb"
   },
   "pos.link.codeLocked": {
-    "message": "மிக அதிகமான தவறான குறியீடுகள். பிறகு முயலவும் அல்லது தொலைபேசி மூலம் இணைக்கவும்.",
+    "message": "மிக அதிகமான தவறான கோடுகள். பிறகு முயலவும் அல்லது தொலைபேசி மூலம் இணைக்கவும்.",
     "review": "reviewed",
     "enHash": "abbbdb33"
   },
   "pos.link.codeOffline": {
-    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். விற்பனை ஒத்திசைக்கப்படும்போது குறியீடு சரிபார்க்கப்படும்.",
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். விற்பனை ஒத்திசைக்கப்படும்போது கோடு சரிபார்க்கப்படும்.",
     "review": "reviewed",
     "enHash": "df15f601"
   },
   "pos.link.codeSave": {
-    "message": "குறியீட்டுடன் இணைக்கவும்",
+    "message": "கோடுடன் இணைக்கவும்",
     "review": "reviewed",
     "enHash": "c9f2a2ec"
   },
@@ -960,12 +960,12 @@
     "enHash": "18990b4f"
   },
   "pos.storeSales.failure.code_used": {
-    "message": "கவுண்டர் குறியீடு ஏற்கனவே பயன்படுத்தப்பட்டது.",
+    "message": "கவுண்டர் கோடு ஏற்கனவே பயன்படுத்தப்பட்டது.",
     "review": "reviewed",
     "enHash": "6ba38a1c"
   },
   "pos.storeSales.failure.code_wrong": {
-    "message": "கவுண்டர் குறியீடு பொருந்தவில்லை.",
+    "message": "கவுண்டர் கோடு பொருந்தவில்லை.",
     "review": "reviewed",
     "enHash": "3d77b8d3"
   },
@@ -975,17 +975,17 @@
     "enHash": "7f280bf4"
   },
   "pos.storeSales.failure.too_late": {
-    "message": "குறியீட்டைச் சரிபார்க்க முடியாத அளவுக்குத் தாமதமாக விற்பனை ஒத்திசைக்கப்பட்டது.",
+    "message": "கோடைச் சரிபார்க்க முடியாத அளவுக்குத் தாமதமாக விற்பனை ஒத்திசைக்கப்பட்டது.",
     "review": "reviewed",
     "enHash": "3e897c4c"
   },
   "pos.storeSales.failure.locked": {
-    "message": "பல தவறான குறியீடுகள்; சரிபார்ப்புகள் நிறுத்தப்பட்டுள்ளன.",
+    "message": "பல தவறான கோடுகள்; சரிபார்ப்புகள் நிறுத்தப்பட்டுள்ளன.",
     "review": "reviewed",
     "enHash": "74daacba"
   },
   "pos.storeSales.failure.unverified": {
-    "message": "குறியீட்டைச் சரிபார்க்க முடியவில்லை.",
+    "message": "கோடைச் சரிபார்க்க முடியவில்லை.",
     "review": "reviewed",
     "enHash": "15c74c7c"
   }

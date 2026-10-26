@@ -212,8 +212,8 @@ func TestAlertRulesLint(t *testing.T) {
 			}
 		}
 	}
-	if rules != 24 {
-		t.Errorf("found %d W3-07 rules, want the 24 of 05 §5", rules)
+	if rules != 25 {
+		t.Errorf("found %d W3-07 rules, want the 25 of 05 §5", rules)
 	}
 }
 
@@ -281,6 +281,13 @@ func alertFixtures(f fixture) map[string]func(e *env, tx pgx.Tx) {
 		"tz-risk-unconfirmed-returns": func(e *env, tx pgx.Tx) {
 			e.txExec(tx, `INSERT INTO risk_flags (id, subject_type, subject_id, rule, created_at, updated_at)
 				VALUES (gen_random_uuid(), 'order', gen_random_uuid(), 'return_unconfirmed', $1::timestamptz - interval '5 minutes', $1)`, alertNow)
+		},
+		// Two small pending requests by one admin to two customers: each is under the
+		// per-customer line, together they pass the day's line (D-251 B9).
+		"tz-risk-admin-adjust-day": func(e *env, tx pgx.Tx) {
+			e.txExec(tx, `INSERT INTO admin_adjustment_requests (id, customer_id, amount, reason, requested_by, requested_at)
+				SELECT gen_random_uuid(), c, 3000, 'goodwill', $2, $1::timestamptz - interval '1 hour'
+				FROM unnest(ARRAY[$3::uuid, $4::uuid]) c`, alertNow, ids.UUID(f.cashier), ids.UUID(f.c1), ids.UUID(f.c2))
 		},
 		"tz-pos-sync-lag": func(e *env, tx pgx.Tx) {
 			e.txExec(tx, `INSERT INTO sync_cursors (device_id, store_id, last_synced_at)
@@ -377,8 +384,8 @@ func TestAlertRulesFire(t *testing.T) {
 			})
 		}
 	}
-	if evaluated != 9 {
-		t.Errorf("evaluated %d Postgres-only rules, want 9", evaluated)
+	if evaluated != 10 {
+		t.Errorf("evaluated %d Postgres-only rules, want 10", evaluated)
 	}
 }
 

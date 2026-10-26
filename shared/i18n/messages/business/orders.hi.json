@@ -45,12 +45,12 @@
     "enHash": "b564001a"
   },
   "orders.tab.asks": {
-    "message": "माँगें",
+    "message": "पूछताछ",
     "review": "reviewed",
     "enHash": "2c5548cf"
   },
   "orders.asks.empty.title": {
-    "message": "अभी कोई माँग नहीं",
+    "message": "अभी कोई पूछताछ नहीं",
     "review": "reviewed",
     "enHash": "f9782d98"
   },
@@ -125,7 +125,7 @@
     "enHash": "76145583"
   },
   "orders.empty.missed.body": {
-    "message": "अस्वीकार, एक्सपायर और रद्द ऑर्डर यहाँ दिखते हैं।",
+    "message": "अस्वीकार, एक्सपायर और कैंसल ऑर्डर यहाँ दिखते हैं।",
     "review": "reviewed",
     "enHash": "2102a5f8"
   },
@@ -310,7 +310,7 @@
     "enHash": "e3ff275a"
   },
   "orders.part.body": {
-    "message": "बताएँ कि आप कितने दे सकते हैं। ग्राहक बदला हुआ ऑर्डर लेगा या उसे रद्द करेगा। उनके लेने तक कुछ भी रखा नहीं जाता।",
+    "message": "बताएँ कि आप कितने दे सकते हैं। ग्राहक बदला हुआ ऑर्डर लेगा या उसे कैंसल करेगा। उनके लेने तक कुछ भी रखा नहीं जाता।",
     "review": "reviewed",
     "enHash": "557cf769"
   },
@@ -350,7 +350,7 @@
     "enHash": "37a27bbf"
   },
   "orders.part.waiting": {
-    "message": "{customer} के बदला हुआ ऑर्डर लेने या रद्द करने का इंतज़ार है।",
+    "message": "{customer} के बदला हुआ ऑर्डर लेने या कैंसल करने का इंतज़ार है।",
     "review": "reviewed",
     "enHash": "ef6bbe9e"
   },
@@ -420,7 +420,7 @@
     "enHash": "a689a999"
   },
   "orders.status.cancelled": {
-    "message": "रद्द",
+    "message": "कैंसल",
     "review": "reviewed",
     "enHash": "a1bf92ef"
   },
@@ -450,7 +450,7 @@
     "enHash": "b84133a5"
   },
   "orders.reason.price_changed": {
-    "message": "क़ीमत बदल गई",
+    "message": "दाम बदल गया",
     "review": "reviewed",
     "enHash": "13faa9f2"
   },
@@ -530,7 +530,7 @@
     "enHash": "3f825b9d"
   },
   "orders.cancel.title": {
-    "message": "ऑर्डर {number} रद्द करें",
+    "message": "ऑर्डर {number} कैंसल करें",
     "review": "reviewed",
     "enHash": "225bf193"
   },
@@ -540,12 +540,12 @@
     "enHash": "24d10967"
   },
   "orders.cancel.confirm": {
-    "message": "ऑर्डर रद्द करें",
+    "message": "ऑर्डर कैंसल करें",
     "review": "reviewed",
     "enHash": "5ae39c4a"
   },
   "orders.cancel.open": {
-    "message": "ऑर्डर रद्द करें",
+    "message": "ऑर्डर कैंसल करें",
     "review": "reviewed",
     "enHash": "5ae39c4a"
   },
@@ -940,7 +940,7 @@
     "enHash": "d4bce752"
   },
   "orders.action.cancelled": {
-    "message": "ऑर्डर रद्द किया।",
+    "message": "ऑर्डर कैंसल किया।",
     "review": "reviewed",
     "enHash": "c3ca8f89"
   },

@@ -8,11 +8,15 @@ BREW_TOOLS := gitleaks lefthook shellcheck
 
 ENVTOOL_SRC := $(wildcard $(ROOT)/scripts/envtool/*.go) $(ROOT)/scripts/envtool/go.mod
 
-$(ENVTOOL): $(ENVTOOL_SRC)
+# Rebuilt on every run, not by timestamp: worktrees share .tools through a
+# symlink, so a binary built from another checkout's sources can be newer than
+# this checkout's and would never be replaced. The Go build cache keeps it fast.
+$(ENVTOOL): $(ENVTOOL_SRC) envtool-always
 	@mkdir -p $(TOOLS)
 	@go -C $(ROOT)/scripts/envtool build -trimpath -o $(ENVTOOL) .
 
-.PHONY: setup-tools setup-keys setup-node setup-hooks check-repo
+.PHONY: setup-tools setup-keys setup-node setup-hooks check-repo envtool-always
+envtool-always:
 
 setup-tools: $(ENVTOOL)
 	@for t in $(REQUIRED_TOOLS); do \

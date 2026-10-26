@@ -24,12 +24,30 @@ function routes(over: Record<string, () => unknown> = {}) {
   };
 }
 
+/**
+ * MapLibre waits for a tap on the Home card (D-251 B1), and stays shown for the rest of the visit, so an
+ * earlier test in this file may have shown it already. The lazy chunk took over the default 1 s under a
+ * parallel load run.
+ */
+async function showHomeMap() {
+  const first = await screen.findByRole('button', { name: /^Tap to see the map|^Sri Lakshmi Stores, open$/ }, { timeout: 4000 });
+  if (first.textContent?.startsWith('Tap to see the map')) fireEvent.click(first);
+  await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' }, { timeout: 4000 });
+}
+
 describe('C-03 map card', () => {
+  it('shows a summary, not the map, until a tap', async () => {
+    renderDiscover('/', routes());
+    atBengaluru();
+    expect(await screen.findByRole('button', { name: /Tap to see the map.*2 shops within/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sri Lakshmi Stores, open' })).not.toBeInTheDocument();
+  });
+
   it('draws the summary pins with their shop names and opens the full map', async () => {
     renderDiscover('/', routes());
     atBengaluru();
-    // The map card loads lazily; under a parallel load run it took over the default 1 s.
-    expect(await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' }, { timeout: 4000 })).toBeInTheDocument();
+    await showHomeMap();
+    expect(screen.getByRole('button', { name: 'Sri Lakshmi Stores, open' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Annapurna Kirana, closed' })).toBeInTheDocument();
     fireEvent.click(await screen.findByRole('button', { name: 'Open full map' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Shops near you' })).toBeInTheDocument();
@@ -38,7 +56,8 @@ describe('C-03 map card', () => {
   it('a pin tap on Home goes to the shop page', async () => {
     renderDiscover('/', routes({ [`/v1/discover/stores/${SHOP_A}/items`]: () => pageOf([]) }));
     atBengaluru();
-    fireEvent.click(await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' }));
+    await showHomeMap();
+    fireEvent.click(screen.getByRole('button', { name: 'Sri Lakshmi Stores, open' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Sri Lakshmi Stores' })).toBeInTheDocument();
   });
 

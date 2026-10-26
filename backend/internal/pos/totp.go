@@ -57,17 +57,27 @@ func totp(secret []byte, step int64) string {
 }
 
 // codeAt finds the step within ±1 of at whose code is code, 0 when none.
+// The step at itself wins over a drift step: with 4 digits a neighbouring
+// step has the same code 1 time in 10,000, and binding the code to that step
+// would use it up, so the sale rung in that minute would then fail as used.
 func codeAt(secret []byte, code string, at time.Time) int64 {
 	base := totpStep(at)
-	var found int64
+	var exact, drift int64
 	for d := int64(-totpDrift); d <= totpDrift; d++ {
 		// Check every step (no early exit) so the time does not depend on
 		// which step matched.
-		if subtle.ConstantTimeCompare([]byte(totp(secret, base+d)), []byte(code)) == 1 && found == 0 {
-			found = base + d
+		match := subtle.ConstantTimeCompare([]byte(totp(secret, base+d)), []byte(code)) == 1
+		switch {
+		case match && d == 0:
+			exact = base
+		case match && drift == 0:
+			drift = base + d
 		}
 	}
-	return found
+	if exact != 0 {
+		return exact
+	}
+	return drift
 }
 
 // codeMatch is the customer's device and step a code is right for.

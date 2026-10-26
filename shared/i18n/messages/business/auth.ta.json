@@ -45,12 +45,12 @@
     "enHash": "8f26c652"
   },
   "auth.signIn.title": {
-    "message": "TodayZ Business இல் உள்நுழையவும்",
+    "message": "TodayZ Business-இல் சைன் இன் செய்யவும்",
     "review": "reviewed",
     "enHash": "4337b537"
   },
   "auth.signIn.sub": {
-    "message": "உங்கள் கடை பதிவுசெய்யப்பட்ட மொபைல் எண்ணைப் பயன்படுத்தவும். SMS மூலம் குறியீடு அனுப்புவோம்.",
+    "message": "உங்கள் கடை பதிவுசெய்யப்பட்ட மொபைல் எண்ணைப் பயன்படுத்தவும். SMS மூலம் கோடு அனுப்புவோம்.",
     "review": "reviewed",
     "enHash": "f63d01a7"
   },
@@ -60,7 +60,7 @@
     "enHash": "8e5c12de"
   },
   "auth.phone.help": {
-    "message": "உள்நுழையவும் ஆர்டர் அறிவிப்புகளுக்கும் இதைப் பயன்படுத்துவோம்.",
+    "message": "சைன் இன் செய்யவும் ஆர்டர் அறிவிப்புகளுக்கும் இதைப் பயன்படுத்துவோம்.",
     "review": "reviewed",
     "enHash": "766d916b"
   },
@@ -70,17 +70,17 @@
     "enHash": "6be55a3e"
   },
   "auth.code.send": {
-    "message": "குறியீட்டை அனுப்பவும்",
+    "message": "கோடை அனுப்பவும்",
     "review": "reviewed",
     "enHash": "313503fa"
   },
   "auth.code.sending": {
-    "message": "குறியீடு அனுப்பப்படுகிறது",
+    "message": "கோடு அனுப்பப்படுகிறது",
     "review": "reviewed",
     "enHash": "28de53b3"
   },
   "auth.code.label": {
-    "message": "6 இலக்கக் குறியீட்டை உள்ளிடவும்",
+    "message": "6 இலக்கக் கோடை உள்ளிடவும்",
     "review": "reviewed",
     "enHash": "d148321a"
   },
@@ -90,17 +90,17 @@
     "enHash": "1e73e888"
   },
   "auth.code.sentTo": {
-    "message": "{phone} க்குக் குறியீடு அனுப்பியுள்ளோம்.",
+    "message": "{phone} க்குக் கோடு அனுப்பியுள்ளோம்.",
     "review": "reviewed",
     "enHash": "c8aa6d25"
   },
   "auth.code.verifying": {
-    "message": "குறியீடு சரிபார்க்கப்படுகிறது",
+    "message": "கோடு சரிபார்க்கப்படுகிறது",
     "review": "reviewed",
     "enHash": "90adc49f"
   },
   "auth.code.resend": {
-    "message": "குறியீட்டை மீண்டும் அனுப்பவும்",
+    "message": "கோடை மீண்டும் அனுப்பவும்",
     "review": "reviewed",
     "enHash": "1d3cb8a9"
   },
@@ -115,17 +115,17 @@
     "enHash": "6c3b4080"
   },
   "auth.error.wrongCode": {
-    "message": "இந்தக் குறியீடு சரியில்லை. சரிபார்த்து மீண்டும் முயலவும்.",
+    "message": "இந்தக் கோடு சரியில்லை. சரிபார்த்து மீண்டும் முயலவும்.",
     "review": "reviewed",
     "enHash": "47948633"
   },
   "auth.error.expired": {
-    "message": "இந்தக் குறியீட்டின் காலம் முடிந்துவிட்டது. புதிய குறியீட்டைக் கேளுங்கள்.",
+    "message": "இந்தக் கோடின் காலம் முடிந்துவிட்டது. புதிய கோடைக் கேளுங்கள்.",
     "review": "reviewed",
     "enHash": "6a90a6f9"
   },
   "auth.error.locked": {
-    "message": "பலமுறை தவறான குறியீடு உள்ளிடப்பட்டது. புதிய குறியீட்டைக் கேளுங்கள்.",
+    "message": "பலமுறை தவறான கோடு உள்ளிடப்பட்டது. புதிய கோடைக் கேளுங்கள்.",
     "review": "reviewed",
     "enHash": "371d1276"
   },
@@ -135,7 +135,7 @@
     "enHash": "c32bd496"
   },
   "auth.error.blocked": {
-    "message": "இந்தக் கணக்கில் இப்போது உள்நுழைய முடியாது. ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "message": "இந்தக் கணக்கில் இப்போது சைன் இன் செய்ய முடியாது. ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
     "review": "reviewed",
     "enHash": "10997ecd"
   },
