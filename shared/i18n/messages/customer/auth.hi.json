@@ -398,5 +398,55 @@
     "message": "साइन आउट करें",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.photo.add": {
+    "message": "प्रोफ़ाइल फ़ोटो जोड़ें",
+    "review": "machine",
+    "enHash": "8427497b"
+  },
+  "account.photo.change": {
+    "message": "प्रोफ़ाइल फ़ोटो बदलें",
+    "review": "machine",
+    "enHash": "01d39b33"
+  },
+  "account.photo.remove": {
+    "message": "फ़ोटो हटाएँ",
+    "review": "machine",
+    "enHash": "c8f5eda8"
+  },
+  "account.photo.uploading": {
+    "message": "आपकी फ़ोटो अपलोड हो रही है",
+    "review": "machine",
+    "enHash": "10e4d87e"
+  },
+  "account.photo.removing": {
+    "message": "आपकी फ़ोटो हटाई जा रही है",
+    "review": "machine",
+    "enHash": "c57ce9be"
+  },
+  "account.photo.error.type": {
+    "message": "JPEG, PNG या WebP फ़ोटो चुनें।",
+    "review": "machine",
+    "enHash": "c759b5d0"
+  },
+  "account.photo.error.size": {
+    "message": "यह फ़ोटो बहुत बड़ी है। 5 MB से छोटी फ़ोटो चुनें।",
+    "review": "machine",
+    "enHash": "bc363444"
+  },
+  "account.photo.error.unreadable": {
+    "message": "हम यह फ़ोटो पढ़ नहीं पाए। कोई दूसरी फ़ोटो आज़माएँ।",
+    "review": "machine",
+    "enHash": "759582f6"
+  },
+  "account.photo.error.rateLimited": {
+    "message": "आपने कई बार फ़ोटो बदली है। थोड़ी देर बाद फिर कोशिश करें।",
+    "review": "machine",
+    "enHash": "b85957cd"
+  },
+  "account.photo.error.generic": {
+    "message": "हम आपकी फ़ोटो अपडेट नहीं कर पाए। फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "257399f9"
   }
 }

@@ -398,5 +398,55 @@
     "message": "సైన్ అవుట్",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.photo.add": {
+    "message": "ప్రొఫైల్ ఫోటో జోడించండి",
+    "review": "machine",
+    "enHash": "8427497b"
+  },
+  "account.photo.change": {
+    "message": "ప్రొఫైల్ ఫోటో మార్చండి",
+    "review": "machine",
+    "enHash": "01d39b33"
+  },
+  "account.photo.remove": {
+    "message": "ఫోటో తీసివేయండి",
+    "review": "machine",
+    "enHash": "c8f5eda8"
+  },
+  "account.photo.uploading": {
+    "message": "మీ ఫోటో అప్‌లోడ్ అవుతోంది",
+    "review": "machine",
+    "enHash": "10e4d87e"
+  },
+  "account.photo.removing": {
+    "message": "మీ ఫోటో తీసివేయబడుతోంది",
+    "review": "machine",
+    "enHash": "c57ce9be"
+  },
+  "account.photo.error.type": {
+    "message": "JPEG, PNG లేదా WebP ఫోటోను ఎంచుకోండి.",
+    "review": "machine",
+    "enHash": "c759b5d0"
+  },
+  "account.photo.error.size": {
+    "message": "ఈ ఫోటో చాలా పెద్దది. 5 MB కంటే చిన్నది ఎంచుకోండి.",
+    "review": "machine",
+    "enHash": "bc363444"
+  },
+  "account.photo.error.unreadable": {
+    "message": "ఈ ఫోటోను మేము చదవలేకపోయాము. వేరే ఫోటో ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "759582f6"
+  },
+  "account.photo.error.rateLimited": {
+    "message": "మీరు చాలాసార్లు ఫోటో మార్చారు. కొంతసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "b85957cd"
+  },
+  "account.photo.error.generic": {
+    "message": "మీ ఫోటోను అప్‌డేట్ చేయలేకపోయాము. మళ్లీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "257399f9"
   }
 }

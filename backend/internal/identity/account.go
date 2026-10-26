@@ -255,6 +255,9 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 				return err
 			}
 		}
+		if err := s.removePhotos(ctx, q, p.UserID); err != nil {
+			return err
+		}
 		if err := q.AnonymiseUser(ctx, identitydb.AnonymiseUserParams{Now: now, ID: uid}); err != nil {
 			return err
 		}

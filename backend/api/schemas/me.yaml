@@ -36,6 +36,13 @@ Me:
       description: Admin roles (D-64); admin app only.
       items:
         type: string
+    photoUrl:
+      description: >-
+        Customer app only (D-253): a signed link to the profile photo, valid for 15 minutes; null
+        without one. Read it again with GET /v1/me rather than storing it.
+      type:
+        - string
+        - "null"
     customer:
       description: Customer app only.
       oneOf:
@@ -223,3 +230,50 @@ AddressPatch:
       maximum: 180
     isDefault:
       type: boolean
+ProfilePhotoContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp]
+ProfilePhotoCreate:
+  type: object
+  additionalProperties: false
+  required: [contentType, sizeBytes]
+  properties:
+    contentType:
+      $ref: "#/ProfilePhotoContentType"
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 5242880
+      description: The file's exact size in bytes (at most 5 MB). The upload URL signs it.
+ProfilePhotoUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type:
+      $ref: "#/ProfilePhotoContentType"
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+ProfilePhotoUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url:
+      type: string
+    method:
+      type: string
+      enum: [PUT]
+    headers:
+      $ref: "#/ProfilePhotoUploadHeaders"
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+ProfilePhotoUpload:
+  type: object
+  required: [id, upload]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    upload:
+      $ref: "#/ProfilePhotoUploadTarget"

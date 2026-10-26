@@ -115,6 +115,124 @@
               type: string
       default:
         $ref: ../common/responses.yaml#/Problem
+/v1/me/photo/uploads:
+  post:
+    operationId: createMyPhotoUpload
+    tags: [me]
+    summary: Get an upload URL for a profile photo
+    description: >-
+      Customer app only (D-253). Records the upload and returns a presigned PUT into the private
+      bucket, valid for 15 minutes. The URL signs the Content-Type and the size, so the PUT sends
+      exactly the returned headers. JPEG, PNG or WebP, at most 5 MB. At most
+      `profile_photo_uploads_per_hour` uploads per person in a rolling hour (`429 rate_limited`).
+      Then confirm it with `POST /v1/me/photo/uploads/{uploadId}/confirm`. `503
+      service_unavailable` while storage is not configured.
+    x-idempotency: none
+    x-problems: [rate_limited]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/me.yaml#/ProfilePhotoCreate
+          example:
+            contentType: image/jpeg
+            sizeBytes: 48211
+    responses:
+      "201":
+        description: The upload and where to send the file
+        headers:
+          Cache-Control:
+            description: "`no-store`: the upload URL is a credential."
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/ProfilePhotoUpload
+            example:
+              id: 01JB0SPH1A2B3C4D5E6F7G8H9J
+              upload:
+                url: https://s3.todayz.localhost/private/profile/01JB0SPH1A2B3C4D5E6F7G8H9J.upload?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                method: PUT
+                headers:
+                  Content-Type: image/jpeg
+                  Content-Length: "48211"
+                expiresAt: "2026-10-26T11:15:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/photo/uploads/{uploadId}/confirm:
+  parameters:
+    - name: uploadId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmMyPhotoUpload
+    tags: [me]
+    summary: Use an uploaded file as my profile photo
+    description: >-
+      Customer app only (D-253). The object must exist with the declared size and be a JPEG,
+      PNG or WebP of that type (`422 validation_failed` on `upload` otherwise). The server
+      re-encodes it as a JPEG of at most 512 px a side, so EXIF (with any location) and other
+      metadata never reach storage, and replaces the previous photo. Only the customer sees it.
+      Another user's or an unknown upload is 404; confirming the same upload again returns the
+      user unchanged. The photo shows at once; there is no review.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The user with the new photo
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Me
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Asha
+              preferredLang: en
+              phoneMasked: 90•••••001
+              app: customer
+              photoUrl: https://s3.todayz.localhost/private/profile/01JB0SPH1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
+              customer:
+                referralCode: K7M2QX
+                activeOrderLimit: null
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/photo:
+  delete:
+    operationId: deleteMyPhoto
+    tags: [me]
+    summary: Remove my profile photo
+    description: Customer app only (D-253). The photo is deleted from storage; without one this changes nothing.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The user without a photo
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Me
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Asha
+              preferredLang: en
+              phoneMasked: 90•••••001
+              app: customer
+              photoUrl: null
+              customer:
+                referralCode: K7M2QX
+                activeOrderLimit: null
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
 /v1/me/addresses:
   get:
     operationId: listMyAddresses

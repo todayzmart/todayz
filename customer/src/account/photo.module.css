@@ -1,0 +1,100 @@
+/* Account: profile photo (D-253). The avatar size and tint come from account.module.css. */
+
+.box {
+  position: relative;
+  flex: none;
+}
+
+.avatar {
+  position: relative;
+  overflow: hidden;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Upload or remove in progress: a veil with a turning loader over the photo. */
+.busy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  opacity: 0.85;
+  color: var(--ink);
+}
+
+.busy svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busy svg {
+    animation: none;
+  }
+}
+
+/* The camera badge on the avatar's corner. */
+.badge {
+  position: absolute;
+  right: calc(var(--space-1) * -1);
+  bottom: calc(var(--space-1) * -1);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--surface);
+  cursor: pointer;
+}
+
+.badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.badge[aria-disabled='true'] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.badge:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  margin-top: var(--space-1);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.status,
+.error {
+  margin: 0;
+  font-size: 13px;
+}
+
+.status {
+  color: var(--ink-2);
+}
+
+.error {
+  flex-basis: 100%;
+  color: var(--danger);
+}

@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ChevronDown, Coins, MapPin, User } from 'lucide-react';
 import { useIntl } from 'react-intl';
+import { PhotoImage } from '../account/ProfilePhoto';
 import { usePlace } from '../app/place';
 import { Icon } from '../shell/Icon';
 import type { CoordsState } from './coords';
@@ -68,7 +69,11 @@ export function Header({ coords }: { coords: CoordsState }) {
           </RouterLink>
         )}
         <Link to="/account" className={styles.avatar} aria-label={intl.formatMessage({ id: 'home.account.label' })}>
-          {signedIn && initial ? <span aria-hidden="true">{initial}</span> : <Icon icon={User} />}
+          <PhotoImage
+            url={signedIn ? me.data?.photoUrl : null}
+            className={styles.avatarImg}
+            fallback={signedIn && initial ? <span aria-hidden="true">{initial}</span> : <Icon icon={User} />}
+          />
         </Link>
       </div>
     </header>

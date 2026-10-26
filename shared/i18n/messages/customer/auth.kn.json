@@ -398,5 +398,55 @@
     "message": "ಸೈನ್ ಔಟ್",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.photo.add": {
+    "message": "ಪ್ರೊಫೈಲ್ ಫೋಟೋ ಸೇರಿಸಿ",
+    "review": "machine",
+    "enHash": "8427497b"
+  },
+  "account.photo.change": {
+    "message": "ಪ್ರೊಫೈಲ್ ಫೋಟೋ ಬದಲಿಸಿ",
+    "review": "machine",
+    "enHash": "01d39b33"
+  },
+  "account.photo.remove": {
+    "message": "ಫೋಟೋ ತೆಗೆದುಹಾಕಿ",
+    "review": "machine",
+    "enHash": "c8f5eda8"
+  },
+  "account.photo.uploading": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "machine",
+    "enHash": "10e4d87e"
+  },
+  "account.photo.removing": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋ ತೆಗೆದುಹಾಕಲಾಗುತ್ತಿದೆ",
+    "review": "machine",
+    "enHash": "c57ce9be"
+  },
+  "account.photo.error.type": {
+    "message": "JPEG, PNG ಅಥವಾ WebP ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "machine",
+    "enHash": "c759b5d0"
+  },
+  "account.photo.error.size": {
+    "message": "ಈ ಫೋಟೋ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ. 5 MB ಗಿಂತ ಚಿಕ್ಕದನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "machine",
+    "enHash": "bc363444"
+  },
+  "account.photo.error.unreadable": {
+    "message": "ಈ ಫೋಟೋವನ್ನು ಓದಲು ನಮಗೆ ಆಗಲಿಲ್ಲ. ಬೇರೆ ಫೋಟೋ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "machine",
+    "enHash": "759582f6"
+  },
+  "account.photo.error.rateLimited": {
+    "message": "ನೀವು ಹಲವು ಬಾರಿ ಫೋಟೋ ಬದಲಿಸಿದ್ದೀರಿ. ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "machine",
+    "enHash": "b85957cd"
+  },
+  "account.photo.error.generic": {
+    "message": "ನಿಮ್ಮ ಫೋಟೋವನ್ನು ಅಪ್‌ಡೇಟ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "machine",
+    "enHash": "257399f9"
   }
 }

@@ -28,6 +28,9 @@ type Me struct {
 	Roles []string
 	// Customer: customer app only; nil when the profile is missing.
 	Customer *CustomerProfile
+	// PhotoURL: customer app only, a presigned GET of the profile photo
+	// (D-253); nil without one.
+	PhotoURL *string
 }
 
 // CustomerProfile is the customer part of Me.
@@ -118,6 +121,7 @@ func (s *Service) readMe(ctx context.Context, q *identitydb.Queries, p authn.Pri
 	case authn.AppAdmin:
 		m.Roles = slices.Clone(p.Roles)
 	case authn.AppCustomer:
+		m.PhotoURL = s.photoURL(row.PhotoKey)
 		cp, err := q.GetCustomerProfile(ctx, ids.UUID(p.UserID))
 		switch {
 		case db.IsNoRows(err):

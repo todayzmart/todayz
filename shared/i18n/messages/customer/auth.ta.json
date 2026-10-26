@@ -398,5 +398,55 @@
     "message": "சைன் அவுட்",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.photo.add": {
+    "message": "சுயவிவரப் படத்தைச் சேர்க்கவும்",
+    "review": "machine",
+    "enHash": "8427497b"
+  },
+  "account.photo.change": {
+    "message": "சுயவிவரப் படத்தை மாற்றவும்",
+    "review": "machine",
+    "enHash": "01d39b33"
+  },
+  "account.photo.remove": {
+    "message": "படத்தை நீக்கவும்",
+    "review": "machine",
+    "enHash": "c8f5eda8"
+  },
+  "account.photo.uploading": {
+    "message": "உங்கள் படம் பதிவேற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "10e4d87e"
+  },
+  "account.photo.removing": {
+    "message": "உங்கள் படம் நீக்கப்படுகிறது",
+    "review": "machine",
+    "enHash": "c57ce9be"
+  },
+  "account.photo.error.type": {
+    "message": "JPEG, PNG அல்லது WebP படத்தைத் தேர்ந்தெடுக்கவும்.",
+    "review": "machine",
+    "enHash": "c759b5d0"
+  },
+  "account.photo.error.size": {
+    "message": "இந்தப் படம் மிகப் பெரியது. 5 MB-க்குக் குறைவான படத்தைத் தேர்ந்தெடுக்கவும்.",
+    "review": "machine",
+    "enHash": "bc363444"
+  },
+  "account.photo.error.unreadable": {
+    "message": "இந்தப் படத்தை எங்களால் படிக்க முடியவில்லை. வேறு படத்தை முயற்சிக்கவும்.",
+    "review": "machine",
+    "enHash": "759582f6"
+  },
+  "account.photo.error.rateLimited": {
+    "message": "நீங்கள் பலமுறை படத்தை மாற்றியுள்ளீர்கள். சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+    "review": "machine",
+    "enHash": "b85957cd"
+  },
+  "account.photo.error.generic": {
+    "message": "உங்கள் படத்தைப் புதுப்பிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+    "review": "machine",
+    "enHash": "257399f9"
   }
 }

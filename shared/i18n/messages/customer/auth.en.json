@@ -318,5 +318,45 @@
   "account.signOut": {
     "defaultMessage": "Sign out",
     "description": "Button that ends the session on this device"
+  },
+  "account.photo.add": {
+    "defaultMessage": "Add a profile photo",
+    "description": "Camera badge on the Account avatar when there is no photo; opens the file picker"
+  },
+  "account.photo.change": {
+    "defaultMessage": "Change profile photo",
+    "description": "Camera badge on the Account avatar when there is a photo; opens the file picker"
+  },
+  "account.photo.remove": {
+    "defaultMessage": "Remove photo",
+    "description": "Small button under the name on Account; deletes the profile photo"
+  },
+  "account.photo.uploading": {
+    "defaultMessage": "Uploading your photo",
+    "description": "Spoken and shown while the new profile photo uploads"
+  },
+  "account.photo.removing": {
+    "defaultMessage": "Removing your photo",
+    "description": "Spoken and shown while the profile photo is removed"
+  },
+  "account.photo.error.type": {
+    "defaultMessage": "Choose a JPEG, PNG or WebP photo.",
+    "description": "The picked file is not a supported image type. Keep JPEG, PNG and WebP as written"
+  },
+  "account.photo.error.size": {
+    "defaultMessage": "That photo is too big. Choose one under 5 MB.",
+    "description": "The picked photo is larger than allowed. Keep 5 MB as written"
+  },
+  "account.photo.error.unreadable": {
+    "defaultMessage": "We couldn't read that photo. Try another one.",
+    "description": "The server could not read the uploaded image"
+  },
+  "account.photo.error.rateLimited": {
+    "defaultMessage": "You've changed your photo many times. Try again later.",
+    "description": "Too many photo uploads in the last hour"
+  },
+  "account.photo.error.generic": {
+    "defaultMessage": "We couldn't update your photo. Try again.",
+    "description": "Uploading or removing the profile photo failed"
   }
 }

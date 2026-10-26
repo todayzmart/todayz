@@ -3,4 +3,5 @@ me.view kind=any step-up=false
 me.edit kind=any step-up=false
 me.delete kind=customer step-up=false
 me.addresses.view kind=customer step-up=false
+me.photo.manage kind=customer step-up=false
 me.addresses.manage kind=customer step-up=false

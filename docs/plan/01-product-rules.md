@@ -32,6 +32,7 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
 - Cloudflare Turnstile protects "send OTP" (invisible mode; challenge only when risky).
 - Sessions: short access token (15 min) + rotating refresh token (30 days customers and business, 12 h admin). The refresh token is in an httpOnly, Secure, SameSite=Strict cookie, one per app, host-only on the API host (details in 02). "Sign out of all devices" exists for every account.
 - A phone number can be a customer and a business user at once; they are separate profiles of one identity.
+- **Profile photo** (D-253). A customer may add, change or remove a profile photo on Account (C-18). JPEG, PNG or WebP, at most 5 MB; the server re-encodes it as a JPEG of at most 512 px a side, so EXIF (location included) and other metadata are never stored. It shows at once (no review) and only to the customer: it is in the private bucket and reaches the app as a link valid for 15 minutes; shops, staff and other customers never see it. At most `profile_photo_uploads_per_hour` uploads per person in a rolling hour (`429 rate_limited`). Removing the photo or deleting the account deletes the file.
 
 ## 3. Businesses, stores, staff
 
@@ -703,6 +704,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `support_tickets_per_hour` | count | 5 | §13: tickets one person may open in a rolling hour. Min 1, max 60. |
 | `support_uploads_per_hour` | count | 30 | §13: attachment uploads one person may ask for in a rolling hour. Min 5, max 300. |
 | `support_upload_ttl_hours` | hours | 24 | §13: an upload no message has claimed is refused and deleted after this. Min 1, max 168. |
+| `profile_photo_uploads_per_hour` | count | 10 | §2: profile photo uploads one customer may ask for in a rolling hour. Min 1, max 60. |
 
 **Feature flags** (turn a feature off without a deploy)
 

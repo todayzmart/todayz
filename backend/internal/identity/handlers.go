@@ -54,6 +54,10 @@ var (
 		"UpdateMe": policy.MeEdit,
 		"DeleteMe": policy.MeDelete,
 
+		"CreateMyPhotoUpload":  policy.MePhotoManage,
+		"ConfirmMyPhotoUpload": policy.MePhotoManage,
+		"DeleteMyPhoto":        policy.MePhotoManage,
+
 		"ListMyAddresses": policy.MeAddressesView,
 		"CreateAddress":   policy.MeAddressesManage,
 		"UpdateAddress":   policy.MeAddressesManage,
@@ -455,6 +459,9 @@ func toAPIMe(m Me) meapi.Me {
 		}
 		out.Customer = cp
 	}
+	if m.App == authn.AppCustomer {
+		out.PhotoUrl = m.PhotoURL
+	}
 	return out
 }
 
@@ -622,4 +629,55 @@ func (h meHandlers) DeleteAddress(ctx context.Context, req meapi.DeleteAddressRe
 		return nil, err
 	}
 	return meapi.DeleteAddress204Response{}, nil
+}
+
+func (h meHandlers) CreateMyPhotoUpload(ctx context.Context, req meapi.CreateMyPhotoUploadRequestObject) (meapi.CreateMyPhotoUploadResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	u, err := h.s.CreatePhotoUpload(ctx, p, string(req.Body.ContentType), req.Body.SizeBytes)
+	if err != nil {
+		return nil, err
+	}
+	return meapi.CreateMyPhotoUpload201JSONResponse{
+		Body: meapi.ProfilePhotoUpload{Id: u.ID.String(), Upload: meapi.ProfilePhotoUploadTarget{
+			Url: u.URL, Method: meapi.ProfilePhotoUploadTargetMethod(http.MethodPut), ExpiresAt: u.ExpiresAt,
+			Headers: meapi.ProfilePhotoUploadHeaders{
+				ContentType: meapi.ProfilePhotoContentType(u.ContentType), ContentLength: strconv.FormatInt(u.Size, 10),
+			},
+		}},
+		Headers: meapi.CreateMyPhotoUpload201ResponseHeaders{CacheControl: ptr("no-store")},
+	}, nil
+}
+
+func (h meHandlers) ConfirmMyPhotoUpload(ctx context.Context, req meapi.ConfirmMyPhotoUploadRequestObject) (meapi.ConfirmMyPhotoUploadResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := ids.Parse(req.UploadId)
+	if err != nil {
+		return nil, notFound()
+	}
+	m, err := h.s.ConfirmPhoto(ctx, p, id)
+	if err != nil {
+		return nil, err
+	}
+	return meapi.ConfirmMyPhotoUpload200JSONResponse{Body: toAPIMe(m), Headers: meapi.ConfirmMyPhotoUpload200ResponseHeaders{ETag: ptr(etag(m.Version))}}, nil
+}
+
+func (h meHandlers) DeleteMyPhoto(ctx context.Context, _ meapi.DeleteMyPhotoRequestObject) (meapi.DeleteMyPhotoResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	m, err := h.s.RemovePhoto(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+	return meapi.DeleteMyPhoto200JSONResponse{Body: toAPIMe(m), Headers: meapi.DeleteMyPhoto200ResponseHeaders{ETag: ptr(etag(m.Version))}}, nil
 }

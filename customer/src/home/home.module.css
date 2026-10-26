@@ -105,6 +105,14 @@
   color: var(--tint-sky-ink);
   font: 800 16px/1 var(--font-display);
   text-decoration: none;
+  overflow: hidden;
+}
+
+/* The profile photo (D-253) fills the circle. */
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .voiceNotice {

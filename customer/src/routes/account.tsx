@@ -5,7 +5,7 @@ import { NATIVE_NAMES, isLocale } from '@todayz/i18n';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { Button, Skeleton, TextField } from '@todayz/ui';
-import { ChevronRight, Languages, LifeBuoy, LogOut, MapPin, ShoppingBasket, UserRound, type LucideIcon } from 'lucide-react';
+import { ChevronRight, Languages, LifeBuoy, LogOut, MapPin, ShoppingBasket, type LucideIcon } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import { patchMe } from '../app/me';
@@ -14,6 +14,8 @@ import { SavedAddresses } from '../address/SavedAddresses';
 import { Icon } from '../shell/Icon';
 import styles from '../shell/shell.module.css';
 import a from '../account/account.module.css';
+import { useProfilePhoto } from '../account/photo';
+import { PhotoActions, PhotoAvatar } from '../account/ProfilePhoto';
 
 export const Route = createFileRoute('/account')({
   component: Account,
@@ -61,6 +63,8 @@ function SignedIn() {
   // Kept here, not in Profile: a 412 reloads the account, which remounts Profile with the fresh name.
   const [note, setNote] = useState<Note>(null);
   const query = useQuery({ queryKey: ['me'], queryFn: () => getMe() });
+  // Also kept here: a new photo reloads the account, and the upload state must outlive that remount.
+  const photo = useProfilePhoto();
 
   return (
     <div className={styles.body}>
@@ -76,14 +80,16 @@ function SignedIn() {
           <Button onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'account.retry' })}</Button>
         </div>
       )}
-      {query.data && <Profile key={query.dataUpdatedAt} me={query.data} note={note} setNote={setNote} />}
+      {query.data && <Profile key={query.dataUpdatedAt} me={query.data} note={note} setNote={setNote} photo={photo} />}
     </div>
   );
 }
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
-function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note) => void }) {
+type Props = { me: Me; note: Note; setNote: (n: Note) => void; photo: ReturnType<typeof useProfilePhoto> };
+
+function Profile({ me, note, setNote, photo }: Props) {
   const intl = useIntl();
   const session = useSession();
   const client = useQueryClient();
@@ -127,20 +133,17 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
         : intl.formatMessage({ id: 'location.set' });
   const lang = isLocale(me.preferredLang) ? NATIVE_NAMES[me.preferredLang] : me.preferredLang;
 
-  const initial = me.name?.trim().charAt(0).toUpperCase();
-
   return (
     <>
       <section className="tz-card" aria-labelledby="acct-me">
         <div className={a.who}>
-          <span className={a.avatar} data-tint="sky" aria-hidden="true">
-            {initial || <Icon icon={UserRound} />}
-          </span>
+          <PhotoAvatar me={me} photo={photo} />
           <div className={a.whoText}>
             <h2 id="acct-me" className="tz-card-title">
               {me.name || me.phoneMasked}
             </h2>
             {me.name && <p className="tz-card-desc">{me.phoneMasked}</p>}
+            <PhotoActions me={me} photo={photo} />
           </div>
         </div>
         <form className={styles.stack} onSubmit={(e) => void save(e)}>

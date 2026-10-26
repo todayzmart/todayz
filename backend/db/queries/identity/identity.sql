@@ -62,7 +62,7 @@ INSERT INTO phone_identities (id, user_id, phone_enc, phone_hash, verified_at, c
 VALUES (@id, @user_id, @phone_enc, @phone_hash, @now, @now);
 
 -- name: GetMe :one
-SELECT u.id, u.name, u.preferred_lang, u.status, u.created_at, u.version, p.phone_enc
+SELECT u.id, u.name, u.preferred_lang, u.status, u.created_at, u.version, u.photo_key, p.phone_enc
 FROM users u JOIN phone_identities p ON p.user_id = u.id
 WHERE u.id = @id;
 
@@ -244,7 +244,7 @@ SELECT status FROM users WHERE id = @id FOR SHARE;
 SELECT phone_hash FROM phone_identities WHERE user_id = @user_id;
 
 -- name: AnonymiseUser :exec
-UPDATE users SET status = 'deleted', deleted_at = @now::timestamptz, name = NULL, version = version + 1
+UPDATE users SET status = 'deleted', deleted_at = @now::timestamptz, name = NULL, photo_key = NULL, version = version + 1
 WHERE id = @id;
 
 -- name: DeletePhoneIdentity :exec
@@ -274,3 +274,50 @@ WHERE user_id = @user_id;
 
 -- name: DeleteAddresses :exec
 DELETE FROM addresses WHERE user_id = @user_id;
+
+------------------------------------------------------------------------------
+-- Profile photo (D-253)
+------------------------------------------------------------------------------
+
+-- name: CountRecentPhotoUploads :one
+SELECT count(*)::int FROM user_photo_uploads WHERE user_id = @user_id AND created_at > @since::timestamptz;
+
+-- name: InsertPhotoUpload :exec
+INSERT INTO user_photo_uploads (id, user_id, object_key, content_type, size_bytes, created_at)
+VALUES (@id, @user_id, @object_key, @content_type, @size_bytes, @now::timestamptz);
+
+-- name: StalePhotoUploads :many
+SELECT id, object_key FROM user_photo_uploads
+WHERE user_id = @user_id AND status = 'uploading' AND created_at < @before::timestamptz
+ORDER BY created_at
+LIMIT 20;
+
+-- name: ExpirePhotoUpload :exec
+UPDATE user_photo_uploads SET status = 'expired' WHERE id = @id AND status = 'uploading';
+
+-- name: LockPhotoUpload :one
+SELECT id, object_key, content_type, size_bytes, status FROM user_photo_uploads
+WHERE id = @id AND user_id = @user_id
+FOR UPDATE;
+
+-- name: MarkPhotoUploadDone :exec
+UPDATE user_photo_uploads SET status = 'done', confirmed_at = @now::timestamptz WHERE id = @id;
+
+-- name: LockUserPhoto :one
+-- The user's current photo, with the row locked for the change.
+SELECT photo_key, status FROM users WHERE id = @id FOR UPDATE;
+
+-- name: SetUserPhoto :exec
+UPDATE users SET photo_key = sqlc.narg(photo_key)::text, version = version + 1 WHERE id = @id;
+
+-- name: UserPhotoObjects :many
+-- Every object a user's photos may have left in the bucket: each upload's
+-- file (<key>.upload), its cleaned copy (<key>.jpg) and the current photo.
+SELECT object_key AS key FROM user_photo_uploads WHERE user_photo_uploads.user_id = @user_id::uuid
+UNION
+SELECT regexp_replace(object_key, '\.upload$', '.jpg') FROM user_photo_uploads WHERE user_photo_uploads.user_id = @user_id::uuid AND status = 'done'
+UNION
+SELECT photo_key FROM users WHERE users.id = @user_id::uuid AND photo_key IS NOT NULL;
+
+-- name: DeletePhotoUploads :exec
+DELETE FROM user_photo_uploads WHERE user_id = @user_id;

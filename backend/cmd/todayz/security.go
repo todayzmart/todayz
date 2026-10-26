@@ -8,8 +8,10 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/mw"
 	"github.com/todayz/backend/internal/platform/ratelimit"
+	"github.com/todayz/backend/internal/platform/storage"
 )
 
 // buildSecurity builds the sign-in pieces the pipeline needs before any route
@@ -32,6 +34,8 @@ func buildSecurity(d *deps) (mw.Authenticator, mw.Limiter, error) {
 	}
 	svc, err := identity.New(identity.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Tokens: tokens, Settings: d.Settings,
+		// Profile photos (D-253); nil without storage config, and the photo routes answer 503.
+		Storage:    storage.New(d.Config.Storage, httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: d.Config.NoEgress})),
 		TestRoutes: d.TestClock != nil, // the /v1/test/clock gate (D-80)
 	})
 	if err != nil {

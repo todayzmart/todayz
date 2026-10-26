@@ -134,23 +134,33 @@ func (c *Client) Publish(ctx context.Context, src, dst, contentType string, maxB
 	if !c.HasImages() {
 		return ErrNoImages
 	}
-	res, err := c.do(ctx, http.MethodGet, c.sign(http.MethodGet, c.private, src, now, nil), nil, "")
+	body, err := c.Get(ctx, src, maxBytes, now)
 	if err != nil {
 		return err
+	}
+	return c.put(ctx, c.images, dst, contentType, body, now)
+}
+
+// Get reads a private object into memory (a signed GET). An object larger
+// than maxBytes is refused with ErrTooLarge.
+func (c *Client) Get(ctx context.Context, key string, maxBytes int64, now time.Time) ([]byte, error) {
+	res, err := c.do(ctx, http.MethodGet, c.sign(http.MethodGet, c.private, key, now, nil), nil, "")
+	if err != nil {
+		return nil, err
 	}
 	body, err := io.ReadAll(io.LimitReader(res.Body, maxBytes+1))
 	_ = res.Body.Close()
 	switch {
 	case err != nil:
-		return err
+		return nil, err
 	case res.StatusCode == http.StatusNotFound:
-		return ErrNoObject
+		return nil, ErrNoObject
 	case res.StatusCode != http.StatusOK:
-		return errors.New("storage: GET answered " + res.Status)
+		return nil, errors.New("storage: GET answered " + res.Status)
 	case int64(len(body)) > maxBytes:
-		return ErrTooLarge
+		return nil, ErrTooLarge
 	}
-	return c.put(ctx, c.images, dst, contentType, body, now)
+	return body, nil
 }
 
 // Remove deletes a private object; one already gone is fine.
