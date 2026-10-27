@@ -1106,8 +1106,5 @@
   },
   "home.save.hours_value": {
     "defaultMessage": "{hours} hours"
-  },
-  "home.lede.photo": {
-    "defaultMessage": "A shopkeeper at the counter of a small general store, its shelves full of stock."
   }
 }

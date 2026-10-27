@@ -1660,3 +1660,9 @@ The questions are in `docs/qa/go-live-gaps/LIST.md`. The founder delegated them;
 - **Now.** `e2e/load/ssefanout` reads the baseline RSS after `-warmup` (1 minute) of events; the end reading, the 10% limit and "no stream lost for good" are unchanged. The summary JSON adds `apiRssMB.afterWarmup`. 08 §6 says so.
 - **Caveat.** RSS moves by tens of MB between 15-second samples while the streams are open (175 to 335 MB in that run), so a single reading at each end is still noisy. If the check flakes, the next step is the founder's other option: judge by the Go heap's trend and its fall after the streams close.
 - Lives in: `e2e/load/ssefanout/main.go`, `docs/plan/08-testing.md`.
+
+**D-267 · The landing hero has no photo: dark text on the white page's mint wash, and a smaller title (founder, 27 Oct: "remove the landing page image and i think change the text color to black from white, reduce the title font little bit"). Changes D-262's hero.**
+- **Now.** `site/src/components/bright/Hero.astro` (Home and For retailers) drops the `<picture>` and its scrim. The band is `--wash` fading to `--surface`, with a `--wash-strong` glow at the top. Title, badge and stats are `--ink`, the lead and note are `--ink-2`, and the accent word is `--brand`, because mint on white is too pale to read. The h1 is `clamp(38px, 6.6vw, 80px)`, down from `clamp(46px, 9vw, 112px)`. PageHead (the inner pages) shares the hero's styles, so it is light too.
+- **Removed.** `bright/heroPhotos.ts`, the 14 `hero-kirana-*` and `hero-shopkeeper-*` files, and the photos' alt texts `home.lede.photo` and `retailers.hero.photo` in all five locales. The largest paint on a phone is now the title, not a photo.
+- **Visual baselines.** The site's Playwright screenshots of the hero change and are re-taken on the next `make e2e`.
+- Lives in: `site/src/components/bright/Hero.astro`, `PageHead.astro`, `site/src/styles/bright.css`, `site/src/views/HomeView.astro`, `RetailersView.astro`.

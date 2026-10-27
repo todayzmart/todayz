@@ -2,7 +2,7 @@
 
 The public site at todayz.in: pages, languages, lead form, the demand marquee and the performance gates.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 08cc9978 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -25,7 +25,7 @@ The page registry is [site/src/lib/pages.ts](../../site/src/lib/pages.ts). Views
 ## Rules
 
 - Astro builds static pages. Draft locales are dropped from the prod build (`drop-draft-locales`, D-102).
-- The landing follows the founder's bright trial on every page (D-262). Shop types have round photos (D-260).
+- The landing follows the founder's bright trial on every page (D-262). The hero has no photo: dark text on the mint wash, with a smaller title (D-267). Shop types have round photos (D-260).
 - Lighthouse gates are in `lighthouserc.json` (D-102). The `/kn/` pages have a recorded exception (D-262, see commit history).
 - The marquee shows searches from at least k=10 people in a window (`site_marquee_min_searchers`, `site_marquee_window_days`, `site_marquee_max_items`).
 

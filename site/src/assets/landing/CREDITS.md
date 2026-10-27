@@ -2,14 +2,9 @@
 
 Photos on the bright landing (D-262). Product and shop names in them are the makers' trademarks; the photos only show goods a neighbourhood shop sells.
 
-## Hero photos (Unsplash licence)
+## Hero photos
 
-Free for commercial use, no credit required ([unsplash.com/license](https://unsplash.com/license)). They replace the trial's street and tea-stall photos (founder, 26 Oct: "the background image is not good"). Encoded from the full-resolution originals (founder, 27 Oct: the 800 px phone copy looked soft): landscape AVIF at 1200, 1920 and 2560 px (SVT-AV1, CRF 34), a portrait crop around the shopkeeper for phones (`-phone-750.avif`, `-phone-1170.avif`), and WebP at 1200 and 1920 px (q75) for browsers without AVIF. `components/bright/heroPhotos.ts` wires them into the hero's `<picture>`.
-
-| File | Page | Photo | Photographer |
-|---|---|---|---|
-| `hero-kirana-*` | Home | https://unsplash.com/photos/a-man-stands-in-a-small-convenience-store-gakuij2BVdg | Rohit Dey |
-| `hero-shopkeeper-*` | For retailers | https://unsplash.com/photos/a-man-smiles-in-a-packed-open-front-store-g3IR5Y3C730 (Kochi) | Wietse Jongsma |
+Removed (D-267): the hero has no photo.
 
 ## Product photos (CC BY 2.0, trial photos)
 

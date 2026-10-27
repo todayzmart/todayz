@@ -1,5 +1,5 @@
 ---
-// S-02 For retailers, in any language. The bright hero with the shopkeeper photo and the owners block
+// S-02 For retailers, in any language. The bright hero (no photo, D-267) and the owners block
 // (D-262), then the shop-facing landing sections; the hero carries the retailers copy, everything else
 // reuses the home text.
 import Hero from '../components/bright/Hero.astro';
@@ -17,7 +17,6 @@ import Base from '../layouts/Base.astro';
 import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { faqJsonLd, softwareApplicationJsonLd } from '../lib/jsonld.ts';
 import { pageById } from '../lib/pages.ts';
-import { shopkeeperPhoto } from '../components/bright/heroPhotos.ts';
 import '../styles/landing.css';
 import '../styles/bright.css';
 
@@ -34,8 +33,6 @@ const faq = [1, 2, 3].map((i) => ({ q: t(`retailers.faq.${i}.q` as MessageKey), 
 <Base page={page} locale={locale} jsonLd={[softwareApplicationJsonLd(locale, t('retailers.meta.description')), faqJsonLd(faq)]}>
   <div class="bp">
     <Hero
-      photo={shopkeeperPhoto}
-      alt={t('retailers.hero.photo')}
       badge={t('nav.retailers')}
       title={t('retailers.hero.title', EM)}
       titleEm={t('retailers.hero.title_em')}
