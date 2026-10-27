@@ -4,6 +4,7 @@ import {
   Bell,
   CalendarClock,
   ChartNoAxesColumn,
+  ClipboardCheck,
   ClipboardPlus,
   Gift,
   HeartHandshake,
@@ -41,6 +42,8 @@ export const NAV: readonly NavItem[] = [
   { section: '', label: 'shell.nav.pulse', icon: Activity, group: null },
   /** A-04 sits right after Pulse, so a field agent (no Pulse) lands on it. */
   { section: 'field', label: 'shell.nav.field', icon: ClipboardPlus, group: null },
+  /** D-269: the daily check of shops that went live by themselves. */
+  { section: 'shop-checks', label: 'shell.nav.shopChecks', icon: ClipboardCheck, group: null },
   { section: 'businesses', label: 'shell.nav.businesses', icon: Store, group: null },
   { section: 'stores', label: 'shell.nav.stores', icon: MapPin, group: null },
   { section: 'customers', label: 'shell.nav.customers', icon: UsersRound, group: null },
@@ -68,7 +71,7 @@ export const NAV: readonly NavItem[] = [
  * file (`src/routes/<area>/…`), which outranks `$section`; nothing here changes (src/app/routing.test.ts).
  */
 /** Sections with a real route (src/routes/<area>/); the rest show the placeholder. */
-export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications', 'risk', 'referrals', 'support', 'field', 'field-agents', 'jobs', 'system', 'demand'];
+export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications', 'risk', 'referrals', 'support', 'field', 'shop-checks', 'field-agents', 'jobs', 'system', 'demand'];
 
 export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter((s) => s && !BUILT_SECTIONS.includes(s));
 

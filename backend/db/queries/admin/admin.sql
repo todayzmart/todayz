@@ -137,7 +137,8 @@ ORDER BY b.created_at DESC, b.id DESC
 LIMIT @lim;
 
 -- name: GetBusiness :one
-SELECT id, brand_name, legal_name, status, needs_info_fields, needs_info_note, submitted_at, verified_at, created_at
+SELECT id, brand_name, legal_name, status, needs_info_fields, needs_info_note, submitted_at, verified_at,
+  check_status, checked_at, check_note, created_at
 FROM businesses WHERE id = @id;
 
 -- name: LockBusiness :one
@@ -154,6 +155,61 @@ UPDATE stores SET status = 'live', live_at = COALESCE(live_at, @now), reviewed_b
   review_note = NULL, version = version + 1
 WHERE business_id = @business_id AND status = 'pending_review'
 RETURNING id;
+
+-- name: ShopCheckQueue :many
+-- The daily check (D-269): live businesses nobody has checked, newest first
+-- (ix_businesses_check_queue).
+SELECT b.id, b.brand_name, b.legal_name, b.status, b.check_status, b.checked_at, b.check_note,
+  COALESCE(c.names ->> 'en', '')::text AS category, b.verified_at, b.created_at, (b.onboarded_by IS NOT NULL)::bool AS by_field_agent,
+  COALESCE(k.status, 'missing')::text AS kyc_status
+FROM businesses b
+  LEFT JOIN categories c ON c.id = b.category_id
+  LEFT JOIN business_kyc k ON k.business_id = b.id
+WHERE b.check_status = 'unchecked' AND b.status = 'verified' AND b.verified_at IS NOT NULL
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+       OR (b.verified_at, b.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY b.verified_at DESC, b.id DESC
+LIMIT @lim;
+
+-- name: ShopCheck :one
+SELECT b.id, b.brand_name, b.legal_name, b.status, b.check_status, b.checked_at, b.check_note,
+  COALESCE(c.names ->> 'en', '')::text AS category, b.verified_at, b.created_at, (b.onboarded_by IS NOT NULL)::bool AS by_field_agent,
+  COALESCE(k.status, 'missing')::text AS kyc_status
+FROM businesses b
+  LEFT JOIN categories c ON c.id = b.category_id
+  LEFT JOIN business_kyc k ON k.business_id = b.id
+WHERE b.id = @id;
+
+-- name: ShopCheckStores :many
+SELECT s.id, s.business_id, s.name, s.status, s.address_line1, s.locality, s.city, s.pincode,
+  (s.location IS NOT NULL)::bool AS has_location,
+  COALESCE(ST_Y(s.location::geometry), 0)::float8 AS lat, COALESCE(ST_X(s.location::geometry), 0)::float8 AS lng,
+  s.live_at
+FROM stores s
+WHERE s.business_id = ANY(@business_ids::uuid[])
+ORDER BY s.business_id, s.created_at, s.id;
+
+-- name: ShopCheckPhotos :many
+-- Shop photos only (no KYC files); a row still waiting for its upload has no object yet.
+SELECT d.id, d.business_id, d.kind, d.store_id, d.status, d.object_key, d.created_at
+FROM business_documents d
+WHERE d.business_id = ANY(@business_ids::uuid[]) AND d.kind IN ('shop_photo','storefront') AND d.status <> 'pending'
+ORDER BY d.business_id, d.created_at DESC, d.id DESC;
+
+-- name: LockBusinessCheck :one
+SELECT status, check_status FROM businesses WHERE id = @id FOR UPDATE;
+
+-- name: CheckBusiness :exec
+UPDATE businesses SET check_status = 'checked', checked_at = @now, checked_by = @by, check_note = sqlc.narg(note),
+  version = version + 1
+WHERE id = @id;
+
+-- name: RejectBusinessCheck :exec
+-- A reject hides the shop at once: search and every customer route read
+-- businesses.status = 'verified' only.
+UPDATE businesses SET status = 'rejected', check_status = 'rejected', checked_at = @now, checked_by = @by,
+  check_note = @note, version = version + 1
+WHERE id = @id;
 
 -- name: RequestBusinessInfo :exec
 UPDATE businesses SET status = 'needs_info', needs_info_fields = @fields::text[], needs_info_note = @note,

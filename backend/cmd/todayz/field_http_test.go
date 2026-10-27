@@ -241,18 +241,19 @@ func TestFieldOnboardingHTTP(t *testing.T) {
 	require.EqualValues(t, 4, ext(r, "attemptsLeft"))
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "submitted", r.body["status"])
+	require.Equal(t, "verified", r.body["status"], "D-269: the owner's confirm puts the shop live")
 	require.Equal(t, true, r.body["ownerConfirmed"])
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM staff s JOIN phone_identities p ON p.user_id = s.user_id
 	  WHERE s.business_id = $1 AND s.role = 'owner' AND s.status = 'active'`, uuidOf(t, bid)))
-	// D-241: the confirm also sends the agent's complete store for review.
-	require.Equal(t, 1, f.count(`SELECT count(*) FROM stores WHERE id = $1 AND status = 'pending_review'`, uuidOf(t, sid)))
-	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'store.submit' AND subject_type = 'store' AND subject_id = $1`, sid))
+	// D-241, D-269: the confirm also puts the agent's complete store live.
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM stores WHERE id = $1 AND status = 'live' AND live_at IS NOT NULL`, uuidOf(t, sid)))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'store.go_live' AND subject_type = 'store' AND subject_id = $1`, sid))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM businesses WHERE id = $1 AND check_status = 'unchecked'`, uuidOf(t, bid)), "it waits in the shop check queue")
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
-	require.Equal(t, http.StatusConflict, r.code, r.raw, "submitted: no second confirm")
+	require.Equal(t, http.StatusConflict, r.code, r.raw, "live: no second confirm")
 	r = f.call(tok, http.MethodPatch, B, map[string]any{"ownerPhone": shop2OwnerPhone}, nil)
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
-	require.Equal(t, "invalid_transition", problemCode(r), "submitted: the owner's number stays")
+	require.Equal(t, "invalid_transition", problemCode(r), "live: the owner's number stays")
 
 	// The owner signs in to the business app and sees it.
 	owner := f.signIn(shopOwnerPhone, "business")
@@ -540,7 +541,7 @@ func TestFieldPhotosHTTP(t *testing.T) {
 	f.bucket.put(t, up)
 	r = confirm(up)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "uploaded", r.body["status"])
+	require.Equal(t, "accepted", r.body["status"], "D-269: no review; the shop check looks at it later")
 	r = confirm(up)
 	require.Equal(t, http.StatusOK, r.code, r.raw, "a second confirm changes nothing")
 	require.EqualValues(t, 1, photos())
@@ -667,7 +668,7 @@ func TestFieldPhotoSweepHTTP(t *testing.T) {
 		require.False(t, f.bucket.has(t, s))
 	}
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM business_documents WHERE id = $1 AND reject_reason = 'not uploaded in time'`, uuidOf(t, docID(stale[0]))))
-	require.Equal(t, "uploaded", status(up))
+	require.Equal(t, "accepted", status(up))
 	require.True(t, f.bucket.has(t, up))
 	require.Equal(t, "pending", status(mine))
 	require.Equal(t, "pending", status(fresh))
@@ -706,7 +707,7 @@ func TestFieldPhotoConfirmRacesSweepHTTP(t *testing.T) {
 	require.Equal(t, http.StatusConflict, c.code, c.raw)
 	require.Equal(t, "invalid_transition", c.body["code"], c.raw)
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM business_documents WHERE id = $1 AND status = 'pending'`, uuidOf(t, id)))
-	require.Zero(t, f.count(`SELECT count(*) FROM audit_log WHERE action = 'document.uploaded' AND subject_id = $1`, id))
+	require.Zero(t, f.count(`SELECT count(*) FROM audit_log WHERE action IN ('document.uploaded', 'document.accepted') AND subject_id = $1`, id))
 
 	// The sweep rejects it once the claim's lease has passed.
 	f.clk.Advance(10*time.Minute + time.Second)

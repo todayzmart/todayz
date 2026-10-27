@@ -199,7 +199,7 @@ func (s *Service) payoutDetail(ctx context.Context, q *payoutsdb.Queries, id ids
 			Utr: r.Utr, PaidAt: r.PaidAt, PaidBy: r.PaidBy, TransactionID: r.TransactionID, CreatedAt: r.CreatedAt,
 			UpdatedAt: r.UpdatedAt, Version: r.Version,
 		}, r.BrandName, r.StatementPeriod),
-		Causes:    api.AdminPayoutCauses{BusinessSuspended: c.Suspended, KycVerified: c.KYCVerified, PayoutDetailsMissing: c.DetailsMissing, OpenRiskFlag: c.RiskFlag},
+		Causes:    api.AdminPayoutCauses{BusinessSuspended: c.Suspended, ShopChecked: c.Checked, PayoutDetailsMissing: c.DetailsMissing, OpenRiskFlag: c.RiskFlag},
 		Lines:     []api.AdminPayoutLine{},
 		ServerNow: s.now(),
 	}

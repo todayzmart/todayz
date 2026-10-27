@@ -23,6 +23,10 @@
     "defaultMessage": "Add shops",
     "description": "Navigation item: field agents onboard shops (A-04)"
   },
+  "shell.nav.shopChecks": {
+    "defaultMessage": "Shop checks",
+    "description": "Navigation item: the daily check of shops that went live by themselves (D-269)"
+  },
   "shell.nav.businesses": {
     "defaultMessage": "Businesses",
     "description": "Navigation item"

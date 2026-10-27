@@ -22,6 +22,9 @@ var BusinessOps = map[string]string{
 	"ReviewAdminBusinessKyc":      policy.AdminBusinessVerify,
 	"ReviewAdminBusinessDocument": policy.AdminBusinessVerify,
 	"RevealAdminBusinessKyc":      policy.AdminKycReveal,
+	"ListAdminShopChecks":         policy.AdminShopCheckView,
+	"CheckAdminShop":              policy.AdminShopCheckDecide,
+	"RejectAdminShop":             policy.AdminShopCheckDecide,
 }
 
 // StoreOps maps the admin-stores operations to their authz actions.
@@ -175,6 +178,41 @@ func (h businessHandlers) ReviewAdminBusinessDocument(ctx context.Context, req b
 		return nil, asProblem(err)
 	}
 	return bizapi.ReviewAdminBusinessDocument200JSONResponse(out), nil
+}
+
+// ListAdminShopChecks implements GET /v1/admin/shop-checks (D-269).
+func (h businessHandlers) ListAdminShopChecks(ctx context.Context, req bizapi.ListAdminShopChecksRequestObject) (bizapi.ListAdminShopChecksResponseObject, error) {
+	out, err := h.s.listShopChecks(ctx, req.Params.Limit, req.Params.Cursor)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return bizapi.ListAdminShopChecks200JSONResponse(out), nil
+}
+
+// CheckAdminShop implements POST /v1/admin/businesses/{businessId}/check.
+func (h businessHandlers) CheckAdminShop(ctx context.Context, req bizapi.CheckAdminShopRequestObject) (bizapi.CheckAdminShopResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.BusinessId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.checkShop(ctx, actor, id, req.Body.Note)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return bizapi.CheckAdminShop200JSONResponse(out), nil
+}
+
+// RejectAdminShop implements POST /v1/admin/businesses/{businessId}/check-reject.
+func (h businessHandlers) RejectAdminShop(ctx context.Context, req bizapi.RejectAdminShopRequestObject) (bizapi.RejectAdminShopResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.BusinessId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.rejectShop(ctx, actor, id, req.Body.Reason)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return bizapi.RejectAdminShop200JSONResponse(out), nil
 }
 
 type storeHandlers struct{ s *Service }

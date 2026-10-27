@@ -384,19 +384,21 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 | `review_reply` | `review.reply` | ✓ | ✓ | – |
 | `banner_copy` | `banners.manage` | ✓ | ✓ | – |
 
-**Admin roles** (paths under `/v1/admin`). There are 7 roles (D-64). Pulse is open to every admin role except `field_agent`. KYC verification is `admin` and `super_admin` only. Money settings are keys with unit `paise`, `bp` or `credits` ([01](01-product-rules.md) §17), and only `super_admin` changes them.
+**Admin roles** (paths under `/v1/admin`). There are 7 roles (D-64). Pulse is open to every admin role except `field_agent`. KYC verification is `admin` and `super_admin` only; since D-269 it gates neither going live nor payouts. The shop check (D-269) is `field_agent`, `admin` and `super_admin`. Money settings are keys with unit `paise`, `bp` or `credits` ([01](01-product-rules.md) §17), and only `super_admin` changes them.
 
 | Domain | Action | Used by | field_agent | support | catalogue | analyst | finance | admin | super_admin |
 |---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | pulse | `admin.pulse.view` | pulse, pulse map, admin stream (read-only) | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | businesses | `admin.business.view` | list, detail (KYC masked) | own | ✓ | – | – | – | ✓ | ✓ |
 | businesses | `admin.business.onboard` | `/admin/field/businesses`: create-for-shop, owner-confirm OTP, documents, stores | own | – | – | – | – | ✓ | ✓ |
-| businesses | `admin.business.verify` | verify, request-info, reject | – | – | – | – | – | ✓ | ✓ |
+| businesses | `admin.business.verify` | verify, request-info, reject (rows still `submitted` or `needs_info` from before D-269) | – | – | – | – | – | ✓ | ✓ |
+| businesses | `admin.shop_check.view` | `GET /admin/shop-checks`: the daily queue of live, unchecked shops, newest first, with stores, pins and photos (A-24, D-269); the whole queue, not own | ✓ | – | – | – | – | ✓ | ✓ |
+| businesses | `admin.shop_check.decide` | `POST /admin/businesses/{id}/check` (optional note) and `/check-reject` (reason; hides the shop and cancels its open online orders with `shop_rejected`); both audited | ✓ | – | – | – | – | ✓ | ✓ |
 | businesses | `admin.business.suspend` | suspend, reinstate | – | – | – | – | – | ✓ | ✓ |
 | businesses | `admin.kyc.reveal` | reveal one KYC field unmasked; audited | – | – | – | – | – | ✓ | ✓ |
 | businesses | `admin.kyc.verify` | review PAN, GSTIN, UPI, bank and documents | – | – | – | – | – | ✓ | ✓ |
 | stores | `admin.store.view` | list, detail | – | ✓ | – | – | – | ✓ | ✓ |
-| stores | `admin.store.review` | new store at a verified business (address, photos) | – | – | – | – | – | ✓ | ✓ |
+| stores | `admin.store.review` | stores still `pending_review` from before D-269 (address, photos); new stores no longer wait for review | – | – | – | – | – | ✓ | ✓ |
 | stores | `admin.store.edit` | pin, hours, force-close | – | – | – | – | – | ✓ | ✓ |
 | field | `admin.field.items.edit` | `/admin/field/businesses/{bid}/stores/{sid}/items` | own, window | – | – | – | – | ✓ | ✓ |
 | field | `admin.field.own_stats` | `GET /admin/field/me/stats`: the caller's own shops onboarded, verified, products added, first-order rate | ✓ | – | – | – | – | ✓ | ✓ |

@@ -70,11 +70,14 @@ WHERE id = ANY(@ids::uuid[]) AND status = 'pending';
 -- name: FieldDocumentForUpdate :one
 SELECT * FROM business_documents WHERE id = @id AND business_id = @business_id FOR UPDATE;
 
--- name: MarkDocumentUploaded :one
--- Not past confirm_by: the sweep claims such a row and deletes its object
--- without a row lock, so a confirm that read the row before then must not
--- mark it uploaded (no row: the upload expired).
-UPDATE business_documents SET status = 'uploaded', updated_at = @now::timestamptz
+-- name: AcceptUploadedDocument :one
+-- A confirmed upload is accepted at once: no one approves a shop photo or a
+-- KYC document before the shop sells (D-269); the shop check looks at it
+-- later and an admin may still reject it. Not past confirm_by: the sweep
+-- claims such a row and deletes its object without a row lock, so a confirm
+-- that read the row before then must not accept it (no row: the upload
+-- expired).
+UPDATE business_documents SET status = 'accepted', updated_at = @now::timestamptz, version = version + 1
 WHERE id = @id AND status = 'pending' AND (confirm_by IS NULL OR confirm_by >= @now::timestamptz)
 RETURNING *;
 

@@ -379,7 +379,7 @@ function Outcome({ order }: { order: Order }) {
   const reason = order.statusReason;
   const known =
     reason &&
-    ['out_of_stock', 'closing_soon', 'too_busy', 'other', 'changed_mind', 'too_slow', 'no_response', 'partial_timeout', 'declined_partial'].includes(reason);
+    ['out_of_stock', 'closing_soon', 'too_busy', 'other', 'changed_mind', 'too_slow', 'no_response', 'partial_timeout', 'declined_partial', 'shop_rejected'].includes(reason);
   return (
     <section className={`tz-card ${styles.stack}`}>
       <h2 className="tz-card-title">{intl.formatMessage({ id: `orders.outcome.${order.status}` }, { shop: order.store.name })}</h2>

@@ -46,14 +46,15 @@ WHERE s.business_id = @business_id
 ORDER BY s.id;
 
 -- HoldCauses reads the automatic hold causes (01 §9): a suspended
--- business, KYC not verified, no payout destination (neither a UPI id nor a
+-- business, a shop not yet checked by a field agent or admin (D-269: it sells
+-- from sign-up, its money waits for the check), no payout destination (neither a UPI id nor a
 -- bank account), a risk flag on the business or one of its stores that is
 -- open or confirmed (01 §256: fraud that has not been cleared; D-225). Only
 -- clearing the flag releases the hold.
 -- name: HoldCauses :one
 SELECT
   (b.status = 'suspended')::boolean AS suspended,
-  coalesce((SELECT k.status = 'verified' FROM business_kyc k WHERE k.business_id = b.id), false)::boolean AS kyc_verified,
+  (b.check_status = 'checked')::boolean AS checked,
   (NOT EXISTS (
     SELECT 1 FROM business_kyc k
     WHERE k.business_id = b.id AND (k.upi_id_enc IS NOT NULL OR k.bank_account_enc IS NOT NULL)

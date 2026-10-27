@@ -175,7 +175,7 @@
                   amountPaise: 267000
               causes:
                 businessSuspended: false
-                kycVerified: true
+                shopChecked: true
                 payoutDetailsMissing: false
                 openRiskFlag: false
               payee:

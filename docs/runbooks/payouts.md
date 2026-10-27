@@ -25,8 +25,9 @@ The ledger side (store_credit, `platform_payouts_cash`, the reconcile) is in
   statement's opening; nothing is written off.
 - **Backfill.** Closing an older month after a later one exists writes the statement but leaves
   the payout alone.
-- **Holds.** A payout is held while the business is suspended, its KYC is not verified, or it has
-  an open risk flag (`business_suspended` → `kyc_incomplete` → `risk_flag`), or by hand
+- **Holds.** A payout is held while the business is suspended, its shop is not checked yet
+  (D-269), it has no UPI or bank to pay to, or it has an open risk flag (`business_suspended` →
+  `shop_unchecked` → `payout_details_missing` → `risk_flag`), or by hand
   (`manual`, with a note). The close never lifts a hold. Mark paid and export check the causes
   live, so a cause opened after the close still blocks the money.
 
@@ -41,8 +42,8 @@ All are finance or super_admin, need step-up auth, a reason, and are audited (`p
 - **Mark paid** sends the UTR and the amount the admin sees. A different amount (the payout was
   recomputed since the screen loaded) is `payout_amount_changed`; reload and check. The same UTR
   again returns the paid payout; another payout's UTR is `utr_in_use`.
-- **Unhold** is refused with `payout_hold_cause_open` while a cause is open: fix the cause (KYC,
-  risk flag, suspension) first.
+- **Unhold** is refused with `payout_hold_cause_open` while a cause is open: fix the cause (shop
+  check on A-24, payout details, risk flag, suspension) first.
 - **Adjustments** above `admin_adjust_dual_approval_above_paise` need a second finance or
   super_admin to approve; the requester cannot approve their own (`approver_is_requester`).
 
@@ -63,6 +64,6 @@ All are finance or super_admin, need step-up auth, a reason, and are audited (`p
 - **"payouts: statement of <business> does not tie"**: the per-kind lines do not sum to closing minus
   opening. A bug or a ledger write around the service; stop and run `ledger_reconcile`. Nothing
   for that business was written.
-- **A payout stays held**: read its causes on A-11. KYC and risk flags are cleared in their own
-  screens; the payout follows at unhold or the next close.
+- **A payout stays held**: read its causes on A-11. A shop is checked on A-24 (Shop checks), risk
+  flags are cleared on A-13, payout details are the owner's; the payout follows at unhold or the next close.
 - **Mark paid refused with `payout_not_payable`**: the payout is held or cancelled.

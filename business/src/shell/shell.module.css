@@ -53,7 +53,7 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Active tab and sidebar item: brand, from the bright skin in bundle.css. */
+/* Active tab: brand, from the bright skin in bundle.css. */
 
 /* Desktop: sticky sidebar, wider content padding, no bottom tabs (Sidebar README: collapses below 1024px). */
 @media (width >= 1024px) {
@@ -144,4 +144,94 @@
 .signOut {
   margin-top: auto;
   padding: var(--space-2);
+}
+
+/*
+ * The dark green sidebar (D-269: the founder's override of the white sidebar, business app only).
+ * Every rule is scoped `.app[data-skin] .side` so it outranks the bright skin's sidebar rules in
+ * bundle.css whatever the load order. Contrast on `rail`: on-rail 12.6:1, on-rail-2 8.3:1,
+ * rail-accent 8.2:1; on `rail-raised`: on-rail 9.4:1. The focus ring turns rail-accent, since the
+ * blue `focus` is too dark on green.
+ */
+.app[data-skin] .side {
+  background: var(--rail);
+  color: var(--on-rail);
+  border-right-color: var(--rail-line);
+}
+
+.app[data-skin] .side :global(.tz-side-brand) {
+  color: var(--on-rail);
+}
+
+.app[data-skin] .side :global(.tz-side-brand) b {
+  color: var(--rail-accent);
+}
+
+.app[data-skin] .side :global(.tz-side-tag) {
+  background: transparent;
+  border-color: var(--rail-line);
+  color: var(--on-rail-2);
+}
+
+.app[data-skin] .side :global(.tz-side-group) {
+  color: var(--on-rail-2);
+}
+
+.app[data-skin] .side a {
+  position: relative;
+  color: var(--on-rail);
+  font-weight: 500;
+}
+
+.app[data-skin] .side a:hover {
+  background: var(--rail-raised);
+  color: var(--on-rail);
+}
+
+.app[data-skin] .side a[aria-current='page'] {
+  background: var(--rail-raised);
+  color: var(--on-rail);
+  font-weight: 600;
+}
+
+/* The active item's bar on the left edge. */
+.app[data-skin] .side a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  inset: 6px auto 6px 0;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--rail-accent);
+}
+
+.app[data-skin] .side a[aria-current='page'] :global(.tz-ico) {
+  color: var(--rail-accent);
+}
+
+.app[data-skin] .side a :global(.tz-count),
+.app[data-skin] .side a[aria-current='page'] :global(.tz-count) {
+  background: transparent;
+  border-color: var(--rail-line);
+  color: var(--on-rail);
+}
+
+/* The shop setup card stays a white card on the rail, so its link keeps the card's ink. */
+.app[data-skin] .side :global(.tz-side-card) a,
+.app[data-skin] .side :global(.tz-side-card) a:hover {
+  background: none;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.app[data-skin] .side :where(a, button):focus-visible {
+  outline-color: var(--rail-accent);
+}
+
+.app[data-skin] .side :global(.tz-btn-ghost) {
+  color: var(--on-rail-2);
+}
+
+.app[data-skin] .side :global(.tz-btn-ghost):hover {
+  background: var(--rail-raised);
+  color: var(--on-rail);
 }

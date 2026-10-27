@@ -2,7 +2,7 @@
 
 TodayZ is hyperlocal retail for India. Neighbourhood shops put their stock online. Customers search what is in stock near them, book it, and either pick it up or have it delivered. Shops run their counter (POS, which works offline), stock, offers, cashback credits and customers from one business app.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
 
 ## The apps
 
@@ -10,7 +10,7 @@ TodayZ is hyperlocal retail for India. Neighbourhood shops put their stock onlin
 |---|---|---|---|---|
 | Customer app (PWA) | Shoppers: search nearby, book, pick up or get delivery, orders, ask nearby shops | [app.todayz.in](https://app.todayz.in) | https://app.todayz.localhost | [customer/](customer/README.md) |
 | Business app (PWA, offline POS) | Shop owners and staff: orders, POS, stock, offers, cashback, customers, statements, insights | [business.todayz.in](https://business.todayz.in) | https://business.todayz.localhost | [business/](business/README.md) |
-| Admin console | The TodayZ team and field agents: stores, approvals, risk, payouts, support, settings | [admin.todayz.in](https://admin.todayz.in) | https://admin.todayz.localhost | [admin/](admin/README.md) |
+| Admin console | The TodayZ team and field agents: stores, the daily shop check, risk, payouts, support, settings | [admin.todayz.in](https://admin.todayz.in) | https://admin.todayz.localhost | [admin/](admin/README.md) |
 | Marketing site | Everyone, in English, Hindi, Kannada, Telugu and Tamil | [todayz.in](https://todayz.in) | https://todayz.localhost | [site/](site/README.md) |
 | API and worker | All apps; the worker runs jobs, timers and crons | api.todayz.in | https://api.todayz.localhost | [backend/](backend/README.md) |
 

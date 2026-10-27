@@ -3,6 +3,7 @@ import type { AdminBusinessDocumentStatus } from '@todayz/api-client/gen/model/a
 import type { AdminBusinessStaffRole } from '@todayz/api-client/gen/model/adminBusinessStaffRole';
 import type { AdminBusinessStaffStatus } from '@todayz/api-client/gen/model/adminBusinessStaffStatus';
 import type { AdminBusinessStatus } from '@todayz/api-client/gen/model/adminBusinessStatus';
+import type { AdminCheckStatus } from '@todayz/api-client/gen/model/adminCheckStatus';
 import type { AdminInfoField } from '@todayz/api-client/gen/model/adminInfoField';
 import type { AdminKycField } from '@todayz/api-client/gen/model/adminKycField';
 import type { AdminKycStatus } from '@todayz/api-client/gen/model/adminKycStatus';
@@ -18,6 +19,13 @@ const STATUS: Record<AdminBusinessStatus, string> = {
   verified: 'businesses.status.verified',
   rejected: 'businesses.status.rejected',
   suspended: 'businesses.status.suspended',
+};
+
+/** D-269: a live shop waits for a field agent or admin to check it. */
+const CHECK: Record<AdminCheckStatus, string> = {
+  unchecked: 'businesses.check.unchecked',
+  checked: 'businesses.check.checked',
+  rejected: 'businesses.check.rejected',
 };
 
 const KYC: Record<AdminKycStatus, string> = {
@@ -101,6 +109,8 @@ const LEAD: Record<AdminLeadStatus, string> = {
 export const statusTone = (s: AdminBusinessStatus): PillTone =>
   s === 'verified' ? 'completed' : s === 'submitted' || s === 'needs_info' ? 'pending' : s === 'draft' ? 'neutral' : 'rejected';
 
+export const checkTone = (s: AdminCheckStatus): PillTone => (s === 'checked' ? 'completed' : s === 'rejected' ? 'rejected' : 'pending');
+
 export const kycTone = (s: AdminKycStatus): PillTone => (s === 'verified' ? 'completed' : s === 'submitted' ? 'pending' : s === 'rejected' ? 'rejected' : 'neutral');
 
 export const docTone = (s: AdminBusinessDocumentStatus): PillTone =>
@@ -114,6 +124,7 @@ export function useBusinessLabels() {
     const t = (id: string) => intl.formatMessage({ id });
     return {
       status: (s: AdminBusinessStatus) => t(STATUS[s]),
+      check: (s: AdminCheckStatus) => t(CHECK[s]),
       kyc: (s: AdminKycStatus) => t(KYC[s]),
       kycField: (f: AdminKycField) => t(KYC_FIELD[f]),
       docKind: (k: AdminBusinessDocumentKind) => t(DOC_KIND[k]),

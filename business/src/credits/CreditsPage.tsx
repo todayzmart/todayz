@@ -12,6 +12,7 @@ import { useCreditAccount, useReferrals } from './queries';
 import { ReferralCard } from './ReferralCard';
 import { StandeeCard } from './StandeeCard';
 import { StatementsCard } from '../statements/StatementsCard';
+import { useBusiness } from '../stores/queries';
 
 /** B-10 Credits and referrals: the credit account, how payouts work, statements, the standee and referrals. */
 export function CreditsPage() {
@@ -63,6 +64,9 @@ function Desk({ store }: { store: CurrentStore }) {
   const intl = useIntl();
   const account = useCreditAccount(store.bid);
   const referrals = useReferrals(store.bid);
+  // D-269: a live shop our team has not checked yet sells and earns, but its payouts wait.
+  const biz = useBusiness(store.bid);
+  const awaitingCheck = biz.data?.status === 'verified' && biz.data.checkStatus === 'unchecked';
   const lines = useMemo(() => account.data?.pages.flatMap((p) => p.items) ?? [], [account.data]);
   const balance = account.data?.pages[0]?.balance;
 
@@ -108,8 +112,8 @@ function Desk({ store }: { store: CurrentStore }) {
           </div>
         )}
       </section>
-      <PayoutsCard />
-      <StatementsCard bid={store.bid} />
+      <PayoutsCard awaitingCheck={awaitingCheck} />
+      <StatementsCard bid={store.bid} awaitingCheck={awaitingCheck} />
       <StandeeCard store={store} />
       <ReferralCard
         referrals={referrals.data}

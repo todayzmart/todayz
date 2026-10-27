@@ -158,5 +158,20 @@
     "message": "{amount} பேஅவுட் அடுத்த ஸ்டேட்மென்ட்டுக்கு மாற்றப்பட்டது.",
     "review": "reviewed",
     "enHash": "17e54cde"
+  },
+  "statements.status.awaitingCheck": {
+    "message": "கடைச் சரிபார்ப்புக்காகக் காத்திருக்கிறது",
+    "review": "reviewed",
+    "enHash": "c3d22ecf"
+  },
+  "statements.payout.awaitingCheck": {
+    "message": "எங்கள் குழு உங்கள் கடையைச் சரிபார்க்கும் வரை {amount} பணம் நிறுத்தி வைக்கப்பட்டுள்ளது.",
+    "review": "reviewed",
+    "enHash": "27cc9403"
+  },
+  "statements.awaitingCheck": {
+    "message": "எங்கள் குழு உங்கள் கடையைச் சரிபார்த்த பிறகு பணம் அனுப்புவது தொடங்கும். அதுவரை நீங்கள் விற்றுக் கிரெடிட்களைச் சம்பாதித்துக்கொண்டே இருப்பீர்கள்.",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

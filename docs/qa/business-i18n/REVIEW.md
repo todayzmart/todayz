@@ -99,6 +99,8 @@ The keys W3-11 added (`coach.*`: the B-19 coach feed and the Overview slot; `ai.
 | `ai.error.capFor` | Try again in {mins} minutes | Plural forms: Hindi uses the same word for one and many; Kannada and Telugu use the oblique plural before "after". |
 | `ai.insight.worded` | Worded by AI | A short mark after a sentence; check it reads as "this sentence was written by AI". |
 
+The keys D-269 added or changed (seller auto-onboarding, 27 Oct: 31 new and 11 reworded `onboarding.*` keys for the B-02 step flow and its green rail, 9 old ones removed; `credits.payouts.awaitingCheck`; `statements.awaitingCheck`, `statements.status.awaitingCheck`, `statements.payout.awaitingCheck`) were machine-written on this branch in hi, kn, te and ta and approved under the same release instruction, with no native-speaker review. The customer's `orders.*` cancel line for `shop_rejected` was added in the same five languages. The "Go live" step is दुकान चालू करें · ಲೈವ್ ಮಾಡಿ · లైవ్ చేయండి · நேரலைக்குக் கொண்டு வாருங்கள் (the Hindi says "start the shop"); check that the "Payouts start after our team checks your shop" note reads calm (not as a warning) in each language.
+
 ## Wiring
 
 - `business/src/app/i18n.ts`: `loadMessages(locale)` imports a single compiled catalogue (one lazy chunk per language), and `initialLocale()` reads `detectLocale()`.

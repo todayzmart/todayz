@@ -20,6 +20,11 @@ const (
 	AdminBusinessVerify = "admin.business.verify" // verify, request info, reject, suspend, reinstate, KYC and document review
 	AdminKycReveal      = "admin.kyc.reveal"      // open one KYC field in full; audited
 
+	// the shop check (D-269): a shop sells from sign-up; a field agent, admin
+	// or super_admin checks it later, which releases its payouts, or rejects it
+	AdminShopCheckView   = "admin.shop_check.view"   // the daily queue of unchecked shops
+	AdminShopCheckDecide = "admin.shop_check.decide" // mark checked, or reject with a reason; audited
+
 	// stores (A-05)
 	AdminStoreView   = "admin.store.view"   // list, detail
 	AdminStoreReview = "admin.store.review" // a new store at a verified business: approve or send back (D-40)
@@ -68,6 +73,8 @@ func init() {
 	admins := grant(authz.Admin, authz.SuperAdmin)
 	catalogue := grant(authz.Catalogue, authz.Admin, authz.SuperAdmin)
 	leads := grant(authz.FieldAgent, authz.Support, authz.Admin, authz.SuperAdmin)
+	// The shop check is the field team's and the admins' (D-269); support only reads A-03.
+	checkers := grant(authz.FieldAgent, authz.Admin, authz.SuperAdmin)
 	// Analyst reads Pulse, dashboards and jobs only (D-64), so it has no audit panel.
 	panel := grant(authz.FieldAgent, authz.Support, authz.Catalogue, authz.Finance, authz.Admin, authz.SuperAdmin)
 	Register(authz.Table{Domain: "admin", Actions: []authz.Action{
@@ -80,6 +87,8 @@ func init() {
 		{Name: AdminBusinessView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/businesses, /v1/admin/businesses/{businessId} (A-03; support read-only)"},
 		{Name: AdminBusinessVerify, Kind: authz.KindAdmin, Grants: admins, Doc: "POST .../businesses/{businessId}/verify, /request-info, /reject, /suspend, /reinstate, /kyc/review, /documents/{docId}/review: audited"},
 		{Name: AdminKycReveal, Kind: authz.KindAdmin, Grants: admins, Doc: "POST .../businesses/{businessId}/kyc/reveal: one field in full, never stored by the client; audited"},
+		{Name: AdminShopCheckView, Kind: authz.KindAdmin, Grants: checkers, Doc: "GET /v1/admin/shop-checks: unchecked live shops, newest first (D-269)"},
+		{Name: AdminShopCheckDecide, Kind: authz.KindAdmin, Grants: checkers, Doc: "POST .../businesses/{businessId}/check, /check-reject: audited; a reject hides the shop and cancels its open orders (D-269)"},
 
 		{Name: AdminStoreView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/stores, /v1/admin/stores/{sid} (A-05)"},
 		{Name: AdminStoreReview, Kind: authz.KindAdmin, Grants: admins, Doc: "POST /v1/admin/stores/{sid}/review: pending_review to live, or back with a note (D-40); audited"},

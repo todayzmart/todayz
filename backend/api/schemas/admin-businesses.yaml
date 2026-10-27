@@ -224,7 +224,7 @@ AdminBusinessDocument:
 AdminBusiness:
   type: object
   additionalProperties: false
-  required: [id, brandName, legalName, status, needsInfoFields, needsInfoNote, submittedAt, verifiedAt, createdAt, kyc, stores, staff, documents, serverNow]
+  required: [id, brandName, legalName, status, needsInfoFields, needsInfoNote, submittedAt, verifiedAt, checkStatus, checkedAt, checkNote, createdAt, kyc, stores, staff, documents, serverNow]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     brandName: {type: string, maxLength: 80}
@@ -245,8 +245,18 @@ AdminBusiness:
       maxLength: 40
     verifiedAt:
       type: [string, 'null']
+      description: When the business went live (D-269 sets it on submit; no admin approves it).
       format: date-time
       maxLength: 40
+    checkStatus: {$ref: ./admin-businesses.yaml#/AdminCheckStatus}
+    checkedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    checkNote:
+      type: [string, 'null']
+      description: The check's note, or the reject's reason.
+      maxLength: 500
     createdAt: {$ref: ./common.yaml#/Timestamp}
     kyc: {$ref: ./admin-businesses.yaml#/AdminKyc}
     stores:
@@ -262,3 +272,133 @@ AdminBusiness:
       maxItems: 100
       items: {$ref: ./admin-businesses.yaml#/AdminBusinessDocument}
     serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminCheckStatus:
+  type: string
+  description: >-
+    The shop check (D-269): a business sells from sign-up and is `unchecked` until a field agent, admin or
+    super_admin checks it (`checked`, which releases its payouts) or rejects it (`rejected`, which hides it).
+  enum: [unchecked, checked, rejected]
+AdminShopCheckStore:
+  type: object
+  additionalProperties: false
+  required: [id, name, status, addressLine1, locality, city, pincode, lat, lng, liveAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 80}
+    status:
+      type: string
+      enum: [draft, pending_review, live, paused, suspended]
+    addressLine1:
+      type: [string, 'null']
+      maxLength: 200
+    locality:
+      type: [string, 'null']
+      maxLength: 80
+    city:
+      type: [string, 'null']
+      maxLength: 80
+    pincode:
+      type: [string, 'null']
+      maxLength: 6
+    lat:
+      type: [number, 'null']
+      format: double
+      minimum: -90
+      maximum: 90
+    lng:
+      type: [number, 'null']
+      format: double
+      minimum: -180
+      maximum: 180
+    liveAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+AdminShopCheckPhoto:
+  type: object
+  additionalProperties: false
+  required: [id, kind, storeId, status, previewUrl, createdAt]
+  description: A shop photo. `previewUrl` is a presigned GET valid for 15 minutes; null while storage is not configured.
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    kind:
+      type: string
+      enum: [shop_photo, storefront]
+    storeId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    status:
+      type: string
+      enum: [uploaded, accepted, rejected]
+    previewUrl:
+      type: [string, 'null']
+      maxLength: 2048
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminShopCheck:
+  type: object
+  additionalProperties: false
+  required: [id, brandName, legalName, status, checkStatus, checkNote, checkedAt, category, liveAt, createdAt, byFieldAgent, kycStatus, stores, photos]
+  description: >-
+    One shop for the check (D-269): its details, stores with the map pin, and photos. No phone numbers; KYC
+    shows only its status (the values stay on A-03 for admins).
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    brandName: {type: string, maxLength: 80}
+    legalName:
+      type: [string, 'null']
+      maxLength: 120
+    status: {$ref: ./admin-businesses.yaml#/AdminBusinessStatus}
+    checkStatus: {$ref: ./admin-businesses.yaml#/AdminCheckStatus}
+    checkNote:
+      type: [string, 'null']
+      description: The check's note, or the reject's reason.
+      maxLength: 500
+    checkedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    category:
+      type: [string, 'null']
+      description: The business category's English name.
+      maxLength: 80
+    liveAt:
+      type: [string, 'null']
+      description: When the business went live (submitted).
+      format: date-time
+      maxLength: 40
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    byFieldAgent:
+      type: boolean
+      description: A field agent onboarded it (A-04), rather than the owner on their own.
+    kycStatus:
+      type: string
+      enum: [missing, submitted, verified, rejected]
+    stores:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-businesses.yaml#/AdminShopCheckStore}
+    photos:
+      type: array
+      maxItems: 20
+      items: {$ref: ./admin-businesses.yaml#/AdminShopCheckPhoto}
+AdminShopCheckList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-businesses.yaml#/AdminShopCheck}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminShopRejected:
+  type: object
+  additionalProperties: false
+  required: [shop, cancelledOrders]
+  properties:
+    shop: {$ref: ./admin-businesses.yaml#/AdminShopCheck}
+    cancelledOrders:
+      type: integer
+      minimum: 0
+      description: The open online orders the reject cancelled (system reason `shop_rejected`, no strike).

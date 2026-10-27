@@ -73,6 +73,7 @@
               legalName: Lakshmi Traders Private Limited
               categoryId: null
               status: draft
+              checkStatus: unchecked
               referralCode: K7M2QX
               myRole: owner
               submittedAt: null
@@ -109,6 +110,7 @@
               legalName: Lakshmi Traders Private Limited
               categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
               status: needs_info
+              checkStatus: unchecked
               referralCode: K7M2QX
               myRole: owner
               submittedAt: "2026-10-22T09:30:00Z"
@@ -151,6 +153,7 @@
               legalName: Lakshmi Traders Private Limited
               categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
               status: draft
+              checkStatus: unchecked
               referralCode: K7M2QX
               myRole: owner
               submittedAt: null
@@ -195,6 +198,7 @@
               legalName: Lakshmi Traders Private Limited
               categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
               status: submitted
+              checkStatus: unchecked
               referralCode: K7M2QX
               myRole: owner
               submittedAt: "2026-10-22T09:30:00Z"
@@ -300,7 +304,7 @@
                   kind: gst
                   contentType: application/pdf
                   storeId: null
-                  status: uploaded
+                  status: accepted
                   rejectReason: null
                   createdAt: "2026-10-22T09:30:00Z"
       default:
@@ -313,8 +317,8 @@
       Owner only. Records the document and returns a presigned PUT into the
       private bucket (D-46), valid for 15 minutes. The URL signs the
       Content-Type and the declared size, so the PUT must send exactly the
-      returned headers. The document stays `pending` until the upload is
-      confirmed. A business holds at most 5 documents of one kind that are
+      returned headers. The document stays `pending` until
+      `.../documents/{docId}/confirm` finds the file stored. A business holds at most 5 documents of one kind that are
       not rejected (`409 conflict` past that). The object key is never
       shown. `503 service_unavailable` while storage is not configured.
     x-idempotency: optional
@@ -358,6 +362,50 @@
                   Content-Type: application/pdf
                   Content-Length: "482113"
                 expiresAt: "2026-10-22T09:45:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/documents/{docId}/confirm:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: docId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmBusinessDocument
+    tags: [business]
+    summary: Confirm a document after its upload
+    description: >-
+      Owner only. Called after the PUT succeeds. The API reads the stored
+      object (a signed HEAD); when it is there with the declared type and no
+      larger than the declared size, the document is `accepted` at once: no
+      one approves a shop photo or a KYC document before the shop sells
+      (D-269). The newest accepted storefront photo becomes the store's
+      photo. The shop check sees every document later, and an admin may still
+      reject one. A file that is missing, of another type or larger is `422
+      validation_failed` and the document stays `pending`. Confirming a
+      document that is no longer pending answers it unchanged.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The document after the check
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/BusinessDocument
+            example:
+              id: 01JB0S5K6M7N8P9Q0R1S2T3V4W
+              kind: gst
+              contentType: application/pdf
+              storeId: null
+              status: accepted
+              rejectReason: null
+              createdAt: "2026-10-22T09:30:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem
 /v1/biz/businesses/{bid}/staff:

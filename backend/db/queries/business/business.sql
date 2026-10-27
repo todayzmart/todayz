@@ -39,8 +39,10 @@ RETURNING *;
 SELECT status FROM businesses WHERE id = @id FOR SHARE;
 
 -- name: SubmitBusiness :one
--- draft or needs_info → submitted (01 §3); the request for information is cleared.
-UPDATE businesses SET status = 'submitted', submitted_at = @now::timestamptz,
+-- draft or needs_info → verified at once (D-269: no admin approval; the
+-- shop check comes later and only gates payouts). verified_by stays NULL: no
+-- person verified it. The request for information is cleared.
+UPDATE businesses SET status = 'verified', submitted_at = @now::timestamptz, verified_at = @now::timestamptz,
   needs_info_fields = NULL, needs_info_note = NULL, version = version + 1
 WHERE id = @id AND status IN ('draft','needs_info')
 RETURNING *;
@@ -69,7 +71,7 @@ ORDER BY s.created_at, s.id;
 
 -- name: CountSubmitStores :many
 -- The stores a submit checks (01 §3: store name, address and pin, contact mobile, hours).
-SELECT id, name, address_line1, city, pincode, (location IS NOT NULL)::bool AS has_location,
+SELECT id, name, status, address_line1, city, pincode, (location IS NOT NULL)::bool AS has_location,
   (phone_enc IS NOT NULL)::bool AS has_phone, hours
 FROM stores WHERE business_id = @business_id ORDER BY created_at, id;
 
@@ -168,16 +170,22 @@ UPDATE stores SET
                        WHEN sqlc.narg(lat)::float8 IS NULL THEN NULL
                        ELSE ST_SetSRID(ST_MakePoint(sqlc.narg(lng)::float8, sqlc.narg(lat)::float8), 4326)::geography END,
   phone_enc     = CASE WHEN @set_phone::bool THEN sqlc.narg(phone_enc)::bytea ELSE phone_enc END,
-  -- A changed name, address, location or phone sends a store customers can
-  -- see (or one that was approved and paused) back to review (D-40).
-  status        = CASE WHEN @needs_review::bool AND status IN ('live','paused') THEN 'pending_review' ELSE status END,
+  -- No review step: an edit never changes the store's status (D-269).
   version = version + 1
 WHERE id = @id AND business_id = @business_id AND version = @version;
 
 -- name: SubmitStore :execrows
--- draft → pending_review (D-40).
+-- draft → pending_review, for a store of a business not submitted yet: the
+-- business's submit puts it live (D-269).
 UPDATE stores SET status = 'pending_review', version = version + 1
 WHERE id = @id AND business_id = @business_id AND status = 'draft';
+
+-- name: GoLiveStore :execrows
+-- A complete draft or waiting store of a live business goes live at once
+-- (D-269: no admin review).
+UPDATE stores SET status = 'live', live_at = COALESCE(live_at, @now::timestamptz), review_note = NULL,
+  version = version + 1
+WHERE id = @id AND business_id = @business_id AND status IN ('draft','pending_review');
 
 -- name: UpdateStoreSettings :execrows
 UPDATE stores SET

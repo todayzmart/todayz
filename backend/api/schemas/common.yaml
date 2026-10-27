@@ -115,8 +115,10 @@ CustomerCancelReason:
   enum: [changed_mind, declined_partial, too_slow, other]
 SystemReason:
   type: string
-  description: Reasons the system sets on its own (04 §1.5). They appear only in responses and are never accepted in a request.
-  enum: [not_accepted, no_show, dispatch_timeout, partial_timeout]
+  description: >-
+    Reasons the system sets on its own (04 §1.5). They appear only in responses and are never accepted in a
+    request. `shop_rejected` cancels the open orders of a shop a field agent or admin rejected (D-269).
+  enum: [not_accepted, no_show, dispatch_timeout, partial_timeout, shop_rejected]
 ReviewTagPositive:
   type: string
   description: Positive review tags (D-60).

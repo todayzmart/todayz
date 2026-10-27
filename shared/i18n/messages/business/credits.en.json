@@ -254,5 +254,9 @@
   "credits.referral.earnedValue": {
     "defaultMessage": "{credits, plural, one {# credit} other {# credits}}",
     "description": "B-10 stat value"
+  },
+  "credits.payouts.awaitingCheck": {
+    "defaultMessage": "Payouts start after our team checks your shop. You keep selling and earning credits meanwhile.",
+    "description": "B-10 how payouts work: note while the shop is not yet checked (D-269)"
   }
 }

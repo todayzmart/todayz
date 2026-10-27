@@ -1,4 +1,4 @@
-import { createBusinessDocument } from '@todayz/api-client/gen/business/business';
+import { confirmBusinessDocument, createBusinessDocument } from '@todayz/api-client/gen/business/business';
 import type { BusinessDocument } from '@todayz/api-client/gen/model/businessDocument';
 import type { DocumentKind } from '@todayz/api-client/gen/model/documentKind';
 import { Skeleton, StatusPill, useToast, type PillTone } from '@todayz/ui';
@@ -12,8 +12,23 @@ import { checkFile, contentTypeOf, DOCUMENT_KINDS, type FileProblem } from './do
 
 const TONE: Record<BusinessDocument['status'], PillTone> = { pending: 'pending', uploaded: 'ready', accepted: 'accepted', rejected: 'rejected' };
 
-/** B-02 documents: one row per kind, a file picker each. The file goes straight to storage on a presigned PUT (D-46). */
-export function DocumentsStep({ bid, editable }: { bid: string; editable: boolean }) {
+/**
+ * B-02 documents: one row per kind, a file picker each. The file goes straight to storage on a
+ * presigned PUT (D-46), then the confirm call checks the bucket holds it and accepts it at once
+ * (D-269: nothing waits for a review; the daily shop check looks at it later).
+ */
+export function DocumentsStep({
+  bid,
+  editable,
+  kinds = DOCUMENT_KINDS,
+  help = 'onboarding.docs.help',
+}: {
+  bid: string;
+  editable: boolean;
+  kinds?: readonly DocumentKind[];
+  /** The note under the rows (an i18n id). */
+  help?: string;
+}) {
   const intl = useIntl();
   const docs = useDocuments(bid);
   return (
@@ -22,12 +37,12 @@ export function DocumentsStep({ bid, editable }: { bid: string; editable: boolea
       {docs.isError && <BizError error={docs.error} />}
       {docs.data && (
         <ul className={styles.list}>
-          {DOCUMENT_KINDS.map((k) => (
+          {kinds.map((k) => (
             <KindRow key={k} bid={bid} kind={k} items={docs.data.items.filter((d) => d.kind === k)} editable={editable} />
           ))}
         </ul>
       )}
-      <p className={styles.note}>{intl.formatMessage({ id: 'onboarding.docs.help' })}</p>
+      <p className={styles.note}>{intl.formatMessage({ id: help })}</p>
     </div>
   );
 }
@@ -51,7 +66,7 @@ function KindRow({ bid, kind, items, editable }: { bid: string; kind: DocumentKi
       // The URL signs the type and size; the browser sets Content-Length itself from the body.
       const res = await fetch(made.upload.url, { method: made.upload.method, headers: { 'Content-Type': made.upload.headers['Content-Type'] }, body: file });
       if (!res.ok) throw new UploadError();
-      return made;
+      return confirmBusinessDocument(bid, made.document.id);
     });
     if (input.current) input.current.value = '';
     await qc.invalidateQueries({ queryKey: docsKey(bid) });

@@ -7,6 +7,9 @@ import styles from './shell.module.css';
 /** Routes that open without a session (B-01). Everything else needs a signed-in person. */
 const OPEN = ['/sign-in'];
 
+/** Signed-in routes that draw their own frame instead of the shell: B-02 has its own green step rail (D-269). */
+const BARE = ['/onboarding'];
+
 /**
  * The business app is for signed-in staff only. While the refresh cookie is being tried nothing
  * shows but a skeleton; signed out, any page sends the person to B-01 with `?next=` back to it.
@@ -52,7 +55,7 @@ export function Gate() {
   return (
     <>
       {offline}
-      <Shell />
+      {BARE.includes(location.pathname) ? <Outlet /> : <Shell />}
     </>
   );
 }

@@ -196,7 +196,7 @@
     "description": "A-02 Pulse: Empty state"
   },
   "pulse.reason": {
-    "defaultMessage": "{reason, select, out_of_stock {Out of stock} closing_soon {Closing soon} too_busy {Too busy} cannot_deliver_address {Cannot deliver there} price_changed {Price changed} not_accepted {Not accepted in time} no_show {Not collected} dispatch_timeout {Not sent out in time} changed_mind {Changed their mind} declined_partial {Declined a part order} too_slow {Too slow} customer_unreachable {Customer unreachable} partial_timeout {No answer on a part order} customer_request {Customer asked} store_request {Store asked} fraud_suspected {Suspected fraud} technical_issue {Technical issue} address_not_found {Address not found} customer_refused {Customer refused} none {No reason given} other {Other reason}}",
+    "defaultMessage": "{reason, select, out_of_stock {Out of stock} closing_soon {Closing soon} too_busy {Too busy} cannot_deliver_address {Cannot deliver there} price_changed {Price changed} not_accepted {Not accepted in time} no_show {Not collected} dispatch_timeout {Not sent out in time} changed_mind {Changed their mind} declined_partial {Declined a part order} too_slow {Too slow} customer_unreachable {Customer unreachable} partial_timeout {No answer on a part order} shop_rejected {Shop rejected} customer_request {Customer asked} store_request {Store asked} fraud_suspected {Suspected fraud} technical_issue {Technical issue} address_not_found {Address not found} customer_refused {Customer refused} none {No reason given} other {Other reason}}",
     "description": "A-02 Pulse: Why an order ended without a sale"
   },
   "pulse.retention": {

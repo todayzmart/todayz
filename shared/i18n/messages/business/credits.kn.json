@@ -318,5 +318,10 @@
     "message": "{credits, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್‌ಗಳು}}",
     "review": "reviewed",
     "enHash": "4854c909"
+  },
+  "credits.payouts.awaitingCheck": {
+    "message": "ನಮ್ಮ ತಂಡ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲಿಸಿದ ನಂತರ ಪಾವತಿಗಳು ಶುರುವಾಗುತ್ತವೆ. ಅಲ್ಲಿಯವರೆಗೆ ನೀವು ಮಾರುತ್ತಾ ಕ್ರೆಡಿಟ್ ಗಳಿಸುತ್ತಿರುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

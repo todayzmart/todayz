@@ -101,6 +101,15 @@ var catalogue = map[string]kindDef{
 			"ready":            {"en": {"Ready for pickup", "Your order from {store} is ready. Show your pickup code at the counter."}},
 			"out_for_delivery": {"en": {"Out for delivery", "Your order from {store} is on its way."}},
 			"delivered":        {"en": {"Delivered", "Your order from {store} was delivered."}},
+			// D-269: a field agent or admin rejected the shop; its open
+			// orders are cancelled with no strike and held credits go back.
+			"shop_rejected": {
+				"en": {"Order cancelled", "{store} can no longer take orders on TodayZ, so your order was cancelled. Any credits you used are back in your wallet."},
+				"hi": {"ऑर्डर रद्द हुआ", "{store} अब TodayZ पर ऑर्डर नहीं ले सकती, इसलिए आपका ऑर्डर रद्द कर दिया गया। इस्तेमाल किए गए क्रेडिट आपके वॉलेट में वापस आ गए हैं।"},
+				"kn": {"ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ", "{store} ಇನ್ನು ಮುಂದೆ TodayZ ನಲ್ಲಿ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ. ನೀವು ಬಳಸಿದ ಕ್ರೆಡಿಟ್‌ಗಳು ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರಳಿವೆ."},
+				"te": {"ఆర్డర్ రద్దయింది", "{store} ఇకపై TodayZలో ఆర్డర్లు తీసుకోదు, కాబట్టి మీ ఆర్డర్ రద్దయింది. మీరు వాడిన క్రెడిట్లు మీ వాలెట్‌కు తిరిగి వచ్చాయి."},
+				"ta": {"ஆர்டர் ரத்து செய்யப்பட்டது", "{store} இனி TodayZ-இல் ஆர்டர்களை ஏற்காது, எனவே உங்கள் ஆர்டர் ரத்து செய்யப்பட்டது. நீங்கள் பயன்படுத்திய கிரெடிட்கள் உங்கள் வாலெட்டுக்குத் திரும்பி வந்துவிட்டன."},
+			},
 		},
 	},
 	notice.KindAskReply: {

@@ -562,5 +562,25 @@
   "businesses.leads.moved": {
     "defaultMessage": "Lead updated",
     "description": "Toast"
+  },
+  "businesses.check.unchecked": {
+    "defaultMessage": "Not checked yet",
+    "description": "A-03 pill: the live shop is waiting for its check (D-269); payouts are held"
+  },
+  "businesses.check.checked": {
+    "defaultMessage": "Checked",
+    "description": "A-03 pill: a field agent or admin checked the shop (D-269)"
+  },
+  "businesses.check.rejected": {
+    "defaultMessage": "Rejected on check",
+    "description": "A-03 pill: the shop was rejected on its check (D-269)"
+  },
+  "businesses.check.at": {
+    "defaultMessage": "Shop check {when}",
+    "description": "A-03: when the shop was checked or rejected (D-269)"
+  },
+  "businesses.check.atNote": {
+    "defaultMessage": "Shop check {when} · {note}",
+    "description": "A-03: when the shop was checked or rejected, and the note or reason (D-269)"
   }
 }

@@ -28,27 +28,28 @@ const maxBody = 1 << 20
 // check in the handler (Service.also): a manager inviting or removing a
 // manager needs staff.manage, a settings change with asksMuted asks.manage.
 var businessOps = map[string]string{
-	"ListBusinesses":         policy.BusinessList,
-	"CreateBusiness":         policy.BusinessCreate,
-	"GetBusiness":            policy.BusinessView,
-	"UpdateBusiness":         policy.BusinessEdit,
-	"SubmitBusiness":         policy.BusinessSubmit,
-	"GetKyc":                 policy.KycView,
-	"PutKyc":                 policy.KycEdit,
-	"ListBusinessDocuments":  policy.KycEdit,
-	"CreateBusinessDocument": policy.KycEdit,
-	"ListStaff":              policy.StaffView,
-	"InviteStaff":            policy.StaffManageCashiers,
-	"RemoveStaff":            policy.StaffManageCashiers,
-	"UpdateStaff":            policy.StaffManage,
-	"AcceptStaffInvite":      policy.StaffAcceptInvite,
-	"ListStores":             policy.StoreManage,
-	"CreateStore":            policy.StoreManage,
-	"GetStore":               policy.StoreManage,
-	"UpdateStore":            policy.StoreManage,
-	"SubmitStore":            policy.StoreManage,
-	"GetStoreSettings":       policy.StoreSettingsEdit,
-	"UpdateStoreSettings":    policy.StoreSettingsEdit,
+	"ListBusinesses":          policy.BusinessList,
+	"CreateBusiness":          policy.BusinessCreate,
+	"GetBusiness":             policy.BusinessView,
+	"UpdateBusiness":          policy.BusinessEdit,
+	"SubmitBusiness":          policy.BusinessSubmit,
+	"GetKyc":                  policy.KycView,
+	"PutKyc":                  policy.KycEdit,
+	"ListBusinessDocuments":   policy.KycEdit,
+	"CreateBusinessDocument":  policy.KycEdit,
+	"ConfirmBusinessDocument": policy.KycEdit,
+	"ListStaff":               policy.StaffView,
+	"InviteStaff":             policy.StaffManageCashiers,
+	"RemoveStaff":             policy.StaffManageCashiers,
+	"UpdateStaff":             policy.StaffManage,
+	"AcceptStaffInvite":       policy.StaffAcceptInvite,
+	"ListStores":              policy.StoreManage,
+	"CreateStore":             policy.StoreManage,
+	"GetStore":                policy.StoreManage,
+	"UpdateStore":             policy.StoreManage,
+	"SubmitStore":             policy.StoreManage,
+	"GetStoreSettings":        policy.StoreSettingsEdit,
+	"UpdateStoreSettings":     policy.StoreSettingsEdit,
 }
 
 // publicOps: the site's lead form is open to anyone (Turnstile guards it).
@@ -187,6 +188,14 @@ func (h bizHandlers) CreateBusinessDocument(ctx context.Context, req businessapi
 		return nil, asProblem(err)
 	}
 	return businessapi.CreateBusinessDocument201JSONResponse{Body: d, Headers: businessapi.CreateBusinessDocument201ResponseHeaders{CacheControl: ptr(noStore)}}, nil
+}
+
+func (h bizHandlers) ConfirmBusinessDocument(ctx context.Context, req businessapi.ConfirmBusinessDocumentRequestObject) (businessapi.ConfirmBusinessDocumentResponseObject, error) {
+	d, err := h.s.confirmDocument(ctx, req.Bid, req.DocId)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return businessapi.ConfirmBusinessDocument200JSONResponse(d), nil
 }
 
 func (h bizHandlers) ListStaff(ctx context.Context, req businessapi.ListStaffRequestObject) (businessapi.ListStaffResponseObject, error) {

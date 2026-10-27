@@ -20,6 +20,9 @@ function business(over: Partial<AdminBusiness> = {}): AdminBusiness {
     needsInfoNote: null,
     submittedAt: '2026-10-24T05:00:00Z',
     verifiedAt: null,
+    checkStatus: 'unchecked',
+    checkedAt: null,
+    checkNote: null,
     createdAt: '2026-10-20T05:00:00Z',
     kyc: {
       status: 'submitted',

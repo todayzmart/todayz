@@ -99,6 +99,7 @@ func toBusiness(b businessdb.Business, role authz.Role) businessapi.Business {
 	out := businessapi.Business{
 		BrandName:    b.BrandName,
 		CategoryId:   optIDString(b.CategoryID),
+		CheckStatus:  businessapi.BusinessCheckStatus(b.CheckStatus),
 		CreatedAt:    b.CreatedAt.UTC(),
 		Id:           idString(b.ID),
 		LegalName:    b.LegalName,
@@ -402,6 +403,37 @@ func incomplete(fields []string) error {
 	return p
 }
 
+// goLiveStores puts the business's complete draft and waiting stores live
+// once the business is live (D-269: no admin review), each audited as
+// store.go_live. A store still missing a detail stays draft for the owner or
+// the field agent to finish; submitReady has already found at least one
+// complete.
+func (s *Service) goLiveStores(ctx context.Context, kind string, uid ids.ID, bid pgtype.UUID) error {
+	q := s.q(ctx)
+	stores, err := q.CountSubmitStores(ctx, bid)
+	if err != nil {
+		return err
+	}
+	now := s.clock.Now()
+	for _, st := range stores {
+		if (st.Status != storeDraft && st.Status != storePendingReview) || len(storeGaps("", st)) > 0 {
+			continue
+		}
+		n, err := q.GoLiveStore(ctx, businessdb.GoLiveStoreParams{Now: now, ID: st.ID, BusinessID: bid})
+		if err != nil {
+			return err
+		}
+		if n == 0 {
+			continue
+		}
+		if err := s.writeAuditAs(ctx, kind, uid, "store.go_live", "store", idString(st.ID),
+			map[string]any{"status": st.Status}, map[string]any{"status": storeLive}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // submitReady checks a business has what a review needs: the category and
 // at least one store with every detail (409 submit_incomplete naming what is
 // missing).
@@ -477,8 +509,12 @@ func (s *Service) submitBusiness(ctx context.Context, bidStr string) (businessap
 		if err != nil {
 			return err
 		}
-		return s.writeAudit(ctx, p.UserID, "business.submit", "business", bid.String(),
-			map[string]any{"status": cur.Status}, map[string]any{"status": b.Status})
+		kind, uid := actor(p.UserID)
+		if err := s.writeAuditAs(ctx, kind, uid, "business.submit", "business", bid.String(),
+			map[string]any{"status": cur.Status}, map[string]any{"status": b.Status}); err != nil {
+			return err
+		}
+		return s.goLiveStores(ctx, kind, uid, b.ID)
 	})
 	if err != nil {
 		var pe *problem.Error

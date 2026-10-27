@@ -15,17 +15,19 @@ const monthDate = (period: string) => `${period}-15T12:00:00+05:30`;
 const PAYOUT = {
   processing: { pill: 'statements.status.processing', line: 'statements.payout.processing', tone: 'pending' },
   needs_kyc: { pill: 'statements.status.needsKyc', line: 'statements.payout.needsKyc', tone: 'cancelled' },
+  awaiting_check: { pill: 'statements.status.awaitingCheck', line: 'statements.payout.awaitingCheck', tone: 'pending' },
   paid: { pill: 'statements.status.paid', line: 'statements.payout.paid', tone: 'completed' },
   carried: { pill: 'statements.status.carried', line: 'statements.payout.carried', tone: 'neutral' },
 } as const satisfies Record<string, { pill: string; line: string; tone: PillTone }>;
 
 /**
  * B-10 monthly statements (01 §9): each closed IST month with its closing balance, the payout's state
- * (processing, on hold for payout details, paid with the UTR, or carried into the next statement's
- * payout when a later close recomputed it), the breakdown and the CSV. Owner and
+ * (processing, on hold for payout details, on hold until our team checks the shop (D-269), paid with
+ * the UTR, or carried into the next statement's payout when a later close recomputed it), the
+ * breakdown and the CSV. Owner and
  * manager; a member limited to some stores gets only those stores' totals from the server.
  */
-export function StatementsCard({ bid }: { bid: string }) {
+export function StatementsCard({ bid, awaitingCheck = false }: { bid: string; awaitingCheck?: boolean }) {
   const intl = useIntl();
   const statements = useStatements(bid);
   const items = useMemo(() => statements.data?.pages.flatMap((p) => p.items) ?? [], [statements.data]);
@@ -37,6 +39,7 @@ export function StatementsCard({ bid }: { bid: string }) {
           {intl.formatMessage({ id: 'credits.statements.title' })}
         </h2>
       </div>
+      {awaitingCheck && <Banner tone="info">{intl.formatMessage({ id: 'statements.awaitingCheck' })}</Banner>}
       {statements.isPending && (
         <div role="status" aria-label={intl.formatMessage({ id: 'statements.loading' })}>
           <Skeleton height="6rem" />

@@ -195,9 +195,9 @@
     "defaultMessage": "Business suspended",
     "description": "Hold cause"
   },
-  "payouts.cause.kyc": {
-    "defaultMessage": "KYC not verified",
-    "description": "Hold cause"
+  "payouts.cause.unchecked": {
+    "defaultMessage": "Shop not checked yet",
+    "description": "Hold cause: no field agent or admin has checked the shop (D-269)"
   },
   "payouts.cause.details": {
     "defaultMessage": "No UPI or bank account",
@@ -266,6 +266,10 @@
   "payouts.hold.kyc": {
     "defaultMessage": "KYC incomplete",
     "description": "Hold reason"
+  },
+  "payouts.hold.unchecked": {
+    "defaultMessage": "Shop not checked",
+    "description": "Hold reason: payouts wait for the shop check (D-269)"
   },
   "payouts.hold.details": {
     "defaultMessage": "Payout details missing",

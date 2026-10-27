@@ -90,6 +90,34 @@ describe('generated output', () => {
   });
 });
 
+/** WCAG 2 contrast ratio of two #rrggbb colours. */
+function contrast(a: string, b: string) {
+  const lum = (hex: string) => {
+    const [r, g, bl] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (bl ?? 0);
+  };
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+  return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05);
+}
+
+describe('the dark green rail (D-269)', () => {
+  const tokens = () => JSON.parse(read('tokens.json')) as Record<string, string>;
+
+  it('keeps AA (4.5:1) for every text colour on the rail fills', () => {
+    const t = tokens();
+    for (const bg of ['rail', 'rail-raised']) {
+      for (const fg of ['on-rail', 'on-rail-2', 'rail-accent']) {
+        expect(contrast(t[fg] ?? '', t[bg] ?? ''), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    // The done disc: rail text on the accent fill.
+    expect(contrast(t['rail'] ?? '', t['rail-accent'] ?? '')).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
 describe('helpers', () => {
   it('undefinedVars reports a var nobody declares', () => {
     const css = '.a { color: var(--ink); background: var(--nope, red); --local: 1px; margin: var(--local); }';

@@ -30,7 +30,7 @@ describe('role-aware sidebar (D-64)', () => {
     const { router, unmount } = renderAt('/', { roles: ['field_agent'] });
     await waitFor(() => expect(router.state.location.pathname).toBe('/field'));
     const side = await sidebar();
-    expect(side.getAllByRole('link').map((l) => l.textContent)).toEqual(['Add shops', 'Businesses', 'Demand', 'Field agents']);
+    expect(side.getAllByRole('link').map((l) => l.textContent)).toEqual(['Add shops', 'Shop checks', 'Businesses', 'Demand', 'Field agents']);
     unmount();
 
     renderAt('/orders', { roles: ['field_agent'] });

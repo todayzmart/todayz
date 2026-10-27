@@ -159,7 +159,7 @@ func TestPayoutDetailsMissingHoldsDB(t *testing.T) {
 	require.Equal(t, api.PayoutStatus("held"), p.Payout.Status)
 	require.Equal(t, api.PayoutHoldCause("payout_details_missing"), *p.Payout.HoldReason)
 	require.True(t, p.Causes.PayoutDetailsMissing)
-	require.True(t, p.Causes.KycVerified)
+	require.True(t, p.Causes.ShopChecked)
 	st, err := e.svc.BusinessStatement(e.ctx, e.biz, nil, "2026-06")
 	require.NoError(t, err)
 	require.Equal(t, api.BusinessPayoutStateStatusNeedsKyc, st.Statement.Payout.Status)

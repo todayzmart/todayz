@@ -100,11 +100,14 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			hashKey = d.Config.Keys.PIIHashKey.Bytes()
 		}
 		ad.Audit = audit.New(d.DB, d.Clock, hashKey)
-		ord, err := orders.New(orders.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings})
+		// The full orders deps: a shop reject (D-269) cancels orders, which
+		// releases stock, credits and offers and tells the customer.
+		ord, err := orders.New(ordersDeps(d))
 		if err != nil {
 			panic("admin: " + err.Error())
 		}
 		ad.Strikes = ord
+		ad.ShopOrders = ord
 		ad.Banners = newBanners(d)
 		if ad.Seal != nil && ad.Hash != nil {
 			acc, err := identity.NewAccounts(d.DB, ad.Seal, ad.Hash)

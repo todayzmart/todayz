@@ -2,7 +2,7 @@
 
 The main journeys through TodayZ, step by step, with the endpoints and packages each step touches.
 
-> As built on main at aa116867 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 How to read this page: each flow has a diagram and a short walk-through. Endpoints are written as in the OpenAPI files under [backend/api/paths](../../backend/api/paths). Packages are under `backend/internal`. Timer lengths, fees and limits are never written here: each is a `platform_settings` key listed in [01-product-rules.md](../plan/01-product-rules.md). For the bigger picture see [architecture.md](architecture.md).
 
@@ -19,7 +19,7 @@ How to read this page: each flow has a diagram and a short walk-through. Endpoin
 | 9 | [Credits ledger](#9-credits-ledger) | `backend/internal/credits` |
 | 10 | [Payouts](#10-payouts) | `backend/internal/payouts` |
 | 11 | [Ask shops nearby](#11-ask-shops-nearby) | `backend/internal/asks` |
-| 12 | [Admin approves a new store](#12-admin-store-onboarding-and-approval) | `backend/internal/business`, `backend/internal/admin` |
+| 12 | [A shop signs up, goes live, is checked later](#12-shop-onboarding-and-the-shop-check) | `backend/internal/business`, `backend/internal/admin` |
 | 13 | [Product photo: draft, then admin approval](#13-product-photo-draft-then-admin-approval) | `backend/internal/catalogue`, `backend/internal/admin` |
 
 ## 1. Customer OTP sign-in and token refresh
@@ -310,29 +310,40 @@ sequenceDiagram
 - Booking from an ask goes through the normal order flow, and `tellAsk` in `backend/internal/orders/create.go` tells the ask whether it was booked.
 - Runbook: [asks-timers.md](../runbooks/asks-timers.md).
 
-## 12. Admin store onboarding and approval
+## 12. Shop onboarding and the shop check
+
+Since D-269 (founder, 27 Oct) nobody approves a shop first. Anyone can sign up, fill in the B-02 steps and start selling; a field agent checks the shop afterwards.
 
 ```mermaid
 sequenceDiagram
   participant O as owner (business app)
   participant B as business
-  participant A as admin console
+  participant F as field agent / admin (A-24)
+  participant Ord as orders
   participant DB as Postgres
-  O->>B: create business, add store, upload documents and KYC
-  B->>DB: business status pending
-  A->>B: GET /v1/admin/businesses
-  A->>B: POST .../kyc/reveal (audited)
-  A->>B: POST .../documents/{docId}/review
-  A->>B: POST .../businesses/{businessId}/verify
-  B->>DB: status verified, audit row
-  A->>B: POST /v1/admin/stores/{storeId}/review
-  B-->>O: store can go live
+  O->>B: create business, store, hours, category, photos, payout details
+  O->>B: POST /v1/biz/businesses/{bid}/submit
+  B->>DB: business verified (verified_by null), check_status unchecked
+  B->>DB: complete stores live, audit store.go_live
+  Note over O,DB: in search and taking orders at once
+  F->>B: GET /v1/admin/shop-checks (newest first)
+  alt shop is fine
+    F->>B: POST /v1/admin/businesses/{bid}/check
+    B->>DB: check_status checked, audit business.check
+  else shop is not real or not right
+    F->>B: POST /v1/admin/businesses/{bid}/check-reject (reason)
+    B->>DB: status rejected, check_status rejected
+    B->>Ord: CancelShopOrders (same transaction)
+    Ord->>DB: open online orders cancelled shop_rejected, credits released, no strike
+    B->>DB: audit business.check_reject
+  end
 ```
 
-- The owner onboards in the business app (`business/src/onboarding`), served by `backend/internal/business`. Field agents can onboard shops for an owner (D-39, `backend/internal/business/agent*.go`, and the `field_*` tables).
-- An admin reviews at `/v1/admin/businesses/{businessId}`: `request-info`, `reject`, `verify`, `suspend` and `reinstate`. Reading sensitive KYC values needs `kyc/reveal` (`admin.kyc.reveal`, no step-up), which writes an audit row (`backend/internal/platform/audit`).
-- A store appears in search only when the store is `live` and its business is `verified` (D-40). `/v1/admin/stores/{storeId}` has `review`, `force-close`, `reopen` and `strikes/reset`.
-- Every admin write is audited; the actor, reason and before and after are in `audit_log`.
+- The owner onboards in the business app (`business/src/onboarding`, a step flow with a dark green rail), served by `backend/internal/business`. Uploaded documents and photos are accepted on upload. A field agent can onboard for an owner (D-39, `backend/internal/business/agent*.go`); the owner's 6-digit code puts the business and its stores live the same way.
+- The check queue and both moves are in `backend/internal/admin/shop_checks.go` (`admin.shop_check.view`, `admin.shop_check.decide`: field_agent, admin, super_admin). The reject cascade is `backend/internal/orders/shop_reject.go`.
+- Until the shop is checked, the monthly close holds its payout with `shop_unchecked` (`backend/internal/payouts`). Checking later does not lift a payout already held; finance releases it on A-11. See [payouts-and-money](../features/payouts-and-money.md).
+- A store appears in search only when the store is `live` and its business is `verified` (D-40), so a reject hides the shop at once. A checked shop that goes wrong later is suspended on A-03.
+- The pre-D-269 paths (`verify`, `request-info`, store `review`) stay for rows created before the change. Every admin write is audited in `audit_log`.
 
 ## 13. Product photo: draft, then admin approval
 

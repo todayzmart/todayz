@@ -1,8 +1,8 @@
 {
   "onboarding.title": {
-    "message": "దుకాణం సెటప్",
+    "message": "మీ దుకాణాన్ని సెటప్ చేయండి",
     "review": "reviewed",
-    "enHash": "0857f615"
+    "enHash": "f54cfff6"
   },
   "onboarding.loading": {
     "message": "మీ దుకాణం సెటప్ లోడ్ అవుతోంది",
@@ -34,11 +34,6 @@
     "review": "reviewed",
     "enHash": "ed6b1f38"
   },
-  "onboarding.step": {
-    "message": "దశ {n}: {title}",
-    "review": "reviewed",
-    "enHash": "1133cf5c"
-  },
   "onboarding.done": {
     "message": "పూర్తయింది",
     "review": "reviewed",
@@ -53,11 +48,6 @@
     "message": "సేవ్ చేయండి",
     "review": "reviewed",
     "enHash": "efc007a3"
-  },
-  "onboarding.business.title": {
-    "message": "మీ దుకాణం గురించి",
-    "review": "reviewed",
-    "enHash": "6291f190"
   },
   "onboarding.business.brandName": {
     "message": "దుకాణం పేరు",
@@ -89,16 +79,6 @@
     "review": "reviewed",
     "enHash": "99f2197d"
   },
-  "onboarding.business.categoryNone": {
-    "message": "కేటగిరీ ఎంచుకోండి",
-    "review": "reviewed",
-    "enHash": "b91bf5d4"
-  },
-  "onboarding.store.title": {
-    "message": "మీ మొదటి దుకాణం",
-    "review": "reviewed",
-    "enHash": "c1b36766"
-  },
   "onboarding.store.have": {
     "message": "దుకాణం జోడించబడింది: {name}.",
     "review": "reviewed",
@@ -114,30 +94,10 @@
     "review": "reviewed",
     "enHash": "a0df4ca0"
   },
-  "onboarding.hours.title": {
-    "message": "తెరిచే సమయాలు",
-    "review": "reviewed",
-    "enHash": "6117e118"
-  },
-  "onboarding.payout.title": {
-    "message": "చెల్లింపు వివరాలు",
-    "review": "reviewed",
-    "enHash": "ad5e1a85"
-  },
-  "onboarding.payout.body": {
-    "message": "మేము మీకు డబ్బు ఎక్కడ పంపాలి. దీన్ని ఇప్పుడు లేదా తర్వాత జోడించవచ్చు; దుకాణాన్ని రివ్యూకు పంపడానికి ఇది అవసరం లేదు.",
-    "review": "reviewed",
-    "enHash": "16c98dff"
-  },
-  "onboarding.docs.title": {
-    "message": "డాక్యుమెంట్లు",
-    "review": "reviewed",
-    "enHash": "687c8286"
-  },
   "onboarding.docs.help": {
-    "message": "ఫోటోలు లేదా PDF, ఒక్కొక్కటి 10 MB వరకు. డాక్యుమెంట్లు గోప్యంగా ఉంచుతాం, మా రివ్యూ టీమ్ మాత్రమే చూస్తుంది.",
+    "message": "ఫోటోలు లేదా PDF, ఒక్కొక్కటి 10 MB వరకు. ఇవి ప్రైవేట్‌గా ఉంటాయి: మీరు, మా బృందం మాత్రమే చూడగలరు.",
     "review": "reviewed",
-    "enHash": "5285e84b"
+    "enHash": "3a2e8447"
   },
   "onboarding.docs.kind.pan": {
     "message": "PAN కార్డ్",
@@ -175,14 +135,14 @@
     "enHash": "27548c4f"
   },
   "onboarding.docs.status.accepted": {
-    "message": "అంగీకరించబడింది",
+    "message": "జోడించబడింది",
     "review": "reviewed",
-    "enHash": "61a0572c"
+    "enHash": "b68734c2"
   },
   "onboarding.docs.status.rejected": {
-    "message": "తిరస్కరించబడింది",
+    "message": "మార్చమని అడిగారు",
     "review": "reviewed",
-    "enHash": "27eeb7a2"
+    "enHash": "99604f84"
   },
   "onboarding.docs.add": {
     "message": "{name} జోడించండి",
@@ -214,25 +174,20 @@
     "review": "reviewed",
     "enHash": "dd02b2ad"
   },
-  "onboarding.submit.title": {
-    "message": "రివ్యూకు పంపండి",
-    "review": "reviewed",
-    "enHash": "ddc87345"
-  },
   "onboarding.submit.body": {
-    "message": "మేము మీ వివరాలు చెక్ చేస్తాం, ఏదైనా కావాలంటే కాల్ చేస్తాం. రివ్యూ జరుగుతున్నప్పుడు కూడా మీరు ఆర్డర్ల కోసం TodayZ వాడవచ్చు.",
+    "message": "మా బృందం రాబోయే కొన్ని రోజుల్లో ప్రతి కొత్త దుకాణాన్ని తనిఖీ చేస్తుంది. మీరు వెంటనే అమ్మవచ్చు; చెల్లింపులు తనిఖీ తర్వాత మొదలవుతాయి.",
     "review": "reviewed",
-    "enHash": "6dc86397"
+    "enHash": "b54252c8"
   },
   "onboarding.submit.action": {
-    "message": "రివ్యూకు పంపండి",
+    "message": "లైవ్ చేయండి",
     "review": "reviewed",
-    "enHash": "ddc87345"
+    "enHash": "b8d1bae4"
   },
   "onboarding.submit.sent": {
-    "message": "రివ్యూకు పంపబడింది",
+    "message": "మీ దుకాణం లైవ్‌లో ఉంది",
     "review": "reviewed",
-    "enHash": "ef78972f"
+    "enHash": "448f50bc"
   },
   "onboarding.status.submitted.title": {
     "message": "మీ దుకాణం రివ్యూలో ఉంది",
@@ -255,24 +210,24 @@
     "enHash": "f7322f3e"
   },
   "onboarding.status.verified.title": {
-    "message": "మీ దుకాణం వెరిఫై అయింది",
+    "message": "మీ దుకాణం లైవ్‌లో ఉంది",
     "review": "reviewed",
-    "enHash": "f69ca01e"
+    "enHash": "448f50bc"
   },
   "onboarding.status.verified.body": {
-    "message": "కస్టమర్లు మీ లైవ్ దుకాణాలను కనుగొనగలరు.",
+    "message": "కస్టమర్లు మీ లైవ్ స్టోర్‌లను కనుగొనగలరు. మా బృందం మీ దుకాణాన్ని తనిఖీ చేసిన తర్వాత చెల్లింపులు మొదలవుతాయి.",
     "review": "reviewed",
-    "enHash": "ca169a4c"
+    "enHash": "3c08f63c"
   },
   "onboarding.status.rejected.title": {
-    "message": "మీ దుకాణం ఆమోదం పొందలేదు",
+    "message": "మీ దుకాణం తొలగించబడింది",
     "review": "reviewed",
-    "enHash": "75e8f563"
+    "enHash": "f4a5ef0a"
   },
   "onboarding.status.rejected.body": {
-    "message": "ఇది పొరపాటు అని మీకు అనిపిస్తే సపోర్ట్‌ను సంప్రదించండి.",
+    "message": "మా బృందం మీ దుకాణాన్ని నిర్ధారించలేకపోయింది, అందుకే కస్టమర్లు దాన్ని చూడలేరు. కారణం తెలుసుకోవడానికి సహాయాన్ని సంప్రదించండి.",
     "review": "reviewed",
-    "enHash": "9e413826"
+    "enHash": "522db36f"
   },
   "onboarding.status.suspended.title": {
     "message": "మీ దుకాణం నిలిపివేయబడింది",
@@ -353,5 +308,160 @@
     "message": "ఇంకేదో వివరం",
     "review": "reviewed",
     "enHash": "61052ba2"
+  },
+  "onboarding.lede": {
+    "message": "కొన్ని వివరాలు నింపండి, మీ దుకాణం వెంటనే లైవ్ అవుతుంది. ఆమోదం కోసం ఎదురుచూడక్కర్లేదు.",
+    "review": "reviewed",
+    "enHash": "f73cd625"
+  },
+  "onboarding.progress": {
+    "message": "{total} లో {done} దశలు పూర్తయ్యాయి",
+    "review": "reviewed",
+    "enHash": "46b052c6"
+  },
+  "onboarding.steps.label": {
+    "message": "సెటప్ దశలు",
+    "review": "reviewed",
+    "enHash": "281a6952"
+  },
+  "onboarding.steps.business": {
+    "message": "దుకాణం పేరు",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.steps.store": {
+    "message": "చిరునామా మరియు మ్యాప్ పిన్",
+    "review": "reviewed",
+    "enHash": "a729fbde"
+  },
+  "onboarding.steps.hours": {
+    "message": "తెరిచే సమయాలు",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.steps.category": {
+    "message": "మీరు ఏమి అమ్ముతారు",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.steps.photos": {
+    "message": "దుకాణం ఫోటోలు",
+    "review": "reviewed",
+    "enHash": "733b9d17"
+  },
+  "onboarding.steps.payout": {
+    "message": "GST, PAN మరియు చెల్లింపులు",
+    "review": "reviewed",
+    "enHash": "21cfd6a1"
+  },
+  "onboarding.steps.live": {
+    "message": "లైవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b8d1bae4"
+  },
+  "onboarding.optional": {
+    "message": "ఐచ్ఛికం",
+    "review": "reviewed",
+    "enHash": "0c6c4102"
+  },
+  "onboarding.recommended": {
+    "message": "సిఫార్సు చేయబడింది",
+    "review": "reviewed",
+    "enHash": "9ef93755"
+  },
+  "onboarding.toDashboard": {
+    "message": "డాష్‌బోర్డ్‌కు వెళ్ళండి",
+    "review": "reviewed",
+    "enHash": "e5fa8758"
+  },
+  "onboarding.stepOf": {
+    "message": "దశ {n} / {total}",
+    "review": "reviewed",
+    "enHash": "78cee4b8"
+  },
+  "onboarding.back": {
+    "message": "వెనుకకు",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "onboarding.next": {
+    "message": "తర్వాత",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "onboarding.skip": {
+    "message": "ప్రస్తుతానికి దాటవేయండి",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "onboarding.intro.business": {
+    "message": "కస్టమర్లు దగ్గరలో వెతికినప్పుడు చూసే పేరు.",
+    "review": "reviewed",
+    "enHash": "06b8dcbd"
+  },
+  "onboarding.intro.store": {
+    "message": "మీ దుకాణం ఎక్కడ ఉంది. కస్టమర్లు, డెలివరీ వాళ్ళు కనుగొనేలా పిన్‌ను దుకాణం తలుపు వద్ద ఉంచండి.",
+    "review": "reviewed",
+    "enHash": "5c51081b"
+  },
+  "onboarding.intro.hours": {
+    "message": "మీరు ఎప్పుడు తెరిచి ఉంటారు. మీరు తెరిచి ఉన్నప్పుడే కస్టమర్లు బుక్ చేయగలరు.",
+    "review": "reviewed",
+    "enHash": "8d5a9398"
+  },
+  "onboarding.intro.category": {
+    "message": "మీ సరుకులో ఎక్కువ భాగానికి సరిపోయేదాన్ని ఎంచుకోండి. దీంతో కస్టమర్లు మిమ్మల్ని కనుగొంటారు.",
+    "review": "reviewed",
+    "enHash": "ac72e9e8"
+  },
+  "onboarding.intro.photos": {
+    "message": "దుకాణం ముందు భాగం ఒక ఫోటో, లోపల ఒకటి. కస్టమర్లు చూడగలిగే దుకాణాన్ని నమ్ముతారు, మా బృందం దుకాణ తనిఖీకి వీటిని ఉపయోగిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "36cd65a6"
+  },
+  "onboarding.intro.payout": {
+    "message": "మేము మీ డబ్బు ఎక్కడికి పంపాలి, మీ పన్ను పత్రాలు. ఇవి లేకుండానే లైవ్ కావచ్చు, తర్వాత జోడించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "fcf5563f"
+  },
+  "onboarding.intro.live": {
+    "message": "మీరు లైవ్ అయిన వెంటనే దగ్గరలోని కస్టమర్లు మీ దుకాణాన్ని కనుగొని బుక్ చేయగలరు.",
+    "review": "reviewed",
+    "enHash": "2178871c"
+  },
+  "onboarding.intro.liveDone": {
+    "message": "మీ దుకాణం స్థితి ఇది.",
+    "review": "reviewed",
+    "enHash": "0006b2db"
+  },
+  "onboarding.live.addProducts": {
+    "message": "మీ ఉత్పత్తులను జోడించండి",
+    "review": "reviewed",
+    "enHash": "28822efe"
+  },
+  "onboarding.photos.help": {
+    "message": "JPG, PNG లేదా WebP, ఒక్కొక్కటి 10 MB వరకు. ఫోటోలు వెంటనే జతవుతాయి; ముందుగా ఎవరూ ఆమోదించనక్కర్లేదు.",
+    "review": "reviewed",
+    "enHash": "61f26173"
+  },
+  "onboarding.taxDocs": {
+    "message": "పన్ను మరియు లైసెన్స్ పత్రాలు",
+    "review": "reviewed",
+    "enHash": "de682406"
+  },
+  "onboarding.taxDocs.help": {
+    "message": "ఫోటోలు లేదా PDF, ఒక్కొక్కటి 10 MB వరకు. ఇవి ప్రైవేట్‌గా ఉంటాయి: మీరు, మా బృందం మాత్రమే చూడగలరు.",
+    "review": "reviewed",
+    "enHash": "3a2e8447"
+  },
+  "onboarding.status.verified_checked.title": {
+    "message": "మీ దుకాణం లైవ్‌లో ఉంది, తనిఖీ పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "617485bc"
+  },
+  "onboarding.status.verified_checked.body": {
+    "message": "కస్టమర్లు మీ లైవ్ స్టోర్‌లను కనుగొనగలరు, చెల్లింపులు సాధారణ షెడ్యూల్‌లో వస్తాయి.",
+    "review": "reviewed",
+    "enHash": "91bc1cac"
   }
 }

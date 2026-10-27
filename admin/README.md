@@ -29,7 +29,7 @@ Feature folders under `src/`:
 | Folder | What |
 |---|---|
 | `pulse`, `demand`, `system`, `jobs`, `audit` | Health and history |
-| `businesses`, `stores`, `customers`, `orders`, `reviews`, `risk` | Marketplace operations |
+| `businesses`, `shop-checks`, `stores`, `customers`, `orders`, `reviews`, `risk` | Marketplace operations (`shop-checks` is A-24, the daily D-269 check queue) |
 | `credits`, `payouts`, `referrals`, `banners`, `notifications` | Money and campaigns |
 | `catalogue`, `field`, `support`, `ai-assist` | Catalogue, field agents, support |
 | `admin-users`, `settings`, `shell`, `routes`, `app`, `test` | Staff, roles, sign-in unlock, `platform_settings` |
