@@ -31,18 +31,20 @@ func runImages(ctx context.Context, args []string, getenv func(string) string, o
 		return runImageTypes(ctx, args[1:], getenv, out)
 	}
 	if len(args) == 0 || args[0] != "import" {
-		return usageError{msg: "images takes import [--dry-run] [--limit N] [--source off|obf|opf] [--contact URL] [--report FILE], or types [--dry-run] [--again] [--limit N] [--picks FILE|builtin] [--contact URL] [--report FILE]"}
+		return usageError{msg: "images takes import [--dry-run] [--limit N] [--source off|obf|opf] [--newest] [--listed-first] [--search-first] [--contact URL] [--report FILE], or types [--dry-run] [--again] [--limit N] [--picks FILE|builtin] [--contact URL] [--report FILE]"}
 	}
 	fs := flag.NewFlagSet("images import", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	dry := fs.Bool("dry-run", false, "look up only; copy and store nothing")
 	limit := fs.Int("limit", 20, "products to try")
 	newest := fs.Bool("newest", false, "try recently added products first (local demo)")
+	listedFirst := fs.Bool("listed-first", false, "try products listed in shops before the rest")
+	searchFirst := fs.Bool("search-first", false, "search by name before the (slow) barcode lookup")
 	source := fs.String("source", "", "only this database: off, obf or opf")
 	contact := fs.String("contact", "https://todayz.in", "contact in the User-Agent")
 	report := fs.String("report", "", "write a Markdown report to this file")
 	if err := fs.Parse(args[1:]); err != nil || fs.NArg() > 0 {
-		return usageError{msg: "images import takes [--dry-run] [--limit N] [--source off|obf|opf] [--newest] [--contact URL] [--report FILE]"}
+		return usageError{msg: "images import takes [--dry-run] [--limit N] [--source off|obf|opf] [--newest] [--listed-first] [--search-first] [--contact URL] [--report FILE]"}
 	}
 	if *limit < 1 || *limit > maxImportLimit {
 		return usageError{msg: "--limit must be between 1 and 20000"}
@@ -78,7 +80,7 @@ func runImages(ctx context.Context, args []string, getenv func(string) string, o
 	}
 	im, err := imageimport.New(deps, imageimport.Options{
 		UserAgent: imageimport.UserAgent(buildinfo.Get().Version, *contact),
-		Limit:     *limit, DryRun: *dry, Only: *source, Newest: *newest,
+		Limit:     *limit, DryRun: *dry, Only: *source, Newest: *newest, ListedFirst: *listedFirst, SearchFirst: *searchFirst,
 	})
 	if err != nil {
 		return err

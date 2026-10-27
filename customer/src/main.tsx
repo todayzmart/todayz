@@ -1,5 +1,6 @@
 import '@todayz/tokens/styles.css';
 import '@todayz/ui/styles.css';
+import './app/theme.css';
 import { createUpdateController } from '@todayz/auth';
 import { applyLocale } from '@todayz/i18n';
 import { configFromEnv, initTelemetry } from '@todayz/telemetry';

@@ -14,7 +14,7 @@ import { RouterLink } from './RouterLink';
 import styles from './home.module.css';
 
 const MAX_SHOP_CARDS = 6;
-const TONES = ['plum', 'blue', 'rose'] as const;
+const TONES = ['teal', 'amber', 'rose'] as const;
 
 interface Card {
   key: string;
@@ -50,7 +50,7 @@ export function Offers({ coords, km }: { coords: Coords; km: number }) {
     seen.add(o.storeId);
     shopCards.push({
       key: o.storeId,
-      tone: TONES[shopCards.length % TONES.length] ?? 'plum',
+      tone: TONES[shopCards.length % TONES.length] ?? 'teal',
       eyebrow: o.storeName,
       title,
       sub: [formatDistance(o.distanceM), o.locality].filter(Boolean).join(' · '),
@@ -74,7 +74,7 @@ export function Offers({ coords, km }: { coords: Coords; km: number }) {
     ...shopCards,
     {
       key: 'credits',
-      tone: 'blue',
+      tone: 'teal',
       eyebrow: intl.formatMessage({ id: 'home.offers.credits.eyebrow' }),
       title: intl.formatMessage({ id: 'home.offers.credits.title' }),
       sub: intl.formatMessage({ id: 'home.offers.credits.sub' }),
@@ -84,7 +84,7 @@ export function Offers({ coords, km }: { coords: Coords; km: number }) {
     },
     {
       key: 'baskets',
-      tone: 'plum',
+      tone: 'teal',
       eyebrow: intl.formatMessage({ id: 'home.offers.baskets.eyebrow' }),
       title: intl.formatMessage({ id: 'basket.entry' }),
       sub: intl.formatMessage({ id: 'basket.entry.body' }),

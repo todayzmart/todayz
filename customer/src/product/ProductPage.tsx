@@ -170,6 +170,63 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
             </div>
           </section>
 
+          <section className={styles.infoBlock} aria-labelledby="product-highlights">
+            <h2 id="product-highlights" className={styles.sectionTitle}>
+              {intl.formatMessage({ id: 'product.highlights.title' })}
+            </h2>
+            <ul className={styles.highlights}>
+              <li>
+                {intl.formatMessage(
+                  { id: 'product.highlights.genuine' },
+                  { brand: item.brand ?? intl.formatMessage({ id: 'product.details.unbranded' }) },
+                )}
+              </li>
+              <li>{intl.formatMessage({ id: 'product.highlights.neighbourhood' })}</li>
+              <li>{intl.formatMessage({ id: 'product.highlights.fulfilment' })}</li>
+            </ul>
+          </section>
+
+          <section className={styles.infoBlock} aria-labelledby="product-about">
+            <h2 id="product-about" className={styles.sectionTitle}>
+              {intl.formatMessage({ id: 'product.about.title' })}
+            </h2>
+            <p className={styles.about}>
+              {intl.formatMessage(
+                { id: 'product.about.body' },
+                {
+                  name: item.name,
+                  brand: item.brand ?? intl.formatMessage({ id: 'product.details.unbranded' }),
+                  pack: packLine(item),
+                  shop: shopName,
+                },
+              )}
+            </p>
+          </section>
+
+          <section className={styles.infoBlock} aria-labelledby="product-specs">
+            <h2 id="product-specs" className={styles.sectionTitle}>
+              {intl.formatMessage({ id: 'product.details.title' })}
+            </h2>
+            <dl className={styles.specs}>
+              <div>
+                <dt>{intl.formatMessage({ id: 'product.details.brand' })}</dt>
+                <dd>{item.brand ?? intl.formatMessage({ id: 'product.details.unbranded' })}</dd>
+              </div>
+              <div>
+                <dt>{intl.formatMessage({ id: 'product.details.net' })}</dt>
+                <dd>{packLine(item)}</dd>
+              </div>
+              <div>
+                <dt>{intl.formatMessage({ id: 'product.details.seller' })}</dt>
+                <dd>{shopName}</dd>
+              </div>
+              <div>
+                <dt>{intl.formatMessage({ id: 'product.details.origin' })}</dt>
+                <dd>{intl.formatMessage({ id: 'product.details.originIndia' })}</dd>
+              </div>
+            </dl>
+          </section>
+
           {canAdd ? (
             <div className={styles.buy}>
               <QuantityStepper

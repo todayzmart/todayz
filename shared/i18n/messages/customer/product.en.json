@@ -90,5 +90,57 @@
   "product.photoCredit": {
     "defaultMessage": "Photo: {author}, {licence}",
     "description": "Credit under a product photo from an open database; author and licence are links"
+  },
+  "product.highlights.title": {
+    "defaultMessage": "Highlights",
+    "description": "Heading above the short product highlights"
+  },
+  "product.highlights.genuine": {
+    "defaultMessage": "Genuine {brand} product",
+    "description": "Highlight; brand is the product's brand name"
+  },
+  "product.highlights.neighbourhood": {
+    "defaultMessage": "From a shop in your neighbourhood",
+    "description": "Highlight: the item is listed by a nearby shop"
+  },
+  "product.highlights.fulfilment": {
+    "defaultMessage": "Pick up in store or get it delivered",
+    "description": "Highlight: the two ways to get the item"
+  },
+  "product.details.title": {
+    "defaultMessage": "Product details",
+    "description": "Heading above the specification rows"
+  },
+  "product.details.brand": {
+    "defaultMessage": "Brand",
+    "description": "Specification row label"
+  },
+  "product.details.net": {
+    "defaultMessage": "Net quantity",
+    "description": "Specification row label"
+  },
+  "product.details.seller": {
+    "defaultMessage": "Sold by",
+    "description": "Specification row label"
+  },
+  "product.details.origin": {
+    "defaultMessage": "Country of origin",
+    "description": "Specification row label"
+  },
+  "product.details.originIndia": {
+    "defaultMessage": "India",
+    "description": "Country of origin value for the demo catalogue"
+  },
+  "product.details.unbranded": {
+    "defaultMessage": "Unbranded",
+    "description": "Brand value when the product has no brand"
+  },
+  "product.about.title": {
+    "defaultMessage": "About this item",
+    "description": "Heading of the short product description"
+  },
+  "product.about.body": {
+    "defaultMessage": "{name} from {brand}, {pack}. Sold by {shop} in your neighbourhood. Check the pack for ingredients, allergens and the date printed by the maker.",
+    "description": "Short product description; name, brand, pack and shop are text"
   }
 }

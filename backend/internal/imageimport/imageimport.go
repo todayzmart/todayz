@@ -36,6 +36,10 @@ import (
 const (
 	ProductPace = 4200 * time.Millisecond
 	SearchPace  = 6500 * time.Millisecond
+	// SearchAPIPace is for search.openfoodfacts.org, a separate search service
+	// from the legacy /cgi/search.pl endpoint. A local demo run reads many
+	// products, so it stays at 30 calls a minute rather than 10.
+	SearchAPIPace = 2 * time.Second
 )
 
 // maxImageBytes is the largest image copied (the product photo limit).
@@ -71,13 +75,16 @@ type Deps struct {
 
 // Options shape one run.
 type Options struct {
-	UserAgent  string            // required: "TodayZ-ImageImport/<version> (<contact>)"
-	Limit      int               // products to try; at least 1
-	DryRun     bool              // look up, copy and store nothing
-	Newest     bool              // consider recent products first (local demo import)
-	Only       string            // one source code, or "" for all
-	BaseURLs   map[string]string // source code → base URL (tests); default Sources
-	ImageHosts []string          // default ImageHosts
+	UserAgent   string            // required: "TodayZ-ImageImport/<version> (<contact>)"
+	Limit       int               // products to try; at least 1
+	DryRun      bool              // look up, copy and store nothing
+	Newest      bool              // consider recent products first (local demo import)
+	ListedFirst bool              // process listed products before the rest of the catalogue
+	SearchFirst bool              // try the name search before the barcode lookup (local demo)
+	Only        string            // one source code, or "" for all
+	BaseURLs    map[string]string // source code → base URL (tests); default Sources
+	SearchURLs  map[string]string // source code → search endpoint (tests); default Sources
+	ImageHosts  []string          // default ImageHosts
 }
 
 // UserAgent is the User-Agent the databases ask for.
@@ -144,6 +151,11 @@ func New(d Deps, o Options) (*Importer, error) {
 		}
 		if u, ok := o.BaseURLs[s.Code]; ok {
 			s.BaseURL = strings.TrimRight(u, "/")
+			// A test server stands in for the whole database, including its search.
+			s.SearchURL = s.BaseURL + "/cgi/search.pl"
+		}
+		if u, ok := o.SearchURLs[s.Code]; ok {
+			s.SearchURL = strings.TrimRight(u, "/")
 		}
 		im.sources = append(im.sources, s)
 	}
@@ -176,10 +188,20 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 	rep := Report{DryRun: im.o.DryRun}
 	q := imageimportdb.New(im.d.DB.Q(ctx))
 	var after pgtype.UUID
+	var listedBefore pgtype.UUID
+	listedDone := !im.o.ListedFirst
+	triedListed := make(map[pgtype.UUID]struct{})
 	for rep.Tried < im.o.Limit {
 		var rows []candidate
 		var err error
-		if im.o.Newest {
+		listedPass := !listedDone
+		if listedPass {
+			newRows, queryErr := q.ImportListedNewestCandidates(ctx, imageimportdb.ImportListedNewestCandidatesParams{Before: listedBefore, Lim: pageSize})
+			err = queryErr
+			for _, r := range newRows {
+				rows = append(rows, candidate{ID: r.ID, Name: r.Name, Barcodes: r.Barcodes, BrandName: r.BrandName, CategorySlug: r.CategorySlug, ParentSlug: r.ParentSlug})
+			}
+		} else if im.o.Newest {
 			newRows, queryErr := q.ImportNewestCandidates(ctx, imageimportdb.ImportNewestCandidatesParams{Before: after, Lim: pageSize})
 			err = queryErr
 			for _, r := range newRows {
@@ -196,10 +218,21 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 			return rep, fmt.Errorf("imageimport: candidates: %w", err)
 		}
 		if len(rows) == 0 {
+			if listedPass {
+				listedDone = true
+				continue
+			}
 			break
 		}
 		for _, r := range rows {
-			after = r.ID
+			if listedPass {
+				listedBefore = r.ID
+			} else {
+				after = r.ID
+				if _, alreadyTried := triedListed[r.ID]; alreadyTried {
+					continue
+				}
+			}
 			// A source-scoped import handles only products assigned to that
 			// database by primary(). This avoids trying a beauty product on OFF
 			// or a food product on OBF, while still counting the requested limit
@@ -211,9 +244,15 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 				break
 			}
 			rep.Tried++
+			if listedPass {
+				triedListed[r.ID] = struct{}{}
+			}
 			if err := im.one(ctx, r, &rep); err != nil {
 				return rep, err
 			}
+		}
+		if listedPass && len(rows) < pageSize {
+			listedDone = true
 		}
 	}
 	return rep, nil
@@ -329,6 +368,11 @@ func (im *Importer) find(ctx context.Context, category, parent string, codes []s
 			order = append(order, s)
 		}
 	}
+	if im.o.SearchFirst && brand != "" {
+		if h, err := im.byName(ctx, order[0], name, brand); err != nil || h != nil {
+			return h, err
+		}
+	}
 	for _, code := range codes {
 		for _, s := range order {
 			p, err := im.product(ctx, s, code)
@@ -340,10 +384,14 @@ func (im *Importer) find(ctx context.Context, category, parent string, codes []s
 			}
 		}
 	}
-	if brand == "" || order[0].Code != first {
+	if brand == "" || order[0].Code != first || im.o.SearchFirst {
 		return nil, nil
 	}
-	hits, err := im.search(ctx, order[0], brand+" "+name)
+	return im.byName(ctx, order[0], name, brand)
+}
+
+func (im *Importer) byName(ctx context.Context, s Source, name, brand string) (*hit, error) {
+	hits, err := im.search(ctx, s, brand+" "+name)
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +399,7 @@ func (im *Importer) find(ctx context.Context, category, parent string, codes []s
 		if p.Code == "" || p.image() == "" || !nameMatch(name, brand, p.ProductName, p.Brands) {
 			continue
 		}
-		return &hit{src: order[0], code: p.Code, imageURL: p.image(), page: order[0].BaseURL + "/product/" + url.PathEscape(p.Code), match: "name"}, nil
+		return &hit{src: s, code: p.Code, imageURL: p.image(), page: s.BaseURL + "/product/" + url.PathEscape(p.Code), match: "name"}, nil
 	}
 	return nil, nil
 }
@@ -372,7 +420,40 @@ func (im *Importer) product(ctx context.Context, s Source, code string) (*offPro
 	return &body.Product, nil
 }
 
+// searchHit is one result of search.openfoodfacts.org. Its brands come as an
+// array, unlike the legacy API's comma-separated string.
+type searchHit struct {
+	Code          string   `json:"code"`
+	ProductName   string   `json:"product_name"`
+	Brands        []string `json:"brands"`
+	ImageFrontURL string   `json:"image_front_url"`
+	ImageURL      string   `json:"image_url"`
+}
+
 func (im *Importer) search(ctx context.Context, s Source, terms string) ([]offProduct, error) {
+	endpoint := s.SearchURL
+	if endpoint == "" {
+		endpoint = s.BaseURL + "/cgi/search.pl"
+	}
+	if strings.HasSuffix(endpoint, "/search") {
+		v := url.Values{}
+		v.Set("q", terms)
+		v.Set("page_size", "5")
+		var body struct {
+			Hits []searchHit `json:"hits"`
+		}
+		if _, err := im.getJSON(ctx, s.Code+":search", SearchAPIPace, endpoint+"?"+v.Encode(), &body); err != nil {
+			return nil, err
+		}
+		out := make([]offProduct, 0, len(body.Hits))
+		for _, h := range body.Hits {
+			out = append(out, offProduct{
+				Code: h.Code, ProductName: h.ProductName, Brands: strings.Join(h.Brands, ", "),
+				ImageFrontURL: h.ImageFrontURL, ImageURL: h.ImageURL,
+			})
+		}
+		return out, nil
+	}
 	v := url.Values{}
 	v.Set("search_terms", terms)
 	v.Set("search_simple", "1")
@@ -383,7 +464,7 @@ func (im *Importer) search(ctx context.Context, s Source, terms string) ([]offPr
 	var body struct {
 		Products []offProduct `json:"products"`
 	}
-	if _, err := im.getJSON(ctx, s.Code+":search", SearchPace, s.BaseURL+"/cgi/search.pl?"+v.Encode(), &body); err != nil {
+	if _, err := im.getJSON(ctx, s.Code+":search", SearchPace, endpoint+"?"+v.Encode(), &body); err != nil {
 		return nil, err
 	}
 	return body.Products, nil

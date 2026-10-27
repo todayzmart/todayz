@@ -16,6 +16,17 @@ import { Icon } from '../shell/Icon';
 import { itemHref, tintOf, useStepperLabels } from './itemUi';
 import styles from './tile.module.css';
 
+/** A merchandising label for the photo. Demo catalogue data has no tags yet, so it is a stable
+ *  hash of the product id: the same item wears the same label everywhere, and most wear none. */
+function tagOf(id: string): 'bestseller' | 'popular' | 'new' | null {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  if (h % 13 === 0) return 'bestseller';
+  if (h % 19 === 0) return 'popular';
+  if (h % 29 === 0) return 'new';
+  return null;
+}
+
 export interface ItemCardProps {
   shopSlug: string;
   item: DiscoverSearchItem;
@@ -41,6 +52,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
   const href = itemHref(shopSlug, item.storeItemId);
   const img = imageUrl(item.imageKey);
   const out = !item.inStock;
+  const tag = tagOf(item.productId);
 
   return (
     <article className={styles.tile} data-out={out ? '' : undefined}>
@@ -52,6 +64,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
             {initials(item.name)}
           </span>
         )}
+        {tag && <span className={styles.tag}>{intl.formatMessage({ id: `store.tags.${tag}` })}</span>}
         {pct !== null && <span className={styles.off}>{intl.formatMessage({ id: 'product.off' }, { pct: String(pct) })}</span>}
         {bookable && (
           <div className={styles.add}>
@@ -75,6 +88,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
           <span className={styles.price}>{money(item.pricePaise)}</span>
           {pct !== null && item.mrpPaise !== null && <s className={styles.mrp}>{money(item.mrpPaise)}</s>}
         </div>
+        {item.brand && <span className={styles.brand}>{item.brand}</span>}
         <RouterLink href={href} className={styles.name}>
           {item.name}
         </RouterLink>

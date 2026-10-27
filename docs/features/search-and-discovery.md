@@ -57,9 +57,10 @@ Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e
 
 - Live in code. The refine-chip parser is built; a stale package comment in `search/search.go` still says it is not.
 - The "ready soonest" ask badge is not shown on search results ([go-live gaps](../qa/go-live-gaps/LIST.md)).
-- Home rails are built in the browser from the nearest shops' item lists (D-269). There is no "items near you", popular-items, per-category item or ETA endpoint, items carry no category or colour (a tile's tint is a hash of the product id), and subcategories have no photos of their own (they repeat the parent's). See [customer-redesign](../qa/customer-redesign/REPORT.md).
+- Home rails are built in the browser from the nearest shops' item lists (D-269, D-273). There is no "items near you", popular-items, per-category item or ETA endpoint, and items carry no category or colour (a tile's tint is a hash of the product id). The six top-level category tiles keep the CC0/owned photos on main; a subcategory repeats its parent's photo or shows none, and no retailer photo is used (D-273).
 - The home map shows without a tap once its section nears the screen (D-272, which supersedes D-251 B1); `/map` is unchanged.
+- The customer app's discovery screens are the quick-commerce layout in TodayZ green: a green header, a grey search pill, round category photos, flat cards with the brand, a saving and a green Add (D-273). Category pages still list shops rather than a product grid.
 
 ## Decisions
 
-D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch). D-272 phone fixes (map always shown, photos fill their tiles, initials skip digits).
+D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch). D-272 phone fixes (map always shown, photos fill their tiles, initials skip digits). D-273 quick-commerce UI in TodayZ green, with no retailer images.

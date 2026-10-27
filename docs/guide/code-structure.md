@@ -270,6 +270,7 @@ Steps run in file-name order. Each file adds its own steps to a list (`SETUP_STE
 | `scripts/envtool` | Go tool behind `make env-check`; prints names with set or missing, never values |
 | `scripts/hooks` | Git hook helpers: `docs-gate.sh`, `forbidden-files.sh`, `no-push.sh` |
 | `scripts/ops` | `restore-drill.sh` and `runbooks_check.py` |
+| `scripts/demo` | Local-demo catalogue helper (D-273): `enrich-catalogue.py` (names, packs, MRP/sale); it refuses anything but `APP_ENV=local\|test` |
 | `scripts/test` | Tests of the scripts themselves (hooks, make targets, no-egress) |
 | `scripts/no-egress.sh` | Wraps `make check` and `make e2e` so outbound traffic is refused and provider keys are unset |
 | `scripts/testpg.sh` | Opt-in shared test Postgres (`make testpg-up`) |

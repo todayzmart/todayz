@@ -113,5 +113,70 @@
     "message": "புகைப்படம்: {author}, {licence}",
     "review": "reviewed",
     "enHash": "8e875b52"
+  },
+  "product.highlights.title": {
+    "message": "Highlights",
+    "review": "machine",
+    "enHash": "1f9c9c4e"
+  },
+  "product.highlights.genuine": {
+    "message": "Genuine {brand} product",
+    "review": "machine",
+    "enHash": "662c0ffe"
+  },
+  "product.highlights.neighbourhood": {
+    "message": "From a shop in your neighbourhood",
+    "review": "machine",
+    "enHash": "e4f55d9c"
+  },
+  "product.highlights.fulfilment": {
+    "message": "Pick up in store or get it delivered",
+    "review": "machine",
+    "enHash": "b3929a44"
+  },
+  "product.details.title": {
+    "message": "Product details",
+    "review": "machine",
+    "enHash": "0357f902"
+  },
+  "product.details.brand": {
+    "message": "Brand",
+    "review": "machine",
+    "enHash": "62b4aa57"
+  },
+  "product.details.net": {
+    "message": "Net quantity",
+    "review": "machine",
+    "enHash": "9195d6b9"
+  },
+  "product.details.seller": {
+    "message": "Sold by",
+    "review": "machine",
+    "enHash": "12c71f0a"
+  },
+  "product.details.origin": {
+    "message": "Country of origin",
+    "review": "machine",
+    "enHash": "2c0ceb4c"
+  },
+  "product.details.originIndia": {
+    "message": "India",
+    "review": "machine",
+    "enHash": "967ce367"
+  },
+  "product.details.unbranded": {
+    "message": "Unbranded",
+    "review": "machine",
+    "enHash": "dd167794"
+  },
+  "product.about.title": {
+    "message": "About this item",
+    "review": "machine",
+    "enHash": "1b27ab57"
+  },
+  "product.about.body": {
+    "message": "{name} from {brand}, {pack}. Sold by {shop} in your neighbourhood. Check the pack for ingredients, allergens and the date printed by the maker.",
+    "review": "machine",
+    "enHash": "96b98cf1"
   }
 }

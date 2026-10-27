@@ -134,5 +134,17 @@
   "store.cart.open": {
     "defaultMessage": "View cart",
     "description": "Cart bar button"
+  },
+  "store.tags.bestseller": {
+    "defaultMessage": "Bestseller",
+    "description": "A small merchandising label on a product card"
+  },
+  "store.tags.popular": {
+    "defaultMessage": "Popular",
+    "description": "A small merchandising label on a product card"
+  },
+  "store.tags.new": {
+    "defaultMessage": "New",
+    "description": "A small merchandising label on a product card"
   }
 }

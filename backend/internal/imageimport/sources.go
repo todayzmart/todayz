@@ -6,10 +6,11 @@ import "strings"
 // are CC BY-SA 3.0: we keep the source, the product page, the licence and the
 // author with every copy and show the credit wherever the image is shown.
 type Source struct {
-	Code    string // product_images.source
-	Name    string
-	BaseURL string // API and product pages
-	Author  string // the attribution the licence asks for
+	Code      string // product_images.source
+	Name      string
+	BaseURL   string // API and product pages
+	SearchURL string // the fast search API, when the database has one
+	Author    string // the attribution the licence asks for
 }
 
 // Licence is the licence of every imported image.
@@ -17,7 +18,7 @@ const Licence = "CC BY-SA 3.0"
 
 // Sources are the three databases, in fallback order.
 var Sources = []Source{
-	{Code: "off", Name: "Open Food Facts", BaseURL: "https://world.openfoodfacts.org", Author: "Open Food Facts contributors"},
+	{Code: "off", Name: "Open Food Facts", BaseURL: "https://world.openfoodfacts.org", SearchURL: "https://search.openfoodfacts.org/search", Author: "Open Food Facts contributors"},
 	{Code: "obf", Name: "Open Beauty Facts", BaseURL: "https://world.openbeautyfacts.org", Author: "Open Beauty Facts contributors"},
 	{Code: "opf", Name: "Open Products Facts", BaseURL: "https://world.openproductsfacts.org", Author: "Open Products Facts contributors"},
 }
@@ -35,10 +36,11 @@ func skipped(category, parent string) bool {
 // primary is the database most likely to know a product of the category.
 func primary(category, parent string) string {
 	switch {
-	case category == "personal-care" || category == "beauty" || parent == "beauty":
+	case category == "personal-care" || category == "beauty" || category == "baby-care" ||
+		category == "hair-care" || category == "skin-care" || category == "makeup" || parent == "beauty" || parent == "baby-care":
 		return "obf"
 	case category == "household",
-		category == "electronics" || parent == "electronics",
+		category == "electronics" || category == "electrical" || category == "batteries-lighting" || parent == "electronics",
 		category == "stationery" || parent == "stationery",
 		category == "hardware" || parent == "hardware":
 		return "opf"

@@ -168,5 +168,20 @@
     "message": "கார்ட்டைப் பார்",
     "review": "reviewed",
     "enHash": "e6d55733"
+  },
+  "store.tags.bestseller": {
+    "message": "Bestseller",
+    "review": "machine",
+    "enHash": "df042dd2"
+  },
+  "store.tags.popular": {
+    "message": "Popular",
+    "review": "machine",
+    "enHash": "9bc2c5b3"
+  },
+  "store.tags.new": {
+    "message": "New",
+    "review": "machine",
+    "enHash": "6403f2b7"
   }
 }
