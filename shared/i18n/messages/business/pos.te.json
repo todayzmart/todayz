@@ -879,61 +879,6 @@
     "review": "reviewed",
     "enHash": "6e6a6f20"
   },
-  "pos.storeSales.open": {
-    "message": "దుకాణం అమ్మకాలు",
-    "review": "reviewed",
-    "enHash": "26e31c8a"
-  },
-  "pos.storeSales.title": {
-    "message": "దుకాణం అమ్మకాలు",
-    "review": "reviewed",
-    "enHash": "26e31c8a"
-  },
-  "pos.storeSales.sub": {
-    "message": "అన్ని పరికరాల నుండి ఈ దుకాణంలో జరిగిన ప్రతి అమ్మకం, కొత్తవి ముందు.",
-    "review": "reviewed",
-    "enHash": "bb528425"
-  },
-  "pos.storeSales.refresh": {
-    "message": "రిఫ్రెష్ చేయండి",
-    "review": "reviewed",
-    "enHash": "56e3badc"
-  },
-  "pos.storeSales.more": {
-    "message": "మరిన్ని చూపించు",
-    "review": "reviewed",
-    "enHash": "dfe60ca9"
-  },
-  "pos.storeSales.loading": {
-    "message": "అమ్మకాలు లోడ్ అవుతున్నాయి",
-    "review": "reviewed",
-    "enHash": "2723eba7"
-  },
-  "pos.storeSales.offline": {
-    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. దుకాణం అమ్మకాలు చూడటానికి కనెక్ట్ అవ్వండి; ఈ పరికరంలోని అమ్మకాలు “అమ్మకాలు” లో ఉన్నాయి.",
-    "review": "reviewed",
-    "enHash": "61c05b4d"
-  },
-  "pos.storeSales.failed": {
-    "message": "అమ్మకాలు లోడ్ కాలేదు. “రిఫ్రెష్ చేయండి” ప్రయత్నించండి.",
-    "review": "reviewed",
-    "enHash": "64c16cab"
-  },
-  "pos.storeSales.forbidden": {
-    "message": "ఈ దుకాణం అమ్మకాలను మీరు చూడలేరు.",
-    "review": "reviewed",
-    "enHash": "4d8a5236"
-  },
-  "pos.storeSales.empty.title": {
-    "message": "ఇంకా అమ్మకాలు లేవు",
-    "review": "reviewed",
-    "enHash": "f2a3f161"
-  },
-  "pos.storeSales.empty.body": {
-    "message": "ఈ దుకాణంలో జరిగిన అమ్మకాలు సర్వర్‌కు చేరిన తర్వాత ఇక్కడ కనిపిస్తాయి.",
-    "review": "reviewed",
-    "enHash": "d6d582c5"
-  },
   "pos.storeSales.offlineSale": {
     "message": "ఆఫ్‌లైన్‌లో అమ్మినది",
     "review": "reviewed",
@@ -988,5 +933,10 @@
     "message": "కోడ్‌ను తనిఖీ చేయలేకపోయాం.",
     "review": "reviewed",
     "enHash": "15c74c7c"
+  },
+  "pos.viewSales": {
+    "message": "అమ్మకాలు చూడండి",
+    "review": "reviewed",
+    "enHash": "c1ce99e8"
   }
 }

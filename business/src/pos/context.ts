@@ -35,3 +35,8 @@ export function usePos(): PosRuntime {
   if (!v) throw new Error('usePos must be used inside <PosProvider>');
   return v;
 }
+
+/** The runtime when a provider is mounted and open, else null: for screens that only add device extras (Counter sales). */
+export function usePosMaybe(): PosRuntime | null {
+  return useContext(Ctx);
+}

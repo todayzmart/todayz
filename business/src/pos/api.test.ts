@@ -1,8 +1,7 @@
 import type { PosSale } from '@todayz/api-client/gen/model/posSale';
-import type { PosSaleSummary } from '@todayz/api-client/gen/model/posSaleSummary';
 import type { SyncChange } from '@todayz/api-client/gen/model/syncChange';
 import { describe, expect, it } from 'vitest';
-import { e164, needsOnline, saleToWire, toAck, toCatalogueChanges, toReverseAck, toStoreSale, toSyncEntry } from './api';
+import { e164, needsOnline, saleToWire, toAck, toCatalogueChanges, toReverseAck, toSyncEntry } from './api';
 import type { Sale } from './types';
 
 function sale(over: Partial<Sale> = {}): Sale {
@@ -154,23 +153,5 @@ describe('catalogue changes', () => {
       { seq: 1, entityId: 'i1', op: 'upsert', item: { id: 'i1', name: 'Rice', pricePaise: 5000, available: 3, isListed: true } },
       { seq: 2, entityId: 'i2', op: 'delete' },
     ]);
-  });
-
-  it('maps a store sale with its link failure, and an unlinked reversed one', () => {
-    const row: PosSaleSummary = {
-      id: 'sale-1', clientId: 'c1', soldAt: '2026-10-24T09:00:00.000Z', receivedAt: '2026-10-24T11:00:00.000Z',
-      totalPaise: 30000, lineCount: 1, unitCount: 3, paymentMethod: 'cash', creditsUsed: 0, cashbackCredits: 0,
-      status: 'completed', reversedAt: null, offline: true,
-      link: { method: 'counter_code', status: 'failed', customerName: null, failure: 'too_late' },
-    };
-    expect(toStoreSale(row)).toEqual({
-      id: 'sale-1', soldAt: row.soldAt, totalPaise: 30000, unitCount: 3, paymentMethod: 'cash', reversed: false, offline: true,
-      link: { status: 'failed', customerName: null, failure: 'too_late' },
-    });
-    const plain = toStoreSale({ ...row, status: 'reversed', reversedAt: row.receivedAt, offline: false, link: null });
-    expect(plain.reversed).toBe(true);
-    expect(plain.link).toBeNull();
-    // A linked sale from an older server without `failure` still maps to a null failure.
-    expect(toStoreSale({ ...row, link: { method: 'bill_qr', status: 'linked', customerName: 'Ananya' } }).link).toEqual({ status: 'linked', customerName: 'Ananya', failure: null });
   });
 });

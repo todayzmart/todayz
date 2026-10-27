@@ -1,6 +1,7 @@
 package pos
 
 import (
+	"bytes"
 	"context"
 	"errors"
 
@@ -18,13 +19,16 @@ import (
 // Ops maps the pos, sync and receipts operations to their authz actions,
 // keyed as the generated strict servers name them (the Go method name).
 var Ops = map[string]string{
-	"CreatePosSale":     policy.PosSell,
-	"ReversePosSale":    policy.PosReverse,
-	"CreateBillClaim":   policy.PosLinkCustomer,
-	"GetBillClaim":      policy.PosLinkCustomer,
-	"VerifyCounterCode": policy.PosLinkCustomer,
-	"SyncStore":         policy.PosSync,
-	"ListPosSales":      policy.PosSales,
+	"CreatePosSale":      policy.PosSell,
+	"ReversePosSale":     policy.PosReverse,
+	"CreateBillClaim":    policy.PosLinkCustomer,
+	"GetBillClaim":       policy.PosLinkCustomer,
+	"VerifyCounterCode":  policy.PosLinkCustomer,
+	"SyncStore":          policy.PosSync,
+	"ListPosSales":       policy.PosSales,
+	"GetPosSale":         policy.PosSales,
+	"GetPosSalesSummary": policy.PosSalesSummary,
+	"ExportPosSales":     policy.PosSalesExport,
 
 	"PreviewBillClaim":   policy.MeBillClaim,
 	"ConfirmBillClaim":   policy.MeBillClaim,
@@ -82,11 +86,60 @@ func (h handlers) ListPosSales(ctx context.Context, req posapi.ListPosSalesReque
 	if err != nil {
 		return nil, err
 	}
-	out, err := h.s.Sales(ctx, sc, req.Params.Limit, req.Params.Cursor)
+	p := req.Params
+	out, err := h.s.Sales(ctx, sc, p.Limit, p.Cursor, SalesFilter{
+		From: p.From, To: p.To, Payment: p.Payment, Status: p.Status, Link: p.Link, Offline: p.Offline, Cashier: p.Cashier,
+	})
 	if err != nil {
 		return nil, err
 	}
 	return posapi.ListPosSales200JSONResponse(out), nil
+}
+
+func (h handlers) GetPosSalesSummary(ctx context.Context, req posapi.GetPosSalesSummaryRequestObject) (posapi.GetPosSalesSummaryResponseObject, error) {
+	sc, err := staffScope(ctx)
+	if err != nil {
+		return nil, err
+	}
+	p := req.Params
+	out, err := h.s.SalesSummary(ctx, sc, SalesFilter{
+		From: p.From, To: p.To, Payment: p.Payment, Status: p.Status, Link: p.Link, Offline: p.Offline, Cashier: p.Cashier,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return posapi.GetPosSalesSummary200JSONResponse(out), nil
+}
+
+func (h handlers) ExportPosSales(ctx context.Context, req posapi.ExportPosSalesRequestObject) (posapi.ExportPosSalesResponseObject, error) {
+	sc, err := staffScope(ctx)
+	if err != nil {
+		return nil, err
+	}
+	p := req.Params
+	b, err := h.s.ExportSales(ctx, sc, SalesFilter{
+		From: p.From, To: p.To, Payment: p.Payment, Status: p.Status, Link: p.Link, Offline: p.Offline, Cashier: p.Cashier,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return posapi.ExportPosSales200TextcsvResponse{Body: bytes.NewReader(b), ContentLength: int64(len(b))}, nil
+}
+
+func (h handlers) GetPosSale(ctx context.Context, req posapi.GetPosSaleRequestObject) (posapi.GetPosSaleResponseObject, error) {
+	sc, err := staffScope(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := pathID(req.SaleId)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.SaleDetail(ctx, sc, id)
+	if err != nil {
+		return nil, err
+	}
+	return posapi.GetPosSale200JSONResponse(out), nil
 }
 
 func (h handlers) ReversePosSale(ctx context.Context, req posapi.ReversePosSaleRequestObject) (posapi.ReversePosSaleResponseObject, error) {

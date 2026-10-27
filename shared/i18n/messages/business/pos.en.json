@@ -703,50 +703,6 @@
     "defaultMessage": "Other",
     "description": "Payment method name"
   },
-  "pos.storeSales.open": {
-    "defaultMessage": "Store sales",
-    "description": "Button on the Sell screen that opens every sale of the store from the server (B-05 sales history)"
-  },
-  "pos.storeSales.title": {
-    "defaultMessage": "Store sales",
-    "description": "Sheet title: the store's sales from the server, every device"
-  },
-  "pos.storeSales.sub": {
-    "defaultMessage": "Every sale at this store from all devices, newest first.",
-    "description": "Line under the store sales title"
-  },
-  "pos.storeSales.refresh": {
-    "defaultMessage": "Refresh",
-    "description": "Button that reloads the store's sales"
-  },
-  "pos.storeSales.more": {
-    "defaultMessage": "Load more",
-    "description": "Button that loads older sales"
-  },
-  "pos.storeSales.loading": {
-    "defaultMessage": "Loading sales",
-    "description": "Accessible name of the loading placeholder"
-  },
-  "pos.storeSales.offline": {
-    "defaultMessage": "You are offline. Connect to see the store's sales; sales on this device are under “Sales”.",
-    "description": "Banner when the store sales cannot load offline"
-  },
-  "pos.storeSales.failed": {
-    "defaultMessage": "Sales could not load. Try “Refresh”.",
-    "description": "Banner when the list fails"
-  },
-  "pos.storeSales.forbidden": {
-    "defaultMessage": "You cannot see this store's sales.",
-    "description": "Banner when the server refuses the list"
-  },
-  "pos.storeSales.empty.title": {
-    "defaultMessage": "No sales yet",
-    "description": "Empty state"
-  },
-  "pos.storeSales.empty.body": {
-    "defaultMessage": "Sales rung up at this store appear here once they reach the server.",
-    "description": "Empty state body"
-  },
   "pos.storeSales.offlineSale": {
     "defaultMessage": "Rung up offline",
     "description": "Tag on a sale that was recorded offline and synced later"
@@ -790,5 +746,9 @@
   "pos.storeSales.failure.unverified": {
     "defaultMessage": "The code could not be checked.",
     "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.viewSales": {
+    "defaultMessage": "View sales",
+    "description": "Sell screen link to Orders → Counter sales (D-268)"
   }
 }

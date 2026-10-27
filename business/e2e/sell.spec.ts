@@ -117,7 +117,43 @@ function posSale(body: { clientId: string; lines: WireLine[]; billDiscountPaise?
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
 function storeSale(n: number, min: number, totalPaise: number, units: number, paymentMethod: string, offline: boolean, link: unknown, status = 'completed') {
   const id = `01J9ZQQQQQQQQQQQQQQQQQQQ${String(n).padStart(2, '0')}`;
-  return { id, clientId: id, soldAt: ago(min), receivedAt: ago(min), totalPaise, lineCount: units, unitCount: units, paymentMethod, creditsUsed: 0, cashbackCredits: 0, status, reversedAt: status === 'reversed' ? ago(min - 1) : null, offline, link };
+  const cashier = n % 2 ? { id: '01J9ZUUUUUUUUUUUUUUUUUUU01', name: 'Ravi' } : { id: '01J9ZUUUUUUUUUUUUUUUUUUU02', name: 'Meena' };
+  return { id, clientId: id, soldAt: ago(min), receivedAt: ago(offline ? min - 3 : min), totalPaise, lineCount: units, unitCount: units, paymentMethod, creditsUsed: n === 1 ? 20 : 0, cashbackCredits: 0, status, reversedAt: status === 'reversed' ? ago(min - 1) : null, offline, link, cashier };
+}
+
+// Counter sales (D-268): the strip's totals and one bill in full, read from the same rows.
+function salesSummary() {
+  const done = STORE_SALES.filter((s) => s.status === 'completed');
+  const total = done.reduce((n, s) => n + s.totalPaise, 0);
+  const by = (m: string) => done.filter((s) => s.paymentMethod === m);
+  return {
+    from: null, to: null, salesPaise: total, billCount: done.length, averageBillPaise: Math.floor(total / done.length),
+    unitCount: done.reduce((n, s) => n + s.unitCount, 0), reversedPaise: 1000, reversedCount: 1, creditsUsed: 20, cashbackCredits: 0,
+    offlineCount: done.filter((s) => s.offline).length, linkedCount: 1,
+    byPayment: ['cash', 'upi', 'card'].map((m) => ({ method: m, billCount: by(m).length, totalPaise: by(m).reduce((n, s) => n + s.totalPaise, 0) })),
+    byCashier: [
+      { cashier: { id: '01J9ZUUUUUUUUUUUUUUUUUUU01', name: 'Ravi' }, billCount: 3, totalPaise: 0 },
+      { cashier: { id: '01J9ZUUUUUUUUUUUUUUUUUUU02', name: 'Meena' }, billCount: 2, totalPaise: 0 },
+    ],
+    serverNow: NOW(),
+  };
+}
+
+function saleDetail(id: string) {
+  const s = STORE_SALES.find((x) => x.id === id);
+  if (!s) return null;
+  const line = (n: number, name: string, unit: number, qty: number, off = 0) => ({
+    id: `${id.slice(0, 24)}L${n}`, clientId: `${id.slice(0, 24)}L${n}`, storeItemId: ITEMS[n]?.id ?? null, name, unitPricePaise: unit, quantity: qty,
+    offerDiscountPaise: off, manualDiscountPaise: 0, lineTotalPaise: unit * qty - off,
+  });
+  const lines = s.totalPaise === 38200 ? [line(0, 'Basmati rice 1 kg', 12000, 2), line(4, 'Tea 250 g', 11000, 1), line(5, 'Milk 500 ml', 3200, 1)] : [line(1, 'Toor dal 1 kg', s.totalPaise / s.unitCount, s.unitCount)];
+  const subtotal = lines.reduce((n, l) => n + l.lineTotalPaise, 0);
+  return {
+    ...s, lines, itemSubtotalPaise: subtotal, billOfferDiscountPaise: 0, subtotalPaise: subtotal, discountPaise: subtotal - s.totalPaise, roundOffPaise: 0,
+    deviceId: '01J9ZDDDDDDDDDDDDDDDDDD7K2', reversalReason: s.status === 'reversed' ? 'Wrong item billed' : null,
+    reversedBy: s.status === 'reversed' ? { id: '01J9ZUUUUUUUUUUUUUUUUUUU09', name: 'Asha' } : null,
+    reversibleUntil: s.status === 'completed' ? new Date(Date.now() + 20 * 3_600_000).toISOString() : null, version: 1, serverNow: NOW(),
+  };
 }
 const failed = (failure: string) => ({ method: 'counter_code', status: 'failed', customerName: null, failure });
 const STORE_SALES = [
@@ -154,10 +190,17 @@ async function fakeApi(page: Page) {
       });
     }
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: NOW() });
+    if (url.pathname === `${base}/stream`) return route.fulfill({ status: 200, contentType: 'text/event-stream', headers: cors(route), body: '' });
+    if (url.pathname === `${base}/asks`) return ok(route, { asks: [], openCount: 0, nextCursor: null, serverNow: NOW() });
     // The owner's sidebar reads today's overview for the Stock badge and the setup card (W3-03).
     if (url.pathname === `${base}/overview`) return ok(route, overview({ newOrders: [] }));
     if (url.pathname === `${base}/items`) return ok(route, { items: ITEMS, nextCursor: null });
     if (url.pathname === `${base}/pos/sales` && req.method() === 'GET') return ok(route, { items: STORE_SALES, nextCursor: null, serverNow: NOW() });
+    if (url.pathname === `${base}/pos/sales-summary`) return ok(route, salesSummary());
+    if (url.pathname.startsWith(`${base}/pos/sales/`) && req.method() === 'GET') {
+      const detail = saleDetail(url.pathname.split('/').pop() ?? '');
+      if (detail) return ok(route, detail);
+    }
     if (url.pathname === `${base}/pos/sales`) return ok(route, posSale(req.postDataJSON() as Parameters<typeof posSale>[0]), 201);
     return route.fulfill({ status: 404, contentType: 'application/problem+json', headers: cors(route), body: JSON.stringify({ type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }) });
   });
@@ -229,19 +272,42 @@ test('phone: counter with the bill bar and the bill sheet (B-05)', async ({ page
   await shot(page, 'sell-bill-sheet-phone.png');
 });
 
-test('phone 360: store sales with each link status and why a link failed (B-05, W2-16)', async ({ page }) => {
+test('phone 360: counter sales with each link status and why a link failed (B-04, D-268)', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/sell');
-  await page.getByRole('button', { name: 'Store sales', exact: true }).click();
-  const sheet = page.getByRole('dialog', { name: 'Store sales' });
-  const list = sheet.getByRole('list', { name: 'Store sales' });
+  await page.getByRole('link', { name: 'View sales' }).click();
+  await expect(page).toHaveURL(/\/orders\?view=sales/);
+  const list = page.getByRole('list', { name: 'Counter sales' });
   await expect(list.getByText('Customer link failed')).toHaveCount(3);
   await expect(list.getByText('The counter code was already used.')).toBeVisible();
   await expect(list.getByText('The device clock was off.')).toBeVisible();
   await expect(list.getByText('The sale synced too late to check the code.')).toBeVisible();
   await expect(list.getByText('Linked to Ananya')).toBeVisible();
   await expect(list.getByText('Link pending')).toBeVisible();
-  await expect(sheet.getByRole('button', { name: 'Refresh' })).toHaveCSS('min-height', '44px');
+  await expect(page.getByRole('region', { name: 'Counter sales at a glance' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
-  await shot(page, 'store-sales-360.png');
+  await shot(page, 'counter-sales-360.png');
+  await list.getByRole('button', { name: /Open bill .*QQ02/ }).click();
+  const detail = page.getByRole('dialog', { name: /^Bill / });
+  await expect(detail.getByText('The counter code was already used.')).toBeVisible();
+  await expect(detail.getByRole('button', { name: 'Reverse' })).toBeVisible();
+  await shot(page, 'counter-sales-detail-360.png');
+});
+
+test('desktop: counter sales table, totals and the bill panel (B-04, D-268)', async ({ page }) => {
+  await page.setViewportSize(VIEWPORTS.desktop);
+  await page.goto('/orders');
+  await page.getByRole('radio', { name: 'Counter sales' }).click();
+  await expect(page).toHaveURL(/view=sales/);
+  const table = page.getByRole('table', { name: 'Counter sales' });
+  await expect(table.getByText('Linked to Ananya')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Counter sales at a glance' }).getByText('Sales', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Export CSV' })).toBeVisible();
+  await shot(page, 'counter-sales-desktop.png');
+  await table.getByRole('button', { name: /Open bill .*QQ01/ }).click();
+  const detail = page.getByRole('dialog', { name: /^Bill / });
+  await expect(detail.getByText('Basmati rice 1 kg')).toBeVisible();
+  await expect(detail.getByText('Ravi')).toBeVisible();
+  await expect(page).toHaveURL(/sale=01J9ZQQ/);
+  await shot(page, 'counter-sales-detail-desktop.png');
 });

@@ -1,0 +1,220 @@
+/* Counter sales (D-268) layout. Component looks come from bundle.css (tz-*) and @todayz/ui; this file
+   only places them. Tokens only. */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chips,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filters select {
+  width: auto;
+  min-width: 9rem;
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 12rem));
+  gap: var(--space-3);
+}
+
+.export {
+  margin-left: auto;
+}
+
+.split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.split b {
+  color: var(--ink);
+}
+
+.muted {
+  color: var(--ink-2);
+}
+
+.billLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.more {
+  align-self: center;
+}
+
+.outbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--tint-amber);
+}
+
+.outboxList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The detail: a bottom sheet on phones and tablets, a panel docked on the right from 1024px. */
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+@media (min-width: 1024px) {
+  .panel:global(.tz-ui-sheet) {
+    max-width: 30rem;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0 0 0 auto;
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  }
+}
+
+.total {
+  font: var(--type-title);
+}
+
+.h3 {
+  margin: 0 0 var(--space-2);
+  font: var(--type-label);
+  color: var(--ink-2);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sums,
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-3) 0 0;
+}
+
+.sums dt,
+.facts dt {
+  color: var(--ink-2);
+}
+
+.sums dd,
+.facts dd {
+  margin: 0;
+  text-align: right;
+}
+
+.facts dd {
+  text-align: left;
+}
+
+.why {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--ink-2);
+  font: var(--type-caption);
+}
+
+.billId {
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.reversed {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--tint-rose);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.notes {
+  margin: 0;
+  padding-left: var(--space-4);
+}

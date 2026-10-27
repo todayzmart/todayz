@@ -102,8 +102,9 @@ test('E2E-07 variant: synced after 12 h → link failed, no credits', async ({ w
 
 test('E2E-07 the shop sees "Customer link failed" on the sale in the business app', async ({ browser, who }) => {
   test.skip(!linkedCode, 'the linked sale did not run');
-  // B-05 store sales (W2-16): the cashier at Sri Lakshmi opens the sales list from the Sell screen.
-  // The sales the variants above synced are the newest at the store, each with why its link failed.
+  // Orders → Counter sales (D-268, was the W2-16 store sales sheet): the cashier at Sri Lakshmi opens
+  // the store's sales from the Sell screen. The sales the variants above synced are the newest at the
+  // store, each with why its link failed. The test clock has moved, so the range is left open.
   const app = await openApp(browser, await who('cashier'), URLS.business);
   try {
     const { page } = app;
@@ -111,18 +112,20 @@ test('E2E-07 the shop sees "Customer link failed" on the sale in the business ap
     await page.goto('/choose-shop');
     await expect(page).not.toHaveURL(/\/choose-shop/);
     await page.goto('/sell');
-    await page.getByRole('button', { name: 'Store sales', exact: true }).click();
-    const sheet = page.getByRole('dialog', { name: 'Store sales' });
-    await expect(sheet).toBeVisible();
-    const sales = sheet.getByRole('list', { name: 'Store sales' });
+    await page.getByRole('link', { name: 'View sales' }).click();
+    await expect(page).toHaveURL(/\/orders\?view=sales/);
+    await page.goto('/orders?view=sales&range=custom');
+    // A table on wide screens, cards on phones; both carry the name "Counter sales".
+    const sales = page.getByRole('table', { name: 'Counter sales' }).or(page.getByRole('list', { name: 'Counter sales' }));
+    await expect(sales).toBeVisible();
     await expect(sales.getByText('Customer link failed').first()).toBeVisible();
     await expect(sales.getByText('The counter code was already used.')).toBeVisible();
     await expect(sales.getByText('The device clock was off.')).toBeVisible();
     await expect(sales.getByText('The sale synced too late to check the code.')).toBeVisible();
     // The linked sale shows as linked: "Linked to {name}" when the customer has set a name, else
-    // "Customer linked" (a freshly signed-in walk-in has none). No phone is shown anywhere on the list.
+    // "Customer linked" (a freshly signed-in walk-in has none). No phone is shown anywhere on the page.
     await expect(sales.getByText(/^(Linked to .+|Customer linked)$/).first()).toBeVisible();
-    expect(await sheet.innerText()).not.toContain(PEOPLE.walkIn.national);
+    expect(await page.locator('main').innerText()).not.toContain(PEOPLE.walkIn.national);
   } finally {
     await app.close();
   }

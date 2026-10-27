@@ -1666,3 +1666,12 @@ The questions are in `docs/qa/go-live-gaps/LIST.md`. The founder delegated them;
 - **Removed.** `bright/heroPhotos.ts`, the 14 `hero-kirana-*` and `hero-shopkeeper-*` files, and the photos' alt texts `home.lede.photo` and `retailers.hero.photo` in all five locales. The largest paint on a phone is now the title, not a photo.
 - **Visual baselines.** The site's Playwright screenshots of the hero change and are re-taken on the next `make e2e`.
 - Lives in: `site/src/components/bright/Hero.astro`, `PageHead.astro`, `site/src/styles/bright.css`, `site/src/views/HomeView.astro`, `RetailersView.astro`.
+
+**D-268 · Counter sales sits in Orders, next to Online orders (lead, 27 Oct).**
+- **Placement.** B-04 Orders has two tabs, Online orders and Counter sales (`/orders?view=sales`); there is no new bottom-nav item. The Sell screen's "Store sales" button and `StoreSalesSheet` (W2-16) are replaced by a "View sales" link. The device's outbox stays in the Sell screen's sales sheet and shows on Counter sales as "Not synced yet".
+- **Who sees what.** Every staff role sees the list and the bill (`pos.sales`). The totals (`pos.sales_summary`, `GET {S}/pos/sales-summary`) and the CSV (`pos.sales_export`, `GET {S}/pos/sales-export`) are owner and manager only, like the store's insights; a cashier gets no stats, no cashier filter and no export. The export never has a phone, code or receipt token, and its cells are formula-safe (D-93).
+- **Filters.** IST calendar days (`from`/`to`, inclusive), payment, status, link, offline, cashier; the list, the stats and the export take the same filters. `link=pending` means `pending_verification`. No new index: `ix_pos_sales_store_sold` serves the store and day range.
+- **Reverse.** Owner or manager inside `pos_reversal_window_hours` from when the sale reached the server (D-131), with a reason. The key is fixed per sale (`reverse-<saleId>`), so a retry or a second manager's click is the same reversal.
+- **Receipt.** The bill panel links the receipt only when this device holds its token; the server never returns receipt tokens in the list, the bill or the export.
+- **Accepted gap.** The online-order chime does not play while Counter sales is open (the alert hook lives in the Online orders view).
+- Lives in: `backend/internal/pos/history.go`, `backend/api/paths/pos.yaml`, `business/src/orders/CounterSales.tsx`, `SaleDetail.tsx`, `salesQueries.ts`. Report: `docs/qa/D-268-counter-sales/REPORT.md`.

@@ -179,7 +179,7 @@ PosSaleSummary:
     A sale in the store's sales history (B-05, W2-16): what the list row shows. `lineCount` is the number
     of lines, `unitCount` the units across them. `offline` is a sale that came through `{S}/sync`.
   required: [id, clientId, soldAt, receivedAt, totalPaise, lineCount, unitCount, paymentMethod, creditsUsed,
-    cashbackCredits, status, reversedAt, offline, link]
+    cashbackCredits, status, reversedAt, offline, link, cashier]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     clientId: {$ref: ./common.yaml#/Ulid}
@@ -201,6 +201,7 @@ PosSaleSummary:
       oneOf:
         - {$ref: "#/PosSaleLink"}
         - {type: "null"}
+    cashier: {$ref: "#/PosCashier"}
 PosSaleList:
   type: object
   required: [items, nextCursor, serverNow]
@@ -209,6 +210,111 @@ PosSaleList:
       type: array
       items: {$ref: "#/PosSaleSummary"}
     nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+PosCashier:
+  type: object
+  description: The staff member who rang a sale (or reversed it). `name` is null when they gave none.
+  required: [id, name]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: [string, "null"]}
+PosSaleLinkFilter:
+  type: string
+  description: >-
+    The counter sales link filter (D-268): `linked` a linked customer, `pending` a typed phone not yet
+    verified (`phone_unverified`), `failed` an offline counter code the server refused, `none` no customer.
+  enum: [linked, pending, failed, none]
+PosSaleDetail:
+  type: object
+  description: >-
+    One sale for the Counter sales detail (D-268). The money is as in `PosSale`; there is no receipt token.
+    `deviceId` is the device that rang it. `reversedBy` and `reversalReason` are set only once reversed.
+  required: [id, clientId, lines, itemSubtotalPaise, billOfferDiscountPaise, subtotalPaise, discountPaise,
+    roundOffPaise, creditsUsed, cashbackCredits, totalPaise, paymentMethod, link, status, offline, cashier,
+    deviceId, soldAt, receivedAt, reversedAt, reversalReason, reversedBy, reversibleUntil, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    clientId: {$ref: ./common.yaml#/Ulid}
+    lines:
+      type: array
+      items: {$ref: "#/PosSaleLine"}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    billOfferDiscountPaise: {$ref: ./common.yaml#/Paise}
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    roundOffPaise: {type: integer, minimum: -49, maximum: 50}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    cashbackCredits: {$ref: ./common.yaml#/Credits}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    paymentMethod: {$ref: "#/PosPaymentMethod"}
+    link:
+      oneOf:
+        - {$ref: "#/PosSaleLink"}
+        - {type: "null"}
+    status: {$ref: "#/PosSaleStatus"}
+    offline: {type: boolean}
+    cashier: {$ref: "#/PosCashier"}
+    deviceId: {$ref: ./common.yaml#/Ulid}
+    soldAt: {$ref: ./common.yaml#/Timestamp}
+    receivedAt: {$ref: ./common.yaml#/Timestamp}
+    reversedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    reversalReason: {type: [string, "null"]}
+    reversedBy:
+      oneOf:
+        - {$ref: "#/PosCashier"}
+        - {type: "null"}
+    reversibleUntil:
+      description: When the reversal window ends; null for a reversed sale.
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+PosSalesPaymentTotal:
+  type: object
+  required: [method, billCount, totalPaise]
+  properties:
+    method: {$ref: "#/PosPaymentMethod"}
+    billCount: {type: integer, minimum: 0}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+PosSalesCashierTotal:
+  type: object
+  required: [cashier, billCount, totalPaise]
+  properties:
+    cashier: {$ref: "#/PosCashier"}
+    billCount: {type: integer, minimum: 0}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+PosSalesSummary:
+  type: object
+  description: >-
+    Counter sales totals for the filters (D-268). `salesPaise`, `billCount`, `averageBillPaise` (rounded
+    down), `unitCount`, credits, cashback and both breakdowns count completed sales only; `reversedPaise`
+    and `reversedCount` the reversed ones. `offlineCount` and `linkedCount` are completed sales too.
+    `from` and `to` echo the range asked for.
+  required: [from, to, salesPaise, billCount, averageBillPaise, unitCount, reversedPaise, reversedCount,
+    creditsUsed, cashbackCredits, offlineCount, linkedCount, byPayment, byCashier, serverNow]
+  properties:
+    from: {type: [string, "null"], format: date}
+    to: {type: [string, "null"], format: date}
+    salesPaise: {type: integer, minimum: 0}
+    billCount: {type: integer, minimum: 0}
+    averageBillPaise: {type: integer, minimum: 0}
+    unitCount: {type: integer, minimum: 0}
+    reversedPaise: {type: integer, minimum: 0}
+    reversedCount: {type: integer, minimum: 0}
+    creditsUsed: {type: integer, minimum: 0}
+    cashbackCredits: {type: integer, minimum: 0}
+    offlineCount: {type: integer, minimum: 0}
+    linkedCount: {type: integer, minimum: 0}
+    byPayment:
+      type: array
+      items: {$ref: "#/PosSalesPaymentTotal"}
+    byCashier:
+      type: array
+      items: {$ref: "#/PosSalesCashierTotal"}
     serverNow: {$ref: ./common.yaml#/ServerNow}
 BillClaimCreateRequest:
   type: object

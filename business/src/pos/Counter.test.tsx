@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { UpdateContext } from '../app/update-context';
 import { NARROW_QUERY } from '../shell/useNarrow';
 import { memoryStorage } from '../sync/storage';
-import type { PosApi, SaleAck, StoreSale, SyncRequest, SyncResponse } from './api';
+import type { PosApi, SaleAck, SyncRequest, SyncResponse } from './api';
 import { Counter } from './Counter';
 import type { PosStoreRef } from './context';
 import { PosProvider } from './runtime';
@@ -58,7 +58,6 @@ function fakeServer(): Server {
     createBillClaim: () => Promise.reject(new Error('unused')),
     getBillClaim: () => Promise.reject(new Error('unused')),
     verifyCounterCode: () => Promise.reject(new Error('unused')),
-    listSales: () => Promise.resolve({ items: [], nextCursor: null }),
   };
   return s;
 }
@@ -327,46 +326,10 @@ describe('B-05 counter', () => {
     expect(within(list).queryByRole('button', { name: 'Reverse' })).toBeNull();
   });
 
-  it('lists the store sales from the server with each link status, the failure reason and more pages', async () => {
-    const { user, server } = await mount({ role: 'cashier' });
-    const base = { totalPaise: 30000, unitCount: 3, paymentMethod: 'cash' as const, reversed: false, offline: true };
-    const page1: StoreSale[] = [
-      { ...base, id: 's-1', soldAt: '2026-10-24T09:30:00.000Z', link: { status: 'failed', customerName: null, failure: 'code_used' } },
-      { ...base, id: 's-2', soldAt: '2026-10-24T09:00:00.000Z', link: { status: 'linked', customerName: 'Ananya', failure: null } },
-    ];
-    const page2: StoreSale[] = [
-      { ...base, id: 's-3', soldAt: '2026-10-24T08:00:00.000Z', link: { status: 'failed', customerName: null, failure: 'clock_off' } },
-      { ...base, id: 's-4', soldAt: '2026-10-24T07:00:00.000Z', offline: false, paymentMethod: 'upi', unitCount: 1, totalPaise: 5000, link: null },
-    ];
-    const calls: (string | null)[] = [];
-    server.api.listSales = (cursor) => {
-      calls.push(cursor);
-      return Promise.resolve(cursor === 'next-1' ? { items: page2, nextCursor: null } : { items: page1, nextCursor: 'next-1' });
-    };
-    await user.click(screen.getByRole('button', { name: 'Store sales' }));
-    const sheet = await screen.findByRole('dialog', { name: 'Store sales' });
-    expect(await within(sheet).findByText('The counter code was already used.')).toBeInTheDocument();
-    expect(within(sheet).getByText('Linked to Ananya')).toBeInTheDocument();
-    expect(within(sheet).getAllByText('Customer link failed')).toHaveLength(1);
-    expect(within(sheet).getAllByText(/3 units · Cash/)).toHaveLength(2);
-    await user.click(within(sheet).getByRole('button', { name: 'Load more' }));
-    expect(await within(sheet).findByText('The device clock was off.')).toBeInTheDocument();
-    expect(within(sheet).getAllByText('Customer link failed')).toHaveLength(2);
-    expect(within(sheet).getByText('No customer')).toBeInTheDocument();
-    expect(within(sheet).getByText(/1 unit · UPI/)).toBeInTheDocument();
-    expect(within(sheet).queryByRole('button', { name: 'Load more' })).toBeNull();
-    expect(calls).toEqual([null, 'next-1']);
-  });
-
-  it('says the store sales need a connection when offline, and does not call the server', async () => {
-    const { user, server } = await mount({ online: false });
-    const listSales = vi.fn(server.api.listSales);
-    server.api.listSales = listSales;
-    await user.click(screen.getByRole('button', { name: 'Store sales' }));
-    const sheet = await screen.findByRole('dialog', { name: 'Store sales' });
-    expect(within(sheet).getByText(/You are offline/)).toBeInTheDocument();
-    expect(within(sheet).getByRole('button', { name: 'Refresh' })).toBeDisabled();
-    expect(listSales).not.toHaveBeenCalled();
+  it('points to Orders → Counter sales for every device\'s sales (D-268)', async () => {
+    await mount({ role: 'cashier' });
+    const link = screen.getByRole('link', { name: 'View sales' });
+    expect(link.getAttribute('href')).toBe('/orders?view=sales');
   });
 
   it('drops a bill QR link when the bill changes after the claim, and says so', async () => {

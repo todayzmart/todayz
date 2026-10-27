@@ -993,5 +993,395 @@
     "message": "ఈ ఆర్డర్‌ను అంగీకరించే సమయం అయిపోయింది.",
     "review": "reviewed",
     "enHash": "2ae054b1"
+  },
+  "orders.view.label": {
+    "message": "ఆర్డర్ల వీక్షణ",
+    "review": "reviewed",
+    "enHash": "94ddb2f9"
+  },
+  "orders.view.online": {
+    "message": "ఆన్‌లైన్ ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "orders.view.counter": {
+    "message": "కౌంటర్ అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "7d7bfe6d"
+  },
+  "orders.sales.filters": {
+    "message": "ఫిల్టర్లు",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "orders.sales.range.label": {
+    "message": "తేదీలు",
+    "review": "reviewed",
+    "enHash": "842b7b5d"
+  },
+  "orders.sales.range.today": {
+    "message": "ఈరోజు",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "orders.sales.range.yesterday": {
+    "message": "నిన్న",
+    "review": "reviewed",
+    "enHash": "da24830f"
+  },
+  "orders.sales.range.7d": {
+    "message": "గత 7 రోజులు",
+    "review": "reviewed",
+    "enHash": "df833fe8"
+  },
+  "orders.sales.range.30d": {
+    "message": "గత 30 రోజులు",
+    "review": "reviewed",
+    "enHash": "6b329852"
+  },
+  "orders.sales.range.custom": {
+    "message": "మీ తేదీలు",
+    "review": "reviewed",
+    "enHash": "081ae3fd"
+  },
+  "orders.sales.from": {
+    "message": "నుండి",
+    "review": "reviewed",
+    "enHash": "3f66052a"
+  },
+  "orders.sales.to": {
+    "message": "వరకు",
+    "review": "reviewed",
+    "enHash": "ae79ea1e"
+  },
+  "orders.sales.filter.payment": {
+    "message": "చెల్లింపు",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.filter.paymentAll": {
+    "message": "అన్ని చెల్లింపులు",
+    "review": "reviewed",
+    "enHash": "e314eea6"
+  },
+  "orders.sales.filter.status": {
+    "message": "స్థితి",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.filter.statusAll": {
+    "message": "అన్ని స్థితులు",
+    "review": "reviewed",
+    "enHash": "6405179d"
+  },
+  "orders.sales.status.completed": {
+    "message": "పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "orders.sales.status.reversed": {
+    "message": "రద్దు చేయబడింది",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.filter.link": {
+    "message": "కస్టమర్ లింక్",
+    "review": "reviewed",
+    "enHash": "795be7be"
+  },
+  "orders.sales.filter.linkAll": {
+    "message": "అన్ని లింక్‌లు",
+    "review": "reviewed",
+    "enHash": "9d44af32"
+  },
+  "orders.sales.link.linked": {
+    "message": "లింక్ అయింది",
+    "review": "reviewed",
+    "enHash": "a089f600"
+  },
+  "orders.sales.link.pending": {
+    "message": "లింక్ పెండింగ్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "orders.sales.link.failed": {
+    "message": "లింక్ విఫలమైంది",
+    "review": "reviewed",
+    "enHash": "9bb72fbe"
+  },
+  "orders.sales.link.none": {
+    "message": "కస్టమర్ లేరు",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "orders.sales.filter.cashier": {
+    "message": "క్యాషియర్",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.filter.cashierAll": {
+    "message": "అందరు క్యాషియర్లు",
+    "review": "reviewed",
+    "enHash": "1c9f2408"
+  },
+  "orders.sales.filter.offline": {
+    "message": "ఆఫ్‌లైన్‌లో బిల్ చేసినవి",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "orders.sales.filter.clear": {
+    "message": "ఫిల్టర్లు తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "41222671"
+  },
+  "orders.sales.export": {
+    "message": "CSV డౌన్‌లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5755f9ac"
+  },
+  "orders.sales.exportFailed": {
+    "message": "అమ్మకాలను డౌన్‌లోడ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "53f0b994"
+  },
+  "orders.sales.formerStaff": {
+    "message": "మాజీ సిబ్బంది",
+    "review": "reviewed",
+    "enHash": "f222bafe"
+  },
+  "orders.sales.col.time": {
+    "message": "సమయం",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "orders.sales.col.bill": {
+    "message": "బిల్",
+    "review": "reviewed",
+    "enHash": "3d734614"
+  },
+  "orders.sales.col.items": {
+    "message": "వస్తువులు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.col.total": {
+    "message": "మొత్తం",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.sales.col.payment": {
+    "message": "చెల్లింపు",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.col.credits": {
+    "message": "క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "orders.sales.col.link": {
+    "message": "కస్టమర్",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.sales.col.status": {
+    "message": "స్థితి",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.col.cashier": {
+    "message": "క్యాషియర్",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.open": {
+    "message": "బిల్ #{id} తెరవండి",
+    "review": "reviewed",
+    "enHash": "57fb67e6"
+  },
+  "orders.sales.items": {
+    "message": "{lines, plural, one {# లైన్} other {# లైన్లు}} · {units, plural, one {# యూనిట్} other {# యూనిట్లు}}",
+    "review": "reviewed",
+    "enHash": "7ff53438"
+  },
+  "orders.sales.loading": {
+    "message": "అమ్మకాలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "orders.sales.empty.title": {
+    "message": "కౌంటర్ అమ్మకాలు లేవు",
+    "review": "reviewed",
+    "enHash": "53ab424c"
+  },
+  "orders.sales.empty.body": {
+    "message": "ఈ తేదీలు, ఫిల్టర్లకు సరిపోయే బిల్లులు లేవు.",
+    "review": "reviewed",
+    "enHash": "1b919fbc"
+  },
+  "orders.sales.more": {
+    "message": "మరిన్ని చూపండి",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "orders.sales.kpi.label": {
+    "message": "కౌంటర్ అమ్మకాలు ఒక్క చూపులో",
+    "review": "reviewed",
+    "enHash": "bfafbe61"
+  },
+  "orders.sales.kpi.sales": {
+    "message": "అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "orders.sales.kpi.bills": {
+    "message": "{count, plural, one {# బిల్} other {# బిల్లులు}}",
+    "review": "reviewed",
+    "enHash": "3055d489"
+  },
+  "orders.sales.kpi.average": {
+    "message": "సగటు బిల్",
+    "review": "reviewed",
+    "enHash": "0b56c06e"
+  },
+  "orders.sales.kpi.reversed": {
+    "message": "రద్దు",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.kpi.credits": {
+    "message": "వాడిన క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.sales.kpi.cashback": {
+    "message": "{count} క్యాష్‌బ్యాక్ ఇచ్చారు",
+    "review": "reviewed",
+    "enHash": "f4cca1d0"
+  },
+  "orders.sales.kpi.failed": {
+    "message": "మొత్తాలు లోడ్ కాలేదు. కింది జాబితా సరైనదే.",
+    "review": "reviewed",
+    "enHash": "e3bfb1b5"
+  },
+  "orders.sales.byPayment": {
+    "message": "చెల్లింపు ప్రకారం",
+    "review": "reviewed",
+    "enHash": "928e8c77"
+  },
+  "orders.sales.outbox.title": {
+    "message": "ఇంకా సింక్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "f8c91683"
+  },
+  "orders.sales.outbox.body": {
+    "message": "ఈ పరికరంలోని అమ్మకాలు ఇంకా TodayZకి చేరలేదు. ఆన్‌లైన్‌లోకి వచ్చినప్పుడు అవే పంపబడతాయి.",
+    "review": "reviewed",
+    "enHash": "fb1752fc"
+  },
+  "orders.sales.detail.title": {
+    "message": "బిల్ #{id}",
+    "review": "reviewed",
+    "enHash": "f0f0e06c"
+  },
+  "orders.sales.detail.notFound": {
+    "message": "ఈ బిల్ ఈ దుకాణానిది కాదు.",
+    "review": "reviewed",
+    "enHash": "32707348"
+  },
+  "orders.sales.detail.error": {
+    "message": "ఈ బిల్ లోడ్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "580d1e48"
+  },
+  "orders.sales.detail.reversal": {
+    "message": "రద్దు వివరాలు",
+    "review": "reviewed",
+    "enHash": "9bcbe9f0"
+  },
+  "orders.sales.detail.reason": {
+    "message": "కారణం",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sales.detail.by": {
+    "message": "ఎవరు",
+    "review": "reviewed",
+    "enHash": "cfadbd7a"
+  },
+  "orders.sales.detail.when": {
+    "message": "ఎప్పుడు",
+    "review": "reviewed",
+    "enHash": "769bb19e"
+  },
+  "orders.sales.detail.items": {
+    "message": "వస్తువులు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.detail.qty": {
+    "message": "{qty} × {price}",
+    "review": "reviewed",
+    "enHash": "696fb1ba"
+  },
+  "orders.sales.detail.lineDiscount": {
+    "message": "{amount} తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "d13b0949"
+  },
+  "orders.sales.detail.billDiscount": {
+    "message": "బిల్ తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "orders.sales.detail.cashback": {
+    "message": "క్యాష్‌బ్యాక్ క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "32fd8a98"
+  },
+  "orders.sales.detail.device": {
+    "message": "పరికరం",
+    "review": "reviewed",
+    "enHash": "a5a74a6d"
+  },
+  "orders.sales.detail.soldAt": {
+    "message": "అమ్మిన సమయం",
+    "review": "reviewed",
+    "enHash": "e6560d9c"
+  },
+  "orders.sales.detail.receivedAt": {
+    "message": "అందిన సమయం",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "orders.sales.detail.billId": {
+    "message": "బిల్ ఐడీ",
+    "review": "reviewed",
+    "enHash": "4da70336"
+  },
+  "orders.sales.detail.copy": {
+    "message": "బిల్ ఐడీ కాపీ చేయండి",
+    "review": "reviewed",
+    "enHash": "4ef6f7b6"
+  },
+  "orders.sales.detail.copied": {
+    "message": "బిల్ ఐడీ కాపీ అయింది",
+    "review": "reviewed",
+    "enHash": "005ea6f2"
+  },
+  "orders.sales.detail.receiptElsewhere": {
+    "message": "ఈ బిల్ చేసిన పరికరంలోనే రసీదు తెరుచుకుంటుంది.",
+    "review": "reviewed",
+    "enHash": "48dfe3fa"
+  },
+  "orders.sales.detail.reversed": {
+    "message": "అమ్మకం రద్దు అయింది",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "orders.sales.detail.reversibleUntil": {
+    "message": "{time} వరకు రద్దు చేయవచ్చు",
+    "review": "reviewed",
+    "enHash": "9e30072b"
   }
 }

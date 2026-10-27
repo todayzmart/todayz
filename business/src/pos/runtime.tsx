@@ -129,6 +129,7 @@ export function PosProvider({ store, children, fallback = null, api: apiIn, stor
     [opened, sync, store, api, online, items, catalogueLoaded, settings, records, reloadRecords, now],
   );
 
-  if (!value) return <>{fallback}</>;
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  // One provider in both states, so a fallback that is the same element as the children (Counter
+  // sales, D-268) keeps its state when the device store opens instead of mounting again.
+  return <Ctx.Provider value={value}>{value ? children : fallback}</Ctx.Provider>;
 }

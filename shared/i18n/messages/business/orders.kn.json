@@ -993,5 +993,395 @@
     "message": "ಈ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸುವ ಸಮಯ ಮುಗಿದಿದೆ.",
     "review": "reviewed",
     "enHash": "2ae054b1"
+  },
+  "orders.view.label": {
+    "message": "ಆರ್ಡರ್ ವೀಕ್ಷಣೆ",
+    "review": "reviewed",
+    "enHash": "94ddb2f9"
+  },
+  "orders.view.online": {
+    "message": "ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "orders.view.counter": {
+    "message": "ಕೌಂಟರ್ ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "7d7bfe6d"
+  },
+  "orders.sales.filters": {
+    "message": "ಫಿಲ್ಟರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "orders.sales.range.label": {
+    "message": "ದಿನಾಂಕಗಳು",
+    "review": "reviewed",
+    "enHash": "842b7b5d"
+  },
+  "orders.sales.range.today": {
+    "message": "ಇಂದು",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "orders.sales.range.yesterday": {
+    "message": "ನಿನ್ನೆ",
+    "review": "reviewed",
+    "enHash": "da24830f"
+  },
+  "orders.sales.range.7d": {
+    "message": "ಕಳೆದ 7 ದಿನಗಳು",
+    "review": "reviewed",
+    "enHash": "df833fe8"
+  },
+  "orders.sales.range.30d": {
+    "message": "ಕಳೆದ 30 ದಿನಗಳು",
+    "review": "reviewed",
+    "enHash": "6b329852"
+  },
+  "orders.sales.range.custom": {
+    "message": "ನಿಮ್ಮ ದಿನಾಂಕಗಳು",
+    "review": "reviewed",
+    "enHash": "081ae3fd"
+  },
+  "orders.sales.from": {
+    "message": "ಇಂದಿನಿಂದ",
+    "review": "reviewed",
+    "enHash": "3f66052a"
+  },
+  "orders.sales.to": {
+    "message": "ವರೆಗೆ",
+    "review": "reviewed",
+    "enHash": "ae79ea1e"
+  },
+  "orders.sales.filter.payment": {
+    "message": "ಪಾವತಿ",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.filter.paymentAll": {
+    "message": "ಎಲ್ಲಾ ಪಾವತಿಗಳು",
+    "review": "reviewed",
+    "enHash": "e314eea6"
+  },
+  "orders.sales.filter.status": {
+    "message": "ಸ್ಥಿತಿ",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.filter.statusAll": {
+    "message": "ಎಲ್ಲಾ ಸ್ಥಿತಿಗಳು",
+    "review": "reviewed",
+    "enHash": "6405179d"
+  },
+  "orders.sales.status.completed": {
+    "message": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "orders.sales.status.reversed": {
+    "message": "ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.filter.link": {
+    "message": "ಗ್ರಾಹಕ ಲಿಂಕ್",
+    "review": "reviewed",
+    "enHash": "795be7be"
+  },
+  "orders.sales.filter.linkAll": {
+    "message": "ಎಲ್ಲಾ ಲಿಂಕ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "9d44af32"
+  },
+  "orders.sales.link.linked": {
+    "message": "ಲಿಂಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "a089f600"
+  },
+  "orders.sales.link.pending": {
+    "message": "ಲಿಂಕ್ ಬಾಕಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "orders.sales.link.failed": {
+    "message": "ಲಿಂಕ್ ವಿಫಲವಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "9bb72fbe"
+  },
+  "orders.sales.link.none": {
+    "message": "ಗ್ರಾಹಕರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "orders.sales.filter.cashier": {
+    "message": "ಕ್ಯಾಷಿಯರ್",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.filter.cashierAll": {
+    "message": "ಎಲ್ಲಾ ಕ್ಯಾಷಿಯರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "1c9f2408"
+  },
+  "orders.sales.filter.offline": {
+    "message": "ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಬಿಲ್ ಮಾಡಿದವು",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "orders.sales.filter.clear": {
+    "message": "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "41222671"
+  },
+  "orders.sales.export": {
+    "message": "CSV ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5755f9ac"
+  },
+  "orders.sales.exportFailed": {
+    "message": "ಮಾರಾಟವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "53f0b994"
+  },
+  "orders.sales.formerStaff": {
+    "message": "ಹಿಂದಿನ ಸಿಬ್ಬಂದಿ",
+    "review": "reviewed",
+    "enHash": "f222bafe"
+  },
+  "orders.sales.col.time": {
+    "message": "ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "orders.sales.col.bill": {
+    "message": "ಬಿಲ್",
+    "review": "reviewed",
+    "enHash": "3d734614"
+  },
+  "orders.sales.col.items": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.col.total": {
+    "message": "ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.sales.col.payment": {
+    "message": "ಪಾವತಿ",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.col.credits": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "orders.sales.col.link": {
+    "message": "ಗ್ರಾಹಕ",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.sales.col.status": {
+    "message": "ಸ್ಥಿತಿ",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.col.cashier": {
+    "message": "ಕ್ಯಾಷಿಯರ್",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.open": {
+    "message": "ಬಿಲ್ #{id} ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "57fb67e6"
+  },
+  "orders.sales.items": {
+    "message": "{lines, plural, one {# ಸಾಲು} other {# ಸಾಲುಗಳು}} · {units, plural, one {# ಘಟಕ} other {# ಘಟಕಗಳು}}",
+    "review": "reviewed",
+    "enHash": "7ff53438"
+  },
+  "orders.sales.loading": {
+    "message": "ಮಾರಾಟ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "orders.sales.empty.title": {
+    "message": "ಕೌಂಟರ್ ಮಾರಾಟವಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "53ab424c"
+  },
+  "orders.sales.empty.body": {
+    "message": "ಈ ದಿನಾಂಕಗಳು ಮತ್ತು ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಯಾವುದೇ ಬಿಲ್ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "1b919fbc"
+  },
+  "orders.sales.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "orders.sales.kpi.label": {
+    "message": "ಕೌಂಟರ್ ಮಾರಾಟದ ಒಂದು ನೋಟ",
+    "review": "reviewed",
+    "enHash": "bfafbe61"
+  },
+  "orders.sales.kpi.sales": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "orders.sales.kpi.bills": {
+    "message": "{count, plural, one {# ಬಿಲ್} other {# ಬಿಲ್‌ಗಳು}}",
+    "review": "reviewed",
+    "enHash": "3055d489"
+  },
+  "orders.sales.kpi.average": {
+    "message": "ಸರಾಸರಿ ಬಿಲ್",
+    "review": "reviewed",
+    "enHash": "0b56c06e"
+  },
+  "orders.sales.kpi.reversed": {
+    "message": "ರದ್ದು",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.kpi.credits": {
+    "message": "ಬಳಸಿದ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.sales.kpi.cashback": {
+    "message": "{count} ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ನೀಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f4cca1d0"
+  },
+  "orders.sales.kpi.failed": {
+    "message": "ಒಟ್ಟು ಮೊತ್ತ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಕೆಳಗಿನ ಪಟ್ಟಿ ಸರಿಯಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "e3bfb1b5"
+  },
+  "orders.sales.byPayment": {
+    "message": "ಪಾವತಿ ಪ್ರಕಾರ",
+    "review": "reviewed",
+    "enHash": "928e8c77"
+  },
+  "orders.sales.outbox.title": {
+    "message": "ಇನ್ನೂ ಸಿಂಕ್ ಆಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f8c91683"
+  },
+  "orders.sales.outbox.body": {
+    "message": "ಈ ಸಾಧನದಲ್ಲಿನ ಮಾರಾಟಗಳು ಇನ್ನೂ TodayZ ತಲುಪಿಲ್ಲ. ಆನ್‌ಲೈನ್ ಆದಾಗ ತಾವಾಗಿಯೇ ಕಳುಹಿಸಲ್ಪಡುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "fb1752fc"
+  },
+  "orders.sales.detail.title": {
+    "message": "ಬಿಲ್ #{id}",
+    "review": "reviewed",
+    "enHash": "f0f0e06c"
+  },
+  "orders.sales.detail.notFound": {
+    "message": "ಈ ಬಿಲ್ ಈ ಅಂಗಡಿಯದ್ದಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "32707348"
+  },
+  "orders.sales.detail.error": {
+    "message": "ಈ ಬಿಲ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "580d1e48"
+  },
+  "orders.sales.detail.reversal": {
+    "message": "ರದ್ದತಿ ವಿವರ",
+    "review": "reviewed",
+    "enHash": "9bcbe9f0"
+  },
+  "orders.sales.detail.reason": {
+    "message": "ಕಾರಣ",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sales.detail.by": {
+    "message": "ಯಾರು",
+    "review": "reviewed",
+    "enHash": "cfadbd7a"
+  },
+  "orders.sales.detail.when": {
+    "message": "ಯಾವಾಗ",
+    "review": "reviewed",
+    "enHash": "769bb19e"
+  },
+  "orders.sales.detail.items": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.detail.qty": {
+    "message": "{qty} × {price}",
+    "review": "reviewed",
+    "enHash": "696fb1ba"
+  },
+  "orders.sales.detail.lineDiscount": {
+    "message": "{amount} ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "d13b0949"
+  },
+  "orders.sales.detail.billDiscount": {
+    "message": "ಬಿಲ್ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "orders.sales.detail.cashback": {
+    "message": "ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "32fd8a98"
+  },
+  "orders.sales.detail.device": {
+    "message": "ಸಾಧನ",
+    "review": "reviewed",
+    "enHash": "a5a74a6d"
+  },
+  "orders.sales.detail.soldAt": {
+    "message": "ಮಾರಾಟವಾದದ್ದು",
+    "review": "reviewed",
+    "enHash": "e6560d9c"
+  },
+  "orders.sales.detail.receivedAt": {
+    "message": "ಸ್ವೀಕರಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "orders.sales.detail.billId": {
+    "message": "ಬಿಲ್ ಐಡಿ",
+    "review": "reviewed",
+    "enHash": "4da70336"
+  },
+  "orders.sales.detail.copy": {
+    "message": "ಬಿಲ್ ಐಡಿ ನಕಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "4ef6f7b6"
+  },
+  "orders.sales.detail.copied": {
+    "message": "ಬಿಲ್ ಐಡಿ ನಕಲಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "005ea6f2"
+  },
+  "orders.sales.detail.receiptElsewhere": {
+    "message": "ಈ ಬಿಲ್ ಮಾಡಿದ ಸಾಧನದಲ್ಲೇ ರಸೀದಿ ತೆರೆಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "48dfe3fa"
+  },
+  "orders.sales.detail.reversed": {
+    "message": "ಮಾರಾಟ ರದ್ದಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "orders.sales.detail.reversibleUntil": {
+    "message": "{time} ವರೆಗೆ ರದ್ದುಗೊಳಿಸಬಹುದು",
+    "review": "reviewed",
+    "enHash": "9e30072b"
   }
 }

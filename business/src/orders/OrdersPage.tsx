@@ -1,26 +1,48 @@
-import { Banner, Button, EmptyState, Skeleton, Tabs, type TabItem } from '@todayz/ui';
+import { Banner, Button, EmptyState, Segmented, Skeleton, Tabs, type TabItem } from '@todayz/ui';
 import { Link } from '@tanstack/react-router';
-import { BellRing, Inbox, Store as StoreIcon, Volume2, VolumeX } from 'lucide-react';
+import { BellRing, Inbox, ReceiptText, ShoppingBag, Store as StoreIcon, Volume2, VolumeX } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { AsksInbox } from '../asks/AsksInbox';
 import { useOpenAsks } from '../asks/api';
 import { useAlertingOrders } from './alerts';
+import { CounterSales } from './CounterSales';
 import { NewOrderCard, OrderRow } from './OrderCards';
 import { TABS, useOrderList, useOrdersStream, type OrderTab } from './queries';
+import type { SalesSearch } from './salesQueries';
 import { useSoundAlert } from './sound';
 import { useCurrentStore, type CurrentStore } from './store';
 import styles from './orders.module.css';
 
 type TabValue = OrderTab | 'asks';
 
-/** B-04 Orders: the business app's order desk. */
-export function OrdersPage({ initialTab }: { initialTab?: 'asks' | undefined } = {}) {
+/** The /orders URL: `tab=asks` on Online orders, or `view=sales` and the Counter sales filters (D-268). */
+export type OrdersSearch = { tab?: 'asks' } & SalesSearch;
+
+export interface OrdersPageProps {
+  search?: OrdersSearch;
+  onSearch?: (next: OrdersSearch) => void;
+}
+
+/** B-04 Orders: the business app's order desk, with the store's counter sales on the second tab. */
+export function OrdersPage({ search = {}, onSearch = () => undefined }: OrdersPageProps = {}) {
   const intl = useIntl();
   const current = useCurrentStore();
+  const view = search.view === 'sales' ? 'sales' : 'online';
   return (
     <div className={styles.page}>
-      <h1 className="tz-page-title">{intl.formatMessage({ id: 'orders.title' })}</h1>
+      <div className={styles.head}>
+        <h1 className="tz-page-title">{intl.formatMessage({ id: 'orders.title' })}</h1>
+        <Segmented
+          label={intl.formatMessage({ id: 'orders.view.label' })}
+          options={[
+            { value: 'online', label: intl.formatMessage({ id: 'orders.view.online' }), icon: ShoppingBag },
+            { value: 'sales', label: intl.formatMessage({ id: 'orders.view.counter' }), icon: ReceiptText },
+          ]}
+          value={view}
+          onChange={(v) => onSearch(v === 'sales' ? { view: 'sales' } : {})}
+        />
+      </div>
       {current.status === 'loading' && (
         <div role="status" aria-label={intl.formatMessage({ id: 'orders.loading' })}>
           <Skeleton height="6rem" />
@@ -46,7 +68,12 @@ export function OrdersPage({ initialTab }: { initialTab?: 'asks' | undefined } =
           }
         />
       )}
-      {current.status === 'ready' && <OrdersDesk store={current.store} initialTab={initialTab} />}
+      {current.status === 'ready' &&
+        (view === 'sales' ? (
+          <CounterSales store={current.store} search={search} onSearch={(next) => onSearch({ ...next, view: 'sales' })} />
+        ) : (
+          <OrdersDesk store={current.store} initialTab={search.tab} />
+        ))}
     </div>
   );
 }

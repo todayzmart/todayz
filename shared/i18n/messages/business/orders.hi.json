@@ -993,5 +993,395 @@
     "message": "इस ऑर्डर को स्वीकार करने का समय ख़त्म हो गया है।",
     "review": "reviewed",
     "enHash": "2ae054b1"
+  },
+  "orders.view.label": {
+    "message": "ऑर्डर का दृश्य",
+    "review": "reviewed",
+    "enHash": "94ddb2f9"
+  },
+  "orders.view.online": {
+    "message": "ऑनलाइन ऑर्डर",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "orders.view.counter": {
+    "message": "काउंटर बिक्री",
+    "review": "reviewed",
+    "enHash": "7d7bfe6d"
+  },
+  "orders.sales.filters": {
+    "message": "फ़िल्टर",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "orders.sales.range.label": {
+    "message": "तारीखें",
+    "review": "reviewed",
+    "enHash": "842b7b5d"
+  },
+  "orders.sales.range.today": {
+    "message": "आज",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "orders.sales.range.yesterday": {
+    "message": "कल",
+    "review": "reviewed",
+    "enHash": "da24830f"
+  },
+  "orders.sales.range.7d": {
+    "message": "पिछले 7 दिन",
+    "review": "reviewed",
+    "enHash": "df833fe8"
+  },
+  "orders.sales.range.30d": {
+    "message": "पिछले 30 दिन",
+    "review": "reviewed",
+    "enHash": "6b329852"
+  },
+  "orders.sales.range.custom": {
+    "message": "अपनी तारीखें",
+    "review": "reviewed",
+    "enHash": "081ae3fd"
+  },
+  "orders.sales.from": {
+    "message": "से",
+    "review": "reviewed",
+    "enHash": "3f66052a"
+  },
+  "orders.sales.to": {
+    "message": "तक",
+    "review": "reviewed",
+    "enHash": "ae79ea1e"
+  },
+  "orders.sales.filter.payment": {
+    "message": "भुगतान",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.filter.paymentAll": {
+    "message": "सभी भुगतान",
+    "review": "reviewed",
+    "enHash": "e314eea6"
+  },
+  "orders.sales.filter.status": {
+    "message": "स्थिति",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.filter.statusAll": {
+    "message": "सभी स्थितियाँ",
+    "review": "reviewed",
+    "enHash": "6405179d"
+  },
+  "orders.sales.status.completed": {
+    "message": "पूरी हुई",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "orders.sales.status.reversed": {
+    "message": "रद्द की गई",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.filter.link": {
+    "message": "ग्राहक लिंक",
+    "review": "reviewed",
+    "enHash": "795be7be"
+  },
+  "orders.sales.filter.linkAll": {
+    "message": "सभी लिंक",
+    "review": "reviewed",
+    "enHash": "9d44af32"
+  },
+  "orders.sales.link.linked": {
+    "message": "जुड़ा हुआ",
+    "review": "reviewed",
+    "enHash": "a089f600"
+  },
+  "orders.sales.link.pending": {
+    "message": "लिंक बाकी",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "orders.sales.link.failed": {
+    "message": "लिंक नहीं हुआ",
+    "review": "reviewed",
+    "enHash": "9bb72fbe"
+  },
+  "orders.sales.link.none": {
+    "message": "कोई ग्राहक नहीं",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "orders.sales.filter.cashier": {
+    "message": "कैशियर",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.filter.cashierAll": {
+    "message": "सभी कैशियर",
+    "review": "reviewed",
+    "enHash": "1c9f2408"
+  },
+  "orders.sales.filter.offline": {
+    "message": "ऑफ़लाइन बिल किए गए",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "orders.sales.filter.clear": {
+    "message": "फ़िल्टर हटाएँ",
+    "review": "reviewed",
+    "enHash": "41222671"
+  },
+  "orders.sales.export": {
+    "message": "CSV डाउनलोड करें",
+    "review": "reviewed",
+    "enHash": "5755f9ac"
+  },
+  "orders.sales.exportFailed": {
+    "message": "बिक्री डाउनलोड नहीं हो सकी। फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "53f0b994"
+  },
+  "orders.sales.formerStaff": {
+    "message": "पूर्व कर्मचारी",
+    "review": "reviewed",
+    "enHash": "f222bafe"
+  },
+  "orders.sales.col.time": {
+    "message": "समय",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "orders.sales.col.bill": {
+    "message": "बिल",
+    "review": "reviewed",
+    "enHash": "3d734614"
+  },
+  "orders.sales.col.items": {
+    "message": "सामान",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.col.total": {
+    "message": "कुल",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.sales.col.payment": {
+    "message": "भुगतान",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.col.credits": {
+    "message": "क्रेडिट",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "orders.sales.col.link": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.sales.col.status": {
+    "message": "स्थिति",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.col.cashier": {
+    "message": "कैशियर",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.open": {
+    "message": "बिल #{id} खोलें",
+    "review": "reviewed",
+    "enHash": "57fb67e6"
+  },
+  "orders.sales.items": {
+    "message": "{lines, plural, one {# लाइन} other {# लाइनें}} · {units, plural, one {# नग} other {# नग}}",
+    "review": "reviewed",
+    "enHash": "7ff53438"
+  },
+  "orders.sales.loading": {
+    "message": "बिक्री लोड हो रही है",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "orders.sales.empty.title": {
+    "message": "कोई काउंटर बिक्री नहीं",
+    "review": "reviewed",
+    "enHash": "53ab424c"
+  },
+  "orders.sales.empty.body": {
+    "message": "इन तारीखों और फ़िल्टर से कोई बिल नहीं मिला।",
+    "review": "reviewed",
+    "enHash": "1b919fbc"
+  },
+  "orders.sales.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "orders.sales.kpi.label": {
+    "message": "काउंटर बिक्री एक नज़र में",
+    "review": "reviewed",
+    "enHash": "bfafbe61"
+  },
+  "orders.sales.kpi.sales": {
+    "message": "बिक्री",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "orders.sales.kpi.bills": {
+    "message": "{count, plural, one {# बिल} other {# बिल}}",
+    "review": "reviewed",
+    "enHash": "3055d489"
+  },
+  "orders.sales.kpi.average": {
+    "message": "औसत बिल",
+    "review": "reviewed",
+    "enHash": "0b56c06e"
+  },
+  "orders.sales.kpi.reversed": {
+    "message": "रद्द",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.kpi.credits": {
+    "message": "इस्तेमाल हुए क्रेडिट",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.sales.kpi.cashback": {
+    "message": "{count} कैशबैक दिया",
+    "review": "reviewed",
+    "enHash": "f4cca1d0"
+  },
+  "orders.sales.kpi.failed": {
+    "message": "कुल नहीं दिखा सके। नीचे की सूची सही है।",
+    "review": "reviewed",
+    "enHash": "e3bfb1b5"
+  },
+  "orders.sales.byPayment": {
+    "message": "भुगतान के हिसाब से",
+    "review": "reviewed",
+    "enHash": "928e8c77"
+  },
+  "orders.sales.outbox.title": {
+    "message": "अभी सिंक नहीं हुई",
+    "review": "reviewed",
+    "enHash": "f8c91683"
+  },
+  "orders.sales.outbox.body": {
+    "message": "इस डिवाइस की वे बिक्री जो अभी TodayZ तक नहीं पहुँचीं। इंटरनेट आने पर अपने आप भेजी जाएँगी।",
+    "review": "reviewed",
+    "enHash": "fb1752fc"
+  },
+  "orders.sales.detail.title": {
+    "message": "बिल #{id}",
+    "review": "reviewed",
+    "enHash": "f0f0e06c"
+  },
+  "orders.sales.detail.notFound": {
+    "message": "यह बिल इस दुकान का नहीं है।",
+    "review": "reviewed",
+    "enHash": "32707348"
+  },
+  "orders.sales.detail.error": {
+    "message": "यह बिल लोड नहीं हो सका। फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "580d1e48"
+  },
+  "orders.sales.detail.reversal": {
+    "message": "रद्द करने का ब्योरा",
+    "review": "reviewed",
+    "enHash": "9bcbe9f0"
+  },
+  "orders.sales.detail.reason": {
+    "message": "कारण",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sales.detail.by": {
+    "message": "किसने",
+    "review": "reviewed",
+    "enHash": "cfadbd7a"
+  },
+  "orders.sales.detail.when": {
+    "message": "कब",
+    "review": "reviewed",
+    "enHash": "769bb19e"
+  },
+  "orders.sales.detail.items": {
+    "message": "सामान",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.detail.qty": {
+    "message": "{qty} × {price}",
+    "review": "reviewed",
+    "enHash": "696fb1ba"
+  },
+  "orders.sales.detail.lineDiscount": {
+    "message": "{amount} छूट",
+    "review": "reviewed",
+    "enHash": "d13b0949"
+  },
+  "orders.sales.detail.billDiscount": {
+    "message": "बिल पर छूट",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "orders.sales.detail.cashback": {
+    "message": "कैशबैक क्रेडिट",
+    "review": "reviewed",
+    "enHash": "32fd8a98"
+  },
+  "orders.sales.detail.device": {
+    "message": "डिवाइस",
+    "review": "reviewed",
+    "enHash": "a5a74a6d"
+  },
+  "orders.sales.detail.soldAt": {
+    "message": "बेचा गया",
+    "review": "reviewed",
+    "enHash": "e6560d9c"
+  },
+  "orders.sales.detail.receivedAt": {
+    "message": "मिला",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "orders.sales.detail.billId": {
+    "message": "बिल आईडी",
+    "review": "reviewed",
+    "enHash": "4da70336"
+  },
+  "orders.sales.detail.copy": {
+    "message": "बिल आईडी कॉपी करें",
+    "review": "reviewed",
+    "enHash": "4ef6f7b6"
+  },
+  "orders.sales.detail.copied": {
+    "message": "बिल आईडी कॉपी हो गई",
+    "review": "reviewed",
+    "enHash": "005ea6f2"
+  },
+  "orders.sales.detail.receiptElsewhere": {
+    "message": "रसीद उसी डिवाइस पर खुलती है जिस पर यह बिल बना।",
+    "review": "reviewed",
+    "enHash": "48dfe3fa"
+  },
+  "orders.sales.detail.reversed": {
+    "message": "बिक्री रद्द हो गई",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "orders.sales.detail.reversibleUntil": {
+    "message": "{time} तक रद्द किया जा सकता है",
+    "review": "reviewed",
+    "enHash": "9e30072b"
   }
 }

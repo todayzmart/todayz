@@ -113,21 +113,106 @@ INSERT INTO pos_sale_lines (
 
 -- name: StoreSales :many
 -- The store's sales, newest first by device sale time, keyset on
--- (sold_at, id) (B-05 sales history, W2-16). The customer is named only
--- for a bill_qr or counter_code link; a phone is never read.
+-- (sold_at, id) (B-05 sales history, W2-16), with the Counter sales filters
+-- (D-268): an IST day range as [from_at, to_at), payment, status, link,
+-- offline and cashier. The customer is named only for a bill_qr or
+-- counter_code link; a phone is never read. ix_pos_sales_store_sold serves
+-- the range.
 SELECT ps.id, ps.client_id, ps.device_seq, ps.link_method, ps.link_status, ps.link_fail_reason,
        ps.credits_used, ps.cashback_credits, ps.total_paise, ps.payment_method, ps.status,
-       ps.reversed_at, ps.sold_at, ps.received_at,
+       ps.reversed_at, ps.reversal_reason, ps.sold_at, ps.received_at, ps.cashier_user_id,
+       ps.discount_paise, ps.bill_offer_discount_paise,
        coalesce(CASE WHEN ps.link_method IN ('bill_qr','counter_code') THEN u.name END, '')::text AS customer_name,
+       coalesce(c.name, '')::text AS cashier_name,
        (SELECT count(*) FROM pos_sale_lines l WHERE l.sale_id = ps.id)::int AS line_count,
        (SELECT coalesce(sum(l.quantity), 0) FROM pos_sale_lines l WHERE l.sale_id = ps.id)::int AS unit_count
 FROM pos_sales ps
 LEFT JOIN users u ON u.id = ps.customer_id
+LEFT JOIN users c ON c.id = ps.cashier_user_id
 WHERE ps.store_id = @store_id
+  AND (sqlc.narg(from_at)::timestamptz IS NULL OR ps.sold_at >= sqlc.narg(from_at)::timestamptz)
+  AND (sqlc.narg(to_at)::timestamptz IS NULL OR ps.sold_at < sqlc.narg(to_at)::timestamptz)
+  AND (sqlc.narg(payment)::text IS NULL OR ps.payment_method = sqlc.narg(payment)::text)
+  AND (sqlc.narg(status)::text IS NULL OR ps.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(link)::text IS NULL
+    OR (sqlc.narg(link)::text = 'none' AND ps.link_method IS NULL)
+    OR (sqlc.narg(link)::text = 'linked' AND ps.link_status = 'linked')
+    OR (sqlc.narg(link)::text = 'pending' AND ps.link_status = 'pending_verification')
+    OR (sqlc.narg(link)::text = 'failed' AND ps.link_status = 'failed'))
+  AND (sqlc.narg(offline)::boolean IS NULL OR (ps.device_seq IS NOT NULL) = sqlc.narg(offline)::boolean)
+  AND (sqlc.narg(cashier)::uuid IS NULL OR ps.cashier_user_id = sqlc.narg(cashier)::uuid)
   AND (sqlc.narg(before_at)::timestamptz IS NULL
     OR (ps.sold_at, ps.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
 ORDER BY ps.sold_at DESC, ps.id DESC
 LIMIT @lim;
+
+-- name: StoreSalesTotals :one
+-- The Counter sales stats for the same filters (D-268): completed sales
+-- count as sales, reversed ones apart.
+SELECT
+  coalesce(sum(ps.total_paise) FILTER (WHERE ps.status = 'completed'), 0)::bigint AS sales_paise,
+  count(*) FILTER (WHERE ps.status = 'completed')::int AS bill_count,
+  coalesce(sum(lu.units) FILTER (WHERE ps.status = 'completed'), 0)::bigint AS unit_count,
+  coalesce(sum(ps.total_paise) FILTER (WHERE ps.status = 'reversed'), 0)::bigint AS reversed_paise,
+  count(*) FILTER (WHERE ps.status = 'reversed')::int AS reversed_count,
+  coalesce(sum(ps.credits_used) FILTER (WHERE ps.status = 'completed'), 0)::bigint AS credits_used,
+  coalesce(sum(ps.cashback_credits) FILTER (WHERE ps.status = 'completed'), 0)::bigint AS cashback_credits,
+  count(*) FILTER (WHERE ps.status = 'completed' AND ps.device_seq IS NOT NULL)::int AS offline_count,
+  count(*) FILTER (WHERE ps.status = 'completed' AND ps.link_status = 'linked')::int AS linked_count
+FROM pos_sales ps
+LEFT JOIN LATERAL (SELECT coalesce(sum(l.quantity), 0) AS units FROM pos_sale_lines l WHERE l.sale_id = ps.id) lu ON true
+WHERE ps.store_id = @store_id
+  AND (sqlc.narg(from_at)::timestamptz IS NULL OR ps.sold_at >= sqlc.narg(from_at)::timestamptz)
+  AND (sqlc.narg(to_at)::timestamptz IS NULL OR ps.sold_at < sqlc.narg(to_at)::timestamptz)
+  AND (sqlc.narg(payment)::text IS NULL OR ps.payment_method = sqlc.narg(payment)::text)
+  AND (sqlc.narg(status)::text IS NULL OR ps.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(link)::text IS NULL
+    OR (sqlc.narg(link)::text = 'none' AND ps.link_method IS NULL)
+    OR (sqlc.narg(link)::text = 'linked' AND ps.link_status = 'linked')
+    OR (sqlc.narg(link)::text = 'pending' AND ps.link_status = 'pending_verification')
+    OR (sqlc.narg(link)::text = 'failed' AND ps.link_status = 'failed'))
+  AND (sqlc.narg(offline)::boolean IS NULL OR (ps.device_seq IS NOT NULL) = sqlc.narg(offline)::boolean)
+  AND (sqlc.narg(cashier)::uuid IS NULL OR ps.cashier_user_id = sqlc.narg(cashier)::uuid);
+
+-- name: StoreSalesByPayment :many
+SELECT ps.payment_method, count(*)::int AS bill_count, coalesce(sum(ps.total_paise), 0)::bigint AS total_paise
+FROM pos_sales ps
+WHERE ps.store_id = @store_id
+  AND (sqlc.narg(from_at)::timestamptz IS NULL OR ps.sold_at >= sqlc.narg(from_at)::timestamptz)
+  AND (sqlc.narg(to_at)::timestamptz IS NULL OR ps.sold_at < sqlc.narg(to_at)::timestamptz)
+  AND (sqlc.narg(payment)::text IS NULL OR ps.payment_method = sqlc.narg(payment)::text)
+  AND (sqlc.narg(status)::text IS NULL OR ps.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(link)::text IS NULL
+    OR (sqlc.narg(link)::text = 'none' AND ps.link_method IS NULL)
+    OR (sqlc.narg(link)::text = 'linked' AND ps.link_status = 'linked')
+    OR (sqlc.narg(link)::text = 'pending' AND ps.link_status = 'pending_verification')
+    OR (sqlc.narg(link)::text = 'failed' AND ps.link_status = 'failed'))
+  AND (sqlc.narg(offline)::boolean IS NULL OR (ps.device_seq IS NOT NULL) = sqlc.narg(offline)::boolean)
+  AND (sqlc.narg(cashier)::uuid IS NULL OR ps.cashier_user_id = sqlc.narg(cashier)::uuid)
+  AND ps.status = 'completed'
+GROUP BY ps.payment_method
+ORDER BY total_paise DESC, ps.payment_method;
+
+-- name: StoreSalesByCashier :many
+SELECT ps.cashier_user_id, coalesce(max(c.name), '')::text AS cashier_name,
+       count(*)::int AS bill_count, coalesce(sum(ps.total_paise), 0)::bigint AS total_paise
+FROM pos_sales ps
+LEFT JOIN users c ON c.id = ps.cashier_user_id
+WHERE ps.store_id = @store_id
+  AND (sqlc.narg(from_at)::timestamptz IS NULL OR ps.sold_at >= sqlc.narg(from_at)::timestamptz)
+  AND (sqlc.narg(to_at)::timestamptz IS NULL OR ps.sold_at < sqlc.narg(to_at)::timestamptz)
+  AND (sqlc.narg(payment)::text IS NULL OR ps.payment_method = sqlc.narg(payment)::text)
+  AND (sqlc.narg(status)::text IS NULL OR ps.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(link)::text IS NULL
+    OR (sqlc.narg(link)::text = 'none' AND ps.link_method IS NULL)
+    OR (sqlc.narg(link)::text = 'linked' AND ps.link_status = 'linked')
+    OR (sqlc.narg(link)::text = 'pending' AND ps.link_status = 'pending_verification')
+    OR (sqlc.narg(link)::text = 'failed' AND ps.link_status = 'failed'))
+  AND (sqlc.narg(offline)::boolean IS NULL OR (ps.device_seq IS NOT NULL) = sqlc.narg(offline)::boolean)
+  AND (sqlc.narg(cashier)::uuid IS NULL OR ps.cashier_user_id = sqlc.narg(cashier)::uuid)
+  AND ps.status = 'completed'
+GROUP BY ps.cashier_user_id
+ORDER BY total_paise DESC, ps.cashier_user_id;
 
 -- name: SaleLines :many
 SELECT * FROM pos_sale_lines WHERE sale_id = @sale_id ORDER BY created_at, id;

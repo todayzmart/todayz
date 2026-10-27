@@ -2,14 +2,14 @@
 
 How a customer books items, how the shop accepts and hands over, and what the timers do.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at aa116867 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
 | App | What |
 |---|---|
 | Customer app | Build a cart, see a quote (items, credits, delivery), place an order for pickup or delivery, confirm or reject a partial accept, extend the hold, get a new pickup code, cancel, track status live. Folders: [cart](../../customer/src/cart/), [checkout](../../customer/src/checkout/), [orders](../../customer/src/orders/). |
-| Shop app | See incoming orders (sound and live stream), accept (fully or partly), reject, mark ready, verify the pickup code, dispatch delivery, mark delivery failed, confirm a return. Folder: [orders](../../business/src/orders/). |
+| Shop app | See incoming orders (sound and live stream), accept (fully or partly), reject, mark ready, verify the pickup code, dispatch delivery, mark delivery failed, confirm a return. The Counter sales tab next to Online orders lists the shop's POS sales ([pos-and-offline](pos-and-offline.md#counter-sales-d-268), D-268). Folder: [orders](../../business/src/orders/). |
 | Admin console | Search orders, cancel with a reason. Folder: [admin/src/orders](../../admin/src/orders/). |
 | Backend jobs | Order timers (below). |
 
@@ -69,4 +69,4 @@ Live in code. No courier integration exists in the code; the shop dispatches and
 
 ## Decisions
 
-D-01, D-04, D-21, D-22, D-28, D-67, D-68, D-69, D-94, D-108 (cancel races, deadlines), D-216, D-218, D-219, D-220, D-222.
+D-01, D-04, D-21, D-22, D-28, D-67, D-68, D-69, D-94, D-108 (cancel races, deadlines), D-216, D-218, D-219, D-220, D-222, D-268 (the Counter sales tab).

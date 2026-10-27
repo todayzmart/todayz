@@ -33,6 +33,47 @@
     parameters:
     - $ref: ../common/parameters.yaml#/Limit
     - $ref: ../common/parameters.yaml#/Cursor
+    - &salesFrom
+      name: from
+      in: query
+      description: The first day, an IST calendar date, inclusive (D-268).
+      schema:
+        type: string
+        format: date
+    - &salesTo
+      name: to
+      in: query
+      description: The last day, an IST calendar date, inclusive; not before `from`.
+      schema:
+        type: string
+        format: date
+    - &salesPayment
+      name: payment
+      in: query
+      schema:
+        $ref: ../schemas/pos.yaml#/PosPaymentMethod
+    - &salesStatus
+      name: status
+      in: query
+      schema:
+        $ref: ../schemas/pos.yaml#/PosSaleStatus
+    - &salesLink
+      name: link
+      in: query
+      schema:
+        $ref: ../schemas/pos.yaml#/PosSaleLinkFilter
+    - &salesOffline
+      name: offline
+      in: query
+      description: '`true`: only sales that came through `{S}/sync`; `false`: only online sales.'
+      schema:
+        type: boolean
+    - &salesCashier
+      name: cashier
+      in: query
+      description: Only the sales this staff member rang.
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
     responses:
       '200':
         description: The sales
@@ -55,6 +96,9 @@
                 status: completed
                 reversedAt: null
                 offline: true
+                cashier:
+                  id: 01JB0C4S1H2J3E4R5V6S7E8R9Z
+                  name: Ravi
                 link:
                   method: counter_code
                   status: failed
@@ -155,6 +199,184 @@
               receiptToken: EXAMPLE_receipt_000000
               version: 1
               serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/pos/sales-summary:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getPosSalesSummary
+    tags:
+    - pos
+    summary: Counter sales totals for a range (B-04 Counter sales, D-268)
+    description: >-
+      Manager and above (`pos.sales_summary`, as the store's insights). The same filters as the list. Sales
+      and bills count completed sales only; reversed ones are counted apart. Days are IST.
+    parameters:
+    - *salesFrom
+    - *salesTo
+    - *salesPayment
+    - *salesStatus
+    - *salesLink
+    - *salesOffline
+    - *salesCashier
+    responses:
+      '200':
+        description: The totals
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/PosSalesSummary
+            example:
+              from: '2026-10-24'
+              to: '2026-10-24'
+              salesPaise: 1250000
+              billCount: 50
+              averageBillPaise: 25000
+              unitCount: 140
+              reversedPaise: 30000
+              reversedCount: 1
+              creditsUsed: 120
+              cashbackCredits: 40
+              offlineCount: 6
+              linkedCount: 12
+              byPayment:
+              - method: cash
+                billCount: 30
+                totalPaise: 700000
+              - method: upi
+                billCount: 20
+                totalPaise: 550000
+              byCashier:
+              - cashier:
+                  id: 01JB0C4S1H2J3E4R5V6S7E8R9Z
+                  name: Ravi
+                billCount: 50
+                totalPaise: 1250000
+              serverNow: '2026-10-24T13:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/pos/sales-export:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: exportPosSales
+    tags:
+    - pos
+    summary: Counter sales as CSV (B-04 Counter sales, D-268)
+    description: >-
+      Manager and above (`pos.sales_export`). Every sale the filters match, newest first, times in IST.
+      Cells are formula-safe (D-93). No phone, code or receipt token; the customer is named only for
+      `bill_qr` and `counter_code`.
+    parameters:
+    - *salesFrom
+    - *salesTo
+    - *salesPayment
+    - *salesStatus
+    - *salesLink
+    - *salesOffline
+    - *salesCashier
+    responses:
+      '200':
+        description: The CSV
+        content:
+          text/csv:
+            schema:
+              type: string
+            example: |
+              sale_id,sold_at_ist,received_at_ist,status,payment_method,lines,units,discount_inr,credits_used,cashback_credits,total_inr,offline,link_method,link_status,customer_name,cashier,reversed_at_ist,reversal_reason
+              01JB0V2S4K3E5S6A7K8E9X0Y1Z,2026-10-24 10:30,2026-10-24 12:30,completed,cash,1,3,0.00,0,0,300.00,true,counter_code,failed,,Ravi,,
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/pos/sales/{saleId}:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: saleId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getPosSale
+    tags:
+    - pos
+    summary: One counter sale with its lines (B-04 Counter sales, D-268)
+    description: >-
+      Cashier and above (`pos.sales`). The lines, money, cashier, device, times, link and, for a reversed
+      sale, who reversed it and why. `reversibleUntil` is when `pos_reversal_window_hours` ends (from
+      `receivedAt` for an offline sale, D-131); null once reversed. A phone is never returned and no
+      receipt token is; another store's sale is 404.
+    responses:
+      '200':
+        description: The sale
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/PosSaleDetail
+            example:
+              id: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+              clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              lines:
+              - id: 01JB0V2K1N2E3S4A5K6E7X8Y9Z
+                clientId: 01JB0V1K1N2E3C4K5N6T7D8X9Y
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter 100 g
+                unitPricePaise: 5800
+                quantity: 2
+                offerDiscountPaise: 0
+                manualDiscountPaise: 0
+                lineTotalPaise: 11600
+              itemSubtotalPaise: 11600
+              billOfferDiscountPaise: 0
+              subtotalPaise: 11600
+              discountPaise: 0
+              roundOffPaise: 0
+              creditsUsed: 0
+              cashbackCredits: 0
+              totalPaise: 11600
+              paymentMethod: cash
+              link: null
+              status: completed
+              offline: false
+              cashier:
+                id: 01JB0C4S1H2J3E4R5V6S7E8R9Z
+                name: Ravi
+              deviceId: 01JB0D1V2C3E4D5E6V7K8C9E0Z
+              soldAt: '2026-10-24T05:00:00Z'
+              receivedAt: '2026-10-24T05:00:00Z'
+              reversedAt: null
+              reversalReason: null
+              reversedBy: null
+              reversibleUntil: '2026-10-25T05:00:00Z'
+              version: 1
+              serverNow: '2026-10-24T06:00:00Z'
       default:
         $ref: ../common/responses.yaml#/Problem
 /v1/biz/businesses/{bid}/stores/{sid}/pos/sales/{saleId}/reverse:

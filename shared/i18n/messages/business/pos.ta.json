@@ -879,61 +879,6 @@
     "review": "reviewed",
     "enHash": "6e6a6f20"
   },
-  "pos.storeSales.open": {
-    "message": "கடையின் விற்பனைகள்",
-    "review": "reviewed",
-    "enHash": "26e31c8a"
-  },
-  "pos.storeSales.title": {
-    "message": "கடையின் விற்பனைகள்",
-    "review": "reviewed",
-    "enHash": "26e31c8a"
-  },
-  "pos.storeSales.sub": {
-    "message": "எல்லாச் சாதனங்களிலிருந்தும் இந்தக் கடையின் ஒவ்வொரு விற்பனையும், புதியவை முதலில்.",
-    "review": "reviewed",
-    "enHash": "bb528425"
-  },
-  "pos.storeSales.refresh": {
-    "message": "புதுப்பிக்கவும்",
-    "review": "reviewed",
-    "enHash": "56e3badc"
-  },
-  "pos.storeSales.more": {
-    "message": "மேலும் காட்டு",
-    "review": "reviewed",
-    "enHash": "dfe60ca9"
-  },
-  "pos.storeSales.loading": {
-    "message": "விற்பனைகள் ஏற்றப்படுகின்றன",
-    "review": "reviewed",
-    "enHash": "2723eba7"
-  },
-  "pos.storeSales.offline": {
-    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். கடையின் விற்பனைகளைப் பார்க்க இணையத்துடன் இணையுங்கள்; இந்தச் சாதனத்தின் விற்பனைகள் “விற்பனைகள்” பகுதியில் உள்ளன.",
-    "review": "reviewed",
-    "enHash": "61c05b4d"
-  },
-  "pos.storeSales.failed": {
-    "message": "விற்பனைகளை ஏற்ற முடியவில்லை. “புதுப்பிக்கவும்” என்பதை முயலவும்.",
-    "review": "reviewed",
-    "enHash": "64c16cab"
-  },
-  "pos.storeSales.forbidden": {
-    "message": "இந்தக் கடையின் விற்பனைகளை நீங்கள் பார்க்க முடியாது.",
-    "review": "reviewed",
-    "enHash": "4d8a5236"
-  },
-  "pos.storeSales.empty.title": {
-    "message": "இன்னும் விற்பனைகள் இல்லை",
-    "review": "reviewed",
-    "enHash": "f2a3f161"
-  },
-  "pos.storeSales.empty.body": {
-    "message": "இந்தக் கடையில் நடந்த விற்பனைகள் சர்வரைச் சென்றடைந்ததும் இங்கே தோன்றும்.",
-    "review": "reviewed",
-    "enHash": "d6d582c5"
-  },
   "pos.storeSales.offlineSale": {
     "message": "ஆஃப்லைனில் விற்கப்பட்டது",
     "review": "reviewed",
@@ -988,5 +933,10 @@
     "message": "கோடைச் சரிபார்க்க முடியவில்லை.",
     "review": "reviewed",
     "enHash": "15c74c7c"
+  },
+  "pos.viewSales": {
+    "message": "விற்பனையைப் பார்",
+    "review": "reviewed",
+    "enHash": "c1ce99e8"
   }
 }

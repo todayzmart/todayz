@@ -993,5 +993,395 @@
     "message": "இந்த ஆர்டரை ஏற்கும் நேரம் முடிந்துவிட்டது.",
     "review": "reviewed",
     "enHash": "2ae054b1"
+  },
+  "orders.view.label": {
+    "message": "ஆர்டர் காட்சி",
+    "review": "reviewed",
+    "enHash": "94ddb2f9"
+  },
+  "orders.view.online": {
+    "message": "ஆன்லைன் ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "orders.view.counter": {
+    "message": "கவுண்டர் விற்பனை",
+    "review": "reviewed",
+    "enHash": "7d7bfe6d"
+  },
+  "orders.sales.filters": {
+    "message": "வடிகட்டிகள்",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "orders.sales.range.label": {
+    "message": "தேதிகள்",
+    "review": "reviewed",
+    "enHash": "842b7b5d"
+  },
+  "orders.sales.range.today": {
+    "message": "இன்று",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "orders.sales.range.yesterday": {
+    "message": "நேற்று",
+    "review": "reviewed",
+    "enHash": "da24830f"
+  },
+  "orders.sales.range.7d": {
+    "message": "கடந்த 7 நாட்கள்",
+    "review": "reviewed",
+    "enHash": "df833fe8"
+  },
+  "orders.sales.range.30d": {
+    "message": "கடந்த 30 நாட்கள்",
+    "review": "reviewed",
+    "enHash": "6b329852"
+  },
+  "orders.sales.range.custom": {
+    "message": "உங்கள் தேதிகள்",
+    "review": "reviewed",
+    "enHash": "081ae3fd"
+  },
+  "orders.sales.from": {
+    "message": "முதல்",
+    "review": "reviewed",
+    "enHash": "3f66052a"
+  },
+  "orders.sales.to": {
+    "message": "வரை",
+    "review": "reviewed",
+    "enHash": "ae79ea1e"
+  },
+  "orders.sales.filter.payment": {
+    "message": "கட்டணம்",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.filter.paymentAll": {
+    "message": "எல்லா கட்டணங்களும்",
+    "review": "reviewed",
+    "enHash": "e314eea6"
+  },
+  "orders.sales.filter.status": {
+    "message": "நிலை",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.filter.statusAll": {
+    "message": "எல்லா நிலைகளும்",
+    "review": "reviewed",
+    "enHash": "6405179d"
+  },
+  "orders.sales.status.completed": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "orders.sales.status.reversed": {
+    "message": "ரத்து செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.filter.link": {
+    "message": "வாடிக்கையாளர் இணைப்பு",
+    "review": "reviewed",
+    "enHash": "795be7be"
+  },
+  "orders.sales.filter.linkAll": {
+    "message": "எல்லா இணைப்புகளும்",
+    "review": "reviewed",
+    "enHash": "9d44af32"
+  },
+  "orders.sales.link.linked": {
+    "message": "இணைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "a089f600"
+  },
+  "orders.sales.link.pending": {
+    "message": "இணைப்பு நிலுவையில்",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "orders.sales.link.failed": {
+    "message": "இணைப்பு தோல்வி",
+    "review": "reviewed",
+    "enHash": "9bb72fbe"
+  },
+  "orders.sales.link.none": {
+    "message": "வாடிக்கையாளர் இல்லை",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "orders.sales.filter.cashier": {
+    "message": "காசாளர்",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.filter.cashierAll": {
+    "message": "எல்லா காசாளர்களும்",
+    "review": "reviewed",
+    "enHash": "1c9f2408"
+  },
+  "orders.sales.filter.offline": {
+    "message": "ஆஃப்லைனில் பில் செய்தவை",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "orders.sales.filter.clear": {
+    "message": "வடிகட்டிகளை அழி",
+    "review": "reviewed",
+    "enHash": "41222671"
+  },
+  "orders.sales.export": {
+    "message": "CSV பதிவிறக்கு",
+    "review": "reviewed",
+    "enHash": "5755f9ac"
+  },
+  "orders.sales.exportFailed": {
+    "message": "விற்பனையைப் பதிவிறக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "53f0b994"
+  },
+  "orders.sales.formerStaff": {
+    "message": "முன்னாள் பணியாளர்",
+    "review": "reviewed",
+    "enHash": "f222bafe"
+  },
+  "orders.sales.col.time": {
+    "message": "நேரம்",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "orders.sales.col.bill": {
+    "message": "பில்",
+    "review": "reviewed",
+    "enHash": "3d734614"
+  },
+  "orders.sales.col.items": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.col.total": {
+    "message": "மொத்தம்",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.sales.col.payment": {
+    "message": "கட்டணம்",
+    "review": "reviewed",
+    "enHash": "b41a92be"
+  },
+  "orders.sales.col.credits": {
+    "message": "கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "orders.sales.col.link": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.sales.col.status": {
+    "message": "நிலை",
+    "review": "reviewed",
+    "enHash": "bae7d5be"
+  },
+  "orders.sales.col.cashier": {
+    "message": "காசாளர்",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "orders.sales.open": {
+    "message": "பில் #{id} ஐத் திற",
+    "review": "reviewed",
+    "enHash": "57fb67e6"
+  },
+  "orders.sales.items": {
+    "message": "{lines, plural, one {# வரி} other {# வரிகள்}} · {units, plural, one {# அலகு} other {# அலகுகள்}}",
+    "review": "reviewed",
+    "enHash": "7ff53438"
+  },
+  "orders.sales.loading": {
+    "message": "விற்பனை ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "orders.sales.empty.title": {
+    "message": "கவுண்டர் விற்பனை இல்லை",
+    "review": "reviewed",
+    "enHash": "53ab424c"
+  },
+  "orders.sales.empty.body": {
+    "message": "இந்தத் தேதிகளுக்கும் வடிகட்டிகளுக்கும் பில்கள் இல்லை.",
+    "review": "reviewed",
+    "enHash": "1b919fbc"
+  },
+  "orders.sales.more": {
+    "message": "மேலும் காட்டு",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "orders.sales.kpi.label": {
+    "message": "கவுண்டர் விற்பனை ஒரு பார்வையில்",
+    "review": "reviewed",
+    "enHash": "bfafbe61"
+  },
+  "orders.sales.kpi.sales": {
+    "message": "விற்பனை",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "orders.sales.kpi.bills": {
+    "message": "{count, plural, one {# பில்} other {# பில்கள்}}",
+    "review": "reviewed",
+    "enHash": "3055d489"
+  },
+  "orders.sales.kpi.average": {
+    "message": "சராசரி பில்",
+    "review": "reviewed",
+    "enHash": "0b56c06e"
+  },
+  "orders.sales.kpi.reversed": {
+    "message": "ரத்து",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "orders.sales.kpi.credits": {
+    "message": "பயன்படுத்திய கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.sales.kpi.cashback": {
+    "message": "{count} கேஷ்பேக் வழங்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "f4cca1d0"
+  },
+  "orders.sales.kpi.failed": {
+    "message": "மொத்தங்களை ஏற்ற முடியவில்லை. கீழே உள்ள பட்டியல் சரியானது.",
+    "review": "reviewed",
+    "enHash": "e3bfb1b5"
+  },
+  "orders.sales.byPayment": {
+    "message": "கட்டண வகைப்படி",
+    "review": "reviewed",
+    "enHash": "928e8c77"
+  },
+  "orders.sales.outbox.title": {
+    "message": "இன்னும் ஒத்திசைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "f8c91683"
+  },
+  "orders.sales.outbox.body": {
+    "message": "இந்தச் சாதனத்தின் விற்பனைகள் இன்னும் TodayZ-ஐ அடையவில்லை. இணையம் வந்ததும் தானாக அனுப்பப்படும்.",
+    "review": "reviewed",
+    "enHash": "fb1752fc"
+  },
+  "orders.sales.detail.title": {
+    "message": "பில் #{id}",
+    "review": "reviewed",
+    "enHash": "f0f0e06c"
+  },
+  "orders.sales.detail.notFound": {
+    "message": "இந்த பில் இந்தக் கடையுடையது அல்ல.",
+    "review": "reviewed",
+    "enHash": "32707348"
+  },
+  "orders.sales.detail.error": {
+    "message": "இந்த பில்லை ஏற்ற முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "580d1e48"
+  },
+  "orders.sales.detail.reversal": {
+    "message": "ரத்து விவரம்",
+    "review": "reviewed",
+    "enHash": "9bcbe9f0"
+  },
+  "orders.sales.detail.reason": {
+    "message": "காரணம்",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sales.detail.by": {
+    "message": "யார்",
+    "review": "reviewed",
+    "enHash": "cfadbd7a"
+  },
+  "orders.sales.detail.when": {
+    "message": "எப்போது",
+    "review": "reviewed",
+    "enHash": "769bb19e"
+  },
+  "orders.sales.detail.items": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.sales.detail.qty": {
+    "message": "{qty} × {price}",
+    "review": "reviewed",
+    "enHash": "696fb1ba"
+  },
+  "orders.sales.detail.lineDiscount": {
+    "message": "{amount} தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "d13b0949"
+  },
+  "orders.sales.detail.billDiscount": {
+    "message": "பில் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "orders.sales.detail.cashback": {
+    "message": "கேஷ்பேக் கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "32fd8a98"
+  },
+  "orders.sales.detail.device": {
+    "message": "சாதனம்",
+    "review": "reviewed",
+    "enHash": "a5a74a6d"
+  },
+  "orders.sales.detail.soldAt": {
+    "message": "விற்ற நேரம்",
+    "review": "reviewed",
+    "enHash": "e6560d9c"
+  },
+  "orders.sales.detail.receivedAt": {
+    "message": "பெற்ற நேரம்",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "orders.sales.detail.billId": {
+    "message": "பில் ஐடி",
+    "review": "reviewed",
+    "enHash": "4da70336"
+  },
+  "orders.sales.detail.copy": {
+    "message": "பில் ஐடியை நகலெடு",
+    "review": "reviewed",
+    "enHash": "4ef6f7b6"
+  },
+  "orders.sales.detail.copied": {
+    "message": "பில் ஐடி நகலெடுக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "005ea6f2"
+  },
+  "orders.sales.detail.receiptElsewhere": {
+    "message": "இந்த பில் போட்ட சாதனத்தில் மட்டுமே ரசீது திறக்கும்.",
+    "review": "reviewed",
+    "enHash": "48dfe3fa"
+  },
+  "orders.sales.detail.reversed": {
+    "message": "விற்பனை ரத்து செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "orders.sales.detail.reversibleUntil": {
+    "message": "{time} வரை ரத்து செய்யலாம்",
+    "review": "reviewed",
+    "enHash": "9e30072b"
   }
 }

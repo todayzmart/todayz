@@ -26,3 +26,11 @@ pos.sales kind=business step-up=false
 pos.sales owner allow
 pos.sales manager allow
 pos.sales cashier allow
+pos.sales_summary kind=business step-up=false
+pos.sales_summary owner allow
+pos.sales_summary manager allow
+pos.sales_summary cashier -
+pos.sales_export kind=business step-up=false
+pos.sales_export owner allow
+pos.sales_export manager allow
+pos.sales_export cashier -

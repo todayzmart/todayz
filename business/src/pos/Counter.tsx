@@ -3,6 +3,7 @@
 import { newUlid, useHoldUpdates } from '@todayz/auth';
 import { formatMoney } from '@todayz/i18n';
 import { Banner, Button, CartBar, EmptyState, PosCart, SearchField, Sheet, Skeleton } from '@todayz/ui';
+import { Link } from '@tanstack/react-router';
 import { History, ListOrdered, PackagePlus, ScanLine, Trash2, UserRoundPlus, X } from 'lucide-react';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -22,14 +23,13 @@ import { needsAttention } from './history';
 import { LinkPanel } from './LinkPanel';
 import { amountDue, creditsAllowed, creditsToPaise, lineTotal } from './money';
 import { SalesSheet } from './SalesSheet';
-import { StoreSalesSheet } from './StoreSalesSheet';
 import type { CatalogueItem, PaymentMethod, SaleLink } from './types';
 import styles from './pos.module.css';
 
 const money = (p: number) => formatMoney(p, 'product');
 const signed = (p: number) => `${p < 0 ? '−' : '+'}${money(Math.abs(p))}`;
 const PAYMENTS: readonly PaymentMethod[] = ['cash', 'upi', 'card'];
-type Sub = 'link' | 'discount' | 'sales' | 'storeSales' | 'camera' | 'add';
+type Sub = 'link' | 'discount' | 'sales' | 'camera' | 'add';
 
 function isEditable(el: Element | null): boolean {
   if (!(el instanceof HTMLElement)) return false;
@@ -298,9 +298,11 @@ export function Counter() {
           <Button variant="soft" icon={History} onClick={() => openSub('sales')}>
             {attention > 0 ? intl.formatMessage({ id: 'pos.sales.openAttention' }, { count: attention }) : intl.formatMessage({ id: 'pos.sales.open' })}
           </Button>
-          <Button variant="soft" icon={ListOrdered} onClick={() => openSub('storeSales')}>
-            {intl.formatMessage({ id: 'pos.storeSales.open' })}
-          </Button>
+          {/* The store's sales from every device live on Orders → Counter sales (D-268). */}
+          <Link to="/orders" search={{ view: 'sales' }} className="tz-btn tz-btn-soft">
+            <ListOrdered className="tz-ico tz-ico-sm" aria-hidden="true" />
+            {intl.formatMessage({ id: 'pos.viewSales' })}
+          </Link>
         </div>
       </div>
 
@@ -490,7 +492,6 @@ export function Counter() {
           setReceiptId(rec.sale.clientId);
         }}
       />
-      <StoreSalesSheet open={sub === 'storeSales'} onClose={closeSub} />
       <ReceiptSheet open={receiptRec !== null} onClose={() => setReceiptId(null)} shopName={store.name} record={receiptRec} />
     </div>
   );
