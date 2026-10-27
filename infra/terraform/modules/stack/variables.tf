@@ -31,6 +31,12 @@ variable "nat_gateway_count" {
   default = 1
 }
 
+variable "vpc_interface_endpoints" {
+  type        = set(string)
+  default     = []
+  description = "Interface endpoints to create; empty sends ECR and Secrets Manager traffic through the NAT gateway (D-263)."
+}
+
 # ---- Compute -------------------------------------------------------------------------
 
 variable "api_instance_type" {

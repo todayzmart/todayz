@@ -1,5 +1,6 @@
 # VPC with 2 AZs: public subnets for the ALB (and the NAT gateway), private subnets for
-# Beanstalk and RDS, VPC endpoints for S3, ECR and Secrets Manager (09 §3.5).
+# Beanstalk and RDS, and the free S3 gateway endpoint (09 §3.5). Interface endpoints are
+# off by default (D-263): ECR and Secrets Manager traffic goes through the NAT gateway.
 
 terraform {
   required_version = ">= 1.9"
@@ -35,6 +36,12 @@ variable "nat_gateway_count" {
     condition     = var.nat_gateway_count >= 1 && var.nat_gateway_count <= var.az_count
     error_message = "nat_gateway_count must be between 1 and az_count."
   }
+}
+
+variable "interface_endpoints" {
+  type        = set(string)
+  default     = []
+  description = "Interface endpoint services, for example [\"ecr.api\", \"ecr.dkr\", \"secretsmanager\"]. Empty: that traffic goes through the NAT gateway (D-263)."
 }
 
 variable "flow_log_retention_days" {
@@ -152,10 +159,12 @@ resource "aws_vpc_endpoint" "s3" {
 }
 
 resource "aws_security_group" "endpoints" {
+  count       = length(var.interface_endpoints) > 0 ? 1 : 0
   name_prefix = "${var.name}-endpoints-"
   description = "Interface endpoints: HTTPS from inside the VPC"
   vpc_id      = aws_vpc.this.id
   tags        = { Name = "${var.name}-endpoints" }
+  #checkov:skip=CKV2_AWS_5:Created only with interface_endpoints set, and then attached to them; checkov cannot follow the empty default (D-263).
 
   lifecycle {
     create_before_destroy = true
@@ -163,7 +172,8 @@ resource "aws_security_group" "endpoints" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "endpoints_https" {
-  security_group_id = aws_security_group.endpoints.id
+  count             = length(var.interface_endpoints) > 0 ? 1 : 0
+  security_group_id = aws_security_group.endpoints[0].id
   description       = "HTTPS from the VPC"
   cidr_ipv4         = var.cidr_block
   ip_protocol       = "tcp"
@@ -172,12 +182,12 @@ resource "aws_vpc_security_group_ingress_rule" "endpoints_https" {
 }
 
 resource "aws_vpc_endpoint" "interface" {
-  for_each            = toset(["ecr.api", "ecr.dkr", "secretsmanager"])
+  for_each            = var.interface_endpoints
   vpc_id              = aws_vpc.this.id
   service_name        = "com.amazonaws.${data.aws_region.current.region}.${each.key}"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = aws_subnet.private[*].id
-  security_group_ids  = [aws_security_group.endpoints.id]
+  security_group_ids  = [aws_security_group.endpoints[0].id]
   private_dns_enabled = true
   tags                = { Name = "${var.name}-${each.key}" }
 }

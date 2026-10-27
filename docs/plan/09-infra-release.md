@@ -124,7 +124,7 @@ Target group health check (`/readyz`): interval 5 s, timeout 4 s, unhealthy thre
 ### 3.5 Network, staging and Redis
 
 - Region `ap-south-1` (Mumbai) for data residency and latency.
-- Network: VPC with 2 AZs, public subnets for the ALB only, private subnets for Beanstalk and RDS, NAT gateway (one at launch to save cost), VPC endpoints for S3/ECR/Secrets Manager.
+- Network: VPC with 2 AZs, public subnets for the ALB only, private subnets for Beanstalk and RDS, NAT gateway (one at launch to save cost), and the free S3 gateway endpoint. No interface endpoints for ECR or Secrets Manager: that traffic goes through the NAT (D-263).
 - **Staging:** the same shape, smaller and single-AZ: api 1 × t4g.micro, worker 1 × t4g.micro, RDS db.t4g.small. It can be stopped off-hours on a schedule.
 - **Redis:** none in v1 (02 §2.3). Add ElastiCache Serverless (Valkey) only on a measured trigger: rate-limit or cache queries take more than 20% of database load in Database Insights, or `LISTEN/NOTIFY` fan-out limits SSE.
 
@@ -165,10 +165,10 @@ Bottom-up from ap-south-1 list prices; the per-resource table is in `docs/qa/dep
 | RDS db.t4g.medium Single-AZ, 100 GB gp3, backups, monitoring | 72 |
 | 3 × t4g.small (api 2, worker 1) with root volumes | 40 |
 | ALB | 24 |
-| NAT gateway | 44 |
-| Interface endpoints (ECR api/dkr, Secrets Manager, 2 AZs) | 48 |
+| NAT gateway (including the extra ECR and Secrets Manager data, D-263) | 47 |
+| Interface endpoints | 0: dropped, traffic goes through the NAT (D-263) |
 | Public IPv4, Secrets Manager (23), CloudWatch, DR copy, ECR/S3 | 49 |
-| **Prod total** | **about $270–300 a month before GST (≈ ₹27–30k with 18% GST on an AISPL account)** |
+| **Prod total** | **about $225–255 a month before GST (≈ ₹23–26k with 18% GST on an AISPL account)** |
 | **Staging** | not deployed (D-210) |
 
 Cloudflare free or pro plan, Grafana Cloud and Sentry free tiers at first.

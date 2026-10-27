@@ -181,15 +181,14 @@ Estimated from the ap-south-1 list prices at 730 hours a month, in USD, before G
 | RDS storage gp3 100 GB, backups beyond free (PITR 14 d), Enhanced Monitoring logs | | 19 |
 | EC2 3 × t4g.small (api 2, worker 1) and their gp3 root volumes | about $0.0168/h each | 40 |
 | Application Load Balancer | hours and LCUs | 24 |
-| NAT gateway (one) | hours and about 50 GB processed | 44 |
-| Interface endpoints: ecr.api, ecr.dkr, secretsmanager × 2 AZs | 6 ENIs at about $0.011/h | 48 |
+| NAT gateway (one) | hours and about 50 GB processed, plus ECR and Secrets Manager traffic (no interface endpoints, D-263) | 47 |
 | Public IPv4 (NAT EIP, 2 ALB addresses) | $0.005/h each | 11 |
 | Secrets Manager | 23 secrets (22 app plus the RDS master) | 9 |
 | CloudWatch | Beanstalk, flow, RDS and ops logs about 20 GB; 11 alarms; one custom metric | 18 |
 | DR: AWS Backup weekly snapshot copy to ap-southeast-1 | storage and cross-region transfer | 6 |
 | ECR, S3 (ALB logs, app versions, state), ECS ops tasks, data out | | 5 |
-| **Total** | | **about 270–300** |
-| With 18% GST (AISPL account) | | about 320–355 (≈ ₹27–30k) |
+| **Total** | | **about 225–255** |
+| With 18% GST (AISPL account) | | about 265–300 (≈ ₹23–26k) |
 
 Usage-billed and not in the total:
 - SMS through End User Messaging, per message;
@@ -197,7 +196,7 @@ Usage-billed and not in the total:
 - Anthropic and Sarvam;
 - Cloudflare (Free or Pro), Grafana Cloud and Sentry (free tiers at first).
 
-The brief expected $220–250. The gap is mostly the interface endpoints ($48), which 09 §3.5 chose. Dropping them saves about $45 net, but whether to do so is the founder's call (D-258). Staging is not deployed (D-210).
+The brief expected $220–250. The interface endpoints ($48) were dropped on the founder's word (D-263), which brings the estimate into that range. Staging is not deployed (D-210).
 
 ## 7. Known gaps (not blocking the first deploy)
 

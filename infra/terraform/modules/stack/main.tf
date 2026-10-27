@@ -23,10 +23,11 @@ locals {
 }
 
 module "network" {
-  source            = "../network"
-  name              = local.name
-  cidr_block        = var.vpc_cidr_block
-  nat_gateway_count = var.nat_gateway_count
+  source              = "../network"
+  name                = local.name
+  cidr_block          = var.vpc_cidr_block
+  nat_gateway_count   = var.nat_gateway_count
+  interface_endpoints = var.vpc_interface_endpoints
 }
 
 module "secrets" {
