@@ -132,8 +132,9 @@ d18=(JWT_SIGNING_KEYS JWT_CURRENT_KID ORDER_CODE_ENC_KEY ORDER_CODE_HMAC_KEY BIL
 found=""
 for k in "${d18[@]}"; do grep -qE "^[[:space:]]*(export[[:space:]]+)?$k=" "$TZ_LOCAL_ENV" && found+="$k "; done
 [[ -z "$found" ]] || bad "local.env must not set D-18 app keys: $found"
-# Provider secrets belong in .env.local only (R2_* here are MinIO's local stand-ins).
-risky="$(names "$TZ_LOCAL_ENV" | grep -E '(_API_KEY|_AUTH_KEY|_TOKEN|_DSN|_PRIVATE_KEY|SECRET_KEY$)' | grep -vx 'R2_SECRET_ACCESS_KEY' || true)"
+# Provider secrets belong in .env.local only (R2_* here are MinIO's local stand-ins;
+# FIREBASE_WEB_API_KEY is a public browser key, here a placeholder for the mock, D-275).
+risky="$(names "$TZ_LOCAL_ENV" | grep -E '(_API_KEY|_AUTH_KEY|_TOKEN|_DSN|_PRIVATE_KEY|SECRET_KEY$)' | grep -vxE 'R2_SECRET_ACCESS_KEY|FIREBASE_WEB_API_KEY' || true)"
 [[ -z "$risky" ]] || bad "local.env must not set provider secrets: $(echo "$risky" | tr '\n' ' ')"
 if grep -qE '^[A-Z][A-Z0-9_]*=.*[[:space:]]#' "$TZ_LOCAL_ENV"; then bad "local.env has an inline comment (envtool does not strip them)"; fi
 done_ok "local.env: names in .env.example, no D-18 app key, no provider secrets"

@@ -19,6 +19,8 @@ export function usePhoneOtpLabels(): PhoneOtpLabels {
       changeNumber: intl.formatMessage({ id: 'auth.code.change' }),
       invalidPhone: intl.formatMessage({ id: 'auth.phone.invalid' }),
       sentTo: (phone: string) => intl.formatMessage({ id: 'auth.code.sentTo' }, { phone }),
+      recaptchaNotice: intl.formatMessage({ id: 'auth.firebase.recaptchaNotice' }),
+      languageCode: intl.locale,
       errors: {
         wrongCode: intl.formatMessage({ id: 'auth.error.wrongCode' }),
         expired: intl.formatMessage({ id: 'auth.error.expired' }),
@@ -29,6 +31,7 @@ export function usePhoneOtpLabels(): PhoneOtpLabels {
         network: intl.formatMessage({ id: 'auth.error.network' }),
         generic: intl.formatMessage({ id: 'auth.error.generic' }),
         captcha: intl.formatMessage({ id: 'auth.error.captcha' }),
+        methodChanged: intl.formatMessage({ id: 'auth.error.methodChanged' }),
       },
     }),
     [intl],

@@ -78,6 +78,7 @@ A job kind's runbook is declared with the kind (`Runbook:` in `backend/internal/
 |---|---|
 | [AWS: everything the founder does, in order](aws-founder-steps.md) | Account unblock, region, SMS and DLT |
 | [Cloud access: what the founder sets up](cloud-access.md) | Who holds which cloud credentials |
+| [Firebase phone sign-in](firebase-phone-auth.md) | Create the Firebase project, switch the sign-in code to Firebase (D-275) and back to AWS SMS |
 
 ## Ops pages
 

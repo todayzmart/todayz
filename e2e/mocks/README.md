@@ -3,7 +3,8 @@
 One Go service (stdlib only) that stands in for every outside provider the
 backend calls in local and test: AWS End User Messaging SMS (and the legacy
 MSG91 SMS routes), WhatsApp (MSG91 and Gupshup), Web
-Push, Cloudflare Turnstile, Sarvam speech-to-text and the Anthropic Messages API.
+Push, Cloudflare Turnstile, Firebase Auth phone sign-in (D-275), Sarvam
+speech-to-text and the Anthropic Messages API.
 It answers in each provider's own request and response shapes, keeps what it
 received in memory, and shows it in a small web UI and a JSON API, so tests can
 read the OTP that was "sent" or the push that was "delivered".
@@ -37,6 +38,7 @@ UI: http://127.0.0.1:4010/ (https://mocks.todayz.localhost once Caddy routes it)
 | `ANTHROPIC_API_KEY` | unset | Used only when `MOCK_LLM=0`. Never logged, never stored, never echoed. |
 | `MOCK_LLM_REPLAY_RECORDED` | unset | `1` also serves recordings from `fixtures/llm/_recorded/`. Off by default, so a recording never changes fixture-mode results. |
 | `MOCK_TURNSTILE_HOSTNAME` | `localhost` | `hostname` in a passing siteverify reply (set it to the app's host if the backend checks it). |
+| `FIREBASE_PROJECT_ID` | `todayz-local` | The Firebase project the mock signs ID tokens for (`aud`, and `iss` `https://securetoken.google.com/<id>`). Must match the API's `FIREBASE_PROJECT_ID`. |
 
 The record-mode upstream is fixed at `https://api.anthropic.com`; there is no
 variable to point it elsewhere (tests set `Config.AnthropicUpstream` in code).
@@ -68,6 +70,8 @@ read captured OTPs. Caddy keeps the original Host when it proxies
 | `WHATSAPP_API_URL` | `http://127.0.0.1:4010/whatsapp` | MSG91 WhatsApp: `https://api.msg91.com` (not `control.msg91.com`, which is SMS/OTP); Gupshup: `https://api.gupshup.io` |
 | `PUSH_API_URL` | `http://127.0.0.1:4010/push` | the subscription's own endpoint |
 | `TURNSTILE_API_URL` | `http://127.0.0.1:4010/turnstile` | `https://challenges.cloudflare.com` |
+| `FIREBASE_JWKS_API_URL` | `http://127.0.0.1:4010/firebase/jwks` | unset: Google's `securetoken@system.gserviceaccount.com` key set. Refused outside local and test |
+| `FIREBASE_AUTH_EMULATOR_URL` (read by the apps through `GET /v1/auth/config`) | `https://mocks.todayz.localhost` | unset: the SDK talks to Google. Refused outside local and test |
 | `STT_API_URL` | `http://127.0.0.1:4010/sarvam` | `https://api.sarvam.ai` |
 | `LLM_API_URL` | `http://127.0.0.1:4010/anthropic` | `https://api.anthropic.com` |
 
@@ -202,6 +206,29 @@ https://developers.cloudflare.com/turnstile/troubleshooting/testing/
   `XXXX.DUMMY.TOKEN.XXXX`, which therefore passes.
 - The mock records only the first 24 characters of the token and whether a
   secret was present (or which test secret it was), never the secret's value.
+
+### Firebase Auth phone sign-in (`/identitytoolkit.googleapis.com`, D-275)
+
+The Firebase JS SDK in emulator mode (`connectAuthEmulator`, pointed at
+`FIREBASE_AUTH_EMULATOR_URL=https://mocks.todayz.localhost`) calls
+`<emulator>/identitytoolkit.googleapis.com/...?key=<web api key>`. The mock
+answers the four calls phone sign-in needs, in Identity Toolkit's shapes. Every
+route needs a non-empty `?key=` (else 400 "API key not valid"), and answers
+browsers only from local origins (localhost, 127.0.0.1, [::1],
+`*.todayz.localhost`); any other `Origin` gets 403. `OPTIONS` answers the CORS
+preflight with 204.
+
+| Route | What |
+|---|---|
+| `GET /identitytoolkit.googleapis.com/v2/recaptchaConfig` | An empty reCAPTCHA config, so the SDK uses its emulator flow (no Google script is loaded). |
+| `POST /identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode` | `phoneNumber` (E.164) plus `recaptchaToken` or `captchaResponse` (else `MISSING_RECAPTCHA_TOKEN`). Makes a random 6-digit code good for 5 minutes, records it as an SMS (sender `firebase`, API `firebase_send_verification_code`) so the UI and `/_mock/sms/latest-otp` show it, and returns `sessionInfo`. A number that is not E.164 with a country code (an Indian one has 12 digits) is `INVALID_PHONE_NUMBER`. |
+| `POST /identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber` | `sessionInfo` and `code`. `MISSING_CODE`, `INVALID_SESSION_INFO`, `SESSION_EXPIRED`, or `INVALID_CODE` (the session stays, so the person can try again). The right code ends the session and returns `idToken` (RS256, 1 hour, `firebase.sign_in_provider: phone`, `auth_time` now), `refreshToken`, `expiresIn`, `localId`, `isNewUser` and `phoneNumber`. |
+| `POST /identitytoolkit.googleapis.com/v1/accounts:lookup` | The user for an `idToken` the mock signed. |
+| `GET /firebase/jwks` | The mock's public key as a JWK set (`Cache-Control: max-age=3600`). The API reads it through `FIREBASE_JWKS_API_URL=http://127.0.0.1:4010/firebase/jwks`. |
+
+The signing key is made fresh at start, so tokens from an earlier run stop
+verifying after a restart. The mock keeps at most 1000 open sessions. Logs carry
+the route and status only, never the phone, the code or a token.
 
 ### Sarvam speech-to-text (`/sarvam`)
 
@@ -391,7 +418,7 @@ main.go                     env, fixture source, listen, graceful stop
 fixtures/                   llm/<feature>/*.json, llm/_recorded/, stt/, sms/, whatsapp/ (embedded)
 internal/capture/           generic ring buffer + per-kind records
 internal/fixtures/          fixture loading, validation, LLM matching
-internal/server/            one file per provider, api.go (/_mock), server.go (routing, logging)
+internal/server/            one file per provider (firebase.go for D-275), api.go (/_mock), server.go (routing, logging)
 internal/ui/                embedded UI (index.html, app.js, mocks.css, generated tz.css)
 internal/ui/cssgen, cmd/gencss   tz.css generator
 ```

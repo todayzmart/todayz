@@ -154,6 +154,16 @@
     "review": "reviewed",
     "enHash": "bc612d87"
   },
+  "auth.error.methodChanged": {
+    "message": "సైన్-ఇన్ కోడ్‌లను పంపే విధానాన్ని మేము మార్చాము. దయచేసి కోడ్‌ను మళ్ళీ పంపండి.",
+    "review": "reviewed",
+    "enHash": "7348da0e"
+  },
+  "auth.firebase.recaptchaNotice": {
+    "message": "ఈ సైన్-ఇన్‌ను Google reCAPTCHA రక్షిస్తుంది. Google గోప్యతా విధానం మరియు సేవా నిబంధనలు వర్తిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "a6c11ccb"
+  },
   "auth.signOut": {
     "message": "సైన్ అవుట్",
     "review": "reviewed",

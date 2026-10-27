@@ -2,7 +2,7 @@
 
 How TodayZ is built, released and rolled back, and what is live today.
 
-> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 3f7ebd09 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## Environments
 
@@ -63,6 +63,8 @@ All in [.github/workflows](../../.github/workflows/). Every action is pinned by 
 | `state-bucket.sh` | (one run) | Creates the Terraform state bucket, versioned, with a native lock file (no DynamoDB, D-255) |
 
 Production builds need real public values: `VITE_API_URL` and `VITE_TURNSTILE_SITE_KEY` for the apps, `PUBLIC_API_URL` and `PUBLIC_TURNSTILE_SITE_KEY` for the site.
+
+Firebase phone sign-in (D-275) needs no build value: the apps read the provider and the public Firebase web config from `GET /v1/auth/config`. The API gets `OTP_PROVIDER` and `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_APP_ID` through the prod `extra_properties` map; with `OTP_PROVIDER=firebase` it refuses to start while one of the four is missing, and it refuses `FIREBASE_JWKS_API_URL` and `FIREBASE_AUTH_EMULATOR_URL` deployed. The Pages CSP (report-only) allows Google's reCAPTCHA and Identity Toolkit hosts. Setup, switching and the switch back: [firebase-phone-auth runbook](../runbooks/firebase-phone-auth.md).
 
 ## Terraform
 

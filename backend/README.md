@@ -2,7 +2,7 @@
 
 The TodayZ Go API and background worker: one module, one binary called `todayz`.
 
-> As built on main at d22219d7 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 3f7ebd09 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Stack: Go, chi (router), pgx v5 and sqlc (database), goose (migrations), River (jobs, stored in Postgres), PostGIS (maps and search), oapi-codegen and kin-openapi (contract). The folder's rules for contributors are in [CLAUDE.md](CLAUDE.md). The system as a whole is in [docs/guide/architecture.md](../docs/guide/architecture.md).
 
@@ -37,6 +37,9 @@ Names only. Non-secret local defaults are committed in [infra/local/local.env](.
 | `PII_ENC_KEY` | Seals personal data and stored idempotent responses |
 | `ORDER_CODE_ENC_KEY`, `ORDER_CODE_HMAC_KEY` | Pickup code sealing and matching |
 | `SMS_API_URL`, `WHATSAPP_API_URL`, `PUSH_API_URL`, `TURNSTILE_API_URL`, `STT_API_URL`, `LLM_API_URL` | Provider base URLs; locally they point to the mocks server |
+| `OTP_PROVIDER` | `sms` (default) or `firebase`: who sends the sign-in code (D-275) |
+| `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_APP_ID` | The public Firebase web config; required deployed when `OTP_PROVIDER=firebase` |
+| `FIREBASE_JWKS_API_URL`, `FIREBASE_AUTH_EMULATOR_URL` | Local and test only: the mocks server's key set and Identity Toolkit stand-in |
 | `R2_ENDPOINT`, `R2_BUCKET_IMAGES`, `R2_BUCKET_PRIVATE` | Object storage (R2 deployed, MinIO local) |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | Telemetry export |
 | `SHUTDOWN_PRESTOP`, `SHUTDOWN_DRAIN` | Drain timings |

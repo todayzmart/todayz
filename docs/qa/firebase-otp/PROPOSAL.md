@@ -4,7 +4,7 @@ The founder asked: "can we integrate firebase auth in this just for SMS OTP".
 
 Yes, it can be done. Firebase would only send the code and check it. TodayZ keeps its own users, sessions, refresh cookies, roles, audit and limits. Once Firebase has checked the phone, the browser gets a Firebase ID token, the API checks that token, and the API signs the person in with the usual TodayZ session. Nothing else in auth changes.
 
-- Status: proposal only. Nothing is built, and no Firebase or Google Cloud project exists. The lead sets up the cloud side after the founder says yes.
+- Status: built on this branch after the founder's answers (D-275). See [REPORT.md](REPORT.md) for what was built and checked. No Firebase or Google Cloud project exists yet; [the runbook](../../runbooks/firebase-phone-auth.md) is the setup. This file is the proposal as it was, kept for its reasoning.
 - Branch: `claude/firebase-sms-otp-761592` (local, not pushed).
 - Today (D-212, D-213, D-264): the API sends a 6-digit code through AWS End User Messaging SMS with a DLT template, stores its HMAC in `otp_requests` and checks it on `POST /v1/auth/otp/verify`. Turnstile guards the send, and the limits come from 01 §2.
 

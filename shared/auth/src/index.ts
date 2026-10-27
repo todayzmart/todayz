@@ -30,3 +30,11 @@ export {
   type PhoneOtpLabels,
   type SignedIn,
 } from './phone-otp';
+export {
+  FirebasePhoneError,
+  firebaseErrorKind,
+  loadFirebasePhone,
+  type FirebaseConfirmation,
+  type FirebasePhone,
+  type FirebasePhoneErrorKind,
+} from './firebase';

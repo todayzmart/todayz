@@ -117,7 +117,15 @@
   },
   "auth.error.captcha": {
     "defaultMessage": "We couldn't check that you are a person. Reload the page and try again.",
-    "description": "The Turnstile check failed to load or run"
+    "description": "The bot check (Turnstile, or reCAPTCHA when Firebase sends the code) failed to load or run"
+  },
+  "auth.error.methodChanged": {
+    "defaultMessage": "We changed how sign-in codes are sent. Please send the code again.",
+    "description": "D-275: the sign-in code service (SMS or Firebase) changed while the page was open"
+  },
+  "auth.firebase.recaptchaNotice": {
+    "defaultMessage": "This sign-in is protected by Google reCAPTCHA. Google's Privacy Policy and Terms of Service apply.",
+    "description": "Small print under the send-code button when Firebase sends the code (D-275); reCAPTCHA's terms require it"
   },
   "auth.welcome.title": {
     "defaultMessage": "Welcome to TodayZ",

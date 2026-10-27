@@ -112,6 +112,9 @@ const NO_BEARER = new Set([
   '/v1/auth/refresh',
   '/v1/auth/logout',
   '/v1/auth/logout-all',
+  // D-275: the public sign-in config and the Firebase ID-token swap.
+  '/v1/auth/config',
+  '/v1/auth/firebase/verify',
 ]);
 
 /**

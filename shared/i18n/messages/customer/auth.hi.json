@@ -149,6 +149,16 @@
     "review": "reviewed",
     "enHash": "bc612d87"
   },
+  "auth.error.methodChanged": {
+    "message": "हमने साइन-इन कोड भेजने का तरीका बदल दिया है। कृपया कोड फिर से भेजें।",
+    "review": "machine",
+    "enHash": "7348da0e"
+  },
+  "auth.firebase.recaptchaNotice": {
+    "message": "यह साइन-इन Google reCAPTCHA से सुरक्षित है। Google की गोपनीयता नीति और सेवा की शर्तें लागू होती हैं।",
+    "review": "machine",
+    "enHash": "a6c11ccb"
+  },
   "auth.welcome.title": {
     "message": "TodayZ में आपका स्वागत है",
     "review": "reviewed",
