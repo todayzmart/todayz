@@ -38,7 +38,7 @@ function SignOut() {
 
 /**
  * Business frame in the bright skin (D-261): grey page, white cards, and from 1024px the dark green
- * sidebar (D-269, the founder's override of the white one; `rail` tokens, shell.module.css), phone
+ * sidebar (D-274, the founder's override of the white one; `rail` tokens, shell.module.css), phone
  * bottom tabs below it (BottomNav). Only one of the two is rendered visible.
  * The sidebar carries the counts (`useNavCounts`: Orders from the live New list) and, until setup
  * is complete, the shop setup card at its foot (B-03; owners and managers). Below 1024px the

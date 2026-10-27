@@ -147,7 +147,7 @@
 }
 
 /*
- * The dark green sidebar (D-269: the founder's override of the white sidebar, business app only).
+ * The dark green sidebar (D-274: the founder's override of the white sidebar, business app only).
  * Every rule is scoped `.app[data-skin] .side` so it outranks the bright skin's sidebar rules in
  * bundle.css whatever the load order. Contrast on `rail`: on-rail 12.6:1, on-rail-2 8.3:1,
  * rail-accent 8.2:1; on `rail-raised`: on-rail 9.4:1. The focus ring turns rail-accent, since the

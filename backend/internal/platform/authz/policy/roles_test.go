@@ -75,7 +75,7 @@ func TestAdminRoleMatrix(t *testing.T) {
 		only("admin.business.verify", "admin", "super_admin")
 	})
 
-	t.Run("the shop check is field_agent, admin and super_admin (D-269)", func(t *testing.T) {
+	t.Run("the shop check is field_agent, admin and super_admin (D-274)", func(t *testing.T) {
 		only("admin.shop_check.view", "field_agent", "admin", "super_admin")
 		only("admin.shop_check.decide", "field_agent", "admin", "super_admin")
 	})

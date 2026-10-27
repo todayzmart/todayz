@@ -1,4 +1,4 @@
--- W4-93 seller auto-onboarding (D-269, founder 27 Oct): a business and its
+-- W4-93 seller auto-onboarding (D-274, founder 27 Oct): a business and its
 -- complete stores go live as soon as the owner (or the field agent, with the
 -- owner's code) submits. No admin approves the business, a store, a shop
 -- photo or GST. A field agent, admin or super_admin later checks the shop:

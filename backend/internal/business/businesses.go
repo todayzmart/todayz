@@ -404,7 +404,7 @@ func incomplete(fields []string) error {
 }
 
 // goLiveStores puts the business's complete draft and waiting stores live
-// once the business is live (D-269: no admin review), each audited as
+// once the business is live (D-274: no admin review), each audited as
 // store.go_live. A store still missing a detail stays draft for the owner or
 // the field agent to finish; submitReady has already found at least one
 // complete.

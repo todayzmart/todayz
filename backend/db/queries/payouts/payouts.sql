@@ -46,7 +46,7 @@ WHERE s.business_id = @business_id
 ORDER BY s.id;
 
 -- HoldCauses reads the automatic hold causes (01 §9): a suspended
--- business, a shop not yet checked by a field agent or admin (D-269: it sells
+-- business, a shop not yet checked by a field agent or admin (D-274: it sells
 -- from sign-up, its money waits for the check), no payout destination (neither a UPI id nor a
 -- bank account), a risk flag on the business or one of its stores that is
 -- open or confirmed (01 §256: fraud that has not been cleared; D-225). Only

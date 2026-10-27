@@ -15,7 +15,7 @@ import (
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
-// The shop check (D-269, founder 27 Oct). A business and its stores go live
+// The shop check (D-274, founder 27 Oct). A business and its stores go live
 // as soon as onboarding is filled in; nobody approves it first. A field
 // agent, admin or super_admin later checks the shop from a daily queue,
 // newest first. Checked releases its payouts (the monthly close holds an

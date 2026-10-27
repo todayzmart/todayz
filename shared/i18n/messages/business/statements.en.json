@@ -129,14 +129,14 @@
   },
   "statements.status.awaitingCheck": {
     "defaultMessage": "Waiting for shop check",
-    "description": "B-10 monthly statements: payout status pill while held until our team checks the shop (D-269)"
+    "description": "B-10 monthly statements: payout status pill while held until our team checks the shop (D-274)"
   },
   "statements.payout.awaitingCheck": {
     "defaultMessage": "Payout of {amount} is on hold until our team checks your shop.",
-    "description": "B-10 monthly statements: payout held until the shop check (D-269)"
+    "description": "B-10 monthly statements: payout held until the shop check (D-274)"
   },
   "statements.awaitingCheck": {
     "defaultMessage": "Payouts start after our team checks your shop. You keep selling and earning credits meanwhile.",
-    "description": "B-10 statements note while the shop is not yet checked (D-269)"
+    "description": "B-10 statements note while the shop is not yet checked (D-274)"
   }
 }

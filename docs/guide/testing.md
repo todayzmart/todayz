@@ -72,7 +72,7 @@ Cross-app Playwright journeys in [e2e/journeys/specs](../../e2e/journeys/specs/)
 | 13 | E2E-20 | Suspended shop |
 | 14 | E2E-05 | Delivery order |
 | 15 | CR-15 | Credit adjustment needs a second finance admin |
-| 16 | E2E-08 | Field-agent onboarding: live at once, then the agent checks the shop (D-269) |
+| 16 | E2E-08 | Field-agent onboarding: live at once, then the agent checks the shop (D-274) |
 | 17 | E2E-11 | Voice stock update |
 | 18 | E2E-13 | AI shopping-list parse |
 | 19 | E2E-14 | Bill scan, waste, flash offer |

@@ -26,7 +26,7 @@ The ledger side (store_credit, `platform_payouts_cash`, the reconcile) is in
 - **Backfill.** Closing an older month after a later one exists writes the statement but leaves
   the payout alone.
 - **Holds.** A payout is held while the business is suspended, its shop is not checked yet
-  (D-269), it has no UPI or bank to pay to, or it has an open risk flag (`business_suspended` →
+  (D-274), it has no UPI or bank to pay to, or it has an open risk flag (`business_suspended` →
   `shop_unchecked` → `payout_details_missing` → `risk_flag`), or by hand
   (`manual`, with a note). The close never lifts a hold. Mark paid and export check the causes
   live, so a cause opened after the close still blocks the money.

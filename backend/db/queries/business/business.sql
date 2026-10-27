@@ -39,7 +39,7 @@ RETURNING *;
 SELECT status FROM businesses WHERE id = @id FOR SHARE;
 
 -- name: SubmitBusiness :one
--- draft or needs_info → verified at once (D-269: no admin approval; the
+-- draft or needs_info → verified at once (D-274: no admin approval; the
 -- shop check comes later and only gates payouts). verified_by stays NULL: no
 -- person verified it. The request for information is cleared.
 UPDATE businesses SET status = 'verified', submitted_at = @now::timestamptz, verified_at = @now::timestamptz,
@@ -170,19 +170,19 @@ UPDATE stores SET
                        WHEN sqlc.narg(lat)::float8 IS NULL THEN NULL
                        ELSE ST_SetSRID(ST_MakePoint(sqlc.narg(lng)::float8, sqlc.narg(lat)::float8), 4326)::geography END,
   phone_enc     = CASE WHEN @set_phone::bool THEN sqlc.narg(phone_enc)::bytea ELSE phone_enc END,
-  -- No review step: an edit never changes the store's status (D-269).
+  -- No review step: an edit never changes the store's status (D-274).
   version = version + 1
 WHERE id = @id AND business_id = @business_id AND version = @version;
 
 -- name: SubmitStore :execrows
 -- draft → pending_review, for a store of a business not submitted yet: the
--- business's submit puts it live (D-269).
+-- business's submit puts it live (D-274).
 UPDATE stores SET status = 'pending_review', version = version + 1
 WHERE id = @id AND business_id = @business_id AND status = 'draft';
 
 -- name: GoLiveStore :execrows
 -- A complete draft or waiting store of a live business goes live at once
--- (D-269: no admin review).
+-- (D-274: no admin review).
 UPDATE stores SET status = 'live', live_at = COALESCE(live_at, @now::timestamptz), review_note = NULL,
   version = version + 1
 WHERE id = @id AND business_id = @business_id AND status IN ('draft','pending_review');

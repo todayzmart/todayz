@@ -2,7 +2,7 @@ import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playw
 import { expect, test, type Page, type Route } from '@playwright/test';
 import { INSIGHTS, overview, PERIOD, SERVER_NOW } from '../src/test/insightsData';
 
-// D-269 seller auto-onboarding on the production-shaped build with a faked API (no stack): B-02's
+// D-274 seller auto-onboarding on the production-shaped build with a faked API (no stack): B-02's
 // dark green step rail on desktop and phone, the live state with the calm payout note, and the
 // dark green shell sidebar. Fails on any sideways scroll at phone width.
 // `TZ_QA_DIR=docs/qa/seller-auto-onboarding pnpm exec playwright test onboarding.shots.spec.ts`
@@ -137,7 +137,7 @@ test.afterEach(() => {
   expect(guard.external, 'requests to non-local hosts').toEqual([]);
 });
 
-test('desktop: the B-02 step rail, a step card and the live state with the payout note (D-269)', async ({ page }) => {
+test('desktop: the B-02 step rail, a step card and the live state with the payout note (D-274)', async ({ page }) => {
   await fakeApi(page, 'started');
   await page.setViewportSize(VIEWPORTS.desktop);
   await page.goto('/onboarding');
@@ -154,7 +154,7 @@ test('desktop: the B-02 step rail, a step card and the live state with the payou
   await shot(page, 'onboarding-live-desktop.png');
 });
 
-test('phone: the rail is a dark header with the steps in a row, nothing scrolls sideways (D-269)', async ({ page }) => {
+test('phone: the rail is a dark header with the steps in a row, nothing scrolls sideways (D-274)', async ({ page }) => {
   await fakeApi(page, 'started');
   await page.setViewportSize({ width: 360, height: 780 });
   await page.goto('/onboarding');
@@ -163,7 +163,7 @@ test('phone: the rail is a dark header with the steps in a row, nothing scrolls 
   await shot(page, 'onboarding-phone.png');
 });
 
-test('desktop: the shell sidebar is dark green (D-269)', async ({ page }) => {
+test('desktop: the shell sidebar is dark green (D-274)', async ({ page }) => {
   await fakeApi(page, 'live');
   await page.setViewportSize(VIEWPORTS.desktop);
   await page.goto('/');

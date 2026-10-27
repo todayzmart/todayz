@@ -110,5 +110,5 @@
   "orders.delivery.acceptedNoTime": { "defaultMessage": "{shop} accepted your order and will send it out soon.", "description": "C-12 accepted delivery note without a time" },
   "orders.delivery.onTheWay": { "defaultMessage": "Your order from {shop} is on the way.", "description": "C-12 out for delivery note" },
   "orders.delivery.to": { "defaultMessage": "Delivering to {label}: {address}", "description": "C-12 delivery address" },
-  "orders.reason.shop_rejected": { "defaultMessage": "This shop can no longer take orders on TodayZ. Any credits you used are back in your wallet.", "description": "Reason: the shop was rejected at the shop check (D-269)" }
+  "orders.reason.shop_rejected": { "defaultMessage": "This shop can no longer take orders on TodayZ. Any credits you used are back in your wallet.", "description": "Reason: the shop was rejected at the shop check (D-274)" }
 }

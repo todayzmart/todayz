@@ -914,7 +914,7 @@ func TestShopCounting(t *testing.T) {
 	assert.Equal(t, statusPending, st)
 	assert.Empty(t, e.ledger.posted)
 
-	// Live but not checked yet (D-269): the sweep still waits.
+	// Live but not checked yet (D-274): the sweep still waits.
 	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
 	out, err := e.svc.Sweep(e.ctx)
 	require.NoError(t, err)

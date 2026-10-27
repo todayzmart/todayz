@@ -182,7 +182,7 @@ func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid
 
 // confirmDocument accepts the owner's document once the bucket holds it with
 // the declared type and at most the declared size (confirmUpload). No one
-// approves it first (D-269); the shop check sees it later.
+// approves it first (D-274); the shop check sees it later.
 func (s *Service) confirmDocument(ctx context.Context, bidStr, docStr string) (businessapi.BusinessDocument, error) {
 	if err := s.ready(ctx); err != nil {
 		return businessapi.BusinessDocument{}, err

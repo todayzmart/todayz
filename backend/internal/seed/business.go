@@ -61,7 +61,7 @@ type seedBusiness struct {
 	Status   string // businesses.status
 	Referral string
 	Verified time.Duration // verified this long before the seed clock (0: not verified)
-	// Unchecked keeps a live business in the D-269 shop check queue; every
+	// Unchecked keeps a live business in the D-274 shop check queue; every
 	// other live or suspended one was checked when it went live.
 	Unchecked bool
 	KYC       *seedKYC

@@ -115,7 +115,7 @@ func (s *Service) countShop(ctx context.Context, o Outcome) error {
 }
 
 // tryQualifyShop qualifies a locked pending shop referral once the business
-// is verified and checked (D-269) and ref_shop_qualifying_orders different
+// is verified and checked (D-274) and ref_shop_qualifying_orders different
 // customers bought (D-168); the last counted sale is the qualifying one.
 func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) error {
 	if row.Status != statusPending || row.Kind != KindAnyShop {

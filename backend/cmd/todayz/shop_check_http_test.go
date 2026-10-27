@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// D-269: the shop check. A shop is live as soon as onboarding is filled in;
+// D-274: the shop check. A shop is live as soon as onboarding is filled in;
 // field_agent, admin and super_admin work the queue (newest first) and mark a
 // shop checked or reject it with a reason, both audited. Every other admin
 // role gets 403. A reject hides the shop and cancels its open online orders

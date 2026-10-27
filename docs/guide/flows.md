@@ -312,7 +312,7 @@ sequenceDiagram
 
 ## 12. Shop onboarding and the shop check
 
-Since D-269 (founder, 27 Oct) nobody approves a shop first. Anyone can sign up, fill in the B-02 steps and start selling; a field agent checks the shop afterwards.
+Since D-274 (founder, 27 Oct) nobody approves a shop first. Anyone can sign up, fill in the B-02 steps and start selling; a field agent checks the shop afterwards.
 
 ```mermaid
 sequenceDiagram
@@ -343,7 +343,7 @@ sequenceDiagram
 - The check queue and both moves are in `backend/internal/admin/shop_checks.go` (`admin.shop_check.view`, `admin.shop_check.decide`: field_agent, admin, super_admin). The reject cascade is `backend/internal/orders/shop_reject.go`.
 - Until the shop is checked, the monthly close holds its payout with `shop_unchecked` (`backend/internal/payouts`). Checking later does not lift a payout already held; finance releases it on A-11. See [payouts-and-money](../features/payouts-and-money.md).
 - A store appears in search only when the store is `live` and its business is `verified` (D-40), so a reject hides the shop at once. A checked shop that goes wrong later is suspended on A-03.
-- The pre-D-269 paths (`verify`, `request-info`, store `review`) stay for rows created before the change. Every admin write is audited in `audit_log`.
+- The pre-D-274 paths (`verify`, `request-info`, store `review`) stay for rows created before the change. Every admin write is audited in `audit_log`.
 
 ## 13. Product photo: draft, then admin approval
 

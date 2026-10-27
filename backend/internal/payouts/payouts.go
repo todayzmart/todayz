@@ -44,7 +44,7 @@ const (
 
 	holdSuspended = "business_suspended"
 	holdUnchecked = "shop_unchecked"
-	holdKYC       = "kyc_incomplete" // before D-269: payouts waited for verified KYC
+	holdKYC       = "kyc_incomplete" // before D-274: payouts waited for verified KYC
 	holdDetails   = "payout_details_missing"
 	holdRisk      = "risk_flag"
 	holdManual    = "manual"
@@ -145,7 +145,7 @@ func (s *Service) newID(now time.Time) ids.ID { return s.ids.New(now) }
 // --- small helpers ---------------------------------------------------------------
 
 // causes are the automatic hold causes now (01 §9). Checked is a shop a
-// field agent or admin has checked (D-269); DetailsMissing is a business with
+// field agent or admin has checked (D-274); DetailsMissing is a business with
 // neither a UPI id nor a bank account to pay to.
 type causes struct {
 	Suspended, Checked, DetailsMissing, RiskFlag bool

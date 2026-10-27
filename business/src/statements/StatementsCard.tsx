@@ -22,7 +22,7 @@ const PAYOUT = {
 
 /**
  * B-10 monthly statements (01 §9): each closed IST month with its closing balance, the payout's state
- * (processing, on hold for payout details, on hold until our team checks the shop (D-269), paid with
+ * (processing, on hold for payout details, on hold until our team checks the shop (D-274), paid with
  * the UTR, or carried into the next statement's payout when a later close recomputed it), the
  * breakdown and the CSV. Owner and
  * manager; a member limited to some stores gets only those stores' totals from the server.

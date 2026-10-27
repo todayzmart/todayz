@@ -17,7 +17,7 @@ export const SECTION_ROLES: Readonly<Record<string, readonly Role[]>> = {
   '': ['support', 'catalogue', 'analyst', 'finance', ...ADMINS],
   /** A-04 (admin.field.*): agents and admins. */
   field: ['field_agent', ...ADMINS],
-  /** D-269 shop checks (admin.shop_check.*): agents and admins. */
+  /** D-274 shop checks (admin.shop_check.*): agents and admins. */
   'shop-checks': ['field_agent', ...ADMINS],
   businesses: ['field_agent', ...SUPPORT_UP],
   stores: SUPPORT_UP,

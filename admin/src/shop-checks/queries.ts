@@ -5,7 +5,7 @@ import { businessKey } from '../businesses/queries';
 
 const QUEUE = ['admin', 'shop-checks'] as const;
 
-/** The live shops nobody has checked yet, newest first (D-269). */
+/** The live shops nobody has checked yet, newest first (D-274). */
 export function useShopChecks() {
   return useInfiniteQuery({
     queryKey: QUEUE,

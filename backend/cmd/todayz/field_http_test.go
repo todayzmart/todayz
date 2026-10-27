@@ -241,11 +241,11 @@ func TestFieldOnboardingHTTP(t *testing.T) {
 	require.EqualValues(t, 4, ext(r, "attemptsLeft"))
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "verified", r.body["status"], "D-269: the owner's confirm puts the shop live")
+	require.Equal(t, "verified", r.body["status"], "D-274: the owner's confirm puts the shop live")
 	require.Equal(t, true, r.body["ownerConfirmed"])
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM staff s JOIN phone_identities p ON p.user_id = s.user_id
 	  WHERE s.business_id = $1 AND s.role = 'owner' AND s.status = 'active'`, uuidOf(t, bid)))
-	// D-241, D-269: the confirm also puts the agent's complete store live.
+	// D-241, D-274: the confirm also puts the agent's complete store live.
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM stores WHERE id = $1 AND status = 'live' AND live_at IS NOT NULL`, uuidOf(t, sid)))
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'store.go_live' AND subject_type = 'store' AND subject_id = $1`, sid))
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM businesses WHERE id = $1 AND check_status = 'unchecked'`, uuidOf(t, bid)), "it waits in the shop check queue")
@@ -541,7 +541,7 @@ func TestFieldPhotosHTTP(t *testing.T) {
 	f.bucket.put(t, up)
 	r = confirm(up)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "accepted", r.body["status"], "D-269: no review; the shop check looks at it later")
+	require.Equal(t, "accepted", r.body["status"], "D-274: no review; the shop check looks at it later")
 	r = confirm(up)
 	require.Equal(t, http.StatusOK, r.code, r.raw, "a second confirm changes nothing")
 	require.EqualValues(t, 1, photos())

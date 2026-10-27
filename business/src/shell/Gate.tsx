@@ -7,7 +7,7 @@ import styles from './shell.module.css';
 /** Routes that open without a session (B-01). Everything else needs a signed-in person. */
 const OPEN = ['/sign-in'];
 
-/** Signed-in routes that draw their own frame instead of the shell: B-02 has its own green step rail (D-269). */
+/** Signed-in routes that draw their own frame instead of the shell: B-02 has its own green step rail (D-274). */
 const BARE = ['/onboarding'];
 
 /**

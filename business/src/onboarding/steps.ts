@@ -1,4 +1,4 @@
-/** The B-02 steps in order (D-269). `payout` is optional; photos are asked for strongly but do not block going live. */
+/** The B-02 steps in order (D-274). `payout` is optional; photos are asked for strongly but do not block going live. */
 export const STEPS = ['business', 'store', 'hours', 'category', 'photos', 'payout', 'live'] as const;
 export type StepId = (typeof STEPS)[number];
 export const OPTIONAL: ReadonlySet<StepId> = new Set(['payout']);

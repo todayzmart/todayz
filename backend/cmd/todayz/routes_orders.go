@@ -38,7 +38,7 @@ func mountOrders(r chi.Router, d *deps) {
 
 // ordersDeps is the orders service with every collaborator a status change
 // writes through. The order routes use it, and so does the admin shop
-// reject, which cancels the shop's open orders (D-269).
+// reject, which cancels the shop's open orders (D-274).
 func ordersDeps(d *deps) orders.Deps {
 	od := orders.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,

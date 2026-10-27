@@ -180,7 +180,7 @@ func (h businessHandlers) ReviewAdminBusinessDocument(ctx context.Context, req b
 	return bizapi.ReviewAdminBusinessDocument200JSONResponse(out), nil
 }
 
-// ListAdminShopChecks implements GET /v1/admin/shop-checks (D-269).
+// ListAdminShopChecks implements GET /v1/admin/shop-checks (D-274).
 func (h businessHandlers) ListAdminShopChecks(ctx context.Context, req bizapi.ListAdminShopChecksRequestObject) (bizapi.ListAdminShopChecksResponseObject, error) {
 	out, err := h.s.listShopChecks(ctx, req.Params.Limit, req.Params.Cursor)
 	if err != nil {

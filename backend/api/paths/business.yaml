@@ -385,7 +385,7 @@
       object (a signed HEAD); when it is there with the declared type and no
       larger than the declared size, the document is `accepted` at once: no
       one approves a shop photo or a KYC document before the shop sells
-      (D-269). The newest accepted storefront photo becomes the store's
+      (D-274). The newest accepted storefront photo becomes the store's
       photo. The shop check sees every document later, and an admin may still
       reject one. A file that is missing, of another type or larger is `422
       validation_failed` and the document stays `pending`. Confirming a

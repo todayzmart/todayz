@@ -50,7 +50,7 @@ func newPayoutShop(t *testing.T) *payoutShop {
 	  ON CONFLICT (business_id) DO UPDATE SET upi_id_enc = excluded.upi_id_enc, upi_id_last4 = excluded.upi_id_last4,
 	    bank_account_enc = excluded.bank_account_enc, bank_account_last4 = excluded.bank_account_last4, bank_ifsc = excluded.bank_ifsc,
 	    legal_name = excluded.legal_name, status = excluded.status`, ids.UUID(b), upi, bank)
-	// D-269: a field agent has checked the shop, so its payouts are not held.
+	// D-274: a field agent has checked the shop, so its payouts are not held.
 	o.a.exec(`UPDATE businesses SET check_status = 'checked', checked_at = now() WHERE id = $1`, ids.UUID(b))
 
 	cr, err := jobs.CreditsService(jobs.Deps{Pool: o.a.tdb.Pool, Clock: o.a.clk, Settings: o.settings, Log: slog.New(slog.NewTextHandler(io.Discard, nil))}, nil)

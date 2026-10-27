@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const read = (f: string) => readFileSync(fileURLToPath(new URL(f, import.meta.url)), 'utf8');
 
-/** The dark green sidebar (D-269): the founder's override of the white one, drawn with the rail tokens. */
+/** The dark green sidebar (D-274): the founder's override of the white one, drawn with the rail tokens. */
 describe('the dark green sidebar', () => {
   const css = read('./shell.module.css');
   const block = css.slice(css.indexOf('*/', css.indexOf('The dark green sidebar')) + 2);

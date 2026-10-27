@@ -245,7 +245,7 @@ AdminBusiness:
       maxLength: 40
     verifiedAt:
       type: [string, 'null']
-      description: When the business went live (D-269 sets it on submit; no admin approves it).
+      description: When the business went live (D-274 sets it on submit; no admin approves it).
       format: date-time
       maxLength: 40
     checkStatus: {$ref: ./admin-businesses.yaml#/AdminCheckStatus}
@@ -275,7 +275,7 @@ AdminBusiness:
 AdminCheckStatus:
   type: string
   description: >-
-    The shop check (D-269): a business sells from sign-up and is `unchecked` until a field agent, admin or
+    The shop check (D-274): a business sells from sign-up and is `unchecked` until a field agent, admin or
     super_admin checks it (`checked`, which releases its payouts) or rejects it (`rejected`, which hides it).
   enum: [unchecked, checked, rejected]
 AdminShopCheckStore:
@@ -339,7 +339,7 @@ AdminShopCheck:
   additionalProperties: false
   required: [id, brandName, legalName, status, checkStatus, checkNote, checkedAt, category, liveAt, createdAt, byFieldAgent, kycStatus, stores, photos]
   description: >-
-    One shop for the check (D-269): its details, stores with the map pin, and photos. No phone numbers; KYC
+    One shop for the check (D-274): its details, stores with the map pin, and photos. No phone numbers; KYC
     shows only its status (the values stay on A-03 for admins).
   properties:
     id: {$ref: ./common.yaml#/Ulid}

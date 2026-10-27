@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { NOW, answerWith, signIn } from './fake-api';
 
 /**
- * A-24 Shop checks (D-269) against the built console, with the queue faked statefully: a field
+ * A-24 Shop checks (D-274) against the built console, with the queue faked statefully: a field
  * agent marks one shop checked and rejects another with a reason, on desktop and at 360px with no
  * sideways scroll. The unit tests cover the edge cases; this proves the bundle wires the flow and
  * leaves the screenshots (`TZ_QA_DIR=docs/qa/seller-auto-onboarding`).

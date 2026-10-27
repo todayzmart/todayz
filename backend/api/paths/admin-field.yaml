@@ -300,7 +300,7 @@
     description: >-
       Called after the PUT succeeds. The API reads the stored object (a signed HEAD); when it is there
       with the declared type and no larger than the declared size, the photo becomes `accepted` at once
-      (D-269), counts in `photos` and shows on the shop; the shop check sees it later. A file that is missing, of another type or larger is `422
+      (D-274), counts in `photos` and shows on the shop; the shop check sees it later. A file that is missing, of another type or larger is `422
       validation_failed` and the photo stays `pending`. Confirming a photo that is no longer pending
       answers it unchanged. Same edit rules as adding the photo.
     x-idempotency: none

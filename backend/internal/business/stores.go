@@ -467,7 +467,7 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
 		}
-		// No admin review takes a live store off the map any more (D-269):
+		// No admin review takes a live store off the map any more (D-274):
 		// the store stays as it is, and the audit row says whether what the
 		// shop check saw (name, address, location, phone) changed.
 		reviewed, err := s.profileChanged(cur, params, newPhone)
@@ -492,7 +492,7 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 }
 
 // profileChanged reports whether an update really changes what the shop
-// check saw (D-40, D-269): the name, the address, the location or the phone.
+// check saw (D-40, D-274): the name, the address, the location or the phone.
 // A field sent with its current value is no change. newPhone is the
 // normalised number sent.
 func (s *Service) profileChanged(cur businessdb.GetStoreRow, p businessdb.UpdateStoreProfileParams, newPhone string) (bool, error) {
@@ -579,7 +579,7 @@ func (s *Service) submitStore(ctx context.Context, bidStr, sidStr string) (busin
 				return incomplete(gaps)
 			}
 		}
-		// A store of a live business goes live at once (D-269); before the
+		// A store of a live business goes live at once (D-274); before the
 		// business is submitted it waits, and the business's submit puts it
 		// live.
 		b, err := q.GetBusiness(ctx, cur.BusinessID)

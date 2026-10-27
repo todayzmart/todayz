@@ -64,7 +64,7 @@ function Desk({ store }: { store: CurrentStore }) {
   const intl = useIntl();
   const account = useCreditAccount(store.bid);
   const referrals = useReferrals(store.bid);
-  // D-269: a live shop our team has not checked yet sells and earns, but its payouts wait.
+  // D-274: a live shop our team has not checked yet sells and earns, but its payouts wait.
   const biz = useBusiness(store.bid);
   const awaitingCheck = biz.data?.status === 'verified' && biz.data.checkStatus === 'unchecked';
   const lines = useMemo(() => account.data?.pages.flatMap((p) => p.items) ?? [], [account.data]);

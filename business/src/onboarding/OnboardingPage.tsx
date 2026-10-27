@@ -37,8 +37,8 @@ import styles from './onboarding.module.css';
 import { firstOpen, OPTIONAL, stepFrom, stepStates, STEPS, type StepId, type StepState } from './steps';
 
 /**
- * B-02 Shop setup as a step flow with a dark green rail (D-269, after the founder's Blinkit
- * reference; our own copy). The shop fills in its details and goes live at once: nothing is
+ * B-02 Shop setup as a step flow with a dark green rail (D-274, a step-rail layout from a reference the
+ * founder shared; our own copy). The shop fills in its details and goes live at once: nothing is
  * approved first. Our team checks the shop later; payouts wait for that check. Owner only.
  * Drawn without the shell (Gate's BARE list); the rail is the page's own navigation.
  */
@@ -69,7 +69,7 @@ export function OnboardingPage() {
   }
   if (cur.status === 'ready' && !canOnboard(cur.business.role)) {
     return (
-      <Frame steps={null} active={null} onPick={noop}>
+      <Frame steps={null} active={null} onPick={noop} home>
         <EmptyState
           icon={Lock}
           title={intl.formatMessage({ id: 'onboarding.ownerOnly.title' })}
@@ -94,9 +94,11 @@ function stepName(intl: IntlShape, id: StepId): string {
 
 /**
  * The page frame: the green rail (desktop, a full-height column; phone, a header with the steps as
- * a scrolling row) and the step content. `steps` is null while there is nothing to list.
+ * a scrolling row) and the step content. `steps` is null while there is nothing to list. `home` shows
+ * "Go to dashboard", only once there is a live shop to go to (a new signup has none).
  */
-function Frame({ steps, active, onPick, children }: { steps: StepState[] | null; active: StepId | null; onPick: (id: StepId) => void; children: ReactNode }) {
+function Frame(props: { steps: StepState[] | null; active: StepId | null; onPick: (id: StepId) => void; home?: boolean; children: ReactNode }) {
+  const { steps, active, onPick, home = false, children } = props;
   const intl = useIntl();
   const at = active ? STEPS.indexOf(active) : -1;
   const done = steps?.filter((s) => s.done && !OPTIONAL.has(s.id)).length ?? 0;
@@ -157,10 +159,12 @@ function Frame({ steps, active, onPick, children }: { steps: StepState[] | null;
             </nav>
           </>
         )}
-        <Link to="/" className={styles.home}>
-          <LayoutDashboard size={16} aria-hidden="true" />
-          {intl.formatMessage({ id: 'onboarding.toDashboard' })}
-        </Link>
+        {home && (
+          <Link to="/" className={styles.home}>
+            <LayoutDashboard size={16} aria-hidden="true" />
+            {intl.formatMessage({ id: 'onboarding.toDashboard' })}
+          </Link>
+        )}
       </aside>
       <main id="main" className={styles.content} tabIndex={-1} data-step={at >= 0 ? at + 1 : undefined}>
         {children}
@@ -343,7 +347,7 @@ function Flow({ business }: { business: BusinessSummary }) {
     }
   }
   return (
-    <Frame steps={steps} active={active} onPick={setPicked}>
+    <Frame steps={steps} active={active} onPick={setPicked} home={status === 'verified' || status === 'suspended'}>
       {active !== 'live' && biz.data && status !== 'draft' && <StatusBanner business={biz.data} />}
       {body}
     </Frame>
@@ -351,7 +355,7 @@ function Flow({ business }: { business: BusinessSummary }) {
 }
 
 /**
- * The shop's state in its words. Live and unchecked says payouts wait for our check (D-269);
+ * The shop's state in its words. Live and unchecked says payouts wait for our check (D-274);
  * the legacy review states stay for businesses that were sent for review before it.
  */
 function StatusBanner({ business }: { business: Business }) {

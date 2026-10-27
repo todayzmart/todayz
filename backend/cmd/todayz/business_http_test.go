@@ -246,7 +246,7 @@ func TestBusinessHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	r = a.call(owner, http.MethodPost, B+"/submit", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	// D-269: filled in is live. The business is verified at once and its
+	// D-274: filled in is live. The business is verified at once and its
 	// complete stores go live with it; the shop check comes later.
 	require.Equal(t, "verified", r.body["status"])
 	require.Equal(t, "unchecked", r.body["checkStatus"])
@@ -645,7 +645,7 @@ func TestBusinessTenancyHTTP(t *testing.T) {
 }
 
 // TestStoreReviewHTTP: a change to what the shop check saw keeps a live or
-// paused store as it is (D-269: no review takes it off the map) and the audit
+// paused store as it is (D-274: no review takes it off the map) and the audit
 // row says the profile changed; a rejected or suspended business takes no
 // store or KYC changes (review M4).
 func TestStoreReviewHTTP(t *testing.T) {

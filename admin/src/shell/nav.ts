@@ -42,7 +42,7 @@ export const NAV: readonly NavItem[] = [
   { section: '', label: 'shell.nav.pulse', icon: Activity, group: null },
   /** A-04 sits right after Pulse, so a field agent (no Pulse) lands on it. */
   { section: 'field', label: 'shell.nav.field', icon: ClipboardPlus, group: null },
-  /** D-269: the daily check of shops that went live by themselves. */
+  /** D-274: the daily check of shops that went live by themselves. */
   { section: 'shop-checks', label: 'shell.nav.shopChecks', icon: ClipboardCheck, group: null },
   { section: 'businesses', label: 'shell.nav.businesses', icon: Store, group: null },
   { section: 'stores', label: 'shell.nav.stores', icon: MapPin, group: null },

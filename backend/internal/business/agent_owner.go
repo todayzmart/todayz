@@ -307,7 +307,7 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 			return err
 		}
 		// The agent onboarded the stores, so the owner need not open the app:
-		// every complete store goes live with the business (D-241, D-269).
+		// every complete store goes live with the business (D-241, D-274).
 		return f.s.goLiveStores(ctx, audit.ActorAdmin, c.p.UserID, cur.ID)
 	})
 	if err != nil {

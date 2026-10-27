@@ -3,7 +3,7 @@ import { smsCodeSince } from '../../fixtures/principals';
 import { ALL_DAY, QA_POINT } from '../../fixtures/seed';
 
 // E2E-08: a field agent onboards a shop (business, store, first item) → the owner confirms with the
-// code sent to their phone, and the business and store go live at once (D-269: nobody approves first)
+// code sent to their phone, and the business and store go live at once (D-274: nobody approves first)
 // → the shop is found in search → the first order is booked, accepted and collected → the field agent
 // marks the shop checked from the daily queue (A-24), which releases its payouts. Admin steps use the
 // admin API (D-83); the owner's confirm code is read from the mock SMS and never printed.
@@ -88,7 +88,7 @@ test('E2E-08 field agent onboards a shop → owner confirms → live at once in 
   // would make the agent's owner-confirm send 429 (01 §2 counts codes per number).
   const owner = await who('newOwner');
   await test.step('the confirm put the business and its store live, unchecked', async () => {
-    // D-241, D-269: the owner's code takes the business and its complete stores live, so the owner
+    // D-241, D-274: the owner's code takes the business and its complete stores live, so the owner
     // need not open the app, and no admin approves anything first.
     const store = await owner.api.ok<{ status: string }>('owner reads the store', 'GET', `/v1/biz/businesses/${bid}/stores/${sid}`);
     expect(store.status).toBe('live');

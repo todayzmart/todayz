@@ -39,7 +39,7 @@ const ALL = [
 ];
 
 const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
-  // A-04, the D-269 shop checks, the A-03 Leads tab, A-23 Gaps and their own A-15 row.
+  // A-04, the D-274 shop checks, the A-03 Leads tab, A-23 Gaps and their own A-15 row.
   { roles: ['field_agent'], nav: ['Add shops', 'Shop checks', 'Businesses', 'Demand', 'Field agents'], hidden: '/orders' },
   {
     roles: ['support'],
@@ -65,7 +65,7 @@ const READS: [RegExp, string[]][] = [
   // admin.field.* (field.golden): agents and admins; every agent's A-15 row is admins only.
   [/^\/v1\/admin\/field(\/|$)/, ['field_agent', 'admin', 'super_admin']],
   [/^\/v1\/admin\/field-agents$/, ['admin', 'super_admin']],
-  // admin.shop_check.view (admin.golden, D-269): the daily queue of unchecked shops.
+  // admin.shop_check.view (admin.golden, D-274): the daily queue of unchecked shops.
   [/^\/v1\/admin\/shop-checks$/, ['field_agent', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
   // admin.support.tickets (support.golden): the A-14 inbox and ticket.

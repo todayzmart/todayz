@@ -15,7 +15,7 @@ const TONE: Record<BusinessDocument['status'], PillTone> = { pending: 'pending',
 /**
  * B-02 documents: one row per kind, a file picker each. The file goes straight to storage on a
  * presigned PUT (D-46), then the confirm call checks the bucket holds it and accepts it at once
- * (D-269: nothing waits for a review; the daily shop check looks at it later).
+ * (D-274: nothing waits for a review; the daily shop check looks at it later).
  */
 export function DocumentsStep({
   bid,

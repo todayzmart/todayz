@@ -24,7 +24,7 @@ const PHOTO: Record<AdminShopCheckPhotoKind, string> = {
 const mapUrl = (lat: number, lng: number) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
 /**
- * Shop checks (D-269): every live shop nobody has checked yet, newest first, with its details,
+ * Shop checks (D-274): every live shop nobody has checked yet, newest first, with its details,
  * stores and photos. A field agent, admin or super_admin marks it checked (payouts may start) or
  * rejects it with a reason (hidden at once, open online orders cancelled). Phone first.
  */

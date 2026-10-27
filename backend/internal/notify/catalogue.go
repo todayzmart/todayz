@@ -101,7 +101,7 @@ var catalogue = map[string]kindDef{
 			"ready":            {"en": {"Ready for pickup", "Your order from {store} is ready. Show your pickup code at the counter."}},
 			"out_for_delivery": {"en": {"Out for delivery", "Your order from {store} is on its way."}},
 			"delivered":        {"en": {"Delivered", "Your order from {store} was delivered."}},
-			// D-269: a field agent or admin rejected the shop; its open
+			// D-274: a field agent or admin rejected the shop; its open
 			// orders are cancelled with no strike and held credits go back.
 			"shop_rejected": {
 				"en": {"Order cancelled", "{store} can no longer take orders on TodayZ, so your order was cancelled. Any credits you used are back in your wallet."},

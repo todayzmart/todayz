@@ -157,7 +157,7 @@ WHERE business_id = @business_id AND status = 'pending_review'
 RETURNING id;
 
 -- name: ShopCheckQueue :many
--- The daily check (D-269): live businesses nobody has checked, newest first
+-- The daily check (D-274): live businesses nobody has checked, newest first
 -- (ix_businesses_check_queue).
 SELECT b.id, b.brand_name, b.legal_name, b.status, b.check_status, b.checked_at, b.check_note,
   COALESCE(c.names ->> 'en', '')::text AS category, b.verified_at, b.created_at, (b.onboarded_by IS NOT NULL)::bool AS by_field_agent,

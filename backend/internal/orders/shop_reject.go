@@ -8,7 +8,7 @@ import (
 )
 
 // CancelShopOrders cancels every open online order of the business's stores
-// when a field agent or admin rejects the shop (D-269): the reason is the
+// when a field agent or admin rejects the shop (D-274): the reason is the
 // system's shop_rejected, nobody gets a strike, held stock, credits and
 // offers go back (end), and each customer is told. It runs in the caller's
 // transaction, so the reject and the cancels commit together, and answers

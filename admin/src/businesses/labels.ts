@@ -21,7 +21,7 @@ const STATUS: Record<AdminBusinessStatus, string> = {
   suspended: 'businesses.status.suspended',
 };
 
-/** D-269: a live shop waits for a field agent or admin to check it. */
+/** D-274: a live shop waits for a field agent or admin to check it. */
 const CHECK: Record<AdminCheckStatus, string> = {
   unchecked: 'businesses.check.unchecked',
   checked: 'businesses.check.checked',

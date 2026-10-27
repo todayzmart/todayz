@@ -72,7 +72,7 @@ SELECT * FROM business_documents WHERE id = @id AND business_id = @business_id F
 
 -- name: AcceptUploadedDocument :one
 -- A confirmed upload is accepted at once: no one approves a shop photo or a
--- KYC document before the shop sells (D-269); the shop check looks at it
+-- KYC document before the shop sells (D-274); the shop check looks at it
 -- later and an admin may still reject it. Not past confirm_by: the sweep
 -- claims such a row and deletes its object without a row lock, so a confirm
 -- that read the row before then must not accept it (no row: the upload

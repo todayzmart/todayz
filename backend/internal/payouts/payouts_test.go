@@ -85,7 +85,7 @@ func TestStatementCSVKeepsNumbersRaw(t *testing.T) {
 func TestHoldReasonOrder(t *testing.T) {
 	require.Equal(t, "", causes{Checked: true}.reason())
 	require.False(t, causes{Checked: true}.open())
-	// D-269: an unchecked shop is held, whatever its KYC says.
+	// D-274: an unchecked shop is held, whatever its KYC says.
 	require.Equal(t, holdUnchecked, causes{}.reason())
 	require.Equal(t, holdUnchecked, causes{DetailsMissing: true, RiskFlag: true}.reason())
 	require.Equal(t, holdDetails, causes{Checked: true, DetailsMissing: true, RiskFlag: true}.reason())

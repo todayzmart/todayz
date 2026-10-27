@@ -103,7 +103,7 @@ function contrast(a: string, b: string) {
   return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05);
 }
 
-describe('the dark green rail (D-269)', () => {
+describe('the dark green rail (D-274)', () => {
   const tokens = () => JSON.parse(read('tokens.json')) as Record<string, string>;
 
   it('keeps AA (4.5:1) for every text colour on the rail fills', () => {

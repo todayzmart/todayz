@@ -1,4 +1,4 @@
-# Seller auto-onboarding (D-269): report
+# Seller auto-onboarding (D-274): report
 
 > As built on main at d641cbe6 (27 Oct 2026), on branch `claude/seller-auto-onboarding-fa62d0`. A record of what was checked and when; it is not kept current.
 
@@ -6,7 +6,7 @@
 
 Anyone can sign up a shop, fill in the details (shop photos and GST included) and start selling. Nobody approves it first. A field agent checks new shops every day: if a shop is not right, they visit it or reject it. Copy only the layout of Blinkit's seller onboarding (the step list on a green bar on the left), and use the same dark green bar for the sidebar inside the business app ("our one is too normal white").
 
-The rules, as the lead recorded them (D-269):
+The rules, as the lead recorded them (D-274):
 
 1. A business and its stores go live as soon as onboarding is filled in.
 2. Payouts wait until a field agent or admin marks the shop checked. The shop keeps selling and earning credits; the monthly close holds the payout with the cause `shop_unchecked`.
@@ -36,7 +36,7 @@ The rules, as the lead recorded them (D-269):
 
 ## Design notes
 
-- Only the layout is Blinkit's: the step list on a dark bar on the left, the step card on white. The colours, icons, type and copy are TodayZ's (Anek and Figtree, Lucide, sentence case).
+- Only the layout follows the founder's reference: the step list on a dark bar on the left, the step card on white. The colours, icons, type and copy are TodayZ's (Anek and Figtree, Lucide, sentence case).
 - The rail colours are new tokens. On `rail`, `on-rail` is 12.6:1, `on-rail-2` 8.3:1 and `rail-accent` 8.2:1 (AA). The blue `focus` ring is too dark on the green, so on the rail it is `rail-accent`.
 - On a phone the rail is a dark header with the steps as a row of chips that scrolls on its own, so the page does not scroll sideways. From 1024px the rail is a full-height column with a hint under each step.
 - The calm note "Payouts start after our team checks your shop." shows on B-02 once live and on B-10 Credits while the shop is unchecked. It is an info banner, not a warning.
@@ -59,7 +59,7 @@ The rules, as the lead recorded them (D-269):
 | `make check-docs` | 1 failure, not from this change: `docs/features/marketing-site.md` links `../qa/landing-v2/`, which is missing on main (D-267) |
 | Review | `claude-reviewer` (Sonnet) on the payout hold, the reject cascade and the role checks; findings and fixes below |
 
-New tests: `backend/cmd/todayz/shop_check_http_test.go` (queue order and paging, 403 for support, finance, catalogue and analyst, check, reject with the cascade, audit rows), the D-269 cases in `business_http_test.go`, `field_http_test.go` and `payouts_*_test.go`, `business/src/onboarding/onboarding.test.tsx`, `business/src/shell/sidebar.test.ts`, `admin/src/shop-checks/shopChecks.test.tsx`, and the A-24 rows in `admin/e2e/roles.spec.ts`. Journey E2E-08 (`e2e/journeys/specs/16-e2e-08-field-onboarding.spec.ts`) now expects the shop live after the owner's code and the agent to check it from A-24.
+New tests: `backend/cmd/todayz/shop_check_http_test.go` (queue order and paging, 403 for support, finance, catalogue and analyst, check, reject with the cascade, audit rows), the D-274 cases in `business_http_test.go`, `field_http_test.go` and `payouts_*_test.go`, `business/src/onboarding/onboarding.test.tsx`, `business/src/shell/sidebar.test.ts`, `admin/src/shop-checks/shopChecks.test.tsx`, and the A-24 rows in `admin/e2e/roles.spec.ts`. Journey E2E-08 (`e2e/journeys/specs/16-e2e-08-field-onboarding.spec.ts`) now expects the shop live after the owner's code and the agent to check it from A-24.
 
 ## Review findings and fixes
 
@@ -71,7 +71,7 @@ New tests: `backend/cmd/todayz/shop_check_http_test.go` (queue order and paging,
 | The reject locked one order's stock while waiting for the next order, so it could deadlock with a shop accept | `OpenOrdersOfBusiness` locks every open order `FOR UPDATE`, in id order, before any `end` |
 | A shop referral (D-168) qualified as soon as the shop was live, so a fake shop could earn the reward before anyone checked it | `BusinessVerified` (referrals) needs `check_status = 'checked'`; the sweep qualifies the shop after the check. `TestShopCounting` (referrals) covers the wait while unchecked |
 | A rejected shop's payout stays held as `shop_unchecked` with no way to release it | Kept as is (the money stays held, which is the safe side). What happens to it is a founder decision, raised with the lead |
-| A rejected owner can sign up a new business; a field agent can check a shop they onboarded; a suspended, unchecked shop can be neither checked nor rejected | Recorded as accepted gaps in D-269 |
+| A rejected owner can sign up a new business; a field agent can check a shop they onboarded; a suspended, unchecked shop can be neither checked nor rejected | Recorded as accepted gaps in D-274 |
 
 ## Screenshots
 
@@ -87,6 +87,6 @@ Taken with a faked API from the production-shaped builds (`business/e2e/onboardi
 - A rejected owner can sign up a new business, which goes live at once. A field agent can check a shop they onboarded.
 - Checking a shop does not release a payout that was already held as `shop_unchecked`. Finance releases it on A-11, because a close never lifts a hold. Later closes do not hold it.
 - A checked shop that goes wrong later is suspended on A-03. Reject from A-24 is only for unchecked shops.
-- The pre-D-269 verify, request-info and store review paths stay for old rows. Nothing new reaches them.
+- The pre-D-274 verify, request-info and store review paths stay for old rows. Nothing new reaches them.
 - The new hi, kn, te and ta strings are machine-written and approved under the founder's release instruction, with no native-speaker review (`docs/qa/business-i18n/REVIEW.md`).
 - No `W4-93` row in `docs/plan/07-work-packages.md`. The migration uses that block, and the lead may add the row.

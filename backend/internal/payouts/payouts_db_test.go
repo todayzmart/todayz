@@ -121,7 +121,7 @@ func (e *env) user() ids.ID {
 func (e *env) business(name string) ids.ID {
 	e.t.Helper()
 	id := e.id()
-	// Checked (D-269), so only the hold under test holds its payout.
+	// Checked (D-274), so only the hold under test holds its payout.
 	e.exec(`INSERT INTO businesses (id, brand_name, referral_code, status, check_status, checked_at)
 	  VALUES ($1, $2, $3, 'verified', 'checked', now())`, ids.UUID(id), name, e.code())
 	return id
@@ -152,7 +152,7 @@ func (e *env) setKYC(status string) {
 	e.exec(`UPDATE business_kyc SET status = $2 WHERE business_id = $1`, ids.UUID(e.biz), status)
 }
 
-// setCheck sets the shop check (D-269): unchecked holds the business's payouts.
+// setCheck sets the shop check (D-274): unchecked holds the business's payouts.
 func (e *env) setCheck(status string) {
 	e.exec(`UPDATE businesses SET check_status = $2, checked_at = CASE WHEN $2 = 'unchecked' THEN NULL ELSE now() END
 	  WHERE id = $1`, ids.UUID(e.biz), status)
@@ -427,7 +427,7 @@ func TestOnePayoutPerBusinessDB(t *testing.T) {
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM audit_log WHERE action = 'payouts.mark_paid' AND after->>'utr' = 'AXIS12345678'`))
 
 	// PO-02: after P1 is paid the next close creates a new payout; a shop
-	// nobody has checked holds it (D-269), and a held payout is still the
+	// nobody has checked holds it (D-274), and a held payout is still the
 	// open one. KYC still under review holds nothing on its own.
 	e.at(ist(2026, 8, 5, 12, 0))
 	e.storeReferral(e.s2, 40)
@@ -590,7 +590,7 @@ func TestExportDB(t *testing.T) {
 	held := e.business("Held Stores")
 	hs := e.store(held, "Held Stores")
 	e.kyc(held, "verified")
-	// Nobody has checked this shop yet (D-269), so its payout is held.
+	// Nobody has checked this shop yet (D-274), so its payout is held.
 	e.exec(`UPDATE businesses SET check_status = 'unchecked', checked_at = NULL WHERE id = $1`, ids.UUID(held))
 	paidBiz := e.business("Paid Stores")
 	ps := e.store(paidBiz, "Paid Stores")

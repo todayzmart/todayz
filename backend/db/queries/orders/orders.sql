@@ -15,7 +15,7 @@
 -- name: StoreForBooking :one
 -- The store as checkout needs it. A store is bookable while live and its
 -- business verified (D-40, the same filter as discovery). The business row
--- is held FOR SHARE to the end of checkout, so a shop reject (D-269, which
+-- is held FOR SHARE to the end of checkout, so a shop reject (D-274, which
 -- locks it FOR UPDATE) either waits for this order and then cancels it, or
 -- commits first and this checkout sees the shop rejected.
 SELECT s.id, s.business_id, s.slug, s.name, s.address_line1, s.address_line2, s.locality,
@@ -588,7 +588,7 @@ WHERE st.id = x.id
 
 -- name: OpenOrdersOfBusiness :many
 -- The open online orders of every store of a business, for the shop reject
--- (D-269). Every order row is locked here, in id order, before any of their
+-- (D-274). Every order row is locked here, in id order, before any of their
 -- stock is touched, so the reject never holds one order's items while it
 -- waits for another order (an accept holds its order, then its items).
 SELECT o.id FROM orders o

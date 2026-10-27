@@ -59,7 +59,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 
 | Package | Purpose | Main files |
 |---|---|---|
-| `backend/internal/admin` | The admin console's own domain: customers, businesses, stores, catalogue review, product images, banners, audit views, AI assist, the D-269 shop check queue | `admin.go`, `handlers.go`, `businesses.go`, `shop_checks.go`, `product_images.go` |
+| `backend/internal/admin` | The admin console's own domain: customers, businesses, stores, catalogue review, product images, banners, audit views, AI assist, the D-274 shop check queue | `admin.go`, `handlers.go`, `businesses.go`, `shop_checks.go`, `product_images.go` |
 | `backend/internal/ai` | The AI platform and every AI feature, one subfolder each (see section 4) | `client/`, `guard/`, `drafts/`, `scrub/` |
 | `backend/internal/asks` | "Ask shops nearby": create, pick stores, shop inbox, replies, windows | `asks.go`, `create.go`, `inbox.go`, `handlers.go` |
 | `backend/internal/banners` | Shop banners: upload, review queue, daily stats, tidy job | `banners.go`, `manage.go`, `handlers.go` |
@@ -75,7 +75,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/notify` | Notification inboxes, delivery (SMS, WhatsApp), escalation, preferences | `notify.go`, `deliver.go`, `provider.go` |
 | `backend/internal/offers` | Offers and their pricing engine, feed, redemptions | `offers.go`, `engine.go`, `pricing.go` |
 | `backend/internal/ops` | The admin System screen: Beanstalk, DB and queue health | `ops.go`, `aws.go`, `db.go` |
-| `backend/internal/orders` | Online booking: create, state machine, timers, codes, delivery, returns, strikes, the shop-reject cancel (D-269) | `orders.go`, `machine.go`, `create.go`, `transitions.go`, `timers.go`, `shop_reject.go` |
+| `backend/internal/orders` | Online booking: create, state machine, timers, codes, delivery, returns, strikes, the shop-reject cancel (D-274) | `orders.go`, `machine.go`, `create.go`, `transitions.go`, `timers.go`, `shop_reject.go` |
 | `backend/internal/payouts` | Monthly statements and payouts | `payouts.go`, `close.go`, `business.go` |
 | `backend/internal/pos` | The shop counter: sales, sync, bill claims, receipts | `pos.go`, `sale.go`, `sync.go`, `claims.go` |
 | `backend/internal/referrals` | Referral programme: clicks, claims, qualifying, rewards | `referrals.go`, `claim.go`, `qualify.go`, `reward.go` |

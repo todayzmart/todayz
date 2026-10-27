@@ -4,7 +4,7 @@ import type { DocumentKind } from '@todayz/api-client/gen/model/documentKind';
 /** The kinds the shop is asked for, in the order they are shown. `other` is left out of the UI. */
 export const DOCUMENT_KINDS: readonly DocumentKind[] = ['pan', 'gst', 'shop_photo', 'storefront', 'license'];
 
-/** B-02's photos step (D-269): what the daily shop check looks at first. */
+/** B-02's photos step (D-274): what the daily shop check looks at first. */
 export const PHOTO_KINDS: readonly DocumentKind[] = ['storefront', 'shop_photo'];
 
 /** B-02's optional payout step: tax and licence papers, never needed to go live. */

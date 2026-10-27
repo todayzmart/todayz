@@ -703,7 +703,7 @@
     tags: [admin-businesses]
     summary: The daily shop check queue, newest first
     description: >-
-      Live businesses nobody has checked yet (D-269), newest first, with their stores, map pins and shop
+      Live businesses nobody has checked yet (D-274), newest first, with their stores, map pins and shop
       photos. Field agents, admins and super_admins work it; every agent sees the whole queue.
     parameters:
       - $ref: ../common/parameters.yaml#/Limit

@@ -180,7 +180,7 @@ AdminPayoutCauses:
   required: [businessSuspended, shopChecked, payoutDetailsMissing, openRiskFlag]
   description: >-
     The automatic hold causes as they are now (01 §9). shopChecked is a shop a field agent or admin has
-    checked (D-269); until then its payout is held. payoutDetailsMissing is a business with neither a
+    checked (D-274); until then its payout is held. payoutDetailsMissing is a business with neither a
     UPI id nor a bank account to pay to.
   properties:
     businessSuspended: {type: boolean}
@@ -247,7 +247,7 @@ BusinessPayoutState:
   description: >-
     The business sees `processing` until finance marks the payout paid, `needs_kyc` while it is held for
     incomplete KYC or payout details, `awaiting_check` while it is held until a field agent or admin
-    checks the shop (D-269), and `paid` with the UTR after (01 §9). An earlier statement whose
+    checks the shop (D-274), and `paid` with the UTR after (01 §9). An earlier statement whose
     payout a later close recomputed (D-09: one open payout per business) is `carried`: its amount went on
     into the next statement's payout, which shows the live state.
   properties:

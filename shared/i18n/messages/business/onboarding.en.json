@@ -109,7 +109,7 @@
   },
   "onboarding.docs.status.accepted": {
     "defaultMessage": "Added",
-    "description": "Document status; accepted at once (D-269)"
+    "description": "Document status; accepted at once (D-274)"
   },
   "onboarding.docs.status.rejected": {
     "defaultMessage": "Asked to replace",

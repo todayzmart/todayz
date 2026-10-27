@@ -66,7 +66,7 @@ function card(list: HTMLElement, n: number): HTMLElement {
   return c;
 }
 
-describe('D-269 shop checks', () => {
+describe('D-274 shop checks', () => {
   it('opens for field agents, admins and super admins only', () => {
     for (const r of ['field_agent', 'admin', 'super_admin']) expect(canOpen([r], 'shop-checks'), r).toBe(true);
     for (const r of ['support', 'finance', 'catalogue', 'analyst']) expect(canOpen([r], 'shop-checks'), r).toBe(false);

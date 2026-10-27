@@ -100,7 +100,7 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			hashKey = d.Config.Keys.PIIHashKey.Bytes()
 		}
 		ad.Audit = audit.New(d.DB, d.Clock, hashKey)
-		// The full orders deps: a shop reject (D-269) cancels orders, which
+		// The full orders deps: a shop reject (D-274) cancels orders, which
 		// releases stock, credits and offers and tells the customer.
 		ord, err := orders.New(ordersDeps(d))
 		if err != nil {

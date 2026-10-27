@@ -156,7 +156,8 @@ describe('B-02 the flow', () => {
     expect(await screen.findByRole('heading', { name: 'Set up your shop' })).toBeInTheDocument();
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.queryByRole('link', { name: 'Orders' })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Go to dashboard' })).toHaveAttribute('href', '/');
+    // A new signup has no shop yet, so there is no dashboard to go to.
+    expect(screen.queryByRole('link', { name: 'Go to dashboard' })).not.toBeInTheDocument();
   });
 
   it('a new owner sees seven steps with only the first open, creates the business with an Idempotency-Key and moves on to the address', async () => {
@@ -274,6 +275,7 @@ describe('B-02 the flow', () => {
   it('a checked shop is told payouts go out as usual', async () => {
     renderAt('/onboarding', { messages, handlers: [shops('owner', 'verified'), ready({ status: 'verified', checkStatus: 'checked' })] });
     expect(await screen.findByText('Your shop is live and checked')).toBeInTheDocument();
+    expect(within(screen.getByRole('complementary')).getByRole('link', { name: 'Go to dashboard' })).toHaveAttribute('href', '/');
   });
 
   it('a live shop can still add photos and papers, but not change its category', async () => {
@@ -292,7 +294,7 @@ describe('B-02 the flow', () => {
     expect(screen.queryByLabelText('Add Photo of the shop front')).not.toBeInTheDocument();
   });
 
-  it('needs_info (sent for review before D-269) shows the requested fields and the note', async () => {
+  it('needs_info (sent for review before D-274) shows the requested fields and the note', async () => {
     renderAt('/onboarding', {
       messages,
       handlers: [shops('owner', 'needs_info'), reads({ biz: { status: 'needs_info', infoRequest: { fields: ['pan', 'documents'], note: 'The PAN photo is blurry.' } } })],

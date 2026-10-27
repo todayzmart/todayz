@@ -261,7 +261,7 @@ SELECT business_id FROM stores WHERE id = @id;
 
 -- name: BusinessVerified :one
 -- A shop counts as verified for referrals once it is live and a field agent
--- or admin has checked it (D-269): it goes live on submit, so live alone
+-- or admin has checked it (D-274): it goes live on submit, so live alone
 -- would let a fake shop earn the reward. The sweep qualifies it after the
 -- check.
 SELECT (status = 'verified' AND check_status = 'checked')::bool AS verified FROM businesses WHERE id = @id;

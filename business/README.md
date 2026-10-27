@@ -32,7 +32,7 @@ Feature folders under `src/`:
 | `stock`, `ai-drafts`, `voice`, `offers` | Stock and offers |
 | `orders`, `customers`, `reviews`, `credits`, `asks` | Orders and customers |
 | `overview`, `analytics`, `insights`, `coach`, `statements` | Numbers and payouts |
-| `onboarding`, `stores`, `settings`, `standee`, `help`, `shell`, `routes`, `app`, `test` | Setup and app frame (B-02 is a step flow with a green rail; the shell sidebar is dark green, D-269) |
+| `onboarding`, `stores`, `settings`, `standee`, `help`, `shell`, `routes`, `app`, `test` | Setup and app frame (B-02 is a step flow with a green rail; the shell sidebar is dark green, D-274) |
 
 ## Tech
 

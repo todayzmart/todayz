@@ -83,7 +83,7 @@ type Deps struct {
 	// image approve and upload routes answer 503.
 	Storage *storage.Client
 	// ShopOrders is internal/orders' cancel of a rejected shop's open orders
-	// (D-269). Without it a shop reject answers 503.
+	// (D-274). Without it a shop reject answers 503.
 	ShopOrders ShopOrderCanceller
 }
 

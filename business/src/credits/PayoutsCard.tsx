@@ -2,7 +2,7 @@ import { Banner } from '@todayz/ui';
 import { useIntl } from 'react-intl';
 import styles from './credits.module.css';
 
-/** How payouts work (01 §9), plain text from i18n. `awaitingCheck`: payouts wait for our shop check (D-269). */
+/** How payouts work (01 §9), plain text from i18n. `awaitingCheck`: payouts wait for our shop check (D-274). */
 export function PayoutsCard({ awaitingCheck = false }: { awaitingCheck?: boolean }) {
   const intl = useIntl();
   const ids = ['in', 'out', 'statement', 'amount', 'paid', 'holds'] as const;

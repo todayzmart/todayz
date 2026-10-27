@@ -8,7 +8,7 @@ How shops are paid: monthly statements, payout holds, exports, and what "mark pa
 
 | App | What |
 |---|---|
-| Shop app | See statements and payout status. While the shop is not checked yet, Credits and statements say "Payouts start after our team checks your shop" (`awaitingCheck`, D-269). Folders: [statements](../../business/src/statements/), [credits](../../business/src/credits/). |
+| Shop app | See statements and payout status. While the shop is not checked yet, Credits and statements say "Payouts start after our team checks your shop" (`awaitingCheck`, D-274). Folders: [statements](../../business/src/statements/), [credits](../../business/src/credits/). |
 | Admin console | List statements and payouts, hold or unhold a payout, export payout files, mark a payout paid by recording a bank reference (UTR). Folder: [admin/src/payouts](../../admin/src/payouts/). |
 | Backend jobs | `payouts_statement_close` closes statements. |
 
@@ -17,7 +17,7 @@ How shops are paid: monthly statements, payout holds, exports, and what "mark pa
 Source: [01-product-rules.md](../plan/01-product-rules.md) section 9.
 
 - A statement closes on the 1st at 00:30 IST.
-- Payout holds, the first that applies: business_suspended, shop_unchecked (the shop check of D-269 not done yet), payout_details_missing (no UPI or bank), risk_flag (D-225); manual from finance. KYC verification no longer holds a payout; kyc_incomplete stays only on payouts held before D-269.
+- Payout holds, the first that applies: business_suspended, shop_unchecked (the shop check of D-274 not done yet), payout_details_missing (no UPI or bank), risk_flag (D-225); manual from finance. KYC verification no longer holds a payout; kyc_incomplete stays only on payouts held before D-274.
 - A close never lifts a hold: a payout held `shop_unchecked` stays held after the check until finance releases it on A-11, and later closes do not hold for it.
 - Payout amount is defined in D-09. The export format is D-85.
 - "Mark paid" only records a UTR. TodayZ makes no bank call; a person pays outside the system.
@@ -56,4 +56,4 @@ Live in code. No bank or payment-gateway integration.
 
 ## Decisions
 
-D-09, D-85, D-93, D-225, D-269.
+D-09, D-85, D-93, D-225, D-274.
