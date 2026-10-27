@@ -1,7 +1,8 @@
 # backend/
 
-Go API and workers: one module, one binary (`todayz api|worker|migrate|seed|version`; `ai` and
-`admin` come with their WPs). chi, pgx v5 + sqlc, goose, River, PostGIS.
+Go API and workers: one module, one binary (`todayz api|worker|migrate|seed|rollup|ai|images|version`).
+chi, pgx v5 + sqlc, goose, River, PostGIS. Every domain package is built; the package map is in
+`docs/guide/code-structure.md` and the human entry point is `backend/README.md`.
 
 Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-rules.md`, then
 02-architecture.md §2–3, §9–10; 03-data-model.md; 04-api.md; 05-observability.md; 11-ai-features.md.
@@ -50,7 +51,7 @@ internal/platform/     shared plumbing, no domain logic:
 internal/jobs/         River registry: jobs.go + one <domain>.go per domain (24)
 internal/seed/         seed registry: seed.go + one <domain>.go per domain (24)
 internal/testkit/      integration-test database (testcontainers PostGIS)
-internal/devtools/     problemgen, settingslint, vulngate (build/check tools, not shipped)
+internal/devtools/     apigen, eventgen, problemgen, settingslint, vulngate (build/check tools, not shipped)
 tools/                 separate go.mod pinning the Go tools (sqlc, goose, golangci-lint, gosec, govulncheck)
 gen/                   generated, git-ignored
 ```
@@ -187,7 +188,8 @@ built `api/` (root, common, one `paths`/`schemas` file per domain, `api/README.m
 `gen/api/spec` + per-domain oapi-codegen stubs, the Schemathesis smoke and fixture, and goose
 out-of-order migrations (D-90). The platform paths (`/healthz`, `/readyz`, `/version`,
 `/v1/test/clock`) are the only operations until the domain WPs land; `/v1/test/slow*` come with
-W1-07 and the D-91 domain problem codes with their domains. Domain packages start in W1.
+W1-07 and the D-91 domain problem codes with their domains. (Historical: the domain packages
+have all landed since; see `docs/guide/code-structure.md` for the current list.)
 
 W1-07 built the observability base: RED middleware with a label allow-list, runtime, pool, queue
 (`telemetry.RegisterQueue`, `QueueOldestAge`) and SSE metrics, the pgx tracer, the partitioned `events`

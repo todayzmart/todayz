@@ -4,11 +4,14 @@ Indian hyperlocal retail: shops digitise their stock; customers search what is n
 
 ## Read first
 
-1. `docs/plan/README.md`: the build plan, waves, roles, Definition of done
-2. `docs/plan/01-product-rules.md`: every product rule and number (single source of truth)
-3. `docs/plan/12-decision-log.md`: why the plan says what it says (D-01…D-101). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
-4. The plan file for your area (architecture, data model, API, observability, screens, work packages, testing, infra, AI)
-5. The `CLAUDE.md` in the folder you are changing
+1. `README.md` and `docs/README.md`: what TodayZ is as built, and the map of every doc
+2. `docs/guide/architecture.md`, `docs/guide/code-structure.md` and the `docs/features/` file for your area: how it works today
+3. `docs/plan/01-product-rules.md`: every product rule and number (single source of truth)
+4. `docs/plan/12-decision-log.md`: why things are the way they are (D-01…). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
+5. `docs/plan/README.md` (waves, roles, Definition of done) and the plan file for your area
+6. The `README.md` and `CLAUDE.md` in the folder you are changing
+
+`docs/guide` and `docs/features` describe what is built; `docs/plan` describes intent. When they differ, the code wins: fix the guide or feature doc.
 
 Design source of truth: https://claude.ai/artifact/W91M8EtFX8zJc9SgMUygZF (copy in `design/source/`). White page, mint wash, pastel tints, Lucide icons, Anek + Figtree, light theme only.
 
@@ -32,6 +35,14 @@ Each app folder must build and test on its own (no imports into a sibling app), 
 
 ## Rules
 
+- **Keep the docs true, in the same change as the code (every AI, every change).** Before you finish, update every doc your change makes stale:
+  - the `docs/features/<area>.md` file: what users can do, rules, code, tests, status, decisions;
+  - `docs/guide/*`: architecture, flows and diagrams, code structure, testing, deployment, local dev;
+  - the folder's `README.md` and `CLAUDE.md`;
+  - the root `README.md` when a feature, app, command or deploy step changes;
+  - `docs/plan/12-decision-log.md` for a new decision.
+
+  Change the `As built on main at <commit>` line of each doc you touch. `make check` runs `check-docs`, which fails when a package, mk file, workflow or app feature folder is missing from the docs, or a link is broken. The commit-msg hook refuses a code commit with no `.md` change unless the message has `Docs: none (<reason>)`. Details: `docs/guide/working-on-todayz.md`.
 - **Never print, echo or log secret values** (AWS, RDS, Beanstalk, Cloudflare, SMS, WhatsApp, Sentry, Grafana, Anthropic, Sarvam keys). Refer to variables by name. Use `make env-check`, which prints only set/missing.
 - **Cloud (D-210, founder 24 Oct):** one private GitHub repo `todayz` in the TodayZ org. No staging: merges to `main` deploy straight to prod (API and worker on Beanstalk, the four apps on Cloudflare Pages). Cloud admin credentials are only in `.env.cloud.local`, read by the lead's shell; never use the founder's personal plugins or connectors. Only the lead pushes, creates cloud resources or applies Terraform, and the first prod apply waits for the founder's yes on the plan summary. Worker sessions stay local: no push, no cloud calls.
 - The API contract is `backend/api/` (split per domain, bundled by `make gen`). The bundled `openapi.yaml` is generated: edit only your own domain's files in `backend/api/paths/` and `backend/api/schemas/`, and run `make gen` in the same change.

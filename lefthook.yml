@@ -11,6 +11,11 @@ pre-commit:
     forbidden-files:
       run: scripts/hooks/forbidden-files.sh {staged_files}
 
+commit-msg:
+  commands:
+    docs-gate:
+      run: scripts/hooks/docs-gate.sh {1}
+
 pre-push:
   commands:
     no-push:

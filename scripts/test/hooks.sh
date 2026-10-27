@@ -15,6 +15,7 @@ for f in .env.example README.md backend/api/paths/orders.yaml customer/src/route
 done
 if "$root/scripts/hooks/no-push.sh" 2>/dev/null; then echo "FAIL: push allowed"; fail=1; fi
 grep -q 'no-push.sh' "$root/lefthook.yml" || { echo "FAIL: pre-push hook not configured"; fail=1; }
+grep -q 'docs-gate.sh' "$root/lefthook.yml" || { echo "FAIL: commit-msg docs gate not configured"; fail=1; }
 # .env.example must hold names only.
 if grep -E '^[A-Z][A-Z0-9_]*=.+' "$root/.env.example"; then echo "FAIL: .env.example has a value"; fail=1; fi
 [[ $fail -eq 0 ]] && echo "ok: git hooks guard secrets, generated code and pushes"

@@ -63,7 +63,7 @@ A WP is done only when all of these are true:
 7. All user-facing text goes through i18n keys (English filled, other languages can be pending).
 8. Metrics, logs and traces for the new code follow [05-observability.md](05-observability.md). New endpoints appear on the API dashboard without extra work; new business events are emitted.
 9. No secret, key, token, OTP or phone number appears in code, logs, test snapshots or chat output. An OTP is never logged in any environment, `local` and `test` included (D-15).
-10. The reviewer approved, and the WP's docs (folder `CLAUDE.md`, API spec, plan file if a rule changed) are updated.
+10. The reviewer approved, and the docs are updated in the same change: the feature file in `docs/features/`, the guides and diagrams in `docs/guide/`, the folder `README.md` and `CLAUDE.md`, the API spec, the root `README.md` if apps, commands or what is live changed, and the plan file and decision log if a rule changed. `make check` (`check-docs`) and the commit-msg hook enforce part of this; see [docs/guide/working-on-todayz.md](../guide/working-on-todayz.md).
 
 ## Ground rules for agents
 

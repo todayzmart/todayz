@@ -73,4 +73,4 @@ visual/       @todayz/e2e-visual (W4-04): visual.spec.ts and baselines/ (key scr
 ## Status
 
 W0-04 built `contract/`. W2-13 built `fixtures/` and `journeys/` (the Wave 2 gate, report in
-`docs/qa/W2-13/`). Load and security come with their WPs.
+`docs/qa/W2-13/`). Load (`e2e/load`, `make load`, W4-02) and security (`e2e/security`, `make security`, W4-03) are built.
