@@ -19,6 +19,14 @@ OtpSendRequest:
   type: object
   additionalProperties: false
   required: [phone, purpose, app, turnstileToken]
+  description: |
+    `step_up` with `app: admin` is refused (422): an admin's step-up code goes to the admin's own number through
+    `POST /v1/auth/step-up/send`, never to a number the caller names (D-264).
+  not:
+    required: [purpose, app]
+    properties:
+      purpose: {const: step_up}
+      app: {const: admin}
   properties:
     phone:
       $ref: "#/IndianMobile"
@@ -26,7 +34,8 @@ OtpSendRequest:
       type: string
       description: |
         Why the code is sent. `login` signs in (`otp/verify`). `step_up` confirms a sensitive action of a
-        signed-in customer, such as deleting the account (`DELETE /v1/me`); it never signs in.
+        signed-in customer, such as deleting the account (`DELETE /v1/me`); it never signs in. An admin's
+        step-up is `POST /v1/auth/step-up/send` (D-264).
       enum: [login, step_up]
     app:
       $ref: "#/AuthApp"

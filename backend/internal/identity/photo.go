@@ -118,7 +118,7 @@ func (s *Service) CreatePhotoUpload(ctx context.Context, p authn.Principal, cont
 		}
 		return q.InsertPhotoUpload(ctx, identitydb.InsertPhotoUploadParams{
 			ID: ids.UUID(id), UserID: ids.UUID(p.UserID), ObjectKey: key, ContentType: contentType,
-			SizeBytes: int32(size), Now: now, //nolint:gosec // size ≤ 5 MB, checked above
+			SizeBytes: int32(size), Now: now, // #nosec G115 -- size is 1..photoMaxBytes (5 MB), checked above
 		})
 	})
 	if err != nil {

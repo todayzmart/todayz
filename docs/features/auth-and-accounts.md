@@ -2,7 +2,7 @@
 
 How people sign in to TodayZ, what a session is, and what an account can do (profile, photo, addresses, deletion).
 
-> As built on main at 713c1cae (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a3ce1b39 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -67,6 +67,8 @@ sequenceDiagram
     API-->>A: validUntil (sessions.step_up_at stamped; token unchanged)
     A->>API: Same † action again
 ```
+
+The code always goes to the number on the admin's account. `POST /v1/auth/otp/send` refuses `purpose: step_up` with `app: admin` (422 `validation_failed`); the contract itself excludes the pair (D-264).
 
 ## Code
 

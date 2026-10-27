@@ -146,6 +146,16 @@ func TestIdentityHTTPDeleteMe(t *testing.T) {
 	require.NotEqual(t, http.StatusOK, a.do(http.MethodGet, "/v1/me", "", bearer(access)).Code)
 }
 
+// D-264: otp/send never sends an admin step-up code to a number the caller
+// names; the contract refuses the pair before the handler runs, and no code is
+// sent.
+func TestIdentityHTTPAdminStepUpNotOnOTPSend(t *testing.T) {
+	a := newIdentityAPI(t)
+	w := a.do(http.MethodPost, "/v1/auth/otp/send", `{"phone":"`+testPhone+`","app":"admin","purpose":"step_up","turnstileToken":"XXXX.DUMMY.TOKEN.XXXX"}`, nil)
+	require.Equal(t, http.StatusUnprocessableEntity, w.Code, w.Body.String())
+	require.Equal(t, "validation_failed", decode(t, w)["code"])
+}
+
 func mustID(t *testing.T, s string) ids.ID {
 	t.Helper()
 	id, err := ids.Parse(s)
