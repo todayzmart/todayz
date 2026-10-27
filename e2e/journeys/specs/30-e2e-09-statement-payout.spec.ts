@@ -53,6 +53,19 @@ test('E2E-09 month-end statement → finance marks the payout paid → the busin
     expect((await shop.creditAccount()).balanceCredits, 'Lakshmi has credits to pay').toBeGreaterThan(0);
   });
 
+  // An open or confirmed risk flag on the business or its shops holds the payout at the close (A-11).
+  // E2E-07 syncs offline sales with odd device times at SL, which flags the shop (D-243), so the
+  // reviewer clears what is open on A-13 first, as an admin would before month end.
+  await test.step('the risk reviewer clears the open flags on Lakshmi Traders and its shops', async () => {
+    const subjects = new Set<string>([LAKSHMI.id, STORES.SL.id, STORES.SL2.id]);
+    for (const status of ['open', 'confirmed']) {
+      const list = await superAdmin.api.ok<{ items: { id: string; subjectId: string | null }[] }>('admin lists the risk flags', 'GET', '/v1/admin/risk/flags', undefined, { params: { status } });
+      for (const f of list.items.filter((i) => i.subjectId !== null && subjects.has(i.subjectId))) {
+        await superAdmin.api.ok('admin clears a flag', 'POST', `/v1/admin/risk/flags/${f.id}/clear`, { from: status, reason: 'E2E-09 gate: reviewed before month end' }, { idem: false });
+      }
+    }
+  });
+
   const period = await test.step('the clock moves just past the 1st, 01:00 IST: last month closes', async () => {
     const ist = new Date((await serverNow()) + IST_MS);
     const firstOfNext = Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth() + 1, 1, 1, 0);

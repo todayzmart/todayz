@@ -5,7 +5,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"net/http"
 	"net/url"
 	"strings"
 	"testing"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/storage"
 )
@@ -108,7 +108,7 @@ func TestTypesPicks(t *testing.T) {
 	require.NoError(t, err)
 	importer := func(dry bool) *TypeImporter {
 		ti, err := NewTypes(Deps{
-			DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: &http.Client{Timeout: 5 * time.Second},
+			DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true, Timeout: 5 * time.Second}),
 			Audit: audit.New(db.New(w.tdb.Pool), w.clk, nil), Clock: w.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil)),
 			Sleep: func(_ context.Context, d time.Duration) error {
 				w.slept = append(w.slept, d)

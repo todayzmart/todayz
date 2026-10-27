@@ -1415,6 +1415,7 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **The flag.** One `pos.offline_sold_at_odd` risk flag per store per IST day, score 50 as for the other POS flags, with details of the cashier and the count. The admin risk queue (A-13) names it "Offline sale with an odd time".
 - **Fixed values in code** (01 §17), not settings: they are device-clock tolerances, not product levers. A device's first sync has no previous sync, so only the ahead and clamp tests apply to it.
 - Tests: `cmd/todayz` `TestPOSOfflineSoldAtOdd`, plus the existing POS sync tests unchanged.
+- **Knock-on in the journeys (27 Oct release check).** E2E-07's odd-time variants now flag SL, and an open flag holds Lakshmi Traders' payout at the close (A-11), so E2E-09 found it `held`, not `pending`. E2E-09 now has the risk reviewer clear the open flags on Lakshmi Traders and its shops (`POST /v1/admin/risk/flags/{id}/clear`) before the month closes, as an admin would. The hold rule is unchanged.
 
 **D-244 · A local-only switch turns off the admin authenticator step (founder, 26 Oct: "remove TOTP for now … in admin").**
 - Superseded by D-264 (27 Oct): the authenticator is gone everywhere, so `ADMIN_TOTP_OFF` and `VITE_ADMIN_TOTP_OFF` are removed. The text below is history.
