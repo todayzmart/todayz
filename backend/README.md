@@ -2,7 +2,7 @@
 
 The TodayZ Go API and background worker: one module, one binary called `todayz`.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Stack: Go, chi (router), pgx v5 and sqlc (database), goose (migrations), River (jobs, stored in Postgres), PostGIS (maps and search), oapi-codegen and kin-openapi (contract). The folder's rules for contributors are in [CLAUDE.md](CLAUDE.md). The system as a whole is in [docs/guide/architecture.md](../docs/guide/architecture.md).
 
@@ -58,6 +58,8 @@ The complete list, with required and optional markers, is in `backend/internal/p
 | `rollup demo [--for 10m]` | Synthetic traffic against the local API, used by `make demo` |
 | `ai eval <feature\|all> [--live]` | Runs AI evals on recorded replies; `--live` calls the model with your own key (`make ai-eval`) |
 | `images import [--dry-run] [--limit N] [--source off\|obf\|opf] [--report FILE]` | Drafts product images from Open Food, Beauty and Products Facts |
+| `images types [--dry-run] [--again] [--limit N] [--contact URL] [--report FILE]` | Finds item-type photo candidates on Wikimedia Commons for A-08 (D-253) |
+| `images types --picks FILE\|builtin [--dry-run] [--report FILE]` | Applies saved picks (`internal/imageimport/data/approved-type-photos.csv` is `builtin`) as A-08 would, audited as the system (D-265) |
 | `version` | Prints build info |
 
 Exit codes: 0 ok, 1 failed, 2 usage.

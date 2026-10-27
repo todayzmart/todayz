@@ -105,27 +105,40 @@ func TestSameShot(t *testing.T) {
 	require.Equal(t, "toothbrush", sameShot("Toothbrush (2021) 02.jpg"))
 }
 
-// fakeCommons answers the search API from a table of titles per search and
-// serves every file as the same JPEG.
+// fakeCommons answers the search API from a table of titles per search, and
+// a title lookup ("titles:<file>" in searches) for any file not in gone, and
+// serves every file as the same JPEG. Files are CC BY-SA 4.0 unless licences
+// says otherwise.
 type fakeCommons struct {
 	mu       sync.Mutex
 	api      *httptest.Server
 	files    *httptest.Server
 	results  map[string][]string
+	licences map[string]string
+	gone     map[string]bool
 	searches []string
 }
 
 func newFakeCommons(t *testing.T, results map[string][]string) *fakeCommons {
 	t.Helper()
-	c := &fakeCommons{results: results}
+	c := &fakeCommons{results: results, licences: map[string]string{}, gone: map[string]bool{}}
 	c.files = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/images/amul.jpg")
 	}))
 	t.Cleanup(c.files.Close)
 	c.api = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
-		require.Equal(t, "6", q.Get("gsrnamespace"))
 		search := strings.TrimSuffix(q.Get("gsrsearch"), " filetype:bitmap")
+		var titles []string
+		if title := strings.TrimPrefix(q.Get("titles"), "File:"); title != "" {
+			search = "titles:" + title
+			if !c.gone[title] {
+				titles = []string{title}
+			}
+		} else {
+			require.Equal(t, "6", q.Get("gsrnamespace"))
+			titles = c.results[search]
+		}
 		c.mu.Lock()
 		c.searches = append(c.searches, search)
 		c.mu.Unlock()
@@ -142,12 +155,16 @@ func newFakeCommons(t *testing.T, results map[string][]string) *fakeCommons {
 			ImageInfo []info `json:"imageinfo"`
 		}
 		pages := []page{}
-		for i, title := range c.results[search] {
+		for i, title := range titles {
 			name := url.PathEscape(strings.ReplaceAll(title, " ", "_"))
+			licence := c.licences[title]
+			if licence == "" {
+				licence = "CC BY-SA 4.0"
+			}
 			pages = append(pages, page{Title: "File:" + title, Index: i + 1, ImageInfo: []info{{
 				ThumbURL: c.files.URL + "/" + name, DescriptionURL: "https://commons.wikimedia.org/wiki/File:" + name,
 				Mime: "image/jpeg", Width: 1200,
-				ExtMetadata: map[string]map[string]any{"LicenseShortName": {"value": "CC BY-SA 4.0"}, "Artist": {"value": "<a href='x'>A. Photographer</a>"}},
+				ExtMetadata: map[string]map[string]any{"LicenseShortName": {"value": licence}, "Artist": {"value": "<a href='x'>A. Photographer</a>"}},
 			}}})
 		}
 		w.Header().Set("Content-Type", "application/json")

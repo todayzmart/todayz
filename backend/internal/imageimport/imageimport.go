@@ -25,6 +25,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/todayz/backend/gen/sqlc/imageimportdb"
+	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -48,15 +49,19 @@ const pageSize = 100
 var ErrRateLimited = errors.New("imageimport: rate limited, run again later")
 
 // Store keeps the copied image in the private bucket (*storage.Client).
+// Publish copies a private object to the images bucket (`types --picks`).
 type Store interface {
 	Put(ctx context.Context, key, contentType string, body []byte, now time.Time) error
 	Remove(ctx context.Context, key string, now time.Time) error
+	Publish(ctx context.Context, src, dst, contentType string, maxBytes int64, now time.Time) error
 }
 
-// Deps are what an import needs. Store may be nil on a dry run.
+// Deps are what an import needs. Store may be nil on a dry run; Audit is
+// needed only to apply picks (`types --picks`).
 type Deps struct {
 	DB     *db.DB
 	Store  Store
+	Audit  *audit.Writer
 	Client *http.Client // httpx.NewOutboundClient
 	Clock  clock.Clock
 	Log    *slog.Logger

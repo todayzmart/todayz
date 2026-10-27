@@ -193,30 +193,36 @@ func (t *TypeImporter) fill(ctx context.Context) (int, error) {
 			continue
 		}
 		err := t.d.DB.InTx(ctx, func(ctx context.Context) error {
-			q := imageimportdb.New(t.d.DB.Q(ctx))
-			prods, err := q.TypeKindProducts(ctx, imageimportdb.TypeKindProductsParams{CategoryID: a.CategoryID, TypeKey: a.TypeKey, TypePhotoID: a.ID})
-			if err != nil || len(prods) == 0 {
-				return err
-			}
-			now := t.d.Clock.Now()
-			imgIDs := make([]pgtype.UUID, len(prods))
-			for i := range prods {
-				imgIDs[i] = ids.UUID(t.ids.New(now))
-			}
-			if err := q.InsertTypeImages(ctx, imageimportdb.InsertTypeImagesParams{Now: now, Ids: imgIDs, ProductIds: prods, TypePhotoID: a.ID}); err != nil {
-				return err
-			}
-			if err := q.SetTypeProductImages(ctx, imageimportdb.SetTypeProductImagesParams{ImageKey: *a.PublicKey, Now: now, Ids: imgIDs, ProductIds: prods}); err != nil {
-				return err
-			}
-			total += len(prods)
-			return nil
+			n, err := t.fillKind(ctx, imageimportdb.New(t.d.DB.Q(ctx)), a.ID, a.CategoryID, a.TypeKey, *a.PublicKey)
+			total += n
+			return err
 		})
 		if err != nil {
 			return total, fmt.Errorf("imageimport: fill %s: %w", a.TypeKey, err)
 		}
 	}
 	return total, nil
+}
+
+// fillKind gives a kind's approved photo to every product of the kind that
+// has no image and never had this photo taken down. It returns how many.
+func (t *TypeImporter) fillKind(ctx context.Context, q *imageimportdb.Queries, photoID, categoryID pgtype.UUID, typeKey, publicKey string) (int, error) {
+	prods, err := q.TypeKindProducts(ctx, imageimportdb.TypeKindProductsParams{CategoryID: categoryID, TypeKey: typeKey, TypePhotoID: photoID})
+	if err != nil || len(prods) == 0 {
+		return 0, err
+	}
+	now := t.d.Clock.Now()
+	imgIDs := make([]pgtype.UUID, len(prods))
+	for i := range prods {
+		imgIDs[i] = ids.UUID(t.ids.New(now))
+	}
+	if err := q.InsertTypeImages(ctx, imageimportdb.InsertTypeImagesParams{Now: now, Ids: imgIDs, ProductIds: prods, TypePhotoID: photoID}); err != nil {
+		return 0, err
+	}
+	if err := q.SetTypeProductImages(ctx, imageimportdb.SetTypeProductImagesParams{ImageKey: publicKey, Now: now, Ids: imgIDs, ProductIds: prods}); err != nil {
+		return 0, err
+	}
+	return len(prods), nil
 }
 
 // clear drops the waiting candidates of kinds with no picked photo, and their
@@ -505,7 +511,7 @@ func (t *TypeImporter) kind(ctx context.Context, k imageimportdb.TypeKindsRow) (
 			stored = append(stored, f.Title)
 			continue
 		}
-		ok, err := t.store(ctx, k, f, len(stored)+1)
+		_, ok, err := t.store(ctx, k.CategoryID, k.TypeKey, f, len(stored)+1)
 		if err != nil {
 			if stopping(ctx, err) {
 				return stored, err
@@ -524,13 +530,30 @@ func (t *TypeImporter) kind(ctx context.Context, k imageimportdb.TypeKindsRow) (
 // keeps those with a free licence, no restriction and a usable size.
 func (t *TypeImporter) search(ctx context.Context, query string) ([]commonsFile, error) {
 	v := url.Values{}
-	v.Set("action", "query")
-	v.Set("format", "json")
-	v.Set("formatversion", "2")
 	v.Set("generator", "search")
 	v.Set("gsrnamespace", "6")
 	v.Set("gsrlimit", "20")
 	v.Set("gsrsearch", query+" filetype:bitmap")
+	files, err := t.imageInfo(ctx, v)
+	if err != nil {
+		return nil, err
+	}
+	var out []commonsFile
+	for _, f := range files {
+		if usable(f) {
+			out = append(out, f)
+		}
+	}
+	return out, nil
+}
+
+// imageInfo asks Commons for the files a query names (a search, or titles),
+// with their size, type, licence and credit, in the query's order. A title
+// Commons does not have is left out.
+func (t *TypeImporter) imageInfo(ctx context.Context, v url.Values) ([]commonsFile, error) {
+	v.Set("action", "query")
+	v.Set("format", "json")
+	v.Set("formatversion", "2")
 	v.Set("prop", "imageinfo")
 	v.Set("iiprop", "url|mime|size|extmetadata")
 	v.Set("iiurlwidth", fmt.Sprint(thumbWidth))
@@ -552,7 +575,7 @@ func (t *TypeImporter) search(ctx context.Context, query string) ([]commonsFile,
 			} `json:"pages"`
 		} `json:"query"`
 	}
-	if _, err := t.im.getJSON(ctx, "commons:search", CommonsPace, t.o.APIURL+"?"+v.Encode(), &body); err != nil {
+	if _, err := t.im.getJSON(ctx, "commons:api", CommonsPace, t.o.APIURL+"?"+v.Encode(), &body); err != nil {
 		return nil, err
 	}
 	pages := body.Query.Pages
@@ -576,14 +599,11 @@ func (t *TypeImporter) search(ctx context.Context, query string) ([]commonsFile,
 			}
 			return ""
 		}
-		f := commonsFile{
+		out = append(out, commonsFile{
 			Title: strings.TrimPrefix(p.Title, "File:"), ThumbURL: ii.ThumbURL, PageURL: ii.DescriptionURL,
 			Licence: meta("LicenseShortName"), Author: plainText(meta("Artist")), Width: ii.Width, Mime: ii.Mime,
 			Restrict: meta("Restrictions"),
-		}
-		if usable(f) {
-			out = append(out, f)
-		}
+		})
 	}
 	return out, nil
 }
@@ -615,32 +635,32 @@ func plainText(s string) string {
 }
 
 // store copies a file into the private bucket as a pending candidate of its
-// kind; false when the kind already had it.
-func (t *TypeImporter) store(ctx context.Context, k imageimportdb.TypeKindsRow, f commonsFile, rank int) (bool, error) {
+// kind and returns the row's id; false when the kind already had it.
+func (t *TypeImporter) store(ctx context.Context, categoryID pgtype.UUID, typeKey string, f commonsFile, rank int) (ids.ID, bool, error) {
 	if err := t.im.wait(ctx, "commons:file", CommonsPace); err != nil {
-		return false, err
+		return ids.Zero, false, err
 	}
 	body, ct, err := t.im.download(ctx, f.ThumbURL)
 	if err != nil {
-		return false, err
+		return ids.Zero, false, err
 	}
 	now := t.d.Clock.Now()
 	id := t.ids.New(now)
 	key := "type-photos/" + id.String() + ext(ct)
 	if err := t.d.Store.Put(ctx, key, ct, body, now); err != nil {
-		return false, fmt.Errorf("imageimport: put: %w", err)
+		return ids.Zero, false, fmt.Errorf("imageimport: put: %w", err)
 	}
 	author := f.Author
 	if author == "" {
 		author = "Wikimedia Commons"
 	}
 	n, err := imageimportdb.New(t.d.DB.Q(ctx)).InsertTypePhoto(ctx, imageimportdb.InsertTypePhotoParams{
-		ID: ids.UUID(id), CategoryID: k.CategoryID, TypeKey: k.TypeKey, Rank: int16(rank), // #nosec G115 -- at most TypeCandidates
+		ID: ids.UUID(id), CategoryID: categoryID, TypeKey: typeKey, Rank: int16(rank), // #nosec G115 -- at most TypeCandidates
 		ObjectKey: key, ContentType: ct, SizeBytes: int32(len(body)), // #nosec G115 -- download caps it at maxImageBytes
 		SourceRef: f.Title, SourceUrl: f.ThumbURL, PageUrl: f.PageURL, Licence: f.Licence, Attribution: author, Now: now,
 	})
 	if err != nil {
-		return false, fmt.Errorf("imageimport: insert type photo: %w", err)
+		return ids.Zero, false, fmt.Errorf("imageimport: insert type photo: %w", err)
 	}
-	return n == 1, nil
+	return id, n == 1, nil
 }

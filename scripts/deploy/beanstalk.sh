@@ -9,6 +9,7 @@
 #   scripts/deploy/beanstalk.sh push                  # push that image to ECR (skipped if the tag is there)
 #   scripts/deploy/beanstalk.sh db-bootstrap          # ops task: roles, extensions, privileges (once; safe to repeat)
 #   scripts/deploy/beanstalk.sh migrate  [TAG]        # ops task: todayz migrate up on that image
+#   scripts/deploy/beanstalk.sh images-picks [TAG]    # ops task: todayz images types --picks builtin (D-265)
 #   scripts/deploy/beanstalk.sh release  [TAG]        # upload the bundles, create the application versions
 #   scripts/deploy/beanstalk.sh deploy   [TAG]        # worker, then api, to that release; waits for each
 #   scripts/deploy/beanstalk.sh ci-deploy             # GitHub Actions: OIDC role, then push, migrate, release, deploy
@@ -29,7 +30,7 @@ IMAGE="$REGISTRY/$REPOSITORY"
 DEPLOY_ROLE_ARN="${TODAYZ_DEPLOY_ROLE_ARN:-arn:aws:iam::$ACCOUNT:role/todayz-$ENV_NAME-github-deploy}"
 
 usage() {
-  sed -n '8,14p' "${BASH_SOURCE[0]}" | sed 's/^# *//' >&2
+  sed -n '8,15p' "${BASH_SOURCE[0]}" | sed 's/^# *//' >&2
   exit 2
 }
 
@@ -129,21 +130,37 @@ cmd_db_bootstrap() {
   run_task "$(cfg dbBootstrap)" db-bootstrap
 }
 
-cmd_migrate() {
-  local tag family current revision
-  tag="$(tag_arg "${1:-}")"
-  check_account && load_cfg
-  family="$(cfg migrate)"
-  # A new revision of the migrate task on this release's image; everything else is copied.
+# on_image FAMILY NAME TAG: register a new revision of an ops task on that release's image
+# (everything else is copied) and print its ARN.
+on_image() {
+  local family="$1" name="$2" tag="$3" current
   current="$(aws ecs describe-task-definition --task-definition "$family" --query taskDefinition --output json)"
   jq --arg image "$IMAGE:$tag" '{
       family, executionRoleArn, networkMode, requiresCompatibilities, cpu, memory, runtimePlatform,
       containerDefinitions: (.containerDefinitions | map(.image = $image))
-    }' <<<"$current" >"$OUT/migrate-taskdef.json"
-  revision="$(aws ecs register-task-definition --cli-input-json "file://$OUT/migrate-taskdef.json" \
-    --query 'taskDefinition.taskDefinitionArn' --output text)"
+    }' <<<"$current" >"$OUT/$name-taskdef.json"
+  aws ecs register-task-definition --cli-input-json "file://$OUT/$name-taskdef.json" \
+    --query 'taskDefinition.taskDefinitionArn' --output text
+}
+
+cmd_migrate() {
+  local tag revision
+  tag="$(tag_arg "${1:-}")"
+  check_account && load_cfg
+  revision="$(on_image "$(cfg migrate)" migrate "$tag")"
   log "migrate on $tag"
   run_task "$revision" migrate
+}
+
+# The founder's item-type photo picks (D-265): after the reference seed, and again after the
+# list grows. Safe to repeat: kinds that have a photo are left alone.
+cmd_images_picks() {
+  local tag revision
+  tag="$(tag_arg "${1:-}")"
+  check_account && load_cfg
+  revision="$(on_image "$(cfg images)" images "$tag")"
+  log "images types --picks builtin on $tag"
+  run_task "$revision" images
 }
 
 bundle() {
@@ -271,6 +288,7 @@ case "$cmd" in
   push) cmd_push "$@" ;;
   db-bootstrap) cmd_db_bootstrap ;;
   migrate) cmd_migrate "$@" ;;
+  images-picks) cmd_images_picks "$@" ;;
   release) cmd_release "$@" ;;
   deploy) cmd_deploy "$@" ;;
   ci-deploy) cmd_ci_deploy ;;

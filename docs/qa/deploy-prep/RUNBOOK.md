@@ -3,7 +3,7 @@
 For the lead, who runs every command here with `.env.cloud.local` loaded. The founder supplies the inputs in §2 and gives an explicit yes on the plan summary before the first prod apply (D-210).
 
 Nothing in this branch has been planned or applied. It was checked offline only:
-- `scripts/ci/terraform.sh static` for `infra/terraform` and `infra/cloudflare`: fmt, validate, tflint, checkov (471 passed, 0 failed, 102 skipped);
+- `scripts/ci/terraform.sh static` for `infra/terraform` and `infra/cloudflare`: fmt, validate, tflint, checkov (473 passed, 0 failed, 103 skipped);
 - `checks/check.py all`;
 - wflint;
 - shellcheck.
@@ -144,7 +144,8 @@ Each `plan` is reviewed before its `apply`. For prod, the summary goes to the fo
     - `aws elasticbeanstalk describe-environments` shows both environments `Green`;
     - the worker log shows River started;
     - the SMS dry run from 09 §6 (D-213), once F5/F6 are done;
-    - sign in to admin, then seed reference data (09 §5 step 6).
+    - sign in to admin, then seed reference data (09 §5 step 6);
+    - then the founder's item-type photos (D-265): `scripts/deploy/beanstalk.sh images-picks`. The `images` ops task runs `todayz images types --picks builtin` on the release's image as `todayz_app`, with the app keys, `DATABASE_URL`, the R2 keys (F8, step 6) and settings, and HTTPS out through the NAT to Commons. For each listed kind it copies the picked photo to the image bucket and gives it to the kind's products. The log ends with `type photo picks done` and the counts; each failure is a warning that names the kind, to pick in A-08. It is safe to repeat: kinds that have a photo are left alone, and a rerun gives the photos to products added since.
 13. **Turn on CI:**
     - create the GitHub `production` environment (F4);
     - set the repository variable `BACKEND_DEPLOY_ENABLED=true`;

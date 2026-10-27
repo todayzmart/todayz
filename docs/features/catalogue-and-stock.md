@@ -2,7 +2,7 @@
 
 How products, shop prices and stock quantities are stored, changed and photographed.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -35,7 +35,7 @@ flowchart LR
     Items --> Rec[catalogue_reconcile job]
 ```
 
-Each movement writes in the same transaction as the quantity change. Allocation across batches is in `alloc.go`. Product photos have three sources in order: the shop's photo, an admin upload, a stock photo of that kind of item (D-252, D-253).
+Each movement writes in the same transaction as the quantity change. Allocation across batches is in `alloc.go`. Product photos have three sources in order: the shop's photo, an admin upload, a stock photo of that kind of item (D-252, D-253). An admin picks each kind's photo from Commons candidates in A-08 (`todayz images types` finds them). The founder's picks are saved in `backend/internal/imageimport/data/approved-type-photos.csv`; `todayz images types --picks builtin` applies them to a new or reset database, with the same steps as A-08 and the system as the audited actor. It leaves alone a kind that already has a photo and a file that was turned down (D-265).
 
 ## Code
 
@@ -52,8 +52,8 @@ Package tests plus `backend/cmd/todayz/*_http_test.go`. Reports: [W1-03](../qa/W
 
 ## Status and known gaps
 
-Live in code. The AI scan flows are drafts only (see [ai-features](ai-features.md)). Stock photos for Indic names depend on the kind mapping.
+Live in code. The AI scan flows are drafts only (see [ai-features](ai-features.md)). Stock photos for Indic names depend on the kind mapping. 20 of the founder's 176 picks could not be saved (the files left the search results) and wait in A-08.
 
 ## Decisions
 
-D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252 and D-253 product images. D-35 and D-79 foreign-key ordering.
+D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252, D-253 and D-265 product images. D-35 and D-79 foreign-key ordering.

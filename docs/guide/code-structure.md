@@ -2,7 +2,7 @@
 
 Where everything is in the repo, and how each folder is organised.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Use this page to find the file for a change. For how the pieces work together read [architecture.md](architecture.md), and for journeys read [flows.md](flows.md). Rules for each folder are in its own `CLAUDE.md`.
 
@@ -69,7 +69,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/coach` | The shop coach: detectors, feed, runs, templates | `coach.go`, `feed.go`, `runs.go` |
 | `backend/internal/credits` | The credits ledger: wallet, lots, holds, cashback, expiry, adjustments | `credits.go`, `adjustments.go`, `reads.go`, `jobs.go` |
 | `backend/internal/identity` | Sign-in (OTP), sessions, refresh rotation, TOTP, addresses, profile photo, accounts | `identity.go`, `otp.go`, `session.go`, `totp.go` |
-| `backend/internal/imageimport` | Drafts product images from Open Food, Beauty and Products Facts | `imageimport.go`, `sources.go` |
+| `backend/internal/imageimport` | Drafts product images from Open Food, Beauty and Products Facts; finds item-type photo candidates on Wikimedia Commons and applies saved picks (`data/approved-type-photos.csv`) | `imageimport.go`, `sources.go`, `types.go`, `picks.go` |
 | `backend/internal/insights` | Business Overview and Demand insights reads | `service.go`, `overview.go`, `analytics.go` |
 | `backend/internal/jobs` | Registry of every job kind, one file per domain | `jobs.go`, `orders.go`, `credits.go` |
 | `backend/internal/notify` | Notification inboxes, delivery (SMS, WhatsApp), escalation, preferences | `notify.go`, `deliver.go`, `provider.go` |

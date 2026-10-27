@@ -15,7 +15,7 @@ Prod apply #1 creates:
 - **Network:** a VPC with 4 subnets in 2 zones, one NAT gateway, the free S3 gateway endpoint, 3 security groups and VPC flow logs. There are no interface endpoints (D-263).
 - **Database:** RDS Postgres on db.t4g.medium, Single-AZ, 100 GB gp3, 14-day point-in-time restore, deletion protection on. A weekly backup copy goes to ap-southeast-1.
 - **Secrets:** 22 empty Secrets Manager entries, filled later by `secrets.sh` (names only).
-- **Ops:** an ECS cluster with two Fargate task definitions (database bootstrap, migrate), IAM roles, log groups, 4 alarms, and an SNS alarm topic that mails `BUDGET_ALERT_EMAIL`.
+- **Ops:** an ECS cluster with three Fargate task definitions (database bootstrap, migrate, item-photo picks), IAM roles, log groups, 4 alarms, and an SNS alarm topic that mails `BUDGET_ALERT_EMAIL`.
 - **Beanstalk:** the `todayz-prod` application only. **No environments, no servers and no load balancer yet.** Those come in prod apply #2, after the database is migrated, as the runbook planned (D-254).
 - **TLS:** the ACM certificate request for `api.todayz.in`.
 

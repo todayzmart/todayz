@@ -2,7 +2,7 @@
 
 How TodayZ is built, released and rolled back, and what is live today.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## Environments
 
@@ -58,7 +58,7 @@ All in [.github/workflows](../../.github/workflows/). Every action is pinned by 
 | Script | Commands | Notes |
 |---|---|---|
 | `pages.sh` | `prepare`, `build`, `deploy` | Output goes to `.cache/pages/<app>`. Public build settings are in [infra/cloudflare/pages.env](../../infra/cloudflare/pages.env). The Vite apps get security headers (CSP in report-only for now). Deploys with `wrangler pages deploy --project-name todayz-<app> --branch main`; needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the environment |
-| `beanstalk.sh` | `build`, `push`, `db-bootstrap`, `migrate`, `release`, `deploy`, `ci-deploy` | One image runs `api`, `worker` and the migrate task. Images go to ECR with immutable tags. A release is two application versions, `<tag>-api` and `<tag>-worker`; deploy order is worker, then api. `ci-deploy` uses an OIDC role (`todayz-prod-github-deploy`, trusted only for the `production` environment), so no AWS key is stored in GitHub |
+| `beanstalk.sh` | `build`, `push`, `db-bootstrap`, `migrate`, `images-picks`, `release`, `deploy`, `ci-deploy` | One image runs `api`, `worker` and the migrate and images ops tasks (`images-picks` applies the saved item-photo picks, D-265). Images go to ECR with immutable tags. A release is two application versions, `<tag>-api` and `<tag>-worker`; deploy order is worker, then api. `ci-deploy` uses an OIDC role (`todayz-prod-github-deploy`, trusted only for the `production` environment), so no AWS key is stored in GitHub |
 | `secrets.sh` | `status`, `app-keys`, `database`, `put NAME`, `share-preview-to-pages` | Fills Secrets Manager containers at `todayz/prod/<NAME>`. Never replaces an existing value |
 | `state-bucket.sh` | (one run) | Creates the Terraform state bucket, versioned, with a native lock file (no DynamoDB, D-255) |
 

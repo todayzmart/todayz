@@ -106,3 +106,32 @@ JOIN type_photos t ON t.id = @type_photo_id AND t.status = 'approved';
 UPDATE products p SET image_id = u.id, image_key = @image_key::text, updated_at = @now::timestamptz, version = version + 1
 FROM (SELECT unnest(@ids::uuid[]) AS id, unnest(@product_ids::uuid[]) AS product_id) u
 WHERE p.id = u.product_id;
+
+-- `images types --picks` (D-265): re-applies picks saved from A-08 with the
+-- steps of admin's approveTypePhoto, decided by the system (no admin user).
+
+-- name: CategoryBySlug :one
+SELECT id FROM categories WHERE slug = @slug;
+
+-- name: TypeKindHasApproved :one
+SELECT EXISTS (SELECT 1 FROM type_photos
+  WHERE category_id = @category_id AND type_key = @type_key AND status = 'approved')::bool;
+
+-- name: TypeKindFile :one
+-- A kind's row for one Commons file, if it has had that file.
+SELECT id, status FROM type_photos
+WHERE category_id = @category_id AND type_key = @type_key AND source_ref = @source_ref;
+
+-- name: LockTypePhoto :one
+SELECT id, category_id, type_key, status, object_key, content_type
+FROM type_photos WHERE id = @id FOR UPDATE;
+
+-- name: ApproveTypePhoto :exec
+UPDATE type_photos SET status = 'approved', public_key = @public_key, decided_by = NULL,
+  decided_at = @now::timestamptz, reject_reason = NULL, updated_at = @now
+WHERE id = @id;
+
+-- name: RejectOtherTypePhotos :execrows
+UPDATE type_photos SET status = 'rejected', reject_reason = @reason, decided_by = NULL,
+  decided_at = @now::timestamptz, updated_at = @now
+WHERE category_id = @category_id AND type_key = @type_key AND status = 'pending' AND id <> @id;

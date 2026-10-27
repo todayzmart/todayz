@@ -1,4 +1,5 @@
-# One-off ops tasks on ECS Fargate (D-254): the database bootstrap and `todayz migrate up`. They
+# One-off ops tasks on ECS Fargate (D-254): the database bootstrap, `todayz migrate up` and the
+# item-photo picks (D-265). They
 # run inside the VPC with the app security group (the database lets it in), so nobody needs a
 # bastion or a public database. scripts/deploy/beanstalk.sh starts them and waits for the exit
 # code; the cluster costs nothing while no task runs.
@@ -14,6 +15,12 @@ locals {
       DATABASE_MIGRATE_URL = module.secrets.secret_arns["DATABASE_MIGRATE_URL"]
     },
   )
+  # The images task (D-265) runs as todayz_app with the app keys, DATABASE_URL and the R2 keys:
+  # `images types --picks builtin` copies the picked photos into the buckets.
+  images_secret_arns = {
+    for n in concat(module.secrets.app_key_names, ["DATABASE_URL", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]) :
+    n => module.secrets.secret_arns[n]
+  }
   ops_log_options = {
     awslogs-group         = aws_cloudwatch_log_group.ops.name
     awslogs-region        = data.aws_region.current.region
@@ -52,7 +59,7 @@ data "aws_iam_policy_document" "ecs_tasks_assume" {
   }
 }
 
-# The execution role pulls the images, writes the logs and reads only the secrets the two tasks
+# The execution role pulls the images, writes the logs and reads only the secrets the tasks
 # are given. The tasks themselves call no AWS API, so they have no task role.
 resource "aws_iam_role" "ops_execution" {
   name_prefix        = "${local.name}-ops-exec-"
@@ -68,7 +75,7 @@ data "aws_iam_policy_document" "ops_execution_secrets" {
   statement {
     sid       = "ReadOpsSecrets"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = distinct(concat(values(local.migrate_secret_arns), [module.database.master_secret_arn]))
+    resources = distinct(concat(values(local.migrate_secret_arns), values(local.images_secret_arns), [module.database.master_secret_arn]))
   }
 }
 
@@ -150,6 +157,43 @@ resource "aws_ecs_task_definition" "migrate" {
   }
 }
 
+# `images types --picks builtin` (D-265), once after the reference seed and again whenever the
+# pick list grows (scripts/deploy/beanstalk.sh images-picks). Like migrate, each run registers a
+# revision on the release's image; the rest is copied, so the R2 settings must be known at the
+# first apply (r2_account_id).
+resource "aws_ecs_task_definition" "images" {
+  family                   = "${local.name}-images"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ops_execution.arn
+
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
+  container_definitions = jsonencode([{
+    name                   = "images"
+    image                  = "${var.ecr_repository_url}:${var.initial_image_tag == "" ? "unreleased" : var.initial_image_tag}"
+    essential              = true
+    readonlyRootFilesystem = true
+    command                = ["images", "types", "--picks", "builtin"]
+    environment = concat([
+      { name = "APP_ENV", value = var.environment },
+      { name = "API_PUBLIC_URL", value = "https://${var.api_hostname}" },
+      { name = "LOG_LEVEL", value = "info" },
+    ], [for k, v in local.extra_properties : { name = k, value = v } if startswith(k, "R2_")])
+    secrets          = [for k, v in local.images_secret_arns : { name = k, valueFrom = v }]
+    logConfiguration = { logDriver = "awslogs", options = local.ops_log_options }
+  }])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
+}
+
 # Everything a script needs to start a task, in one place it can read without Terraform.
 resource "aws_ssm_parameter" "ops_run_task" {
   #checkov:skip=CKV2_AWS_34:Not a secret: cluster, subnet and security group ids and task families.
@@ -162,6 +206,7 @@ resource "aws_ssm_parameter" "ops_run_task" {
     securityGroups    = [aws_security_group.app.id]
     dbBootstrap       = aws_ecs_task_definition.db_bootstrap.family
     migrate           = aws_ecs_task_definition.migrate.family
+    images            = aws_ecs_task_definition.images.family
     logGroup          = aws_cloudwatch_log_group.ops.name
     application       = aws_elastic_beanstalk_application.this.name
     apiEnvironment    = "${local.name}-api"
