@@ -1,6 +1,9 @@
-/* C-08 Product detail. Tokens only. */
+/* C-08 Product detail: the photo on a pastel square, then the name, price, stock and Add; side by side
+   on a wide screen (D-269). Tokens only. */
 
 .page {
+  --column: 560px;
+
   max-width: var(--column);
   margin: 0 auto;
   display: flex;
@@ -13,22 +16,78 @@
   align-self: flex-start;
 }
 
+@media (width >= 1024px) {
+  .page {
+    --column: 1040px;
+  }
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.gallery,
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (width >= 768px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-8);
+  }
+
+  .gallery {
+    position: sticky;
+    top: var(--space-4);
+  }
+}
+
 .media {
   display: grid;
   place-items: center;
-  height: 200px;
+  aspect-ratio: 1;
+  max-height: 320px;
   border-radius: var(--radius-xl);
-  background: var(--surface-subtle);
-  color: var(--ink-3);
+  background: var(--t-bg, var(--surface-subtle));
+  color: var(--t-ink, var(--ink-3));
   font: var(--type-display-xl);
   overflow: hidden;
 }
 
+@media (width >= 768px) {
+  .media {
+    max-height: none;
+  }
+}
+
 .mediaImg {
-  width: 100%;
-  height: 100%;
+  width: 82%;
+  height: 82%;
   object-fit: contain;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
+  mix-blend-mode: multiply;
+}
+
+.price {
+  font: 800 26px/1.1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.off {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font: 800 12px/18px var(--font-sans);
 }
 
 .credit {

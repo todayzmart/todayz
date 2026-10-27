@@ -96,8 +96,13 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
     <div aria-busy={items.isPending}>
       {items.isPending && (
         <div className={styles.items}>
-          <Skeleton shape="block" height="190px" />
-          <Skeleton shape="block" height="190px" />
+          {[0, 1, 2, 3, 4, 5].map((k) => (
+            <div key={k} className={styles.skelTile}>
+              <Skeleton shape="block" height="auto" />
+              <Skeleton width="40%" />
+              <Skeleton width="85%" />
+            </div>
+          ))}
         </div>
       )}
       {items.isError && (

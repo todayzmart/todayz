@@ -408,5 +408,40 @@
     "message": "ಸ್ಥಳ ಬದಲಿಸಿ",
     "review": "machine",
     "enHash": "04410a88"
+  },
+  "home.mode.label": {
+    "message": "ಯಾವುದಕ್ಕೆ ಅಂಗಡಿಗಳನ್ನು ತೋರಿಸಬೇಕು",
+    "review": "machine",
+    "enHash": "07de4fb5"
+  },
+  "home.mode.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "machine",
+    "enHash": "6a720856"
+  },
+  "home.rail.from": {
+    "message": "{shop} ಇಂದ",
+    "review": "machine",
+    "enHash": "bb11572a"
+  },
+  "home.rail.deals": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಆಫರ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "018ddbfb"
+  },
+  "home.rail.under": {
+    "message": "{price} ಒಳಗೆ",
+    "review": "machine",
+    "enHash": "8344ca3d"
+  },
+  "home.rail.seeAll": {
+    "message": "ಎಲ್ಲಾ ನೋಡಿ",
+    "review": "machine",
+    "enHash": "2941c5ce"
+  },
+  "home.rail.seeAllAt": {
+    "message": "{shop} ನ ಎಲ್ಲಾ ವಸ್ತುಗಳನ್ನು ನೋಡಿ",
+    "review": "machine",
+    "enHash": "fb6d20da"
   }
 }

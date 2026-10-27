@@ -537,6 +537,57 @@
   background: var(--b-tint);
 }
 
+/* Shop types on For retailers (D-269): pastel tiles, the product photo multiplied onto the tint */
+.bp .b-types {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bp .b-types li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 14px 20px;
+  border-radius: var(--b-r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.bp .b-type-photo {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  margin-bottom: 10px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--b-tint) 14%, var(--surface));
+  overflow: hidden;
+}
+
+/* Sized by width: a 16:10 box is 62.5% as tall as it is wide, so a 56% square always fits. */
+.bp .b-type-photo img {
+  width: 56%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.bp .b-types b {
+  padding: 0 6px;
+  font: 700 18px/24px var(--font-display);
+}
+
+.bp .b-types p {
+  margin: 0;
+  padding: 0 6px;
+  font: 400 14px/20px var(--font-sans);
+  color: var(--ink-2);
+}
+
 /* Cost */
 .bp .b-cost {
   display: grid;
@@ -1694,6 +1745,21 @@
 
   .bp .b-shelf {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (width <= 760px) {
+  .bp .b-types {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .bp .b-types li {
+    padding: 10px 10px 16px;
+  }
+
+  .bp .b-types b {
+    font-size: 16px;
   }
 }
 

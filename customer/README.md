@@ -36,7 +36,7 @@ Feature folders under `src/`:
 
 ## Tech
 
-React 19, Vite, TanStack Router and Query, `@todayz/ui`, `@todayz/api-client`, `@todayz/i18n`. Light theme only. Bundle budget in `size-limit`.
+React 19, Vite, TanStack Router and Query, `@todayz/ui`, `@todayz/api-client`, `@todayz/i18n`. Light theme only; discovery screens use quick-commerce patterns on TodayZ tokens (D-269, see [CLAUDE.md](CLAUDE.md)). Bundle budget in `size-limit`.
 
 ## More
 

@@ -408,5 +408,40 @@
     "message": "लोकेशन बदलें",
     "review": "machine",
     "enHash": "04410a88"
+  },
+  "home.mode.label": {
+    "message": "किसके लिए दुकानें दिखाएँ",
+    "review": "machine",
+    "enHash": "07de4fb5"
+  },
+  "home.mode.all": {
+    "message": "सभी",
+    "review": "machine",
+    "enHash": "6a720856"
+  },
+  "home.rail.from": {
+    "message": "{shop} से",
+    "review": "machine",
+    "enHash": "bb11572a"
+  },
+  "home.rail.deals": {
+    "message": "आपके पास के ऑफ़र",
+    "review": "machine",
+    "enHash": "018ddbfb"
+  },
+  "home.rail.under": {
+    "message": "{price} से कम",
+    "review": "machine",
+    "enHash": "8344ca3d"
+  },
+  "home.rail.seeAll": {
+    "message": "सभी देखें",
+    "review": "machine",
+    "enHash": "2941c5ce"
+  },
+  "home.rail.seeAllAt": {
+    "message": "{shop} का सारा सामान देखें",
+    "review": "machine",
+    "enHash": "fb6d20da"
   }
 }

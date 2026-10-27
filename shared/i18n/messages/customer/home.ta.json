@@ -408,5 +408,40 @@
     "message": "இருப்பிடத்தை மாற்றவும்",
     "review": "machine",
     "enHash": "04410a88"
+  },
+  "home.mode.label": {
+    "message": "எதற்கான கடைகளைக் காட்ட வேண்டும்",
+    "review": "machine",
+    "enHash": "07de4fb5"
+  },
+  "home.mode.all": {
+    "message": "அனைத்தும்",
+    "review": "machine",
+    "enHash": "6a720856"
+  },
+  "home.rail.from": {
+    "message": "{shop} இலிருந்து",
+    "review": "machine",
+    "enHash": "bb11572a"
+  },
+  "home.rail.deals": {
+    "message": "உங்கள் அருகிலுள்ள சலுகைகள்",
+    "review": "machine",
+    "enHash": "018ddbfb"
+  },
+  "home.rail.under": {
+    "message": "{price} க்குள்",
+    "review": "machine",
+    "enHash": "8344ca3d"
+  },
+  "home.rail.seeAll": {
+    "message": "அனைத்தையும் பார்",
+    "review": "machine",
+    "enHash": "2941c5ce"
+  },
+  "home.rail.seeAllAt": {
+    "message": "{shop} இன் அனைத்துப் பொருட்களையும் பார்",
+    "review": "machine",
+    "enHash": "fb6d20da"
   }
 }

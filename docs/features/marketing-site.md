@@ -2,7 +2,7 @@
 
 The public site at todayz.in: pages, languages, lead form, the demand marquee and the performance gates.
 
-> As built on main at 08cc9978 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -25,7 +25,7 @@ The page registry is [site/src/lib/pages.ts](../../site/src/lib/pages.ts). Views
 ## Rules
 
 - Astro builds static pages. Draft locales are dropped from the prod build (`drop-draft-locales`, D-102).
-- The landing follows the founder's bright trial on every page (D-262). The hero has no photo: dark text on the mint wash, with a smaller title (D-267). Shop types have round photos (D-260).
+- The landing follows the founder's bright trial on every page (D-262). The hero has no photo: dark text on the mint wash, with a smaller title (D-267). Shop types are pastel tiles with a cut-out CC0 or public-domain photo on the type's tint (D-269, replacing D-260's round photos), styled by `.bp .b-types` in `bright.css`; sources in `site/src/assets/photos/SOURCES.md`.
 - Lighthouse gates are in `lighthouserc.json` (D-102). The `/kn/` pages have a recorded exception (D-262, see commit history).
 - The marquee shows searches from at least k=10 people in a window (`site_marquee_min_searchers`, `site_marquee_window_days`, `site_marquee_max_items`).
 
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Tests
 
-Unit tests in `site/src/lib/*.test.ts`, Playwright in [site/e2e](../../site/e2e/), the check-site and Lighthouse scripts. Reports: [landing-v2](../qa/landing-v2/), [W4-04](../qa/W4-04/REPORT.md).
+Unit tests in `site/src/lib/*.test.ts`, Playwright in [site/e2e](../../site/e2e/), the check-site and Lighthouse scripts. Reports: [W1-09](../qa/W1-09/), [W4-04](../qa/W4-04/REPORT.md), [customer-redesign](../qa/customer-redesign/REPORT.md) (shop-type tiles).
 
 ## Status and known gaps
 
@@ -60,4 +60,4 @@ Live in code. Legal pages are English only (B6). The Kannada phone Lighthouse sc
 
 ## Decisions
 
-D-102, D-103, D-214, D-247, D-248, D-260, D-262.
+D-102, D-103, D-214, D-247, D-248, D-260, D-262, D-269.

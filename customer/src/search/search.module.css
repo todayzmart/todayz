@@ -2,7 +2,15 @@
    per shop with its items in a swipe row. Tokens only. */
 
 .page {
+  --column: 560px;
+
   padding-bottom: calc(var(--space-12) + var(--space-6));
+}
+
+@media (width >= 1024px) {
+  .page {
+    --column: 960px;
+  }
 }
 
 .head {
@@ -158,21 +166,23 @@
 .items {
   display: flex;
   gap: var(--space-3);
-  padding: 0 var(--space-3) var(--space-1);
+  padding: 0 var(--space-3) var(--space-2);
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
 }
 
+/* Item tiles (store/ItemCard): the next one peeks in on a phone. */
 .items > * {
   flex: none;
-  width: 156px;
+  width: 142px;
   scroll-snap-align: start;
 }
 
-.group .items :global(.tz-pcard) {
-  border-color: var(--line);
-  box-shadow: none;
+@media (width >= 1024px) {
+  .items > * {
+    width: 168px;
+  }
 }
 
 /* C-23 voice search: listening, the cap, a failure (W3-12). */

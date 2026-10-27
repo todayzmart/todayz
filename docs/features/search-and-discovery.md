@@ -2,13 +2,13 @@
 
 How a customer finds nearby shops and items: search, ranking, saved baskets, ratings and reviews, and the plain-language helpers.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
 | App | What |
 |---|---|
-| Customer app | Set a location. Search items. Filter with refine chips. Search by voice or plain sentence. Open a shop or item page. See proof on results (badges, ratings). Save baskets (lists) and find the shop that has the whole list or the best two-shop split. Write a review after pickup. Folders: [search](../../customer/src/search/), [search-assist](../../customer/src/search-assist/), [voice-search](../../customer/src/voice-search/), [basket](../../customer/src/basket/), [store](../../customer/src/store/), [home](../../customer/src/home/), [map](../../customer/src/map/), [substitutes](../../customer/src/substitutes/), [list-parse](../../customer/src/list-parse/). |
+| Customer app | Set a location. Search items. Filter with refine chips. Search by voice or plain sentence. Open a shop or item page. See proof on results (badges, ratings). Browse Home as a quick-commerce shelf (D-269): a sticky search with an All / Pickup / Delivery switch, pastel category tiles with photos, sideways product rails ("From {shop}", "Deals near you", "Under ₹99") and each category's subcategories; add an item from any tile with ADD, which turns into − n +. Save baskets (lists) and find the shop that has the whole list or the best two-shop split. Write a review after pickup. Folders: [search](../../customer/src/search/), [search-assist](../../customer/src/search-assist/), [voice-search](../../customer/src/voice-search/), [basket](../../customer/src/basket/), [store](../../customer/src/store/), [home](../../customer/src/home/), [map](../../customer/src/map/), [substitutes](../../customer/src/substitutes/), [list-parse](../../customer/src/list-parse/). |
 | Shop app | Reply to reviews. Folder: [reviews](../../business/src/reviews/). |
 | Admin console | Hide or restore reviews and replies, handle reports. Folder: [reviews](../../admin/src/reviews/). |
 | Backend jobs | `store_rating` (Bayesian rating writer), `store_reliability`, `rollup_ask_demand`. |
@@ -36,6 +36,8 @@ flowchart LR
     R --> L[search_log row]
 ```
 
+Home's rails have no endpoint of their own (D-269): `home/railShops.ts` picks the nearest open, bookable shops from the list Home already loaded, `home/Rails.tsx` reads each one's items (`GET /v1/discover/stores/{slug}/items`) and builds the rails in the browser; a tile's Add uses the same cart actions as the shop page. The All / Pickup / Delivery switch sends `pickup` or `delivery` to the store list, as the old filter chips did.
+
 Basket search checks which shops have every line, and if none does, finds the best pair of shops (D-110). Substitutes are rule-based with a pack-size tolerance setting (D-235).
 
 ## Code
@@ -49,14 +51,15 @@ Basket search checks which shops have every line, and if none does, finds the be
 
 ## Tests
 
-Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e2e/scenarios/BSK.md`. Reports: [W1-06](../qa/W1-06/REPORT.md), [W2-06](../qa/W2-06/REPORT.md), [W2-14](../qa/W2-14/REPORT.md), [W3-12](../qa/W3-12/REPORT.md), [refine-synonym-miss](../qa/refine-synonym-miss/).
+Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e2e/scenarios/BSK.md`. Reports: [W1-06](../qa/W1-06/REPORT.md), [W2-06](../qa/W2-06/REPORT.md), [W2-14](../qa/W2-14/REPORT.md), [W3-12](../qa/W3-12/REPORT.md), [customer-redesign](../qa/customer-redesign/REPORT.md), [refine-synonym-miss](../qa/refine-synonym-miss/).
 
 ## Status and known gaps
 
 - Live in code. The refine-chip parser is built; a stale package comment in `search/search.go` still says it is not.
 - The "ready soonest" ask badge is not shown on search results ([go-live gaps](../qa/go-live-gaps/LIST.md)).
+- Home rails are built in the browser from the nearest shops' item lists (D-269). There is no "items near you", popular-items, per-category item or ETA endpoint, items carry no category or colour (a tile's tint is a hash of the product id), and subcategories have no photos of their own (they repeat the parent's). See [customer-redesign](../qa/customer-redesign/REPORT.md).
 - The home map is a "tap to see the map" card (D-251 B1).
 
 ## Decisions
 
-D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab.
+D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch).

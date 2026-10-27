@@ -21,6 +21,8 @@ export interface AddToBasketProps {
   detail?: string;
   /** Smaller button for product cards. */
   compact?: boolean;
+  /** Only the basket icon (item tiles); the name stays in the accessible label. */
+  iconOnly?: boolean;
 }
 
 type Unit = (size: number, unit: string) => string;
@@ -38,7 +40,7 @@ async function addToSaved(qc: QueryClient, id: string, line: Omit<EditLine, 'key
   }
 }
 
-export function AddToBasket({ productId, name, detail = '', compact = false }: AddToBasketProps) {
+export function AddToBasket({ productId, name, detail = '', compact = false, iconOnly = false }: AddToBasketProps) {
   const intl = useIntl();
   const toast = useToast();
   const qc = useQueryClient();
@@ -103,7 +105,7 @@ export function AddToBasket({ productId, name, detail = '', compact = false }: A
         onClick={onClick}
         aria-label={compact ? intl.formatMessage({ id: 'basket.add.labelFor' }, { name }) : undefined}
       >
-        {intl.formatMessage({ id: 'basket.add' })}
+        {iconOnly ? <span className="tz-ui-sr-only">{intl.formatMessage({ id: 'basket.add' })}</span> : intl.formatMessage({ id: 'basket.add' })}
       </Button>
       {status === 'signedIn' && (
         <Sheet
