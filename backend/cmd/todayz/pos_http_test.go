@@ -482,7 +482,7 @@ func TestPOS02Reversal(t *testing.T) {
 }
 
 // POS-04: two devices sell the last unit offline; both sales apply, stock
-// goes to -1 and the item comes back countNeeded (02 §4.3).
+// goes to -1 and the item comes back as 0 and countNeeded (02 §4.3, D-270).
 func TestPOS04OversellOffline(t *testing.T) {
 	p := newPosShop(t)
 	r := p.sync(p.manager, p.stockEntry(1, "damage", p.atta, 499))
@@ -504,7 +504,8 @@ func TestPOS04OversellOffline(t *testing.T) {
 		it, _ := c.(map[string]any)["item"].(map[string]any)
 		if it != nil && it["id"] == p.atta {
 			found = true
-			require.EqualValues(t, -1, it["onHand"])
+			require.EqualValues(t, 0, it["onHand"])
+			require.EqualValues(t, 0, it["available"])
 			require.Equal(t, true, it["countNeeded"])
 		}
 	}

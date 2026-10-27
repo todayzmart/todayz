@@ -254,3 +254,54 @@
   justify-content: space-between;
   gap: var(--space-2);
 }
+
+/* D-270: the Update stock dialog and the blocked units on a tile. */
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font: var(--type-body);
+  color: var(--ink);
+}
+
+.check input {
+  margin-top: 0.2em;
+}
+
+.stockFacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.stockFacts > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.stockFacts dt {
+  color: var(--ink-2);
+  font: var(--type-caption);
+}
+
+.stockFacts dd {
+  margin: 0;
+  font: var(--type-heading);
+  color: var(--ink);
+}
+
+.stockAfter {
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-body);
+}
+
+.tileBlocked {
+  color: var(--tint-amber-ink);
+  font: var(--type-caption);
+}

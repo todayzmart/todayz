@@ -2,7 +2,7 @@
 
 How products, shop prices and stock quantities are stored, changed and photographed.
 
-> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -22,6 +22,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md) section 4.
 - Batches carry expiry (D-99). Stale and low stock use `stock_stale_after_hours` and `low_stock_default`.
 - A shop may sell at any price, above the MRP too (D-245).
 - Online stock is reserved at accept, not at placing (D-01).
+- Stock does not go below zero (D-270): `catalogue.Writer` refuses a POS sale above available (`Sale.CapAvailable`) and damage or expiry above on hand (`Removal.CapOnHand`). A synced offline sale is never refused, so an offline race can still leave on hand below 0; every read (`items.go`, the sync changes) then shows on hand and available as 0 with `countNeeded: true` until a count.
 
 ## How it works
 
@@ -56,4 +57,4 @@ Live in code. The AI scan flows are drafts only (see [ai-features](ai-features.m
 
 ## Decisions
 
-D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252, D-253 and D-265 product images. D-35 and D-79 foreign-key ordering.
+D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252, D-253 and D-265 product images. D-270 no stock below zero. D-35 and D-79 foreign-key ordering.

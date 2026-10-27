@@ -156,8 +156,10 @@ StoreItem:
   type: object
   description: >-
     A store's listing of a master product with its price and stock (01 §4).
-    `available` is `onHand − reserved`; `onHand` may be below 0 after an
-    offline sale (03 stock rule 1). `stale` is true when the stock was last
+    `available` is `onHand − reserved`, never shown below 0: when two offline
+    devices sold the last unit, the stored on hand may be below 0, and then
+    `onHand` and `available` read 0 and `countNeeded` is true until someone
+    counts (03 stock rule 1, D-270). `stale` is true when the stock was last
     confirmed more than `stock_stale_after_hours` ago (or never).
   required: [id, storeId, productId, name, productName, localName, brand, variant, packSize, unit,
     categoryId, barcodes, pricePaise, mrpPaise, productMrpPaise, onHand, reserved, available,
@@ -190,11 +192,18 @@ StoreItem:
       description: The master product's MRP.
       type: [integer, "null"]
       minimum: 0
-    onHand: {type: integer}
+    onHand:
+      type: integer
+      minimum: 0
     reserved:
       type: integer
       minimum: 0
-    available: {type: integer}
+    available:
+      type: integer
+      minimum: 0
+    countNeeded:
+      type: boolean
+      description: The stored on hand is below 0 (an offline race); a count fixes it (D-270).
     lowStockAt:
       type: [integer, "null"]
       description: The store's threshold; null uses `low_stock_default`.

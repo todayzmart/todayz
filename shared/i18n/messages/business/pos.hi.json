@@ -154,16 +154,6 @@
     "review": "reviewed",
     "enHash": "46a8c0dc"
   },
-  "pos.banner.short.title": {
-    "message": "{count, plural, one {# आइटम} other {# आइटम}} मौजूद गिनती से ज़्यादा है",
-    "review": "reviewed",
-    "enHash": "96a4287f"
-  },
-  "pos.banner.short.body": {
-    "message": "आप फिर भी इसे बेच सकते हैं। स्टॉक गिनती दोबारा गिनने के लिए चिह्नित होगी।",
-    "review": "reviewed",
-    "enHash": "6f3c3731"
-  },
   "pos.banner.linkDropped.title": {
     "message": "ग्राहक लिंक हटाया गया",
     "review": "reviewed",
@@ -938,5 +928,90 @@
     "message": "बिक्री देखें",
     "review": "reviewed",
     "enHash": "c1ce99e8"
+  },
+  "pos.stock.title": {
+    "message": "स्टॉक अपडेट करें",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "pos.stock.reason.add": {
+    "message": "{name} के अभी सिर्फ़ {available} बेचे जा सकते हैं। ज़्यादा बेचने के लिए शेल्फ़ गिनें।",
+    "review": "reviewed",
+    "enHash": "6f92ba1e"
+  },
+  "pos.stock.reason.charge": {
+    "message": "बिल में {name} अभी उपलब्ध {available} से ज़्यादा है। पैसे लेने से पहले शेल्फ़ गिनें।",
+    "review": "reviewed",
+    "enHash": "f494f65f"
+  },
+  "pos.stock.reason.sold": {
+    "message": "यह बिक्री हो गई, पर TodayZ में {name} बेचे गए से कम था। स्टॉक सही करने के लिए शेल्फ़ गिनें।",
+    "review": "reviewed",
+    "enHash": "243e8b77"
+  },
+  "pos.stock.cancel": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "pos.stock.save": {
+    "message": "गिनती सेव करें",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "pos.stock.onHand": {
+    "message": "हाथ में",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "pos.stock.blocked": {
+    "message": "ऑनलाइन ऑर्डर के लिए रोके गए",
+    "review": "reviewed",
+    "enHash": "49e39c58"
+  },
+  "pos.stock.available": {
+    "message": "उपलब्ध",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "pos.stock.countNeeded": {
+    "message": "TodayZ में जितना था उससे ज़्यादा बिका। ठीक करने के लिए शेल्फ़ गिनें।",
+    "review": "reviewed",
+    "enHash": "8630b84e"
+  },
+  "pos.stock.counted": {
+    "message": "अभी गिना",
+    "review": "reviewed",
+    "enHash": "00c212f8"
+  },
+  "pos.stock.countedHelp": {
+    "message": "अभी शेल्फ़ पर कितने नग हैं",
+    "review": "reviewed",
+    "enHash": "f286ea90"
+  },
+  "pos.stock.countedInvalid": {
+    "message": "पूरी संख्या लिखें",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "pos.stock.includesBlocked": {
+    "message": "{count, plural, one {इस गिनती में ऑनलाइन ऑर्डर के लिए रखा # नग शामिल है} other {इस गिनती में ऑनलाइन ऑर्डर के लिए रखे # नग शामिल हैं}}",
+    "review": "reviewed",
+    "enHash": "74cd172f"
+  },
+  "pos.stock.after": {
+    "message": "हाथ में {onHand} होंगे, उपलब्ध {available}",
+    "review": "reviewed",
+    "enHash": "882a5004"
+  },
+  "pos.stock.saveFailed": {
+    "message": "गिनती सेव नहीं हुई। फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "d2cbaf3e"
+  },
+  "pos.tile.blocked": {
+    "message": "{count} ऑनलाइन ऑर्डर के लिए रोके गए",
+    "review": "reviewed",
+    "enHash": "3bd43798"
   }
 }

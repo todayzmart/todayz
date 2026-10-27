@@ -116,6 +116,7 @@ type saleWrite struct {
 	Link              link
 	Offers            []AppliedOffer // online only: what the bill's offers took, redeemed with the sale
 	OfferUnmatched    bool           // offline only: a device offer discount the engine would not give (D-131)
+	CapStock          bool           // online only: a line above available is refused (D-270)
 	Path              string         // the request field of the bill, for errors
 }
 
@@ -180,9 +181,22 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		if ln.ItemID != ids.Zero {
 			mv, err = s.stock.Sell(ctx, t, StockSale{
 				StoreID: in.StoreID, ItemID: ln.ItemID, Qty: ln.Qty, SaleID: saleID,
-				ClientID: ln.ClientID, UserID: in.Cashier, DeviceID: in.StockDevice,
+				ClientID: ln.ClientID, UserID: in.Cashier, DeviceID: in.StockDevice, CapAvailable: in.CapStock,
 			})
+			var short *ShortError
 			switch {
+			case errors.As(err, &short):
+				// Lines of one item are taken in turn; available is the
+				// item's units before this sale, so earlier lines add back.
+				avail := int64(short.Available)
+				for _, prev := range b.Lines[:i] {
+					if prev.ItemID == ln.ItemID {
+						avail += int64(prev.Qty)
+					}
+				}
+				return written{}, problem.New(genproblems.InsufficientStock, "").
+					WithExtension("storeItemId", ln.ItemID.String()).
+					WithExtension("available", avail)
 			case errors.Is(err, ErrItemNotFound):
 				return written{}, fieldErr(fmt.Sprintf("%s.lines[%d].storeItemId", in.Path, i), "not_found")
 			case errors.Is(err, ErrClientIDReused):
@@ -411,7 +425,7 @@ func (s *Service) CreateSale(ctx context.Context, sc authz.Scope, body posapi.Po
 		out, err = s.writeSale(ctx, st, saleWrite{
 			StoreID: sc.StoreID, ClientID: clientID, Cashier: p.UserID, Device: device,
 			StockDevice: realDevice(device, real), Bill: b, Payment: string(body.PaymentMethod),
-			SoldAt: s.now(), Link: l, Offers: applied, Path: "body",
+			SoldAt: s.now(), Link: l, Offers: applied, Path: "body", CapStock: true,
 		})
 		if errors.Is(err, errSaleExists) {
 			replay = true

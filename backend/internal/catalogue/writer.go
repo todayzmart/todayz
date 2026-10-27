@@ -76,6 +76,14 @@ type OverError struct{ Max int32 }
 
 func (e *OverError) Error() string { return fmt.Sprintf("catalogue: quantity above %d", e.Max) }
 
+// capAt is *OverError when qty is above limit (never below 0 in Max).
+func capAt(qty int32, limit int64) error {
+	if int64(qty) > limit {
+		return &OverError{Max: i32(max(limit, 0))} // limit < qty ≤ 1e6
+	}
+	return nil
+}
+
 // Allocation is one batch's share of a movement.
 type Allocation struct {
 	BatchID ids.ID
@@ -131,6 +139,10 @@ type Sale struct {
 	ClientID        ids.ID // the offline line id; zero for none
 	Note            *string
 	Who             Who
+	// CapAvailable refuses more than available (on_hand − reserved) with
+	// *OverError; the online counter sale sets it (D-270). A synced offline
+	// sale does not: it already happened.
+	CapAvailable bool
 }
 
 // Sell writes a sale and takes it from the batches in rule 8's sale order.
@@ -142,6 +154,11 @@ func (w *Writer) Sell(ctx context.Context, q db.Querier, in Sale) (Movement, err
 		return Movement{}, ErrQuantity
 	}
 	return w.one(ctx, q, in.StoreID, in.ItemID, in.Source, in.ClientID, func(t *txn) (Movement, error) {
+		if in.CapAvailable {
+			if err := capAt(in.Qty, int64(t.item.OnHand)-int64(t.item.Reserved)); err != nil {
+				return Movement{}, err
+			}
+		}
 		bs, err := t.batches()
 		if err != nil {
 			return Movement{}, err
@@ -284,9 +301,12 @@ type Removal struct {
 	// CapAvailable refuses more than available (on_hand − reserved) with
 	// *OverError; the business app's damage and expired forms set it.
 	CapAvailable bool
-	ClientID     ids.ID
-	Note         *string
-	Who          Who
+	// CapOnHand refuses more than on_hand with *OverError; a synced offline
+	// damage or expired entry sets it (D-270).
+	CapOnHand bool
+	ClientID  ids.ID
+	Note      *string
+	Who       Who
 }
 
 // Remove writes damage or expired stock, taken in rule 8's plain order.
@@ -298,10 +318,14 @@ func (w *Writer) Remove(ctx context.Context, q db.Querier, in Removal) (Movement
 		return Movement{}, ErrQuantity
 	}
 	return w.one(ctx, q, in.StoreID, in.ItemID, in.Source, in.ClientID, func(t *txn) (Movement, error) {
-		if in.CapAvailable {
-			avail := int64(t.item.OnHand) - int64(t.item.Reserved)
-			if int64(in.Qty) > avail {
-				return Movement{}, &OverError{Max: i32(max(avail, 0))} // avail < Qty ≤ 1e6
+		switch {
+		case in.CapAvailable:
+			if err := capAt(in.Qty, int64(t.item.OnHand)-int64(t.item.Reserved)); err != nil {
+				return Movement{}, err
+			}
+		case in.CapOnHand:
+			if err := capAt(in.Qty, int64(t.item.OnHand)); err != nil {
+				return Movement{}, err
 			}
 		}
 		bs, err := t.batches()

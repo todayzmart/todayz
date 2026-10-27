@@ -106,9 +106,9 @@
                   name: Amul Butter 100 g
                   pricePaise: 5800
                   mrpPaise: 6000
-                  onHand: -1
+                  onHand: 0
                   reserved: 0
-                  available: -1
+                  available: 0
                   isListed: true
                   countNeeded: true
                   version: 9

@@ -13,8 +13,13 @@
 //    request until the bad one is found; that entry is `rejected` and later entries still go.
 //  - A sale linked by bill QR cannot wait for a sync (its claim lasts 120 s), so it goes through
 //    POST pos/sales only; if that fails past the claim it is refused and a person rings it again.
-//  - A sale never conflicts away: stock may go negative (flagged "count needed"), a counter-code link
-//    may fail at sync ("Customer link failed"), and the server's price is shown as returned.
+//  - Stock (D-270): the counter never rings more than the device's `available`, and a sale or a count
+//    updates the stored catalogue at once, so the next bill sees it offline too. POST pos/sales refuses
+//    a line above the server's available (`insufficient_stock`): the device adopts that number, keeps
+//    the sale (the money was taken) for the sync, which never refuses for stock, and asks for a count.
+//  - A sale never conflicts away: an offline race may still take stock below 0 on the server (read as 0
+//    with "count needed"), a counter-code link may fail at sync ("Customer link failed"), and the
+//    server's price is shown as returned.
 //  - `410 resync_required` (cursor older than 30 days, D-36) downloads a full catalogue snapshot first.
 import { ApiError } from '@todayz/api-client';
 import { entryToWire, needsOnline, saleToWire, type PosApi, type SaleAck, type SyncResult } from '../pos/api';
@@ -37,6 +42,8 @@ export interface SyncState {
   attempts: number;
   /** Goes up whenever the stored catalogue changes, so the screen reloads it. */
   catalogueVersion: number;
+  /** The item an online sale found short (`insufficient_stock`), so the counter asks for a count (D-270). */
+  short: { storeItemId: string; available: number } | null;
 }
 
 export interface EngineDeps {
@@ -74,6 +81,18 @@ export function isRetryable(e: unknown): boolean {
   return e.status === 409 && e.code === 'conflict' ? true : e.status === 401;
 }
 
+/** What the change feed says about an item (price and stock), which wins over a fetched copy. */
+function feedFields(i: CatalogueItem): Pick<CatalogueItem, 'pricePaise' | 'available' | 'isListed' | 'onHand' | 'reserved' | 'countNeeded'> {
+  return {
+    pricePaise: i.pricePaise,
+    available: i.available,
+    isListed: i.isListed,
+    ...(i.onHand !== undefined ? { onHand: i.onHand } : {}),
+    ...(i.reserved !== undefined ? { reserved: i.reserved } : {}),
+    ...(i.countNeeded !== undefined ? { countNeeded: i.countNeeded } : {}),
+  };
+}
+
 export function createSyncEngine(deps: EngineDeps) {
   const { storage, api, deviceId, newId } = deps;
   const now = deps.now ?? Date.now;
@@ -89,6 +108,7 @@ export function createSyncEngine(deps: EngineDeps) {
     nextAttemptAt: null,
     attempts: 0,
     catalogueVersion: 0,
+    short: null,
   };
   let singleMode = false;
   let chain: Promise<unknown> = Promise.resolve();
@@ -138,10 +158,31 @@ export function createSyncEngine(deps: EngineDeps) {
     return entry;
   }
 
+  /** Changes the stored items at once, ahead of the server's change feed (which then overwrites them). */
+  async function adjustStock(change: (item: CatalogueItem) => CatalogueItem | null, ids: ReadonlySet<string>) {
+    const { items, meta } = await storage.loadCatalogue();
+    if (!meta) return;
+    const next = items.filter((i) => ids.has(i.id)).flatMap((i) => change(i) ?? []);
+    if (next.length === 0) return;
+    await storage.applyChanges(next, [], meta);
+    set({ catalogueVersion: state.catalogueVersion + 1 });
+  }
+
+  /** Takes a sale's units off (sign -1) or puts them back (sign 1) in the stored catalogue. */
+  function saleStock(sale: Sale, sign: 1 | -1) {
+    const qty = new Map<string, number>();
+    for (const l of sale.lines) if (l.storeItemId) qty.set(l.storeItemId, (qty.get(l.storeItemId) ?? 0) + l.quantity);
+    return adjustStock((i) => {
+      const d = sign * (qty.get(i.id) ?? 0);
+      return { ...i, available: Math.max(0, i.available + d), ...(i.onHand !== undefined ? { onHand: Math.max(0, i.onHand + d) } : {}) };
+    }, new Set(qty.keys()));
+  }
+
   /** Records a sale in the outbox. The caller gives everything except the device sequence number. */
   async function recordSale(sale: Omit<Sale, 'deviceSeq' | 'deviceId'>): Promise<OutboxEntry> {
     const seq = await storage.nextSeq();
     const entry = await newEntry('sale', sale.clientId, { ...sale, deviceId, deviceSeq: seq }, seq);
+    await saleStock(entry.payload as Sale, -1);
     await recount();
     return entry;
   }
@@ -149,8 +190,19 @@ export function createSyncEngine(deps: EngineDeps) {
   async function recordMovement(m: StockMovement): Promise<OutboxEntry> {
     const seq = await storage.nextSeq();
     const entry = await newEntry('movement', newId(), m, seq);
+    await adjustStock((i) => {
+      const reserved = Math.max(0, i.reserved ?? 0);
+      const onHand = i.onHand ?? Math.max(0, i.available) + reserved;
+      const next = m.kind === 'count_correction' ? m.quantity : m.kind === 'restock' ? onHand + m.quantity : Math.max(0, onHand - m.quantity);
+      return { ...i, onHand: next, available: Math.max(0, next - reserved), ...(m.kind === 'count_correction' ? { countNeeded: false } : {}) };
+    }, new Set([m.storeItemId]));
     await recount();
     return entry;
+  }
+
+  /** The counter has asked for the count after an `insufficient_stock` answer. */
+  function clearShort() {
+    if (state.short) set({ short: null });
   }
 
   function stripCode(sale: Sale): Sale {
@@ -205,6 +257,8 @@ export function createSyncEngine(deps: EngineDeps) {
   async function markRejected(entry: OutboxEntry, code: string) {
     const payload = entry.kind === 'sale' ? stripCode(entry.payload as Sale) : entry.payload;
     await storage.putEntry({ ...entry, state: 'rejected', lastError: code, payload, result: { errorCode: code } });
+    // The server never took these units; give them back to the device's count.
+    if (entry.kind === 'sale') await saleStock(entry.payload as Sale, 1);
   }
 
   async function prune() {
@@ -231,7 +285,7 @@ export function createSyncEngine(deps: EngineDeps) {
       try {
         const full = await api.getItem(id);
         const cur = merged.get(id);
-        merged.set(id, cur ? { ...full, pricePaise: cur.pricePaise, available: cur.available, isListed: cur.isListed } : full);
+        merged.set(id, cur ? { ...full, ...feedFields(cur) } : full);
       } catch {
         // Keep the patch; the next snapshot fills the rest.
       }
@@ -402,6 +456,13 @@ export function createSyncEngine(deps: EngineDeps) {
         await adoptPrice(e);
         if (needsOnline(sale)) await markRejected(sending, e.code);
         else await storage.putEntry({ ...sending, state: 'pending', lastError: e.code });
+      } else if (e instanceof ApiError && e.code === 'insufficient_stock') {
+        // The server had fewer units than this device knew (another device, or an online order since the
+        // last pull). The customer has paid and left with the goods, so the sale is real: it goes by sync,
+        // which never refuses for stock, and the counter asks for a count of the item (D-270).
+        if (needsOnline(sale)) await markRejected(sending, e.code);
+        else await storage.putEntry({ ...sending, state: 'pending', lastError: e.code });
+        await adoptStock(e);
       } else if (isRetryable(e)) {
         await storage.putEntry({ ...sending, state: 'pending', lastError: e instanceof ApiError ? e.code : 'network' });
         if (needsOnline(sale)) failure(e, state.attempts + 1);
@@ -421,6 +482,24 @@ export function createSyncEngine(deps: EngineDeps) {
     if (!item || !meta) return;
     await storage.applyChanges([{ ...item, pricePaise: price }], [], meta);
     set({ catalogueVersion: state.catalogueVersion + 1 });
+  }
+
+  async function adoptStock(e: ApiError) {
+    const ext = e.problem.extensions;
+    const id = ext?.storeItemId;
+    const available = ext?.available;
+    if (typeof id !== 'string' || typeof available !== 'number') return;
+    // `available` is the server's before this sale, which is still on its way by sync.
+    const sold = (await storage.listEntries())
+      .filter((x) => x.kind === 'sale' && (x.state === 'pending' || x.state === 'sending'))
+      .flatMap((x) => (x.payload as Sale).lines)
+      .filter((l) => l.storeItemId === id)
+      .reduce((n, l) => n + l.quantity, 0);
+    await adjustStock((i) => {
+      const left = Math.max(0, available - sold);
+      return { ...i, available: left, onHand: left + Math.max(0, i.reserved ?? 0), countNeeded: available - sold < 0 };
+    }, new Set([id]));
+    set({ short: { storeItemId: id, available } });
   }
 
   /** Bill-QR sales wait for the network here, not in a sync batch (their claim cannot be replayed later). */
@@ -483,6 +562,7 @@ export function createSyncEngine(deps: EngineDeps) {
     nextAttemptAt: () => state.nextAttemptAt,
     recordSale,
     recordMovement,
+    clearShort,
     sendSaleNow,
     reverse,
     flush,

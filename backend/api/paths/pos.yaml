@@ -117,8 +117,11 @@
       Cashier and above (`pos.sell`). Idempotent by `clientId` as well as the key: a second call with the
       same `clientId` returns the first sale. Catalogued lines are sold at the item's price now (`409
       price_changed` with `extensions.storeItemId` and `extensions.pricePaise` when the POS's price is
-      old) and offers are applied by the server; each writes a `sale_pos` movement, and stock may go
-      negative (02 §4.3). A manual line or bill discount needs `pos.discount` (manager and above, D-06).
+      old) and offers are applied by the server; each writes a `sale_pos` movement. A line above the
+      item's available units (on hand less what accepted online orders hold, summed over the bill's lines
+      of that item) is `409 insufficient_stock` with `extensions.storeItemId` and `extensions.available`
+      (the item's available before this sale), and nothing is written (D-270). An offline sale that
+      arrives through sync is never refused for stock (02 §4.3). A manual line or bill discount needs `pos.discount` (manager and above, D-06).
       Round-off to the nearest ₹1 is automatic (D-94). `link.method: bill_qr` takes the claim the customer
       confirmed (`409 claim_mismatch` when the bill changed since the QR, `409 claim_expired`, `409
       claim_already_used` when another sale used it) and spends its credits; `counter_code` needs a right
@@ -128,6 +131,7 @@
     x-money: true
     x-problems:
     - price_changed
+    - insufficient_stock
     - claim_expired
     - claim_already_used
     - claim_mismatch

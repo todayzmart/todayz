@@ -17,8 +17,14 @@ export interface CatalogueItem {
   pricePaise: number;
   /** Price after the item-level offer, as the server priced it; absent when no offer applies. */
   offerPricePaise?: number | null;
-  /** Units available to sell; may be 0 or negative (an offline sale can drive it below 0). */
+  /** Units available to sell: on hand less what accepted online orders hold. The counter never sells past it (D-270). */
   available: number;
+  /** Units on the shelf, the online orders' units included. Absent in a snapshot stored before D-270. */
+  onHand?: number;
+  /** Units set aside for accepted online orders not yet collected or delivered ("blocked for online orders"). */
+  reserved?: number;
+  /** The server's on hand went below 0 after an offline race; it reads 0 here until someone counts (D-270). */
+  countNeeded?: boolean;
   isListed: boolean;
   /** 1 is the best seller; the quick tiles show the top 24 (06 B-05). */
   topRank?: number | null;

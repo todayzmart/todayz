@@ -154,16 +154,6 @@
     "review": "reviewed",
     "enHash": "46a8c0dc"
   },
-  "pos.banner.short.title": {
-    "message": "{count, plural, one {# பொருள்} other {# பொருட்கள்}} கையிருப்பு எண்ணிக்கையை விட அதிகம்",
-    "review": "reviewed",
-    "enHash": "96a4287f"
-  },
-  "pos.banner.short.body": {
-    "message": "இருந்தாலும் நீங்கள் விற்கலாம். ஸ்டாக் எண்ணிக்கை மறு எண்ணிக்கைக்குக் குறிக்கப்படும்.",
-    "review": "reviewed",
-    "enHash": "6f3c3731"
-  },
   "pos.banner.linkDropped.title": {
     "message": "வாடிக்கையாளர் இணைப்பு நீக்கப்பட்டது",
     "review": "reviewed",
@@ -938,5 +928,90 @@
     "message": "விற்பனையைப் பார்",
     "review": "reviewed",
     "enHash": "c1ce99e8"
+  },
+  "pos.stock.title": {
+    "message": "ஸ்டாக்கைப் புதுப்பி",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "pos.stock.reason.add": {
+    "message": "{name} இப்போது {available} மட்டுமே விற்க முடியும். மேலும் விற்க அலமாரியை எண்ணுங்கள்.",
+    "review": "reviewed",
+    "enHash": "6f92ba1e"
+  },
+  "pos.stock.reason.charge": {
+    "message": "பில்லில் {name} இப்போது கிடைக்கும் {available} ஐ விட அதிகம். பணம் பெறும் முன் அலமாரியை எண்ணுங்கள்.",
+    "review": "reviewed",
+    "enHash": "f494f65f"
+  },
+  "pos.stock.reason.sold": {
+    "message": "இந்த விற்பனை நடந்தது, ஆனால் TodayZ இல் {name} விற்றதை விடக் குறைவாக இருந்தது. ஸ்டாக் சரியாக இருக்க அலமாரியை எண்ணுங்கள்.",
+    "review": "reviewed",
+    "enHash": "243e8b77"
+  },
+  "pos.stock.cancel": {
+    "message": "ரத்து செய்",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "pos.stock.save": {
+    "message": "எண்ணிக்கையைச் சேமி",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "pos.stock.onHand": {
+    "message": "கையிருப்பு",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "pos.stock.blocked": {
+    "message": "ஆன்லைன் ஆர்டர்களுக்காக ஒதுக்கியவை",
+    "review": "reviewed",
+    "enHash": "49e39c58"
+  },
+  "pos.stock.available": {
+    "message": "கிடைப்பவை",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "pos.stock.countNeeded": {
+    "message": "TodayZ இல் இருந்ததை விட அதிகம் விற்கப்பட்டது. சரிசெய்ய அலமாரியை எண்ணுங்கள்.",
+    "review": "reviewed",
+    "enHash": "8630b84e"
+  },
+  "pos.stock.counted": {
+    "message": "இப்போது எண்ணியவை",
+    "review": "reviewed",
+    "enHash": "00c212f8"
+  },
+  "pos.stock.countedHelp": {
+    "message": "இப்போது அலமாரியில் உள்ள அலகுகள்",
+    "review": "reviewed",
+    "enHash": "f286ea90"
+  },
+  "pos.stock.countedInvalid": {
+    "message": "முழு எண்ணை உள்ளிடுங்கள்",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "pos.stock.includesBlocked": {
+    "message": "{count, plural, one {இந்த எண்ணிக்கையில் ஆன்லைன் ஆர்டர்களுக்கு ஒதுக்கிய # அலகு அடங்கும்} other {இந்த எண்ணிக்கையில் ஆன்லைன் ஆர்டர்களுக்கு ஒதுக்கிய # அலகுகள் அடங்கும்}}",
+    "review": "reviewed",
+    "enHash": "74cd172f"
+  },
+  "pos.stock.after": {
+    "message": "கையிருப்பு {onHand}, கிடைப்பவை {available}",
+    "review": "reviewed",
+    "enHash": "882a5004"
+  },
+  "pos.stock.saveFailed": {
+    "message": "எண்ணிக்கையைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "d2cbaf3e"
+  },
+  "pos.tile.blocked": {
+    "message": "{count} ஆன்லைன் ஆர்டர்களுக்காக ஒதுக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "3bd43798"
   }
 }

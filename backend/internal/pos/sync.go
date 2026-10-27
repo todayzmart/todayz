@@ -789,10 +789,12 @@ func (s *Service) changes(ctx context.Context, storeID ids.ID, after, upto int64
 			Op: syncapi.SyncChangeOp(r.Op),
 		}
 		if r.ItemID.Valid {
+			// Never a negative count on screen: an offline race below 0 shows
+			// 0 and "count needed" until someone counts (D-270).
 			onHand, reserved := int(deref(r.OnHand)), int(deref(r.Reserved))
 			c.Item = &syncapi.SyncItemState{
 				Id: mustID(r.ItemID).String(), ProductId: idString(r.ProductID), Name: r.ItemName,
-				PricePaise: int(deref(r.PricePaise)), OnHand: onHand, Reserved: reserved, Available: onHand - reserved,
+				PricePaise: int(deref(r.PricePaise)), OnHand: max(onHand, 0), Reserved: reserved, Available: max(onHand-reserved, 0),
 				IsListed: deref(r.IsListed), CountNeeded: onHand < 0, Version: int(deref(r.ItemVersion)),
 			}
 			if r.MrpPaise != nil {

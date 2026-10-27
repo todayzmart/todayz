@@ -154,16 +154,6 @@
     "review": "reviewed",
     "enHash": "46a8c0dc"
   },
-  "pos.banner.short.title": {
-    "message": "{count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}} ఉన్న లెక్క కంటే ఎక్కువ",
-    "review": "reviewed",
-    "enHash": "96a4287f"
-  },
-  "pos.banner.short.body": {
-    "message": "అయినా మీరు అమ్మవచ్చు. స్టాక్ లెక్కను మళ్ళీ లెక్కించడానికి గుర్తు పెడతాం.",
-    "review": "reviewed",
-    "enHash": "6f3c3731"
-  },
   "pos.banner.linkDropped.title": {
     "message": "కస్టమర్ లింక్ తీసివేయబడింది",
     "review": "reviewed",
@@ -938,5 +928,90 @@
     "message": "అమ్మకాలు చూడండి",
     "review": "reviewed",
     "enHash": "c1ce99e8"
+  },
+  "pos.stock.title": {
+    "message": "స్టాక్ అప్‌డేట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "pos.stock.reason.add": {
+    "message": "{name} ఇప్పుడు {available} మాత్రమే అమ్మగలరు. ఎక్కువ అమ్మడానికి షెల్ఫ్ లెక్కించండి.",
+    "review": "reviewed",
+    "enHash": "6f92ba1e"
+  },
+  "pos.stock.reason.charge": {
+    "message": "బిల్లులో {name} ఇప్పుడు అందుబాటులో ఉన్న {available} కంటే ఎక్కువ ఉంది. డబ్బు తీసుకునే ముందు షెల్ఫ్ లెక్కించండి.",
+    "review": "reviewed",
+    "enHash": "f494f65f"
+  },
+  "pos.stock.reason.sold": {
+    "message": "ఈ అమ్మకం జరిగింది, కానీ TodayZ లో {name} అమ్మినదానికంటే తక్కువ ఉంది. స్టాక్ సరిగా ఉండేలా షెల్ఫ్ లెక్కించండి.",
+    "review": "reviewed",
+    "enHash": "243e8b77"
+  },
+  "pos.stock.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "pos.stock.save": {
+    "message": "లెక్క సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "pos.stock.onHand": {
+    "message": "చేతిలో ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "pos.stock.blocked": {
+    "message": "ఆన్‌లైన్ ఆర్డర్ల కోసం ఆపినవి",
+    "review": "reviewed",
+    "enHash": "49e39c58"
+  },
+  "pos.stock.available": {
+    "message": "అందుబాటులో",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "pos.stock.countNeeded": {
+    "message": "TodayZ లో ఉన్నదానికంటే ఎక్కువ అమ్ముడైంది. సరిచేయడానికి షెల్ఫ్ లెక్కించండి.",
+    "review": "reviewed",
+    "enHash": "8630b84e"
+  },
+  "pos.stock.counted": {
+    "message": "ఇప్పుడు లెక్కించినవి",
+    "review": "reviewed",
+    "enHash": "00c212f8"
+  },
+  "pos.stock.countedHelp": {
+    "message": "ఇప్పుడు షెల్ఫ్‌లో ఉన్న యూనిట్లు",
+    "review": "reviewed",
+    "enHash": "f286ea90"
+  },
+  "pos.stock.countedInvalid": {
+    "message": "పూర్ణ సంఖ్య నమోదు చేయండి",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "pos.stock.includesBlocked": {
+    "message": "{count, plural, one {ఈ లెక్కలో ఆన్‌లైన్ ఆర్డర్ల కోసం ఉంచిన # యూనిట్ ఉంది} other {ఈ లెక్కలో ఆన్‌లైన్ ఆర్డర్ల కోసం ఉంచిన # యూనిట్లు ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "74cd172f"
+  },
+  "pos.stock.after": {
+    "message": "చేతిలో {onHand} ఉంటాయి, అందుబాటులో {available}",
+    "review": "reviewed",
+    "enHash": "882a5004"
+  },
+  "pos.stock.saveFailed": {
+    "message": "లెక్క సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "d2cbaf3e"
+  },
+  "pos.tile.blocked": {
+    "message": "{count} ఆన్‌లైన్ ఆర్డర్ల కోసం ఆపినవి",
+    "review": "reviewed",
+    "enHash": "3bd43798"
   }
 }

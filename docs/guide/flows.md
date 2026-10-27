@@ -2,7 +2,7 @@
 
 The main journeys through TodayZ, step by step, with the endpoints and packages each step touches.
 
-> As built on main at aa116867 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 How to read this page: each flow has a diagram and a short walk-through. Endpoints are written as in the OpenAPI files under [backend/api/paths](../../backend/api/paths). Packages are under `backend/internal`. Timer lengths, fees and limits are never written here: each is a `platform_settings` key listed in [01-product-rules.md](../plan/01-product-rules.md). For the bigger picture see [architecture.md](architecture.md).
 
@@ -204,7 +204,7 @@ sequenceDiagram
   P->>API: POST .../pos/sales (online sale, same path)
 ```
 
-- **Offline.** The sale is saved with a `deviceSeq` in IndexedDB (`business/src/sync`, `business/src/pos`). Prices and stock come from the cached catalogue.
+- **Offline.** The sale is saved with a `deviceSeq` in IndexedDB (`business/src/sync`, `business/src/pos`). Prices and stock come from the cached catalogue, which the device lowers with each sale it records. A line never goes past the item's available (on hand less units blocked for online orders); asking for more opens Update stock, a count that goes through the same outbox (D-270). Online, the server refuses a sale above available with `409 insufficient_stock`; a synced sale is never refused for stock, so only an offline race leaves on hand below 0, read as 0 with `countNeeded`.
 - **Sync.** `POST /v1/biz/businesses/{bid}/stores/{sid}/sync` sends a batch. Each entry runs in its own savepoint, so one bad entry is reported and the rest are applied. A repeated `deviceSeq` is answered as a duplicate. The batch size and how old an entry may be are settings (see 01 §6 to §8).
 - **Online sale.** `POST .../pos/sales` records a sale straight away. `POST .../pos/sales/{saleId}/reverse` reverses one within the reversal window (D-08), which also reverses any credits and cashback.
 - **Linking a customer.** The customer either scans a bill QR (an HMAC-signed token with a short life, claimed through `/v1/me/bill-claims/{token}/preview` and `/confirm`) or reads a counter code that is a TOTP seeded from `/v1/me/counter-code-seed` and checked at `/v1/biz/.../counter-code/verify`, even offline (D-12). A linked sale earns cashback through the credits ledger.

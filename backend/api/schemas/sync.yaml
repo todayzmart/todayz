@@ -9,7 +9,7 @@ SyncEntryKind:
   type: string
   description: >-
     `sale` is an offline bill; the others are stock changes as on the item's movements route
-    (`count` is a count correction to `counted`; `restock`, `damage` and `expired` move `quantity`).
+    (`count` is a count correction to `counted`; `restock`, `damage` and `expired` move `quantity`; `damage` and `expired` above the item's on hand are rejected `invalid`, D-270).
   enum: [sale, count, restock, damage, expired]
 SyncPhone:
   type: string
@@ -132,7 +132,7 @@ SyncEntryResult:
       description: The receipt token for a sale applied now; the server keeps only its hash.
 SyncItemState:
   type: object
-  description: A store item as it is now. `countNeeded` is true while stock is below zero (02 §4.3).
+  description: A store item as it is now. `countNeeded` is true while the stored on hand is below zero (02 §4.3); `onHand` and `available` then read 0, never below (D-270).
   required: [id, productId, name, pricePaise, mrpPaise, onHand, reserved, available, isListed, countNeeded, version]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
@@ -140,9 +140,9 @@ SyncItemState:
     name: {type: string}
     pricePaise: {$ref: ./common.yaml#/Paise}
     mrpPaise: {type: [integer, "null"]}
-    onHand: {type: integer}
+    onHand: {type: integer, minimum: 0}
     reserved: {type: integer}
-    available: {type: integer}
+    available: {type: integer, minimum: 0}
     isListed: {type: boolean}
     countNeeded: {type: boolean}
     version: {type: integer}

@@ -57,7 +57,7 @@ Stock movement `source` enum, complete (D-01): `opening`, `restock`, `supplier_b
 
 Stock rules and invariants (property-tested, checked nightly):
 
-1. `store_items.on_hand` = Σ `stock_movements.delta` for the item (kept by the movement trigger; nightly reconcile alerts on drift). POS sync may drive it negative; that is flagged, not refused.
+1. `store_items.on_hand` = Σ `stock_movements.delta` for the item (kept by the movement trigger; nightly reconcile alerts on drift). The POS never sells past available and damage and expiry are capped at on hand (D-270), so on hand goes below 0 only when two offline devices sold the same last units; sync keeps both real sales, and every read shows the item at 0 with `countNeeded` until a count.
 2. `store_items.reserved` = Σ `quantity` of the item's `stock_reservations` with status `held` (kept by a trigger on `stock_reservations`).
 3. Accepting an order (or the customer confirming a partial accept) creates `held` reservations and does not touch on hand.
 4. `collected` / `delivered` writes one `sale_online` movement per line and sets the line's reservation to `consumed` (`consumed_movement_id`). Every other terminal state releases the reservations, except `delivery_failed`, whose reservations stay `held` until the return is settled (§4.3, D-69).

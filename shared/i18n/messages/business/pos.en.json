@@ -65,15 +65,15 @@
   },
   "pos.tile.inStock": {
     "defaultMessage": "{count} in stock",
-    "description": "Stock label on an item tile; {count} is the number on hand"
+    "description": "Stock label on an item tile; {count} is the units available to sell (D-270)"
   },
   "pos.tile.out": {
     "defaultMessage": "Out of stock",
-    "description": "Stock label on an item tile with nothing left; it can still be sold"
+    "description": "Stock label on an item tile with nothing available; the counter cannot sell it until a count (D-270)"
   },
   "pos.tile.countNeeded": {
     "defaultMessage": "Count needed",
-    "description": "Stock label on an item tile whose stock went below zero"
+    "description": "Stock label on an item tile whose stock went below zero after an offline sale; it shows 0 until counted (D-270)"
   },
   "pos.catalogue.empty.title": {
     "defaultMessage": "No items on this device yet",
@@ -122,14 +122,6 @@
   "pos.banner.waiting.body": {
     "defaultMessage": "They send in the background. Nothing to do.",
     "description": "Waiting-to-sync banner body"
-  },
-  "pos.banner.short.title": {
-    "defaultMessage": "{count, plural, one {# item is} other {# items are}} more than the count on hand",
-    "description": "Banner when the bill has more of an item than stock"
-  },
-  "pos.banner.short.body": {
-    "defaultMessage": "You can still sell it. The stock count will be flagged for a recount.",
-    "description": "Short-stock banner body"
   },
   "pos.banner.linkDropped.title": {
     "defaultMessage": "Customer link removed",
@@ -750,5 +742,73 @@
   "pos.viewSales": {
     "defaultMessage": "View sales",
     "description": "Sell screen link to Orders → Counter sales (D-268)"
+  },
+  "pos.stock.title": {
+    "defaultMessage": "Update stock",
+    "description": "Title of the D-270 stock count dialog at the counter"
+  },
+  "pos.stock.reason.add": {
+    "defaultMessage": "Only {available} of {name} can be sold now. Count the shelf to sell more.",
+    "description": "Why the dialog opened: the bill wants more than is available; {wanted} is what the bill wants"
+  },
+  "pos.stock.reason.charge": {
+    "defaultMessage": "The bill has more {name} than the {available} available now. Count the shelf before you charge.",
+    "description": "Why the dialog opened: stock fell after the line was added"
+  },
+  "pos.stock.reason.sold": {
+    "defaultMessage": "This sale went through, but TodayZ had less {name} than was sold. Count the shelf so the stock is right.",
+    "description": "Why the dialog opened: an online sale found the stock short after the bill was taken"
+  },
+  "pos.stock.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Closes the stock dialog; the bill stays as it was"
+  },
+  "pos.stock.save": {
+    "defaultMessage": "Save count",
+    "description": "Saves the count as a stock count"
+  },
+  "pos.stock.onHand": {
+    "defaultMessage": "On hand",
+    "description": "Units on the shelf, blocked ones included"
+  },
+  "pos.stock.blocked": {
+    "defaultMessage": "Blocked for online orders",
+    "description": "Units set aside for accepted online orders not yet collected or delivered"
+  },
+  "pos.stock.available": {
+    "defaultMessage": "Available",
+    "description": "Units the counter may sell now"
+  },
+  "pos.stock.countNeeded": {
+    "defaultMessage": "More was sold than TodayZ had. Count the shelf to set it right.",
+    "description": "Banner when the stock went below zero after an offline sale"
+  },
+  "pos.stock.counted": {
+    "defaultMessage": "Counted now",
+    "description": "Field for the units counted on the shelf"
+  },
+  "pos.stock.countedHelp": {
+    "defaultMessage": "Units on the shelf right now",
+    "description": "Help under the count field"
+  },
+  "pos.stock.countedInvalid": {
+    "defaultMessage": "Enter a whole number",
+    "description": "Error when the count is not a whole number"
+  },
+  "pos.stock.includesBlocked": {
+    "defaultMessage": "{count, plural, one {This count includes the # unit set aside for online orders} other {This count includes the # units set aside for online orders}}",
+    "description": "Checkbox, shown only when units are blocked; unticked, the blocked units are added to the count"
+  },
+  "pos.stock.after": {
+    "defaultMessage": "On hand will be {onHand}, available {available}",
+    "description": "Preview of the stock after the count"
+  },
+  "pos.stock.saveFailed": {
+    "defaultMessage": "Could not save the count. Try again.",
+    "description": "Banner when saving the count fails on the device"
+  },
+  "pos.tile.blocked": {
+    "defaultMessage": "{count} blocked for online orders",
+    "description": "Item tile and search result: units set aside for accepted online orders"
   }
 }

@@ -1,4 +1,5 @@
 import en from '@todayz/i18n/compiled/business/en.json';
+import { ApiError } from '@todayz/api-client';
 import { createUpdateController } from '@todayz/auth';
 import { asMessages } from '@todayz/i18n';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
@@ -19,7 +20,9 @@ const SERVER_NOW = '2026-10-24T10:00:00.000Z';
 const SETTINGS = { creditMinOrderValuePaise: null, reversalWindowHours: null, offlineLinkMaxHours: null };
 
 const RICE: CatalogueItem = { id: 'item-rice', name: 'Rice 1 kg', packSize: 1, unit: 'kg', barcodes: ['8901234567890'], pricePaise: 5000, available: 10, isListed: true, topRank: 1 };
-const SUGAR: CatalogueItem = { id: 'item-sugar', name: 'Sugar 1 kg', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 4500, available: 1, isListed: true, topRank: 2 };
+// Two of Sugar's three units are blocked for accepted online orders (D-270).
+const SUGAR: CatalogueItem = { id: 'item-sugar', name: 'Sugar 1 kg', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 4500, onHand: 3, reserved: 2, available: 1, isListed: true, topRank: 2 };
+const SALT: CatalogueItem = { id: 'item-salt', name: 'Salt 1 kg', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 2500, onHand: 0, reserved: 0, available: 0, isListed: true, topRank: 3 };
 
 interface Server {
   api: PosApi;
@@ -35,7 +38,7 @@ function fakeServer(): Server {
   const s: Server = { created: [], syncs: [], refuse: null, failSale: null, reversed: [], api: undefined as unknown as PosApi };
   const ack = (clientId: string, totalPaise = 5000): SaleAck => ({ saleId: `sale-${clientId}`, receiptToken: `tok-${clientId}`, roundOffPaise: 0, totalPaise, serverNow: SERVER_NOW });
   s.api = {
-    getSnapshot: () => Promise.resolve({ items: [RICE, SUGAR], cursor: 'c0', settings: SETTINGS, serverNow: SERVER_NOW }),
+    getSnapshot: () => Promise.resolve({ items: [RICE, SUGAR, SALT], cursor: 'c0', settings: SETTINGS, serverNow: SERVER_NOW }),
     getChanges: () => Promise.resolve({ changes: [], cursor: 'c1', settings: SETTINGS, serverNow: SERVER_NOW }),
     getItem: () => Promise.reject(new Error('unused')),
     sync: (body) => {
@@ -82,7 +85,7 @@ async function mount(opts: Options = {}) {
   const server = fakeServer();
   const storage = memoryStorage();
   // A device that has already downloaded its catalogue, so the counter works offline from the first paint.
-  await storage.saveCatalogue([RICE, SUGAR], { cursor: 'c0', settings: SETTINGS, syncedAt: SERVER_NOW });
+  await storage.saveCatalogue([RICE, SUGAR, SALT], { cursor: 'c0', settings: SETTINGS, syncedAt: SERVER_NOW });
   const store: PosStoreRef = { bid: 'b1', sid: 's1', name: 'Asha Stores', role: opts.role ?? 'owner' };
   const user = userShim();
   const tree = (
@@ -165,12 +168,67 @@ describe('B-05 counter', () => {
     expect(within(screen.getByRole('complementary')).getByText('Loose sugar')).toBeInTheDocument();
   });
 
-  it('flags a line that is more than the count on hand but still lets the sale through', async () => {
-    const { user } = await mount();
+  it('shows units blocked for online orders on the tile, and never a count below 0', async () => {
+    await mount();
+    expect(tile(/Sugar 1 kg/)).toHaveTextContent('1 in stock');
+    expect(tile(/Sugar 1 kg/)).toHaveTextContent('2 blocked for online orders');
+    expect(tile(/Rice 1 kg/)).not.toHaveTextContent('blocked');
+  });
+
+  it('asks for a count instead of raising a line past available; the count leaves out the blocked units by default', async () => {
+    const { user, storage } = await mount();
+    await user.click(tile(/Sugar 1 kg/));
+    const bill = within(screen.getByRole('complementary'));
+    await user.click(bill.getByRole('button', { name: /^Add one/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Update stock' });
+    expect(within(dialog).getByText('Blocked for online orders').nextSibling).toHaveTextContent('2');
+    const box = within(dialog).getByRole('checkbox', { name: 'This count includes the 2 units set aside for online orders' });
+    expect(box).not.toBeChecked();
+    // Still one in the bill while the dialog is open.
+    expect(due()).toHaveTextContent('₹45');
+    await user.type(within(dialog).getByLabelText('Counted now'), '4');
+    expect(within(dialog).getByText(/On hand will be 6, available 4/)).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Save count' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Update stock' })).toBeNull());
+    expect(due()).toHaveTextContent('₹90');
+    const entries = await storage.listEntries();
+    expect(entries.find((e) => e.kind === 'movement')?.payload).toEqual({ storeItemId: SUGAR.id, kind: 'count_correction', quantity: 6 });
+    expect(tile(/Sugar 1 kg/)).toHaveTextContent('4 in stock');
+  });
+
+  it('takes the count as the whole shelf when the blocked units are included', async () => {
+    const { user, storage } = await mount();
     await user.click(tile(/Sugar 1 kg/));
     await user.click(within(screen.getByRole('complementary')).getByRole('button', { name: /^Add one/ }));
-    expect(await screen.findByText(/more than the count on hand/)).toBeInTheDocument();
-    expect(charge()).toBeEnabled();
+    const dialog = await screen.findByRole('dialog', { name: 'Update stock' });
+    await user.click(within(dialog).getByRole('checkbox'));
+    await user.type(within(dialog).getByLabelText('Counted now'), '2');
+    await user.click(within(dialog).getByRole('button', { name: 'Save count' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Update stock' })).toBeNull());
+    // On hand 2, both blocked for online orders: nothing is left to sell, so the line goes.
+    expect((await storage.listEntries()).find((e) => e.kind === 'movement')?.payload).toMatchObject({ quantity: 2 });
+    expect(within(screen.getByRole('complementary')).queryByText('Sugar 1 kg')).toBeNull();
+  });
+
+  it('opens the dialog with no checkbox when nothing is blocked, and Cancel leaves the bill as it was', async () => {
+    const { user, storage } = await mount();
+    await user.click(tile(/Salt 1 kg/));
+    const dialog = await screen.findByRole('dialog', { name: 'Update stock' });
+    expect(within(dialog).queryByRole('checkbox')).toBeNull();
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Update stock' })).toBeNull());
+    expect(within(screen.getByRole('complementary')).queryByText('Salt 1 kg')).toBeNull();
+    expect(await storage.listEntries()).toHaveLength(0);
+  });
+
+  it('opens the dialog for the item when the server finds an online sale short, and keeps the sale', async () => {
+    const { user, server, storage } = await mount();
+    server.failSale = new ApiError({ type: 'about:blank', title: 'x', status: 409, code: 'insufficient_stock', extensions: { storeItemId: RICE.id, available: 0 } }, new Headers());
+    await user.click(tile(/Rice 1 kg/));
+    await user.click(charge());
+    const dialog = await screen.findByRole('dialog', { name: 'Update stock' });
+    expect(within(dialog).getByText(/This sale went through/)).toBeInTheDocument();
+    expect((await storage.listEntries())[0]).toMatchObject({ kind: 'sale', state: 'pending', lastError: 'insufficient_stock' });
   });
 
   it('charges online: records on the device, sends it once, shows the sale as done', async () => {

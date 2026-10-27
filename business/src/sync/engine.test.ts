@@ -479,6 +479,63 @@ describe('bill QR sales and price changes', () => {
   });
 });
 
+describe('stock at the counter (D-270)', () => {
+  const rice = { id: 'item-1', name: 'Rice', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 5000, onHand: 6, reserved: 2, available: 4, isListed: true };
+
+  it('takes a recorded sale off the stored stock at once, and gives it back if the server refuses it', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [rice];
+    await engine.refreshCatalogue();
+    await engine.recordSale(sale('a'));
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ onHand: 4, available: 2 });
+    server.respond = () => ({ status: 'rejected', code: 'invalid' });
+    await engine.flush({ force: true });
+    expect((await engine.entries())[0]?.state).toBe('rejected');
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ onHand: 6, available: 4 });
+  });
+
+  it('applies a count to the stored item before it syncs: blocked units stay set aside', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [{ ...rice, countNeeded: true, onHand: 0, available: 0 }];
+    await engine.refreshCatalogue();
+    await engine.recordMovement({ storeItemId: 'item-1', kind: 'count_correction', quantity: 7 });
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ onHand: 7, available: 5, countNeeded: false });
+    await engine.flush({ force: true });
+    expect(server.syncCalls[0]?.body.entries[0]).toMatchObject({ kind: 'movement', payload: { storeItemId: 'item-1', kind: 'count_correction', quantity: 7 } });
+  });
+
+  it('on insufficient_stock adopts the server number, keeps the paid sale for sync and asks for a count', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [rice];
+    await engine.refreshCatalogue();
+    server.api.createSale = () =>
+      Promise.reject(new ApiError({ type: 'about:blank', title: 'x', status: 409, code: 'insufficient_stock', extensions: { storeItemId: 'item-1', available: 1 } }, new Headers()));
+    await engine.recordSale(sale('a'));
+    const e = await engine.sendSaleNow('a');
+    expect(e).toMatchObject({ state: 'pending', lastError: 'insufficient_stock' });
+    // The server had 1; this sale of 2 is on its way, so the device reads 0 and "count needed".
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ available: 0, countNeeded: true });
+    expect(engine.state().short).toEqual({ storeItemId: 'item-1', available: 1 });
+    engine.clearShort();
+    expect(engine.state().short).toBeNull();
+    await engine.flush({ force: true });
+    expect((await engine.entries())[0]?.state).toBe('synced');
+  });
+
+  it('refuses a bill QR sale on insufficient_stock (its claim cannot wait for a sync)', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [rice];
+    await engine.refreshCatalogue();
+    server.api.createSale = () =>
+      Promise.reject(new ApiError({ type: 'about:blank', title: 'x', status: 409, code: 'insufficient_stock', extensions: { storeItemId: 'item-1', available: 1 } }, new Headers()));
+    await engine.recordSale(sale('q', { link: { method: 'bill_qr', claimId: 'claim-1', creditsUsed: 0 } }));
+    await engine.flush();
+    expect((await engine.entries())[0]).toMatchObject({ state: 'rejected', lastError: 'insufficient_stock' });
+    // The sale never happened on the server: its units go back (then the server's 1 is adopted).
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ available: 1 });
+  });
+});
+
 describe('catalogue changes', () => {
   it('merges price and stock into the stored item and fetches a new item in full', async () => {
     const { engine, server, storage } = setup();

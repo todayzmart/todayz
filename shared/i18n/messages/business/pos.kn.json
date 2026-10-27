@@ -154,16 +154,6 @@
     "review": "reviewed",
     "enHash": "46a8c0dc"
   },
-  "pos.banner.short.title": {
-    "message": "{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}} ಇರುವ ಎಣಿಕೆಗಿಂತ ಹೆಚ್ಚು",
-    "review": "reviewed",
-    "enHash": "96a4287f"
-  },
-  "pos.banner.short.body": {
-    "message": "ಆದರೂ ನೀವು ಮಾರಬಹುದು. ಸ್ಟಾಕ್ ಎಣಿಕೆಯನ್ನು ಮರು-ಎಣಿಕೆಗೆ ಗುರುತಿಸಲಾಗುತ್ತದೆ.",
-    "review": "reviewed",
-    "enHash": "6f3c3731"
-  },
   "pos.banner.linkDropped.title": {
     "message": "ಗ್ರಾಹಕರ ಲಿಂಕ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
     "review": "reviewed",
@@ -938,5 +928,90 @@
     "message": "ಮಾರಾಟ ನೋಡಿ",
     "review": "reviewed",
     "enHash": "c1ce99e8"
+  },
+  "pos.stock.title": {
+    "message": "ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "pos.stock.reason.add": {
+    "message": "{name} ಅನ್ನು ಈಗ {available} ಮಾತ್ರ ಮಾರಬಹುದು. ಹೆಚ್ಚು ಮಾರಲು ಶೆಲ್ಫ್ ಎಣಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6f92ba1e"
+  },
+  "pos.stock.reason.charge": {
+    "message": "ಬಿಲ್‌ನಲ್ಲಿ {name} ಈಗ ಲಭ್ಯವಿರುವ {available} ಕ್ಕಿಂತ ಹೆಚ್ಚಿದೆ. ಹಣ ಪಡೆಯುವ ಮೊದಲು ಶೆಲ್ಫ್ ಎಣಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f494f65f"
+  },
+  "pos.stock.reason.sold": {
+    "message": "ಈ ಮಾರಾಟ ಆಗಿದೆ, ಆದರೆ TodayZ ನಲ್ಲಿ {name} ಮಾರಿದ್ದಕ್ಕಿಂತ ಕಡಿಮೆ ಇತ್ತು. ಸ್ಟಾಕ್ ಸರಿಯಾಗಲು ಶೆಲ್ಫ್ ಎಣಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "243e8b77"
+  },
+  "pos.stock.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "pos.stock.save": {
+    "message": "ಎಣಿಕೆ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "pos.stock.onHand": {
+    "message": "ಕೈಯಲ್ಲಿರುವುದು",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "pos.stock.blocked": {
+    "message": "ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಗೆ ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "49e39c58"
+  },
+  "pos.stock.available": {
+    "message": "ಲಭ್ಯವಿದೆ",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "pos.stock.countNeeded": {
+    "message": "TodayZ ನಲ್ಲಿದ್ದಕ್ಕಿಂತ ಹೆಚ್ಚು ಮಾರಾಟವಾಗಿದೆ. ಸರಿಪಡಿಸಲು ಶೆಲ್ಫ್ ಎಣಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "8630b84e"
+  },
+  "pos.stock.counted": {
+    "message": "ಈಗ ಎಣಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "00c212f8"
+  },
+  "pos.stock.countedHelp": {
+    "message": "ಈಗ ಶೆಲ್ಫ್‌ನಲ್ಲಿರುವ ಘಟಕಗಳು",
+    "review": "reviewed",
+    "enHash": "f286ea90"
+  },
+  "pos.stock.countedInvalid": {
+    "message": "ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "pos.stock.includesBlocked": {
+    "message": "{count, plural, one {ಈ ಎಣಿಕೆಯಲ್ಲಿ ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಗೆ ಇಟ್ಟ # ಘಟಕ ಸೇರಿದೆ} other {ಈ ಎಣಿಕೆಯಲ್ಲಿ ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಗೆ ಇಟ್ಟ # ಘಟಕಗಳು ಸೇರಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "74cd172f"
+  },
+  "pos.stock.after": {
+    "message": "ಕೈಯಲ್ಲಿ {onHand} ಇರುತ್ತದೆ, ಲಭ್ಯ {available}",
+    "review": "reviewed",
+    "enHash": "882a5004"
+  },
+  "pos.stock.saveFailed": {
+    "message": "ಎಣಿಕೆ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "d2cbaf3e"
+  },
+  "pos.tile.blocked": {
+    "message": "{count} ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಗೆ ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "3bd43798"
   }
 }

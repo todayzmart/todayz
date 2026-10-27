@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { cartReducer, cartTotals, emptyCart, MAX_QUANTITY, shortLines, toSaleLines, type CartAction, type CartState } from './cart';
+import { cartReducer, cartTotals, emptyCart, firstShortLine, MAX_QUANTITY, toSaleLines, type CartAction, type CartState } from './cart';
 import type { CatalogueItem } from './types';
 
 const rice: CatalogueItem = { id: 'rice', name: 'Rice', variant: '1 kg', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 6050, available: 3, isListed: true };
 const oil: CatalogueItem = { id: 'oil', name: 'Oil', packSize: 1, unit: 'l', barcodes: [], pricePaise: 20000, offerPricePaise: 18000, available: 10, isListed: true };
+const bags: CatalogueItem = { id: 'bags', name: 'Bags', packSize: 1, unit: 'pc', barcodes: [], pricePaise: 500, available: 100000, isListed: true };
 
 const run = (...actions: CartAction[]): CartState => actions.reduce(cartReducer, emptyCart);
 
@@ -26,7 +27,7 @@ describe('cart lines', () => {
   });
 
   it('sets a typed quantity, whole numbers only, capped', () => {
-    const s = run({ type: 'add', item: rice, lineId: 'l1' }, { type: 'setQuantity', lineId: 'l1', quantity: 4.9 });
+    const s = run({ type: 'add', item: bags, lineId: 'l1' }, { type: 'setQuantity', lineId: 'l1', quantity: 4.9 });
     expect(s.lines[0]?.quantity).toBe(4);
     expect(cartReducer(s, { type: 'setQuantity', lineId: 'l1', quantity: 100000 }).lines[0]?.quantity).toBe(MAX_QUANTITY);
     expect(cartReducer(s, { type: 'setQuantity', lineId: 'l1', quantity: 0 }).lines).toHaveLength(0);
@@ -69,10 +70,33 @@ describe('totals', () => {
   });
 });
 
-describe('short stock', () => {
-  it('lists lines that want more than is on hand, and still allows the sale', () => {
-    const s = run({ type: 'add', item: rice, lineId: 'l1', quantity: 5 }, { type: 'add', item: oil, lineId: 'l2' });
-    expect(shortLines(s).map((l) => l.id)).toEqual(['l1']);
-    expect(cartTotals(s).totalPaise).toBeGreaterThan(0);
+describe('stock cap (D-270)', () => {
+  it('never adds or raises a line past the available units', () => {
+    let s = run({ type: 'add', item: rice, lineId: 'l1', quantity: 5 });
+    expect(s.lines[0]?.quantity).toBe(3);
+    s = cartReducer(s, { type: 'add', item: rice, lineId: 'l1' });
+    expect(s.lines[0]?.quantity).toBe(3);
+    expect(cartReducer(s, { type: 'step', lineId: 'l1', by: 1 }).lines[0]?.quantity).toBe(3);
+    expect(cartReducer(s, { type: 'setQuantity', lineId: 'l1', quantity: 9 }).lines[0]?.quantity).toBe(3);
+    expect(cartReducer(s, { type: 'setQuantity', lineId: 'l1', quantity: 2 }).lines[0]?.quantity).toBe(2);
+  });
+
+  it('adds nothing when none is available', () => {
+    expect(run({ type: 'add', item: { ...rice, available: 0 }, lineId: 'l1' }).lines).toHaveLength(0);
+  });
+
+  it('fits a line to a new count: raises up to the new available, lowers or removes it', () => {
+    const s = run({ type: 'add', item: rice, lineId: 'l1', quantity: 3 });
+    expect(cartReducer(s, { type: 'fit', item: { ...rice, available: 8 }, lineId: 'l1', quantity: 5 }).lines[0]).toMatchObject({ quantity: 5, available: 8 });
+    expect(cartReducer(s, { type: 'fit', item: { ...rice, available: 2 }, lineId: 'l1', quantity: 5 }).lines[0]?.quantity).toBe(2);
+    expect(cartReducer(s, { type: 'fit', item: { ...rice, available: 0 }, lineId: 'l1', quantity: 5 }).lines).toHaveLength(0);
+    expect(cartReducer(emptyCart, { type: 'fit', item: { ...oil, available: 4 }, lineId: 'n1', quantity: 6 }).lines[0]).toMatchObject({ id: 'n1', quantity: 4 });
+  });
+
+  it('finds the first line above what the live catalogue says is available', () => {
+    const s = run({ type: 'add', item: rice, lineId: 'l1', quantity: 3 }, { type: 'add', item: oil, lineId: 'l2', quantity: 2 }, { type: 'addCustom', lineId: 'c1', name: 'Bag', unitPricePaise: 500 });
+    expect(firstShortLine(s, () => null)).toBeNull();
+    expect(firstShortLine(s, (id) => (id === 'oil' ? 1 : null))?.id).toBe('l2');
+    expect(firstShortLine(s, (id) => (id === 'rice' ? 2 : 10))?.id).toBe('l1');
   });
 });

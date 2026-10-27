@@ -14,8 +14,8 @@ import { cameraScanSupported } from '../scanner/support';
 import { looksLikeBarcode, useWedgeScanner } from '../scanner/wedge';
 import { useNarrow } from '../shell/useNarrow';
 import { AddProductSheet } from './AddProductSheet';
-import { cartReducer, cartTotals, emptyCart, shortLines, type CartAction, type CartLine } from './cart';
-import { findByBarcode, searchItems, sellPricePaise, topTiles } from './catalogue';
+import { cartReducer, cartTotals, emptyCart, firstShortLine, type CartAction, type CartLine } from './cart';
+import { blockedUnits, findByBarcode, searchItems, sellableUnits, sellPricePaise, topTiles } from './catalogue';
 import { buildSale, creditsFor } from './checkout';
 import { usePos } from './context';
 import { DiscountSheet } from './DiscountSheet';
@@ -23,6 +23,7 @@ import { needsAttention } from './history';
 import { LinkPanel } from './LinkPanel';
 import { amountDue, creditsAllowed, creditsToPaise, lineTotal } from './money';
 import { SalesSheet } from './SalesSheet';
+import { UpdateStockDialog, type StockAskReason } from './UpdateStockDialog';
 import type { CatalogueItem, PaymentMethod, SaleLink } from './types';
 import styles from './pos.module.css';
 
@@ -38,6 +39,14 @@ function isEditable(el: Element | null): boolean {
 
 function maskPhone(phone: string): string {
   return `•••• ${phone.slice(-4)}`;
+}
+
+/** A count the counter asks for before the bill may hold more of an item (D-270). */
+interface StockAsk {
+  item: CatalogueItem;
+  lineId: string;
+  wanted: number;
+  reason: StockAskReason;
 }
 
 export function Counter() {
@@ -59,18 +68,22 @@ export function Counter() {
   const [chargeFailed, setChargeFailed] = useState(false);
   const [lastSaleId, setLastSaleId] = useState<string | null>(null);
   const [receiptId, setReceiptId] = useState<string | null>(null);
+  const [stockAsk, setStockAsk] = useState<StockAsk | null>(null);
   const searchBox = useRef<HTMLDivElement>(null);
 
   const canManage = store.role === 'owner' || store.role === 'manager';
   const totals = cartTotals(cart);
   const credits = creditsFor(cart, settings);
   const due = amountDue(totals.totalPaise, creditsToPaise(credits));
-  const short = shortLines(cart);
   const hasBill = cart.lines.length > 0;
 
   useHoldUpdates(updates, hasBill || charging);
 
   const results = useMemo(() => searchItems(items, query), [items, query]);
+  const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
+  // An online sale the server found short (D-270) asks for a count too; nothing in the bill waits on it.
+  const soldShort = sync.short ? byId.get(sync.short.storeItemId) : undefined;
+  const ask: StockAsk | null = stockAsk ?? (soldShort ? { item: soldShort, lineId: '', wanted: 0, reason: 'sold' } : null);
   const tiles = useMemo(() => topTiles(items), [items]);
   const lastRec = records.find((r) => r.sale.clientId === lastSaleId) ?? null;
   const receiptRec = records.find((r) => r.sale.clientId === receiptId) ?? null;
@@ -87,13 +100,41 @@ export function Counter() {
     }
   };
 
-  const addItem = (item: CatalogueItem) => {
+  // The bill never holds more of an item than is available (D-270): past it, ask for a count first.
+  const addItem = (picked: CatalogueItem) => {
+    const item = byId.get(picked.id) ?? picked;
     const existing = cart.lines.find((l) => l.storeItemId === item.id);
     const lineId = existing?.id ?? newUlid();
-    act({ type: 'add', item, lineId });
-    setActive(lineId);
     setQuery('');
     setLastSaleId(null);
+    const wanted = (existing?.quantity ?? 0) + 1;
+    if (wanted > sellableUnits(item)) return setStockAsk({ item, lineId, wanted, reason: 'add' });
+    act({ type: 'add', item, lineId });
+    setActive(lineId);
+  };
+
+  /** Moves a line to `quantity`; raising it past the item's available asks for a count instead. */
+  const setLineQuantity = (lineId: string, quantity: number) => {
+    setActive(lineId);
+    const line = cart.lines.find((l) => l.id === lineId);
+    const item = line?.storeItemId ? byId.get(line.storeItemId) : undefined;
+    if (quantity <= 0) return act({ type: 'remove', lineId });
+    if (!line || !item || quantity <= line.quantity) return act({ type: 'setQuantity', lineId, quantity });
+    if (quantity > sellableUnits(item)) return setStockAsk({ item, lineId, wanted: quantity, reason: 'add' });
+    act({ type: 'fit', item, lineId, quantity });
+  };
+
+  const closeStock = () => {
+    if (stockAsk) setStockAsk(null);
+    else engine.clearShort();
+  };
+
+  const onCounted = (item: CatalogueItem) => {
+    if (ask && ask.reason !== 'sold' && ask.wanted > 0) {
+      act({ type: 'fit', item, lineId: ask.lineId, quantity: ask.wanted });
+      setActive(ask.lineId);
+    }
+    closeStock();
   };
 
   const onCode = (code: string) => {
@@ -134,6 +175,10 @@ export function Counter() {
 
   const charge = async () => {
     if (charging || !hasBill) return;
+    // A sync or an online order may have lowered an item since it was added: count before charging.
+    const short = firstShortLine(cart, (id) => byId.get(id)?.available ?? null);
+    const shortItem = short?.storeItemId ? byId.get(short.storeItemId) : undefined;
+    if (short && shortItem) return setStockAsk({ item: shortItem, lineId: short.id, wanted: short.quantity, reason: 'charge' });
     setCharging(true);
     setChargeFailed(false);
     try {
@@ -164,7 +209,8 @@ export function Counter() {
         void charge();
       } else if ((e.key === '+' || e.key === '-') && !isEditable(document.activeElement) && sub === null && active) {
         e.preventDefault();
-        act({ type: 'step', lineId: active, by: e.key === '+' ? 1 : -1 });
+        const line = cart.lines.find((l) => l.id === active);
+        if (line) setLineQuantity(active, line.quantity + (e.key === '+' ? 1 : -1));
       }
     };
   });
@@ -184,8 +230,17 @@ export function Counter() {
     if (narrow && hasBill) setCartOpen(true);
   };
 
+  // Never below 0: an offline race reads "Count needed" (D-270).
   const stockLabel = (i: CatalogueItem) =>
-    i.available > 0 ? intl.formatMessage({ id: 'pos.tile.inStock' }, { count: i.available }) : i.available === 0 ? intl.formatMessage({ id: 'pos.tile.out' }) : intl.formatMessage({ id: 'pos.tile.countNeeded' });
+    i.countNeeded || i.available < 0
+      ? intl.formatMessage({ id: 'pos.tile.countNeeded' })
+      : i.available > 0
+        ? intl.formatMessage({ id: 'pos.tile.inStock' }, { count: i.available })
+        : intl.formatMessage({ id: 'pos.tile.out' });
+  const blockedLabel = (i: CatalogueItem) => {
+    const n = blockedUnits(i);
+    return n > 0 ? intl.formatMessage({ id: 'pos.tile.blocked' }, { count: n }) : null;
+  };
 
   const linkSummary = (l: SaleLink): string => {
     if (l.method === 'bill_qr') return intl.formatMessage({ id: 'pos.cart.link.billQr' }, { name: l.customerName ?? '', credits: credits });
@@ -210,10 +265,7 @@ export function Counter() {
           ...(cart.link ? { summary: linkSummary(cart.link) } : {}),
         }}
         lines={cart.lines.map((l) => ({ id: l.id, name: l.name, detail: lineDetail(l), quantity: l.quantity, total: money(lineTotal(l)) }))}
-        onQuantityChange={(id, q) => {
-          setActive(id);
-          act(q <= 0 ? { type: 'remove', lineId: id } : { type: 'setQuantity', lineId: id, quantity: q });
-        }}
+        onQuantityChange={setLineQuantity}
         stepperLabels={{
           add: intl.formatMessage({ id: 'pos.cart.add' }),
           decrement: intl.formatMessage({ id: 'pos.cart.less' }),
@@ -323,11 +375,6 @@ export function Counter() {
           {intl.formatMessage({ id: online ? 'pos.banner.waiting.body' : 'pos.banner.offline.body' })}
         </Banner>
       )}
-      {short.length > 0 && (
-        <Banner tone="warning" live="status" title={intl.formatMessage({ id: 'pos.banner.short.title' }, { count: short.length })}>
-          {intl.formatMessage({ id: 'pos.banner.short.body' })}
-        </Banner>
-      )}
       {linkDropped && (
         <Banner tone="info" live="status" title={intl.formatMessage({ id: 'pos.banner.linkDropped.title' })} action={<Button size="sm" variant="ghost" onClick={() => setLinkDropped(false)}>{intl.formatMessage({ id: 'pos.close' })}</Button>}>
           {intl.formatMessage({ id: 'pos.banner.linkDropped.body' })}
@@ -388,7 +435,7 @@ export function Counter() {
               <ul className={styles.tiles}>
                 {tiles.map((i) => (
                   <li key={i.id}>
-                    <ItemTile item={i} stock={stockLabel(i)} onAdd={addItem} />
+                    <ItemTile item={i} stock={stockLabel(i)} blocked={blockedLabel(i)} onAdd={addItem} />
                   </li>
                 ))}
               </ul>
@@ -400,7 +447,7 @@ export function Counter() {
                 <ul className={styles.tiles}>
                   {results.map((i) => (
                     <li key={i.id}>
-                      <ItemTile item={i} stock={stockLabel(i)} onAdd={addItem} />
+                      <ItemTile item={i} stock={stockLabel(i)} blocked={blockedLabel(i)} onAdd={addItem} />
                     </li>
                   ))}
                 </ul>
@@ -492,14 +539,16 @@ export function Counter() {
           setReceiptId(rec.sale.clientId);
         }}
       />
+      <UpdateStockDialog item={ask?.item ?? null} wanted={ask?.wanted ?? 0} reason={ask?.reason ?? 'add'} onCancel={closeStock} onSaved={onCounted} />
       <ReceiptSheet open={receiptRec !== null} onClose={() => setReceiptId(null)} shopName={store.name} record={receiptRec} />
     </div>
   );
 }
 
-function ItemTile({ item, stock, onAdd }: { item: CatalogueItem; stock: string; onAdd: (i: CatalogueItem) => void }) {
+function ItemTile({ item, stock, blocked, onAdd }: { item: CatalogueItem; stock: string; blocked: string | null; onAdd: (i: CatalogueItem) => void }) {
   const price = sellPricePaise(item);
   const out = item.available <= 0;
+  const warn = item.countNeeded === true || item.available < 0;
   return (
     <button type="button" className={`tz-pos-tile ${out ? styles.tileDim : ''}`} onClick={() => onAdd(item)}>
       <span>
@@ -508,8 +557,9 @@ function ItemTile({ item, stock, onAdd }: { item: CatalogueItem; stock: string; 
       </span>
       <span className={styles.tileMeta}>
         <span className="tz-price">{money(price)}</span>
-        <small className={item.available < 0 ? styles.tileWarn : undefined}>{stock}</small>
+        <small className={warn ? styles.tileWarn : undefined}>{stock}</small>
       </span>
+      {blocked && <small className={styles.tileBlocked}>{blocked}</small>}
     </button>
   );
 }

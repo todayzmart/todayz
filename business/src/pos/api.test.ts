@@ -150,7 +150,7 @@ describe('catalogue changes', () => {
       { seq: 4, entity: 'category', entityId: 'c1', op: 'delete', item: null },
     ];
     expect(toCatalogueChanges(changes)).toEqual([
-      { seq: 1, entityId: 'i1', op: 'upsert', item: { id: 'i1', name: 'Rice', pricePaise: 5000, available: 3, isListed: true } },
+      { seq: 1, entityId: 'i1', op: 'upsert', item: { id: 'i1', name: 'Rice', pricePaise: 5000, available: 3, onHand: 4, reserved: 1, countNeeded: false, isListed: true } },
       { seq: 2, entityId: 'i2', op: 'delete' },
     ]);
   });

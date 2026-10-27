@@ -195,8 +195,8 @@ func (r posReferrals) Revoke(ctx context.Context, _, saleID ids.ID) error {
 // PosStock is the catalogue's stock writer as pos.Stock: a sale line is one
 // sale_pos movement referring to the sale, idempotent on the line's client
 // id; a reversal is a pos_reversal against that movement; an offline stock
-// entry is a count, a restock or an uncapped damage or expired removal
-// (02 §4.3: the device saw it happen). The API's routes file uses it.
+// entry is a count, a restock or a damage or expired removal capped at on
+// hand (D-270). An online sale is capped at available (*pos.ShortError). The API's routes file uses it.
 func PosStock(c clock.Clock) pos.Stock { return posStock{w: catalogue.NewWriter(c)} }
 
 type posStock struct{ w *catalogue.Writer }
@@ -206,7 +206,11 @@ func (s posStock) Sell(ctx context.Context, tx pgx.Tx, in pos.StockSale) (ids.ID
 		StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty,
 		Source: catalogue.SourceSalePOS, RefType: "pos_sale", RefID: in.SaleID,
 		ClientID: in.ClientID, Who: catalogue.Who{UserID: in.UserID, DeviceID: in.DeviceID},
+		CapAvailable: in.CapAvailable,
 	})
+	if over := (*catalogue.OverError)(nil); errors.As(err, &over) {
+		return ids.Zero, &pos.ShortError{Available: over.Max}
+	}
 	if err != nil {
 		return ids.Zero, posStockErr(err)
 	}
@@ -247,7 +251,7 @@ func (s posStock) Change(ctx context.Context, tx pgx.Tx, in pos.StockChange) (po
 			src = catalogue.SourceExpired
 		}
 		m, err = s.w.Remove(ctx, tx, catalogue.Removal{
-			StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty, Source: src,
+			StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty, Source: src, CapOnHand: true,
 			ClientID: in.ClientID, Note: in.Note, Who: who,
 		})
 	default:

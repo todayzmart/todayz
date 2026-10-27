@@ -10,7 +10,7 @@ const SID = '01J9ZSSSSSSSSSSSSSSSSSSSSS';
 const NOW = () => new Date().toISOString();
 const base = `/v1/biz/businesses/${BID}/stores/${SID}`;
 
-function item(n: number, name: string, pricePaise: number, available: number, barcodes: string[] = []) {
+function item(n: number, name: string, pricePaise: number, available: number, barcodes: string[] = [], reserved = 0) {
   const id = `01J9ZIIIIIIIIIIIIIIIIIII${String(n).padStart(2, '0')}`;
   return {
     id,
@@ -28,8 +28,8 @@ function item(n: number, name: string, pricePaise: number, available: number, ba
     pricePaise,
     mrpPaise: null,
     productMrpPaise: null,
-    onHand: available,
-    reserved: 0,
+    onHand: available + reserved,
+    reserved,
     available,
     lowStockAt: null,
     lowStock: false,
@@ -49,7 +49,9 @@ const ITEMS = [
   item(5, 'Tea 250 g', 11000, 6),
   item(6, 'Milk 500 ml', 3200, 40),
   item(7, 'Parle-G biscuits', 1000, 80),
-  item(8, 'Atta 5 kg', 26000, 2),
+  // Three of Atta's five are blocked for accepted online orders; Ghee has none left (D-270).
+  item(8, 'Atta 5 kg', 26000, 2, [], 3),
+  item(9, 'Ghee 500 ml', 32000, 0),
 ];
 
 const cors = (route: Route) => {
@@ -258,6 +260,39 @@ test('desktop: offline sales queue on the device and show as waiting (B-05)', as
   const sales = page.getByRole('dialog', { name: 'Sales on this device' });
   await expect(sales.getByText('Waiting to sync')).toHaveCount(2);
   await shot(page, 'sell-offline-queue.png');
+});
+
+test('desktop: a line never goes past available; the count dialog with and without blocked units (D-270)', async ({ page }) => {
+  await page.setViewportSize(VIEWPORTS.desktop);
+  await page.goto('/sell');
+  const atta = tileOf(page, 'Atta 5 kg');
+  await expect(atta).toContainText('3 blocked for online orders');
+  await tileOf(page, 'Basmati rice').click();
+  await atta.click();
+  await atta.click();
+  await shot(page, 'pos-stock-tile-blocked.png');
+  await atta.click();
+  const dialog = page.getByRole('dialog', { name: 'Update stock' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('checkbox', { name: 'This count includes the 3 units set aside for online orders' })).not.toBeChecked();
+  await dialog.getByLabel('Counted now').fill('4');
+  await expect(dialog.getByText('On hand will be 7, available 4')).toBeVisible();
+  await shot(page, 'pos-stock-dialog-blocked.png');
+  await dialog.getByRole('button', { name: 'Save count' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.locator('.tz-amt')).toHaveText('₹900');
+  await expect(atta).toContainText('4 in stock');
+
+  const search = page.getByRole('searchbox', { name: 'Search or scan an item' }).or(page.getByRole('textbox', { name: 'Search or scan an item' }));
+  await search.fill('Ghee');
+  await page.getByRole('region', { name: 'Items' }).getByRole('button', { name: /Ghee 500 ml/ }).click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('checkbox')).toHaveCount(0);
+  await dialog.getByLabel('Counted now').fill('6');
+  await shot(page, 'pos-stock-dialog-plain.png');
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.locator('.tz-amt')).toHaveText('₹900');
 });
 
 test('phone: counter with the bill bar and the bill sheet (B-05)', async ({ page }) => {

@@ -224,6 +224,9 @@ export function toCatalogueItem(s: StoreItem): CatalogueItem {
     barcodes: s.barcodes,
     pricePaise: s.pricePaise,
     available: s.available,
+    onHand: s.onHand,
+    reserved: s.reserved,
+    countNeeded: s.countNeeded ?? false,
     isListed: s.isListed,
   };
 }
@@ -235,8 +238,8 @@ export function toCatalogueChanges(changes: readonly SyncChange[]): CatalogueCha
     if (c.entity !== 'store_item') continue;
     if (c.op === 'delete') out.push({ seq: c.seq, entityId: c.entityId, op: 'delete' });
     else if (c.item) {
-      const { id, name, pricePaise, available, isListed } = c.item;
-      out.push({ seq: c.seq, entityId: c.entityId, op: 'upsert', item: { id, name, pricePaise, available, isListed } });
+      const { id, name, pricePaise, available, onHand, reserved, countNeeded, isListed } = c.item;
+      out.push({ seq: c.seq, entityId: c.entityId, op: 'upsert', item: { id, name, pricePaise, available, onHand, reserved, countNeeded, isListed } });
     }
   }
   return out;

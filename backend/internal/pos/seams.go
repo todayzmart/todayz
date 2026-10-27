@@ -3,6 +3,7 @@ package pos
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -26,7 +27,16 @@ type StockSale struct {
 	ClientID        ids.ID
 	UserID          ids.ID
 	DeviceID        ids.ID // zero unless a devices row
+	// CapAvailable refuses more than the item's available units with
+	// *ShortError: an online sale (D-270). A synced offline sale is kept.
+	CapAvailable bool
 }
+
+// ShortError is a sale line above the item's available units (on hand less
+// what accepted online orders hold), at write time (D-270).
+type ShortError struct{ Available int32 }
+
+func (e *ShortError) Error() string { return fmt.Sprintf("pos: only %d available", e.Available) }
 
 // StockReversal puts a sale line's units back (a pos_reversal movement).
 type StockReversal struct {
@@ -47,8 +57,9 @@ const (
 
 // StockChange is an offline stock entry: a count (Qty is the counted
 // on-hand) or a restock, damage or expired movement of Qty units. Damage
-// and expired are not capped at what is available: the device saw them
-// happen (02 §4.3).
+// and expired are capped at on hand, never at available: the device saw
+// them happen, but no item goes below 0 for them (D-270, superseding the
+// uncapped reading of 02 §4.3).
 type StockChange struct {
 	Kind            string
 	StoreID, ItemID ids.ID

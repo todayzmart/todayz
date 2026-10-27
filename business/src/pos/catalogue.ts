@@ -70,3 +70,34 @@ export function topTiles(items: readonly CatalogueItem[], count = TILE_COUNT): C
     .sort((a, b) => itemLabel(a).localeCompare(itemLabel(b)))
     .slice(0, count);
 }
+
+// Stock at the counter (D-270). The counter never sells past `available`; the server refuses an
+// online sale above it, and an offline race that still takes an item below 0 reads 0 with "Count needed".
+
+/** Units set aside for accepted online orders that are not collected or delivered yet. */
+export function blockedUnits(item: CatalogueItem): number {
+  return Math.max(0, item.reserved ?? 0);
+}
+
+/** Units the counter may sell now. */
+export function sellableUnits(item: CatalogueItem): number {
+  return Math.max(0, item.available);
+}
+
+/** Units on the shelf, the blocked ones included. */
+export function onHandUnits(item: CatalogueItem): number {
+  return Math.max(0, item.onHand ?? sellableUnits(item) + blockedUnits(item));
+}
+
+/**
+ * The on hand a count sets. A person who counted every unit on the shelf, the ones set aside for
+ * online orders too, ticks `includesBlocked`; otherwise the blocked units are added to the count.
+ */
+export function countedOnHand(counted: number, blocked: number, includesBlocked: boolean): number {
+  return includesBlocked ? counted : counted + blocked;
+}
+
+/** The item after a count: on hand as counted, available what is left once the blocked units are set aside. */
+export function afterCount(item: CatalogueItem, onHand: number): CatalogueItem {
+  return { ...item, onHand, available: Math.max(0, onHand - blockedUnits(item)), countNeeded: false };
+}
