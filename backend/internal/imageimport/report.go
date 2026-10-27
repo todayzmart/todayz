@@ -98,3 +98,45 @@ func (r TypeReport) WriteMarkdown(w io.Writer) error {
 	}
 	return nil
 }
+
+// WriteMarkdown writes an `images types --picks` run as a Markdown page.
+func (r PickReport) WriteMarkdown(w io.Writer) error {
+	run := "Run"
+	if r.DryRun {
+		run = "Dry run (nothing stored; each file checked on Commons)"
+	}
+	products := 0
+	for _, l := range r.Picked {
+		products += l.Products
+	}
+	if _, err := fmt.Fprintf(w, "# Item-type photo picks\n\n%s: %d products given their kind's approved photo first; %d picks applied (%d products), %d left alone, %d failed.\n",
+		run, r.Filled, len(r.Picked), products, len(r.Kept), len(r.Failed)); err != nil {
+		return err
+	}
+	sections := []struct {
+		title string
+		lines []TypeLine
+	}{
+		{"Applied", r.Picked},
+		{"Left alone", r.Kept},
+		{"Failed (pick these again in A-08)", r.Failed},
+	}
+	for _, s := range sections {
+		if len(s.lines) == 0 {
+			continue
+		}
+		if _, err := fmt.Fprintf(w, "\n## %s\n\n", s.title); err != nil {
+			return err
+		}
+		for _, l := range s.lines {
+			line := fmt.Sprintf("- %s (%s, %d products): %s", l.TypeKey, l.Category, l.Products, strings.Join(l.Files, "; "))
+			if l.Reason != "" {
+				line += " — " + l.Reason
+			}
+			if _, err := fmt.Fprintln(w, line); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}

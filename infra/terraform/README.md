@@ -13,7 +13,7 @@ envs/account   AWS Budgets alarm (first resource, 80% actual / 100% forecast), t
 envs/staging   unused since D-210 (prod only); kept validating, has no backend
 envs/prod      the stack: api 2-6 x t4g.small, worker 1-3 x t4g.small, db.t4g.medium Single-AZ
 modules/stack  composes the rest for one environment; timings.tf holds the shutdown timings;
-               ops.tf the Fargate ops tasks (db bootstrap, migrate); deploy.tf the app-versions
+               ops.tf the Fargate ops tasks (db bootstrap, migrate, images); deploy.tf the app-versions
                bucket and the GitHub deploy role
 modules/network   VPC, 2 AZs, public/private subnets, one NAT, S3/ECR/Secrets Manager endpoints, flow logs
 modules/database  RDS Postgres 16 (+ PostGIS at bootstrap), gp3 100 -> 500 GB, PITR 14 d, Database

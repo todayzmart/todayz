@@ -58,6 +58,8 @@ The complete list, with required and optional markers, is in `backend/internal/p
 | `rollup demo [--for 10m]` | Synthetic traffic against the local API, used by `make demo` |
 | `ai eval <feature\|all> [--live]` | Runs AI evals on recorded replies; `--live` calls the model with your own key (`make ai-eval`) |
 | `images import [--dry-run] [--limit N] [--source off\|obf\|opf] [--report FILE]` | Drafts product images from Open Food, Beauty and Products Facts |
+| `images types [--dry-run] [--again] [--limit N] [--contact URL] [--report FILE]` | Finds item-type photo candidates on Wikimedia Commons for A-08 (D-253) |
+| `images types --picks FILE\|builtin [--dry-run] [--report FILE]` | Applies saved picks (`internal/imageimport/data/approved-type-photos.csv` is `builtin`) as A-08 would, audited as the system (D-265) |
 | `admin unlock-sign-in --phone-file FILE\|- --reason TEXT` (or `--phone-env NAME`) | Break glass (D-264): lifts an admin's sign-in lock and clears its wrong-code count when no super admin can, as `todayz_app`; audited with the system actor; the number is read from a file, stdin or a variable and never printed. Prod: deploy RUNBOOK §8 |
 | `version` | Prints build info |
 

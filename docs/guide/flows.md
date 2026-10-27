@@ -356,4 +356,5 @@ sequenceDiagram
 - The app resizes the photo, then `backend/internal/catalogue/photos.go` issues a presigned PUT into the private bucket (size limit in the contract) and, on confirm, queues the photo for review. Until approval the shop sees its own photo through a signed link (D-252, D-253).
 - Admin approval is in `backend/internal/admin/product_images.go` (`approve`, `reject`, bulk `product-image-approvals`). Only an approval copies the image to the public images bucket and makes it the product's picture.
 - Seed images from open data are drafted by `todayz images import` (`backend/internal/imageimport`, D-252) and go through the same approval.
+- Item-type photos (D-253): `todayz images types` stores Commons candidates per kind, and an admin picks one in A-08. `todayz images types --picks builtin` re-applies the saved picks with the same steps, audited as the system (D-265).
 - AI plays no part in photo approval. A person always decides. (`backend/internal/ai/imagecheck` exists for banner images and is not wired yet.)
