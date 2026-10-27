@@ -474,7 +474,7 @@ How the suite measures these (W4-02, `e2e/load/README.md`):
 - `browse_peak`: "reads" are every discover read except search and suggest (summary, store list with and without a category, categories, shop page, shop items with and without a query, substitutes). "search" is `GET /v1/discover/search` and the typeahead `GET /v1/discover/suggest` together (`lat_search`). The summary also prints each endpoint on its own line, so the search endpoint alone can be judged.
 - `order_burst`: "timers late" means the gap between `accept_by` and the order's `expired` event, measured for the orders that were left unaccepted (`checks/order_burst.sql`). "Ledger reconcile clean" means the credits reconcile (03 §6) finds nothing.
 - `pos_rush`: p95 covers online sales, retries and sync batches together. A sync batch carries 20 sales, so its own time is about 20 sales' worth. "No duplicate sales" means no (store, clientId) pair holds two sales, and the run recorded no more sales than the distinct clientIds it sent (`checks/pos_rush.sql`).
-- `sse_fanout`: "memory stable" means the API's RSS at the end of the run is within 10% of its RSS once the streams are open, and no stream is lost for good.
+- `sse_fanout`: "memory stable" means the API's RSS at the end of the run is within 10% of its RSS after the first minute of events (every stream has written by then), and no stream is lost for good (D-266).
 - `soak`: the local run is 20 minutes (`LOAD_SOAK_DURATION`); the full 2 hours is for staging (wave 5). "No connection leak" means pool and Postgres connection counts return to their idle level after the run (`sample.sh`).
 
 ## 7. Security tests

@@ -14,7 +14,7 @@ make load                # every scenario; or one: make load-browse | load-order
 | `scenarios/bootstrap.js` | Signs in the load shop people through the API (mock SMS) and names them, so `data/link_staff.sql` can make them owners and managers of the load shops. Phone identities are keyed and sealed, so SQL cannot create them. |
 | `data/export_fixture.sql` | Writes `out/fixture.json`: shop ids, coordinates, in-stock items, cities, search terms. No phones or codes. |
 | `scenarios/*.js` | k6: browse_peak, order_burst, pos_rush, otp_abuse, soak. Each writes `out/<scenario>-summary.json` (p50/p95/p99, error rates, threshold verdicts). |
-| `ssefanout/` | Go driver for sse_fanout (k6 cannot hold SSE streams): signs in, opens the streams, publishes events through the outbox and `pg_notify`, measures delivery and the api's RSS. |
+| `ssefanout/` | Go driver for sse_fanout (k6 cannot hold SSE streams): signs in, opens the streams, publishes events through the outbox and `pg_notify`, measures delivery and the api's RSS (baseline after the first minute of events, D-266). |
 | `checks/*.sql` | Post-run verdicts that need the database: accept-timer lateness and the ledger reconcile (order_burst), duplicate sales (pos_rush). |
 | `sample.sh` | CSV of RSS, Go heap, goroutines, pool and Postgres connections every 30 s, run alongside the soak. |
 

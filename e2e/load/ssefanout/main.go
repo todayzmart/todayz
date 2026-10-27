@@ -12,7 +12,7 @@
 // event; delivery latency is the time from writing the statement to reading the frame.
 //
 // Pass: delivery p95 < 2 s; memory stable (API RSS at the end within 10% of the RSS after the
-// streams opened, and no stream lost for good). Prints counts, durations and sizes only.
+// first minute of events, once every stream has written, and no stream lost for good). Prints counts, durations and sizes only.
 package main
 
 import (
@@ -59,7 +59,7 @@ type cfg struct {
 	storeStreams, customers  int
 	perCustomer              int
 	rate                     float64
-	duration, ramp           time.Duration
+	duration, ramp, warmup   time.Duration
 }
 
 func main() {
@@ -74,6 +74,7 @@ func main() {
 	flag.Float64Var(&c.rate, "rate", 20, "events published per second")
 	flag.DurationVar(&c.duration, "duration", 8*time.Minute, "publishing time after the streams are open (tokens live 15 min)")
 	flag.DurationVar(&c.ramp, "ramp", 60*time.Second, "time over which the streams open")
+	flag.DurationVar(&c.warmup, "warmup", time.Minute, "publishing time before the baseline RSS (each stream's first writes allocate its buffers)")
 	flag.Parse()
 	if err := run(c); err != nil {
 		fmt.Fprintln(os.Stderr, "sse_fanout:", err)
@@ -292,6 +293,8 @@ wait:
 	sampleT := time.NewTicker(15 * time.Second)
 	defer sampleT.Stop()
 	end := time.After(c.duration)
+	warm := time.After(c.warmup)
+	var rssWarm int64
 	published := 0
 	t2 := time.Now()
 pubLoop:
@@ -320,6 +323,9 @@ pubLoop:
 			samples = append(samples, sample{At: time.Now().UTC().Format(time.RFC3339), RSSMB: r / 1024, Open: openNow.Load()})
 			fmt.Printf("t+%s published %d, deliveries %d, open %d, reconnects %d, api rss %d MB\n",
 				time.Since(t2).Round(time.Second), published, frames.Load(), openNow.Load(), reconnects.Load(), r/1024)
+		case <-warm:
+			rssWarm = rssKB(apiPID)
+			fmt.Printf("api rss after %s of events %d MB (the baseline)\n", c.warmup, rssWarm/1024)
 		case <-end:
 			break pubLoop
 		}
@@ -348,11 +354,11 @@ pubLoop:
 		return lat[int(q*float64(len(lat)-1))]
 	}
 	growth := 0.0
-	if rssOpen > 0 {
-		growth = float64(rssEnd-rssOpen) / float64(rssOpen)
+	if rssWarm > 0 {
+		growth = float64(rssEnd-rssWarm) / float64(rssWarm)
 	}
 	passLat := len(lat) > 0 && p(0.95) < 2000
-	passMem := growth < 0.10 && lost.Load() == 0
+	passMem := rssWarm > 0 && growth < 0.10 && lost.Load() == 0
 	res := map[string]any{
 		"scenario": "sse_fanout", "at": time.Now().UTC().Format(time.RFC3339),
 		"streams": len(targets), "storeStreams": storeCount * perStore, "customerStreams": c.customers * c.perCustomer,
@@ -360,7 +366,7 @@ pubLoop:
 		"published": published, "ratePerSec": c.rate, "durationSec": c.duration.Seconds(),
 		"deliveriesExpected": want, "deliveries": len(lat), "deliveriesMissing": missing,
 		"latencyMs": map[string]float64{"p50": p(0.50), "p95": p(0.95), "p99": p(0.99), "max": p(1)},
-		"apiRssMB":  map[string]int64{"beforeStreams": rss0 / 1024, "afterOpen": rssOpen / 1024, "end": rssEnd / 1024},
+		"apiRssMB":  map[string]int64{"beforeStreams": rss0 / 1024, "afterOpen": rssOpen / 1024, "afterWarmup": rssWarm / 1024, "end": rssEnd / 1024},
 		"rssGrowth": growth, "samples": samples,
 		"pass": map[string]bool{"deliveryP95Under2s": passLat, "memoryStable": passMem},
 	}
@@ -378,8 +384,8 @@ pubLoop:
 		len(targets), storeCount*perStore, c.customers*c.perCustomer, readyN, reconnects.Load(), lost.Load())
 	fmt.Printf("events %d at %.0f/s, deliveries %d of %d expected (missing %d)\n", published, c.rate, len(lat), want, missing)
 	fmt.Printf("delivery ms p50=%.1f p95=%.1f p99=%.1f max=%.1f  %s (p95 < 2000)\n", p(0.5), p(0.95), p(0.99), p(1), verdict(passLat))
-	fmt.Printf("api rss MB before %d, open %d, end %d (growth %.1f%%)  %s (growth < 10%%, no stream lost)\n",
-		rss0/1024, rssOpen/1024, rssEnd/1024, growth*100, verdict(passMem))
+	fmt.Printf("api rss MB before %d, open %d, after %s of events %d, end %d (growth %.1f%%)  %s (growth < 10%%, no stream lost)\n",
+		rss0/1024, rssOpen/1024, c.warmup, rssWarm/1024, rssEnd/1024, growth*100, verdict(passMem))
 	if !passLat || !passMem {
 		return errors.New("FAIL")
 	}
