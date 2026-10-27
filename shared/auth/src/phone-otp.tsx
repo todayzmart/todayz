@@ -9,19 +9,35 @@ import { getDeviceId } from './device';
 import type { Session } from './session';
 import { getTurnstileToken } from './turnstile';
 
-export type OtpErrorKind = 'wrongCode' | 'expired' | 'locked' | 'rateLimited' | 'blocked' | 'network' | 'generic';
+export type OtpErrorKind =
+  | 'wrongCode'
+  | 'expired'
+  | 'locked'
+  | 'signinLocked'
+  | 'rateLimited'
+  | 'blocked'
+  | 'network'
+  | 'generic';
 
 /** Maps an API failure to the message kind the screen shows. */
 export function otpErrorKind(e: unknown): OtpErrorKind {
   if (e instanceof ApiError) {
     if (e.code === 'otp_expired') return 'expired';
     if (e.code === 'otp_locked') return 'locked';
+    // D-264: the admin app's sign-in is locked for this number after too many wrong codes.
+    if (e.code === 'signin_locked') return 'signinLocked';
     if (e.code === 'rate_limited') return 'rateLimited';
     if (e.code === 'account_blocked') return 'blocked';
     if (e.code === 'unauthorized' || e.code === 'validation_failed') return 'wrongCode';
     return 'generic';
   }
   return 'network';
+}
+
+/** The message for an error kind, with the fallbacks the labels allow. */
+export function otpErrorMessage(errors: PhoneOtpLabels['errors'], kind: OtpErrorKind): string {
+  if (kind === 'signinLocked') return errors.signinLocked ?? errors.locked;
+  return errors[kind];
 }
 
 export interface PhoneOtpLabels {
@@ -37,8 +53,11 @@ export interface PhoneOtpLabels {
   resendIn: (seconds: number) => string;
   changeNumber: string;
   invalidPhone: string;
-  /** Message by error kind. */
-  errors: Record<OtpErrorKind | 'captcha', string>;
+  /**
+   * Message by error kind. `signinLocked` (admin app only, D-264) falls back to `locked` when
+   * an app does not set it.
+   */
+  errors: Record<Exclude<OtpErrorKind, 'signinLocked'> | 'captcha', string> & { signinLocked?: string };
   /** "Code sent to +91 90000 00001" shown above the boxes. */
   sentTo: (maskedPhone: string) => string;
 }
@@ -46,8 +65,6 @@ export interface PhoneOtpLabels {
 export interface SignedIn {
   userId: string;
   isNewUser: boolean;
-  /** Admin app only: what the second factor needs (`totp_enrol` or `totp_verify`). */
-  nextStep?: 'totp_enrol' | 'totp_verify' | undefined;
 }
 
 export interface PhoneOtpFlowProps {
@@ -125,8 +142,10 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
       setStep('code');
     } catch (e) {
       const kind = otpErrorKind(e);
-      fail(labels.errors[kind === 'wrongCode' ? 'generic' : kind]);
-      if (e instanceof ApiError && e.retryAfterSeconds) setWait(e.retryAfterSeconds);
+      fail(otpErrorMessage(labels.errors, kind === 'wrongCode' ? 'generic' : kind));
+      // A sign-in lock runs for hours and another super admin may lift it sooner: show the
+      // message, not an hours-long countdown that would also hold every other number.
+      if (kind !== 'signinLocked' && e instanceof ApiError && e.retryAfterSeconds) setWait(e.retryAfterSeconds);
     } finally {
       setSending(false);
     }
@@ -146,14 +165,9 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
           deviceId: getDeviceId(session.app),
         });
         session.signIn({ accessToken: r.accessToken, expiresAt: r.expiresAt, userId: r.userId });
-        const step = (r as { nextStep?: string }).nextStep;
-        onSignedInRef.current({
-          userId: r.userId,
-          isNewUser: r.isNewUser,
-          nextStep: step === 'totp_enrol' || step === 'totp_verify' ? step : undefined,
-        });
+        onSignedInRef.current({ userId: r.userId, isNewUser: r.isNewUser });
       } catch (e) {
-        setCodeError(labelsRef.current.errors[otpErrorKind(e)]);
+        setCodeError(otpErrorMessage(labelsRef.current.errors, otpErrorKind(e)));
         setErrorKey((k) => k + 1);
         setCode('');
       } finally {

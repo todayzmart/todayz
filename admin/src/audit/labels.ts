@@ -113,6 +113,9 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.adminUserDisable' });
         case 'admin_user.enable':
           return intl.formatMessage({ id: 'audit.action.adminUserEnable' });
+        case 'admin_user.unlock_sign_in':
+          return intl.formatMessage({ id: 'audit.action.adminUserUnlockSignIn' });
+        // Written only before D-264 removed the admin authenticator; old audit entries still carry it.
         case 'admin_user.totp_reset':
           return intl.formatMessage({ id: 'audit.action.adminUserTotpReset' });
         case 'notification.test_send':

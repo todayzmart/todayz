@@ -1,6 +1,6 @@
 # ASVS 4.0.3 Level 2 checklist (W4-03)
 
-- **Scope:** the Go API (`backend/`), the four Pages apps, and the customer Pages Function. Checked at base `a6b58e40` on 26 Oct 2026.
+- **Scope:** the Go API (`backend/`), the four Pages apps, and the customer Pages Function. Checked at base `a6b58e40` on 26 Oct 2026; the 2.2.1, 2.7.1, 2.8, 4.3.1 and 4.3.3 rows were updated for D-264 on main at `a0402006`, 27 Oct 2026.
 - **Status values:** pass, gap, partial, n/a.
 - **Evidence:** a `file:line` or a test. Go paths are relative to `backend/`.
 - **Coverage:** the items are grouped by ASVS chapter. Requirements that cannot apply to this stack are collapsed into one n/a row per chapter. TodayZ has no passwords, file execution, XML, GraphQL, SOAP or server-side templates.
@@ -23,18 +23,15 @@
 
 | ID | Requirement | Status | Evidence |
 |---|---|---|---|
-| 2.2.1 | Anti-automation on authentication | pass | Turnstile, a 30 s resend gap, 5 per phone per hour and 20 per IP per hour (`internal/identity/otp.go:52-104`), and 5 verify attempts (`:195-218`). Stack test: `e2e/security/abuse.stack.test.mjs` |
+| 2.2.1 | Anti-automation on authentication | pass | Turnstile, a 30 s resend gap, 5 per phone per hour and 20 per IP per hour (`internal/identity/otp.go:52-104`), and 5 verify attempts per code. Admin sign-in also has a cumulative limit (D-264): 10 wrong codes for one number in 24 h, across requests, lock its admin sign-in for 24 h (`internal/identity/signin_limits.go`; settings `admin_signin_*`), unlocked early only by another super_admin. Admin step-up sends have their own 10 an hour. Stack test: `e2e/security/abuse.stack.test.mjs`; `internal/identity/signin_limits_test.go` |
 | 2.2.3 | Notify the user after auth changes | gap (low) | No sign-in or new-device notice to the user. An OTP SMS is the only signal |
 | 2.5.x | Credential recovery | n/a | No passwords. Recovery is an OTP to the phone |
-| 2.7.1 | Out-of-band authenticator not via insecure channel | partial | SMS OTP is the product decision (01 §2). The admin app adds TOTP |
+| 2.7.1 | Out-of-band authenticator not via insecure channel | partial | SMS OTP is the product decision (01 §2), for admins too since D-264 (admin step-up is a second SMS code, not a separate factor) |
 | 2.7.2 | OOB code expires within 10 min | pass | 5 min (`internal/identity/identity.go:44`) |
 | 2.7.3 | OOB code used once | pass | the request is consumed on success (`internal/identity/otp.go:212-246`) |
 | 2.7.4 | OOB code bound to the request | pass | HMAC over request id and code (`internal/identity/otp.go:409-411`) |
 | 2.7.6 | OOB code ≥ 20 bits of entropy | gap (accepted) | 6 digits is about 20 bits. With 5 tries and a 5-minute TTL this is the product rule (01 §2) |
-| 2.8.1 | TOTP has a defined lifetime | pass | 30 s steps (`internal/identity/totp.go`) |
-| 2.8.3 | Approved crypto for TOTP | pass | HMAC-SHA1 TOTP (RFC 6238), compared in constant time (`internal/identity/totp.go:112`) |
-| 2.8.4 | TOTP used once | pass | last step recorded per admin (`internal/identity/totp_service.go`) |
-| 2.8.5 | TOTP reuse logged and alerted | partial | logged. No alert rule yet (W4-02) |
+| 2.8.x | Single- or multi-factor one-time verifier (TOTP) | n/a | no user-facing TOTP since D-264 (the POS counter code is a device code checked by the shop, not an authenticator) |
 | 2.9.x | Cryptographic authenticator | n/a | none |
 | 2.10.x | Service secrets not in code | pass | all secrets come from env (`make env-check`). gitleaks over the history is clean apart from go.sum false positives (REPORT) |
 | 2.1.x, 2.3.x, 2.4.x | Passwords | n/a | no passwords |
@@ -70,9 +67,9 @@
 | 4.1.5 | Fail securely | pass | an unknown action is a 500, and a nil authorizer refuses (`internal/platform/authz/engine.go:105`, `internal/platform/httpx/mw/authz.go:17`) |
 | 4.2.1 | IDOR protection | pass | store-scoped loads plus business scope. `cmd/todayz/security_abuse_http_test.go` TestAbuseIDORSweepHTTP covers items, orders, bill claims, POS sales, offers and staff across stores and businesses, and checks nothing changed |
 | 4.2.2 | CSRF protection | pass | Bearer API (no ambient credential), except refresh and logout, which use an Origin allowlist plus `X-TZ-Client` (`internal/identity/handlers.go:239-264`). Tested in `cmd/todayz/identity_http_test.go:147` and the stack suite |
-| 4.3.1 | Admin interfaces need MFA | pass | otp+totp for the admin app (`internal/platform/authn/authenticator.go:78-80`) |
+| 4.3.1 | Admin interfaces need MFA | gap (accepted) | Admins sign in with the SMS OTP alone and confirm † actions with a second SMS code (D-264). The founder accepted that this does not protect against a SIM swap |
 | 4.3.2 | No directory browsing or metadata exposure | pass | API serves JSON only. Pages serves the built `dist` |
-| 4.3.3 | Step-up for high-value actions | pass | `StepUp: true` on † actions, for example payouts (`internal/platform/authz/policy/payouts.go:28-29`) |
+| 4.3.3 | Step-up for high-value actions | pass | `StepUp: true` on † actions, for example payouts (`internal/platform/authz/policy/payouts.go:28-29`); the step-up is a fresh SMS code within 10 min (`internal/identity/stepup.go`, D-264) |
 
 ## V5 Validation, sanitisation, encoding
 
@@ -100,7 +97,7 @@
 | 6.2.5 | No insecure modes or padding | pass | GCM only |
 | 6.2.6 | Nonces unique | pass | random 12-byte nonce per seal (`internal/platform/pii/pii.go:29`) |
 | 6.3.1 | Random numbers from a CSPRNG | pass | crypto/rand for codes and tokens. The one math/rand use is jitter, annotated `#nosec G404` (`internal/pos/sync.go:189`) |
-| 6.4.1 | Key management | partial | separate keys per purpose (TOTP_ENC_KEY ≠ PII_ENC_KEY is enforced, `internal/identity/identity.go:222`). The secrets-manager design is W5 |
+| 6.4.1 | Key management | partial | separate keys per purpose (`PII_ENC_KEY`, `ORDER_CODE_ENC_KEY`, `DEVICE_SECRET_ENC_KEY`, …); the old TOTP_ENC_KEY ≠ PII_ENC_KEY check went with the key (D-264). The secrets-manager design is W5 |
 
 ## V7 Errors and logging
 

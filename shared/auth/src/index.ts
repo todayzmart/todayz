@@ -24,6 +24,7 @@ export {
 export {
   PhoneOtpFlow,
   otpErrorKind,
+  otpErrorMessage,
   type OtpErrorKind,
   type PhoneOtpFlowProps,
   type PhoneOtpLabels,

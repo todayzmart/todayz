@@ -88,7 +88,7 @@ func TestMigrateSeedAndServe(t *testing.T) {
 		pw = pw[strings.Index(pw, ":")+1 : strings.Index(pw, "@")]
 		require.NotContains(t, logs, pw, "a database password reached the logs")
 	}
-	for _, k := range []string{"PII_HASH_KEY", "TOTP_ENC_KEY", "JWT_SIGNING_KEYS"} {
+	for _, k := range []string{"PII_HASH_KEY", "DEVICE_SECRET_ENC_KEY", "JWT_SIGNING_KEYS"} {
 		require.NotContains(t, logs, e[k], "%s reached the logs", k)
 	}
 }

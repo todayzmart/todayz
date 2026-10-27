@@ -28,7 +28,7 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
 - An OTP is never logged, in any environment. In `local` and `test` only, the reserved numbers `+91 90000 000xx` accept `000000`; any other number goes through the mock SMS server. Sends to reserved numbers still go to the mock SMS server; only verification is short-circuited. There is no `dev` environment.
 - In `local` and `test` only, a test clock (`/v1/test/clock`) lets testers move server time for manual testing of timers and expiries. Staging and prod builds return 404 for it (D-80).
 - Business users sign in the same way. One person can belong to several businesses with a role in each.
-- Admin staff sign in with mobile OTP plus a TOTP authenticator app (mandatory for every admin role). Each admin gets 10 one-time recovery codes.
+- Admin staff sign in with mobile OTP alone, like everyone else; there is no authenticator app and no recovery codes (D-264). After `admin_signin_max_failures` wrong admin sign-in codes for one number within `admin_signin_failure_window_hours` (counted across its codes), that number's admin sign-in is locked for `admin_signin_lock_hours`: sending and checking admin sign-in codes answer `429 signin_locked` until the lock ends or another super admin unlocks it on A-18 ("Unlock sign-in", a † action, audited). A good sign-in code clears the count. The count is kept for every number tried in the admin app, admin or not, so the lock never shows which numbers are admins; anyone who knows an admin's number can lock that admin out, and the founder accepted that (D-264). A † admin action (money, settings, admin users and roles, `money` jobs) needs a **step-up**: a fresh SMS code sent to the admin's own number and typed in the step-up dialog, valid for 10 min of that sign-in. Step-up codes follow the sign-in code's rules above (6 digits, 5 min, 5 attempts) with their own send limits: resend after 30 s between step-up codes and at most `admin_step_up_sends_per_hour` an hour per admin, apart from the sign-in limits (a step-up straight after signing in is never refused for the sign-in's sends). The fifth wrong code of one step-up request signs the admin out everywhere in the admin app. An SMS step-up does not protect against a SIM swap; the founder accepted that risk (D-264).
 - Cloudflare Turnstile protects "send OTP" (invisible mode; challenge only when risky).
 - Sessions: short access token (15 min) + rotating refresh token (30 days customers and business, 12 h admin). The refresh token is in an httpOnly, Secure, SameSite=Strict cookie, one per app, host-only on the API host (details in 02). "Sign out of all devices" exists for every account.
 - A phone number can be a customer and a business user at once; they are separate profiles of one identity.
@@ -462,7 +462,7 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 
 **Background jobs** (D-95). Every background job is a registered kind with a class: `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup` or `maintenance` (partitions, retention).
 - `timer` kinds can never be paused or run by hand: order correctness depends on them.
-- `money` kinds: `super_admin` only, with admin TOTP step-up (within 10 min) and a reason.
+- `money` kinds: `super_admin` only, with an SMS step-up (within 10 min, D-264) and a reason.
 - Every other kind: `admin` and `super_admin`, with a reason.
 - Read access to A-21: `admin`, `super_admin`, `analyst` and `support` (all classes); `finance` (the `money` class only). `field_agent` and `catalogue` have none.
 - Every pause, resume, run-now and retry writes an audit row.
@@ -684,6 +684,15 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
 | `profile_photo_uploads_per_hour` | count | 10 | §2: profile photo uploads one customer may ask for in a rolling hour. Min 1, max 60. |
 
+**Admin sign-in** (§2, D-264)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `admin_signin_max_failures` | count | 10 | §2: wrong admin sign-in codes for one number within `admin_signin_failure_window_hours`, across its codes, that lock its admin sign-in. A good sign-in code clears the count. Min 3, max 50. |
+| `admin_signin_failure_window_hours` | hours | 24 | §2: the window in which wrong admin sign-in codes are counted. Min 1, max 168. |
+| `admin_signin_lock_hours` | hours | 24 | §2: how long a locked admin sign-in stays locked (`429 signin_locked`), unless another super admin unlocks it on A-18. Min 1, max 168. |
+| `admin_step_up_sends_per_hour` | count | 10 | §2: step-up codes one admin may ask for in a rolling hour; a bucket of its own, apart from the sign-in send limits. Min 1, max 60. |
+
 **Risk** (A-13, D-225). Each raises a `risk_flags` row only; no one is blocked or suspended because of it. The one money effect is §9's payout hold: a flag on a business or one of its stores holds that business's payout while it is open or confirmed, until someone clears it.
 
 | Key | Unit | Default | Rule |
@@ -760,7 +769,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | Admin step-up validity | 10 min | 02 |
 | Sync cursor life | 30 days | D-36 |
 | Banner attribution window | 24 h | §12, D-77 |
-| OTP limits | 6 digits, 5 min, 5 attempts, resend 30 s, 5 sends per number per hour, 20 per IP per hour | §2 |
+| OTP limits | 6 digits, 5 min, 5 attempts, resend 30 s, 5 sends per number per hour, 20 per IP per hour (admin step-up codes are counted apart, in `admin_step_up_sends_per_hour`, with the 30 s gap between step-up codes only) | §2 |
 | Device clock tolerance for offline links | 2 min | §6, D-12 |
 | Voice recording length | 15 s | §12; also customer voice search, §11.1, D-101 |
 | `sold_at` clamp for offline sales | 72 h | 02 §4.3 |

@@ -8,13 +8,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // Admin console: admin.todayz.in, locally https://admin.todayz.localhost (Caddy) -> 127.0.0.1:5303.
 // A production build needs a real VITE_TURNSTILE_SITE_KEY and an https VITE_API_URL (authDefines throws without them).
-// ADMIN_TOTP_OFF=1 (D-244, the API's local-only switch) reaches the dev server only, never a build.
-export default defineConfig(({ mode, command }) => ({
+export default defineConfig(({ mode }) => ({
   ...todayzServer({ port: 5303, hostname: 'admin.todayz.localhost' }),
-  define: {
-    ...authDefines(mode, loadEnv(mode, process.cwd(), 'VITE_')),
-    'import.meta.env.VITE_ADMIN_TOTP_OFF': JSON.stringify(command === 'serve' && process.env['ADMIN_TOTP_OFF'] === '1' ? '1' : ''),
-  },
+  define: authDefines(mode, loadEnv(mode, process.cwd(), 'VITE_')),
   resolve: { alias: intlNoParserAlias },
   plugins: [
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),

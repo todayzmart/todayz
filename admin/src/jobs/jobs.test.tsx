@@ -4,6 +4,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { NOW, emptyAudit } from '../test/fixtures';
 import { json, problem, renderAt, type Handler } from '../test/render';
+import { STEP_UP_REQUEST, passStepUp, stepUpHandler } from '../test/step-up';
 import { logsLink, traceLink } from './explore';
 import { jobGate } from './gate';
 import { scheduleLabel } from './schedule';
@@ -128,19 +129,6 @@ function api(opts: { roles?: string[]; stepUp?: boolean } = {}) {
     return undefined;
   };
   return { handler, state };
-}
-
-function stepUpVerify(state: { stepUpNeeded: boolean }): Handler {
-  return (c) => {
-    if (c.path !== '/v1/auth/totp/verify') return undefined;
-    state.stepUpNeeded = false;
-    return json(200, { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' });
-  };
-}
-
-async function typeCode(code: string) {
-  const boxes = (await screen.findByRole('group', { name: 'Authenticator code' })).querySelectorAll('input');
-  for (const [i, d] of code.split('').entries()) fireEvent.change(boxes[i] as HTMLInputElement, { target: { value: d } });
 }
 
 describe('scheduleLabel', () => {
@@ -284,7 +272,7 @@ describe('A-21 kind page (SC-OPS-07)', () => {
 
   it('tells an admin that money jobs are for a super admin', async () => {
     renderAt(`/jobs/payout_weekly?run=${RUN_ID}`, { roles: ['admin'], handlers: [api().handler] });
-    expect(await screen.findByText('Money jobs can be run, paused or retried by a super admin only, after a fresh authenticator code.')).toBeInTheDocument();
+    expect(await screen.findByText('Money jobs can be run, paused or retried by a super admin only, after a fresh SMS code.')).toBeInTheDocument();
     expect(await screen.findByText('Two numbers bounced.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Run now' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
@@ -341,20 +329,19 @@ describe('A-21 kind page (SC-OPS-07)', () => {
     expect(screen.getByRole('link', { name: 'Grafana trace' }).getAttribute('href')).toContain('tempo');
   });
 
-  it('retries a failed money run after a fresh authenticator code (super_admin)', async () => {
+  it('retries a failed money run after a fresh SMS code (super_admin)', async () => {
     const a = api({ stepUp: true });
-    const { calls } = renderAt(`/jobs/payout_weekly?run=${RUN_ID}`, { roles: ['super_admin'], handlers: [a.handler, stepUpVerify(a.state)] });
+    const { calls } = renderAt(`/jobs/payout_weekly?run=${RUN_ID}`, { roles: ['super_admin'], handlers: [a.handler, stepUpHandler(a.state)] });
     fireEvent.click(await screen.findByRole('button', { name: 'Retry' }));
     const dialog = await screen.findByRole('dialog', { name: 'Retry this run?' });
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'Bank was down' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Retry' }));
 
-    await screen.findByRole('dialog', { name: 'Confirm it is you' });
-    await typeCode('123456');
+    await passStepUp();
     await waitFor(() => expect(screen.getByText('Retry started.')).toBeInTheDocument());
     const posts = calls.filter((c) => c.method === 'POST' && c.path === `/v1/admin/job-runs/${RUN_ID}/retry`);
     expect(posts).toHaveLength(2);
     expect(posts[1]?.body).toEqual({ reason: 'Bank was down' });
-    expect(calls.find((c) => c.path === '/v1/auth/totp/verify')?.body).toMatchObject({ purpose: 'step_up' });
+    expect(calls.find((c) => c.path === '/v1/auth/step-up/verify')?.body).toEqual({ requestId: STEP_UP_REQUEST, code: '123456' });
   });
 });

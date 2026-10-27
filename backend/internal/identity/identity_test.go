@@ -673,7 +673,8 @@ func TestBlockedUser(t *testing.T) {
 }
 
 // Admin sign-in: only an existing, enabled admin; roles come from admin_users;
-// an OTP-only admin session is amr otp (TOTP: totp_service_test.go).
+// the SMS OTP alone signs an admin in, amr otp, with no step-up yet
+// (D-264; the step-up: stepup_test.go).
 func TestAdminSignIn(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
 	const phone = "+919876543210"
@@ -697,7 +698,7 @@ func TestAdminSignIn(t *testing.T) {
 	require.Equal(t, f.clk.Now().Add(authn.AdminRefreshTTL-OTPResendGap), adm.RefreshExpiresAt)
 	p, err := f.svc.tokens.Verify(adm.AccessToken)
 	require.NoError(t, err)
-	require.Equal(t, authn.AMROTP, p.AMR, "OTP only until TOTP verifies")
+	require.Equal(t, authn.AMROTP, p.AMR, "D-264: the SMS OTP alone")
 	require.Equal(t, []string{"support", "finance"}, p.Roles)
 
 	st, err := f.svc.CheckSession(context.Background(), adm.UserID, p.SessionID, authn.AppAdmin)
@@ -902,20 +903,6 @@ func TestPreflight(t *testing.T) {
 	require.IsType(t, noSMS{}, sms, "never a client that signs for the override")
 	require.ErrorContains(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), "SMS_API_URL must be unset in staging and prod")
 
-	// TOTP_ENC_KEY (M2): config.Load already refuses a deployed config
-	// without it; Preflight checks it again, like the other keys.
-	cfg = loadConfig(t, env)
-	cfg.Keys.TOTPEncKey = config.Secret{}
-	require.EqualError(t, Preflight(cfg), "identity: required in staging and prod: TOTP_ENC_KEY")
-
-	// The same value as PII_ENC_KEY is refused, without naming either value.
-	same := maps.Clone(env)
-	same["TOTP_ENC_KEY"] = same["PII_ENC_KEY"]
-	err = Preflight(loadConfig(t, same))
-	require.EqualError(t, err, "identity: TOTP_ENC_KEY must differ from PII_ENC_KEY")
-	require.NotContains(t, err.Error(), same["PII_ENC_KEY"])
-	same["APP_ENV"] = "local"
-	require.NoError(t, Preflight(loadConfig(t, same)), "local is not checked")
 }
 
 // The staging and prod providers: no SMS refuses every send.

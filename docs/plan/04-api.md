@@ -45,7 +45,7 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
 - Labels: **pub** = anonymous OK; **cus** = customer; **any** = any signed-in user; **biz(cashier)** = any staff with access to that store; **biz(manager)** = manager or owner; **biz(owner)** = owner only; **adm(roles)** = the listed admin roles. `super_admin` can do everything, so it is not repeated.
 - Admin roles (D-64): `field_agent`, `support`, `catalogue`, `analyst`, `finance`, `admin`, `super_admin`. `admin` can do everything except credit adjustments, admin-user and role management, money settings (unit `paise`, `bp` or `credits`), payout hold, unhold, mark-paid and export, and pausing or running `money` jobs (D-95). `analyst` only reads Pulse, dashboards and jobs (A-21). "all but field_agent" in 2.7 means `support`, `catalogue`, `analyst`, `finance`, `admin`.
 - Permission keys (e.g. `item.price.edit`, `stock.restock`, `stock.count`) and the full role matrix are in 02 (D-38). Policy code lives in `platform/authz/policy/<domain>.go` (D-50).
-- Step-up: sensitive admin actions need a TOTP re-prompt within 10 min (02); marked **step-up** below.
+- Step-up: sensitive admin actions need a fresh SMS code to the admin's own phone within 10 min (02, D-264); marked **step-up** below.
 
 ### 1.4 Errors and problem codes (D-24)
 
@@ -58,9 +58,10 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
   | Code | Status | Domain file | Meaning |
   |---|---|---|---|
   | `otp_locked` | 429 | `auth.yaml` | too many wrong OTP attempts |
+  | `signin_locked` | 429 | `auth.yaml` | admin-app sign-in for this number is locked after too many wrong codes across requests; `Retry-After` until the lock ends (D-264) |
   | `otp_expired` | 401 | `auth.yaml` | OTP older than 5 min |
   | `account_blocked` | 403 | `auth.yaml` | account blocked by admin |
-  | `step_up_required` | 403 | `auth.yaml` | admin TOTP older than 10 min |
+  | `step_up_required` | 403 | `auth.yaml` | no admin SMS step-up in the last 10 min (D-264) |
   | `price_changed` | 409 | `orders.yaml` | price moved since the quote; the fresh quote is in `extensions` |
   | `below_minimum` | 409 | `orders.yaml` | under the store's delivery minimum |
   | `delivery_closed` | 409 | `orders.yaml` | delivery ordered outside delivery hours; `extensions.nextDeliveryWindow`; pickup still offered |
@@ -141,10 +142,9 @@ How it works (W0-03, `platform/idempotency`):
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | POST | /v1/auth/otp/send | pub | `{phone, purpose, app, turnstileToken}` → `{requestId, resendAfter}`; never reveals whether the phone exists; the OTP is never logged (D-15) |
-| POST | /v1/auth/otp/verify | pub | `{requestId, code, app, deviceId}` → access token + the app's refresh cookie; `{isNewUser}` |
-| POST | /v1/auth/totp/enrol | adm | first admin login: secret QR + 10 recovery codes shown once |
-| POST | /v1/auth/totp/verify | adm | `{code, purpose: login|step_up}`; second factor after OTP and step-up |
-| POST | /v1/auth/totp/recover | adm | `{recoveryCode}`; single use (`admin_recovery_codes`) |
+| POST | /v1/auth/otp/verify | pub | `{requestId, code, app, deviceId}` → access token + the app's refresh cookie; `{isNewUser}`. For `app=admin`, wrong codes count toward the number's sign-in lock (01 §2); while locked, send and verify answer 429 `signin_locked` (D-264) |
+| POST | /v1/auth/step-up/send | adm | bearer only (the refresh cookie is not a caller); no body → `{requestId, resendAfter}`; texts a code to the admin's own number; its own limits: 30 s between step-up codes and `admin_step_up_sends_per_hour` per admin, apart from the sign-in limits (D-264) |
+| POST | /v1/auth/step-up/verify | adm | `{requestId, code}` → `{validUntil}`; stamps the sign-in as stepped up for 10 min; 422 `code_invalid` (`attemptsLeft`), 401 `otp_expired`, 429 `otp_locked` ends the admin's sessions (D-264) |
 | POST | /v1/auth/refresh | cookie | `{app}`; rotates; a retry of a lost response within 30 s, before the new token is used, gets the same new token (D-239); reuse of an old token revokes the family |
 | POST | /v1/auth/logout | cookie | current session of this app |
 | POST | /v1/auth/logout-all | cookie | all sessions of this app |
@@ -455,12 +455,12 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | Notifications | PATCH | /v1/admin/notification-templates/{templateId} | admin | W3-05 | |
 | Notifications | POST | /v1/admin/notification-templates/{templateId}/test-send | admin | W3-05 | to own phone |
 | Notifications | GET | /v1/admin/integrations | admin | W3-05 | on/off flag and key `set`/`missing`, never values (D-19) |
-| Settings | GET | /v1/admin/settings | admin | W3-05 | with unit, min/max (D-03) |
-| Settings | PATCH | /v1/admin/settings/{key} | admin | W3-05 | `{value, reason}`; step-up; keys are the 01 §17 names (D-61); money settings (unit `paise`, `bp` or `credits`) are super_admin only (D-64) |
+| Settings | GET | /v1/admin/settings | admin | W3-05 | with unit, min/max (D-03), `editable` for the caller and `superAdminOnly` |
+| Settings | PATCH | /v1/admin/settings/{key} | admin | W3-05 | `{value, reason}`; step-up; keys are the 01 §17 names (D-61); money settings (unit `paise`, `bp` or `credits`) and the `access` group (admin sign-in limits) are super_admin only, 403 `forbidden` otherwise (D-64, D-264); the value must lie in the row's min/max (422) |
 | Settings | GET | /v1/admin/settings/{key}/history | admin | W3-05 | |
 | Admin users | GET/POST | /v1/admin/users | super_admin | W3-05 | invite with one or more of the 7 roles (D-64) |
 | Admin users | PATCH | /v1/admin/users/{adminId} | super_admin | W3-05 | roles, disable; step-up |
-| Admin users | POST | /v1/admin/users/{adminId}/reset-totp | super_admin | W3-05 | step-up |
+| Admin users | POST | /v1/admin/users/{adminId}/unlock-sign-in | super_admin | D-264 | `{reason}`; lifts the admin's sign-in lock and clears the wrong-code count; step-up; audited `admin_user.unlock_sign_in`; 409 `invalid_transition` for oneself or when not locked; a disabled admin can be unlocked (sign-in still refuses them). The admin-user schema carries `signInLockedUntil`. Break glass when no super_admin can sign in: `todayz admin unlock-sign-in` (CLI, D-264) |
 | Audit | GET | /v1/admin/audit | admin | W3-05 | |
 | Jobs | GET | /v1/admin/jobs | support, analyst, finance (`money` kinds only), admin | W1-11 | `admin-jobs.yaml` (D-95). Every kind with its class, owner, schedule, last run, next run, 7-day success rate, average and maximum duration, paused state; filters `class=`, `status=` |
 | Jobs | GET | /v1/admin/jobs/{kind} | same as the list | W1-11 | one kind: settings, schedule in IST, control state (`paused`, `reason`, who and when) |

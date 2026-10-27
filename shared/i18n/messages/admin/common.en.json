@@ -60,7 +60,7 @@
     "description": "Title of the step-up dialog before a sensitive admin change"
   },
   "common.stepUp.body": {
-    "defaultMessage": "Enter the 6-digit code from your authenticator app. It covers changes for the next 10 minutes.",
+    "defaultMessage": "This change needs a fresh code by SMS to your staff number. One code covers changes for the next 10 minutes.",
     "description": "Body of the step-up dialog"
   },
   "common.stepUp.confirm": {

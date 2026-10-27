@@ -8,7 +8,6 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { initialLocale, loadMessages } from './app/i18n';
 import { makeQueryClient, makeRouter } from './app/router';
-import { createSecondFactor } from './app/second-factor';
 import { makeSession } from './app/session';
 
 const locale = initialLocale();
@@ -19,7 +18,6 @@ const router = makeRouter(queryClient);
 // The access token lives in this object's memory only; the refresh cookie is httpOnly.
 const session = makeSession();
 const update = createUpdateController();
-const factor = createSecondFactor();
 
 // Off unless VITE_RUM_ENDPOINT is set for a staging or production build (05-observability §2.5).
 // RUM labels use the matched route id (`/businesses/$businessId`), never the raw path.
@@ -31,7 +29,7 @@ if (!root) throw new Error('#root is missing from index.html');
 void loadMessages(locale).then((messages) => {
   createRoot(root).render(
     <StrictMode>
-      <App messages={messages} router={router} queryClient={queryClient} session={session} update={update} factor={factor} />
+      <App messages={messages} router={router} queryClient={queryClient} session={session} update={update} />
     </StrictMode>,
   );
 });

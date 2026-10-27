@@ -1,7 +1,7 @@
 import { safeNext as shared, validateNextSearch as validate } from '@todayz/auth';
 
 /** Gate routes that must never be a `?next=` target (they would loop). */
-const BLOCKED = ['/sign-in', '/two-step'] as const;
+const BLOCKED = ['/sign-in'] as const;
 
 /** `?next=` after sign-in: a path on this app only, never another origin (see `@todayz/auth`). */
 export const safeNext = (next: unknown): string => shared(next, BLOCKED);

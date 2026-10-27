@@ -40,7 +40,7 @@
     "description": "A-01 page title"
   },
   "auth.signIn.sub": {
-    "defaultMessage": "Use your staff mobile number. We'll send a code by SMS, then ask for your authenticator code.",
+    "defaultMessage": "Use your staff mobile number. We'll send a code by SMS.",
     "description": "A-01 line under the title"
   },
   "auth.phone.label": {
@@ -103,6 +103,10 @@
     "defaultMessage": "Too many wrong codes. Ask for a new code.",
     "description": "Too many wrong attempts on one code"
   },
+  "auth.error.signinLocked": {
+    "defaultMessage": "Too many wrong codes for this number. Sign-in is locked for now. Try again later, or ask another super admin to unlock it.",
+    "description": "Admin sign-in locked after too many wrong codes across requests (D-264); another super admin can unlock it on Admin users"
+  },
   "auth.error.rateLimited": {
     "defaultMessage": "Too many tries. Wait a moment and try again.",
     "description": "Rate limit on sending codes"
@@ -127,116 +131,56 @@
     "defaultMessage": "Sign out",
     "description": "Button that ends the session on this device"
   },
-  "auth.twoStep.title": {
-    "defaultMessage": "Two-step check",
-    "description": "A-01 second step heading"
+  "auth.stepUp.send": {
+    "defaultMessage": "Send code",
+    "description": "Step-up dialog: button that sends a fresh 6-digit code by SMS to the admin's own staff number (D-264)"
   },
-  "auth.twoStep.verifySub": {
-    "defaultMessage": "Open your authenticator app and enter the 6-digit code for TodayZ.",
-    "description": "A-01 line under the heading when the admin already has an authenticator"
+  "auth.stepUp.sending": {
+    "defaultMessage": "Sending the code",
+    "description": "Step-up dialog: accessible label of the send button while the SMS is being sent"
   },
-  "auth.twoStep.enrolSub": {
-    "defaultMessage": "Set up an authenticator app before you continue. You only do this once.",
-    "description": "A-01 line under the heading on first sign-in"
+  "auth.stepUp.sent": {
+    "defaultMessage": "We sent a code by SMS to your staff number.",
+    "description": "Step-up dialog: shown above the code boxes once the SMS is on its way"
   },
-  "auth.twoStep.loading": {
-    "defaultMessage": "Checking your two-step setup",
-    "description": "Spoken while the authenticator setup loads"
+  "auth.stepUp.codeLabel": {
+    "defaultMessage": "Code from the SMS",
+    "description": "Step-up dialog: label of the 6-digit code boxes"
   },
-  "auth.twoStep.unavailable": {
-    "defaultMessage": "The two-step check is not available yet. Try again in a moment.",
-    "description": "The enrol or verify call failed or does not exist yet"
+  "auth.stepUp.resend": {
+    "defaultMessage": "Send a new code",
+    "description": "Step-up dialog: button that sends another SMS code"
   },
-  "auth.twoStep.retry": {
-    "defaultMessage": "Try again",
-    "description": "Button that loads the two-step setup again"
+  "auth.stepUp.resendIn": {
+    "defaultMessage": "New code in {seconds} s",
+    "description": "Step-up dialog: disabled resend button while the wait between codes runs; seconds counts down"
   },
-  "auth.twoStep.secretLabel": {
-    "defaultMessage": "Setup key",
-    "description": "Label of the authenticator secret shown for typing in by hand"
+  "auth.stepUp.wrong": {
+    "defaultMessage": "That code is not right. Check the SMS and try again.",
+    "description": "Step-up dialog: the code did not match"
   },
-  "auth.twoStep.secretHelp": {
-    "defaultMessage": "In your authenticator app choose “Enter a setup key”, paste this key and pick time-based.",
-    "description": "Help under the setup key"
-  },
-  "auth.twoStep.uriOpen": {
-    "defaultMessage": "Open in authenticator app",
-    "description": "Link that opens the otpauth address"
-  },
-  "auth.twoStep.codeLabel": {
-    "defaultMessage": "Authenticator code",
-    "description": "Name of the group of six code boxes for the authenticator code"
-  },
-  "auth.twoStep.confirm": {
-    "defaultMessage": "Confirm code",
-    "description": "Button that sends the authenticator code"
-  },
-  "auth.twoStep.wrong": {
-    "defaultMessage": "That code is not right. Check the time on your phone and try again.",
-    "description": "Wrong authenticator code"
-  },
-  "auth.twoStep.wrongLeft": {
+  "auth.stepUp.wrongLeft": {
     "defaultMessage": "That code is not right. {count, plural, one {# try} other {# tries}} left.",
-    "description": "Wrong authenticator code with the tries left. {count} is the number left."
+    "description": "Step-up dialog: the code did not match; count is how many tries are left for this code"
   },
-  "auth.twoStep.locked": {
-    "defaultMessage": "Too many wrong codes. Sign in again.",
-    "description": "The admin sessions were ended after too many wrong authenticator codes"
+  "auth.stepUp.expired": {
+    "defaultMessage": "That code has expired or was already used. Send a new code.",
+    "description": "Step-up dialog: the code is older than 5 minutes, already used, or not this admin's"
   },
-  "auth.twoStep.signInAgain": {
+  "auth.stepUp.locked": {
+    "defaultMessage": "Too many wrong codes. You have been signed out; sign in again.",
+    "description": "Step-up dialog: the fifth wrong code ended every admin session of this person"
+  },
+  "auth.stepUp.signInAgain": {
     "defaultMessage": "Sign in again",
-    "description": "Button that returns to the phone step after a lock"
+    "description": "Step-up dialog: button shown after the lockout; goes to sign-in"
   },
-  "auth.twoStep.useRecovery": {
-    "defaultMessage": "Use a recovery code instead",
-    "description": "Link that switches to the recovery code form"
+  "auth.stepUp.rateLimited": {
+    "defaultMessage": "Too many codes asked for. Wait before you ask for another.",
+    "description": "Step-up dialog: the number or this network has had too many codes; the resend button counts down the wait"
   },
-  "auth.twoStep.useApp": {
-    "defaultMessage": "Use the authenticator app instead",
-    "description": "Link that switches back to the authenticator code"
-  },
-  "auth.recovery.label": {
-    "defaultMessage": "Recovery code",
-    "description": "Label of the recovery code field"
-  },
-  "auth.recovery.help": {
-    "defaultMessage": "Each code works once. Hyphens and spaces are ignored.",
-    "description": "Help under the recovery code field"
-  },
-  "auth.recovery.submit": {
-    "defaultMessage": "Use recovery code",
-    "description": "Button that sends the recovery code"
-  },
-  "auth.recovery.wrong": {
-    "defaultMessage": "That recovery code is not right or was already used.",
-    "description": "Wrong recovery code"
-  },
-  "auth.recovery.left": {
-    "defaultMessage": "{count, plural, one {# recovery code left} other {# recovery codes left}}. Ask a super admin for a reset when you run low.",
-    "description": "Shown after a recovery code was used. {count} is how many are left."
-  },
-  "auth.recovery.shownTitle": {
-    "defaultMessage": "Save your recovery codes",
-    "description": "Heading of the screen that shows the 10 recovery codes once"
-  },
-  "auth.recovery.shownBody": {
-    "defaultMessage": "Each code works once if you lose your authenticator. They are shown only now. Store them somewhere safe, away from this device.",
-    "description": "Body of the recovery codes screen"
-  },
-  "auth.recovery.listLabel": {
-    "defaultMessage": "Recovery codes",
-    "description": "Accessible name of the list of recovery codes"
-  },
-  "auth.recovery.saved": {
-    "defaultMessage": "I have saved these codes",
-    "description": "Checkbox label; the person confirms they stored the codes"
-  },
-  "auth.recovery.continue": {
-    "defaultMessage": "Continue to “Pulse”",
-    "description": "Button after the recovery codes were saved"
-  },
-  "auth.recovery.continueRecover": {
-    "defaultMessage": "Continue",
-    "description": "Button after a recovery code was accepted"
+  "auth.stepUp.unavailable": {
+    "defaultMessage": "We couldn't send or check the code. Try again in a moment.",
+    "description": "Step-up dialog: any other failure (network, server)"
   }
 }

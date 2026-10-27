@@ -101,24 +101,23 @@ func TestLogoutAllRacesRefresh(t *testing.T) {
 	}
 }
 
-// M1: the TOTP lockout racing a refresh loop on another admin sign-in of the
-// same admin leaves no live admin session.
-func TestTOTPLockoutRacesRefresh(t *testing.T) {
+// M1: the SMS step-up lockout (D-264) racing a refresh loop on another
+// admin sign-in of the same admin leaves no live admin session.
+func TestStepUpLockoutRacesRefresh(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
-	a := enrolAdmin(f)
+	newAdmin(f, adminPhone)
 	for i := range raceTrials {
-		f.clk.Advance(OTPWindow)
-		_, p1 := adminSignIn(f)
-		f.clk.Advance(TOTPPeriod)
-		elevated := f.totp(p1, a.secret, TOTPPurposeLogin) // the sign-in the loop keeps
-		_, p2 := adminSignIn(f)
+		f.clk.Advance(OTPWindow)              // fresh send limits per trial: three sends each
+		kept, _ := adminSignIn(f, adminPhone) // the sign-in the loop keeps
+		_, p2 := adminSignIn(f, adminPhone)
 		uid := ids.UUID(p2.UserID)
+		reqID, code := f.sendStepUp(p2, adminPhone)
 
-		l := startRefreshLoop(f, authn.AppAdmin, elevated.RefreshToken)
+		l := startRefreshLoop(f, authn.AppAdmin, kept.RefreshToken)
 		<-l.started
 		var err error
-		for range TOTPMaxFailures {
-			_, err = f.svc.VerifyTOTP(f.ctx("10.0.0.1"), p2, wrongCode(a.secret, f.clk.Now()), TOTPPurposeLogin)
+		for range OTPMaxAttempts {
+			_, err = f.svc.VerifyStepUp(f.ctx("10.0.0.1"), p2, reqID, otherCode(code))
 		}
 		requireCode(t, err, genproblems.OtpLocked, "trial %d", i)
 		refusedOrStopped(t, l.stop())

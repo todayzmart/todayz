@@ -124,8 +124,7 @@ type DeleteInput struct {
 //     runs, and identity anonymises the user, deletes the phone identity and
 //     addresses, scrubs devices (push keys, and a new device id in place of
 //     the browser's), clears the user agent and IP hash of every session,
-//     revokes every session of every app and, for a disabled admin, drops
-//     the TOTP secret and recovery codes.
+//     revokes every session of every app.
 //
 // otp_requests.phone_enc is NOT NULL (the verify step needs it), so the
 // sealed phone of this user's codes stays until the 24-hour OTP purge.
@@ -216,12 +215,10 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 
 		// Business owners: W1-04 registers a check; an active admin keeps
 		// their account (a super_admin disables them first; lead: 409, Q2).
-		disabledAdmin := false
 		if a, err := q.GetAdminUser(ctx, uid); err == nil {
 			if a.DisabledAt == nil {
 				return problem.New(genproblems.Conflict, "")
 			}
-			disabledAdmin = true
 		} else if !db.IsNoRows(err) {
 			return err
 		}
@@ -276,14 +273,6 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 		}
 		if err := q.ScrubSessionPII(ctx, uid); err != nil {
 			return err
-		}
-		if disabledAdmin {
-			if err := q.ClearAdminTotp(ctx, uid); err != nil {
-				return err
-			}
-			if err := q.DeleteRecoveryCodes(ctx, uid); err != nil {
-				return err
-			}
 		}
 		_, err = s.audit.Write(ctx, auditEntry(authn.AppCustomer, p.UserID, "identity.account_deleted", map[string]any{
 			"revoked": revoked, "checks": len(hooks.Can), "hooks": len(hooks.On),

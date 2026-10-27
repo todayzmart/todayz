@@ -62,7 +62,6 @@ var AppKeyNames = []string{
 	"PII_ENC_KEY",
 	"PII_HASH_KEY",
 	"DEVICE_SECRET_ENC_KEY",
-	"TOTP_ENC_KEY",
 }
 
 // SigningKey is one Ed25519 JWT signing key from JWT_SIGNING_KEYS.
@@ -92,7 +91,6 @@ type AppKeys struct {
 	PIIEncKey          Secret
 	PIIHashKey         Secret
 	DeviceSecretEncKey Secret
-	TOTPEncKey         Secret
 	// SharePreviewKey is SHARE_PREVIEW_KEY, the secret the customer Pages
 	// Function sends with a link preview read so the API counts the visitor's
 	// IP, not Cloudflare's (W3-16). make setup generates it locally like the
@@ -178,11 +176,6 @@ type Config struct {
 	// NoEgress is true when TODAYZ_NO_EGRESS=1 or APP_ENV=test: outbound HTTP
 	// may reach only loopback addresses (SC-PL-04).
 	NoEgress bool
-
-	// AdminTOTPOff skips the admin authenticator step (enrol, verify and
-	// step-up) when ADMIN_TOTP_OFF=1: the SMS code alone signs an admin in.
-	// Local and test only (D-244); staging and prod refuse to start with it.
-	AdminTOTPOff bool
 
 	// Shutdown holds the API drain timings from the environment (02 §2.8,
 	// D-98). Zero means unset: lifecycle.APITimings applies the defaults and
@@ -320,10 +313,6 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		r.bad("SMS_API_URL", "must be unset in staging and prod")
 	}
 	c.NoEgress = r.boolDefault("TODAYZ_NO_EGRESS", false) || env == EnvTest
-	c.AdminTOTPOff = r.boolDefault("ADMIN_TOTP_OFF", false)
-	if env.IsDeployed() && c.AdminTOTPOff {
-		r.bad("ADMIN_TOTP_OFF", "must be unset in staging and prod")
-	}
 	c.Shutdown = Shutdown{PreStop: r.duration("SHUTDOWN_PRESTOP"), Drain: r.duration("SHUTDOWN_DRAIN")}
 
 	sort.Strings(r.missing)
@@ -604,7 +593,6 @@ func (r *reader) appKeys() AppKeys {
 		PIIEncKey:          r.key32("PII_ENC_KEY"),
 		PIIHashKey:         r.key32("PII_HASH_KEY"),
 		DeviceSecretEncKey: r.key32("DEVICE_SECRET_ENC_KEY"),
-		TOTPEncKey:         r.key32("TOTP_ENC_KEY"),
 		SharePreviewKey:    r.key32("SHARE_PREVIEW_KEY"),
 	}
 	k.JWTCurrentKID = r.raw("JWT_CURRENT_KID")

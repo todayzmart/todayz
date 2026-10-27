@@ -261,14 +261,12 @@ func TestDeleteAccountRefusesAnAdmin(t *testing.T) {
 	require.NoError(t, f.svc.DeleteAccount(f.ctx("10.0.0.1"), p, DeleteInput{RequestID: reqID, Code: code}))
 }
 
-// L1: deleting a disabled admin who had enrolled TOTP drops the sealed
-// secret and every recovery code with the account.
-func TestDeleteAccountDisabledAdminDropsTOTP(t *testing.T) {
+// L1: deleting a disabled admin ends their admin sign-ins with the account;
+// the admin_users row stays (disabled) for the audit trail.
+func TestDeleteAccountDisabledAdmin(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
-	ad := enrolAdmin(f) // TOTP secret, enabled, ten recovery codes
-	uid := ids.UUID(ad.in.UserID)
-	require.Equal(t, 1, f.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND totp_secret_enc IS NOT NULL AND totp_enabled_at IS NOT NULL`, uid))
-	require.NotZero(t, f.count(`SELECT count(*) FROM admin_recovery_codes WHERE admin_id = $1`, uid))
+	ad, _ := newAdmin(f, adminPhone)
+	uid := ids.UUID(ad.UserID)
 	f.owner(`UPDATE admin_users SET disabled_at = now() WHERE user_id = $1`, uid)
 
 	cust := f.signIn(adminPhone, authn.AppCustomer)
@@ -276,8 +274,7 @@ func TestDeleteAccountDisabledAdminDropsTOTP(t *testing.T) {
 	require.NoError(t, err)
 	reqID, code := stepUpCode(f, adminPhone)
 	require.NoError(t, f.svc.DeleteAccount(f.ctx("10.0.0.1"), p, DeleteInput{RequestID: reqID, Code: code}))
-	require.Equal(t, 1, f.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND totp_secret_enc IS NULL AND totp_enabled_at IS NULL AND totp_last_step IS NULL AND disabled_at IS NOT NULL`, uid))
-	require.Zero(t, f.count(`SELECT count(*) FROM admin_recovery_codes WHERE admin_id = $1`, uid))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND disabled_at IS NOT NULL`, uid))
 	require.Zero(t, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_at IS NULL`, uid))
 }
 

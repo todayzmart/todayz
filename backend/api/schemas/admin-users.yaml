@@ -14,7 +14,7 @@ AdminUserStatus:
 AdminUser:
   type: object
   additionalProperties: false
-  required: [id, name, phoneMasked, roles, status, totpEnrolled, createdBy, createdByName, createdAt, disabledAt, lastActiveAt, version]
+  required: [id, name, phoneMasked, roles, status, createdBy, createdByName, createdAt, disabledAt, lastActiveAt, signInLockedUntil, version]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     name:
@@ -31,9 +31,6 @@ AdminUser:
       uniqueItems: true
       items: {$ref: '#/AdminRole'}
     status: {$ref: '#/AdminUserStatus'}
-    totpEnrolled:
-      type: boolean
-      description: False until the person sets up their authenticator at their next sign-in.
     createdBy:
       type: [string, 'null']
       description: The admin who invited this one; null for a seeded admin.
@@ -48,6 +45,13 @@ AdminUser:
         - {type: 'null'}
     lastActiveAt:
       description: The latest use of any of this person's admin sessions; null when they have never signed in.
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    signInLockedUntil:
+      description: >-
+        When the lock on this person's admin sign-in ends, after too many wrong sign-in codes (D-264);
+        null when their sign-in is not locked. Sessions they already have keep working.
       oneOf:
         - {$ref: ./common.yaml#/Timestamp}
         - {type: 'null'}
@@ -102,7 +106,7 @@ AdminUserChange:
     status: {$ref: '#/AdminUserStatus'}
     version: {type: integer, minimum: 1}
     reason: {type: string, minLength: 1, maxLength: 500}
-AdminUserTOTPReset:
+AdminSignInUnlock:
   type: object
   additionalProperties: false
   required: [reason]

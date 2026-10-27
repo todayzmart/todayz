@@ -40,7 +40,6 @@ var AppKeys = []string{
 	"PII_ENC_KEY",
 	"PII_HASH_KEY",
 	"DEVICE_SECRET_ENC_KEY",
-	"TOTP_ENC_KEY",
 	"SHARE_PREVIEW_KEY",
 }
 

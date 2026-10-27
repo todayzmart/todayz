@@ -4,6 +4,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { NOW } from '../test/fixtures';
 import { json, problem, renderAt, type Handler } from '../test/render';
+import { passStepUp, stepUpHandler } from '../test/step-up';
 import { validateCreditsSearch } from './search';
 
 const ACC = '01JB0AA1A2B3C4D5E6F7G8H9J0';
@@ -106,19 +107,6 @@ function api(opts: { stepUp?: boolean; outcome?: 'posted' | 'pending' } = {}): A
   return state;
 }
 
-function stepUpVerify(state: Api): Handler {
-  return (c) => {
-    if (c.path !== '/v1/auth/totp/verify') return undefined;
-    state.stepUpNeeded = false;
-    return json(200, { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' });
-  };
-}
-
-async function typeCode(code: string) {
-  const boxes = (await screen.findByRole('group', { name: 'Authenticator code' })).querySelectorAll('input');
-  for (const [i, d] of code.split('').entries()) fireEvent.change(boxes[i] as HTMLInputElement, { target: { value: d } });
-}
-
 /** A toast moves out of a closing dialog's top layer into the page, so look it up each try. */
 async function toastSays(text: string) {
   await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(text));
@@ -159,7 +147,7 @@ describe('A-09 credits', () => {
 
   it('adjusts after a step-up with whole credits, a reason, the link and an Idempotency-Key', async () => {
     const a = api({ stepUp: true });
-    const { calls } = renderAt(`/credits?account=${ACC}`, { roles: ['finance'], handlers: [a.handler, stepUpVerify(a)] });
+    const { calls } = renderAt(`/credits?account=${ACC}`, { roles: ['finance'], handlers: [a.handler, stepUpHandler(a)] });
     const panel = await screen.findByRole('complementary', { name: 'Priya' });
     fireEvent.click(within(panel).getByRole('button', { name: 'Adjust credits' }));
     const dialog = await screen.findByRole('dialog', { name: 'Adjust credits for Priya' });
@@ -174,8 +162,7 @@ describe('A-09 credits', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'Duplicate cashback' } });
     fireEvent.change(within(dialog).getByLabelText('Ticket or order (optional)'), { target: { value: 'TZ-1' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Adjust' }));
-    await screen.findByRole('dialog', { name: 'Confirm it is you' });
-    await typeCode('123456');
+    await passStepUp();
     await toastSays("-₹300 posted to Priya's wallet");
     const posts = calls.filter((c) => c.method === 'POST' && c.path === '/v1/admin/credit-adjustments');
     expect(posts).toHaveLength(2);

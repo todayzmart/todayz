@@ -17,7 +17,7 @@ import (
 // policy table: "an admin holding one of these roles, and a fresh step-up
 // when asked" (02 §3.2–3.3, D-64). It reads the principal slot 11 put in the
 // context, whose roles and StepUpAt come from the live session (admin_users
-// and the sign-in's last TOTP verification), so a role change, a disabled
+// and the sign-in's last SMS step-up, D-264), so a role change, a disabled
 // admin or an expired step-up takes effect on the next request.
 //
 //	gate := authz.NewAdminGate(clk)
@@ -27,13 +27,12 @@ import (
 // Errors are problems, never written by Require:
 //
 //   - no principal: 401 unauthorized;
-//   - not an admin-app principal, or an admin without amr otp+totp: 403
-//     forbidden;
+//   - not an admin-app principal: 403 forbidden;
 //   - an admin holding none of anyOf (super_admin holds every role): 403
 //     forbidden;
-//   - stepUp and no TOTP verification within authn.StepUpWindow (10 min):
-//     403 step_up_required, and the client calls POST /v1/auth/totp/verify
-//     {purpose: step_up} and retries;
+//   - stepUp and no SMS step-up within authn.StepUpWindow (10 min): 403
+//     step_up_required, and the client calls POST /v1/auth/step-up/send and
+//     /v1/auth/step-up/verify, then retries;
 //   - anyOf empty or naming a role that is not a D-64 admin role: 500 (a
 //     programming error; fail closed).
 //
@@ -68,7 +67,7 @@ func (g *AdminGate) Require(ctx context.Context, anyOf []Role, stepUp bool) (aut
 	if !ok || p.IsAnonymous() {
 		return authn.Principal{}, problem.New(genproblems.Unauthorized, "")
 	}
-	if p.App != authn.AppAdmin || p.AMR != authn.AMROTPTOTP {
+	if p.App != authn.AppAdmin {
 		return authn.Principal{}, refused()
 	}
 	if !holdsAny(p.Roles, anyOf) {

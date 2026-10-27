@@ -108,7 +108,7 @@ backend/
 │   │                          authn (JWT, refresh, OTP), authz (policy/<domain>.go + golden tables), crypto (AES-256-GCM, HMAC, key loading),
 │   │                          ratelimit, idempotency, audit, settings (platform_settings cache), telemetry (otel, metrics, slog, sentry),
 │   │                          events (product events writer), storage (R2/S3), realtime (SSE hub)
-│   ├── identity/              users, phone identities, sessions, OTP, devices, admin TOTP + recovery codes, account deletion hooks
+│   ├── identity/              users, phone identities, sessions, OTP, devices, admin SMS step-up (D-264), account deletion hooks
 │   ├── business/              businesses, stores, staff, KYC, business documents, onboarding, settings, QR standee
 │   ├── catalogue/             master products, store items, batches, stock movements, catalogue_changes, imports, review queue
 │   ├── search/                geo + text search, ranking, zero-result log, result proof (summary, badges) and the refine-chip parser (D-101)
@@ -156,7 +156,7 @@ Rule: domain packages depend on `platform`, never on each other's internals. Cro
 | Migrations | `goose` (SQL files, embedded) | Simple, run as a sub-command before deploy |
 | Jobs and timers | `River` (Postgres-backed), wrapped by `internal/platform/jobs` (`jobs.Define`, W1-11, D-95) | Transactional enqueue: an order and its expiry job commit together; no Redis needed. Every worker is a registered kind (§2.7) |
 | Auth tokens | `golang-jwt` with EdDSA (Ed25519) | Small signatures; key id rotation |
-| TOTP | `pquerna/otp` | Admin 2FA and counter codes |
+| TOTP | `pquerna/otp` | Counter codes (the admin authenticator is gone, D-264) |
 | Crypto | stdlib `crypto/aes` (GCM), `crypto/hmac` | Field encryption and keyed lookups (§10) |
 | Logs | `log/slog` JSON | Stdlib |
 | Traces/metrics | OpenTelemetry Go SDK, OTLP HTTP | Vendor-neutral, Grafana Cloud |
@@ -270,7 +270,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
 
 ### 3.1 Tokens and sessions
 
-- OTP verify returns an **access token** (JWT, EdDSA, 15 min, header `kid`, claims: `sub` user id, `aud` app (`customer|business|admin`), `sid` session id, `roles` for admin, `amr` (`otp`, `otp+totp`)). Keys come from `JWT_SIGNING_KEYS` (JSON set of Ed25519 keys with `kid`); new tokens are signed with `JWT_CURRENT_KID`, and older keys stay in the set until their tokens expire.
+- OTP verify returns an **access token** (JWT, EdDSA, 15 min, header `kid`, claims: `sub` user id, `aud` app (`customer|business|admin`), `sid` session id, `roles` for admin, `amr` (`otp`; the admin `otp+totp` is gone, D-264)). Keys come from `JWT_SIGNING_KEYS` (JSON set of Ed25519 keys with `kid`); new tokens are signed with `JWT_CURRENT_KID`, and older keys stay in the set until their tokens expire.
 - It also sets a **refresh token** cookie: opaque 256-bit, stored hashed (SHA-256) in `sessions`, rotated on each use. Lifetime 30 days (customer, business), 12 h (admin). Reuse of an old refresh token revokes the whole session family (theft detection). A rotation's new token is derived (HMAC under `PII_HASH_KEY`) from the presented token and a salt stored on the rotated row, so a retry whose response was lost, within `RotationGrace` (30 s) and before the new token is used, gets the same new token back; once it is used, the retry is a 401 that keeps the cookie, and after the window it is reuse (D-105, D-239).
 - **Refresh cookies (D-14):** one per app, so signing out of one app never touches another.
 
@@ -283,7 +283,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
   Each is host-only on the API host (no `Domain` attribute), `Path=/v1/auth`, `HttpOnly`, `Secure`, `SameSite=Strict`. The apps and the API share a registrable domain, so requests between them are same-site. Locally the host is `api.todayz.localhost`.
 - Access token is kept in memory in the SPA (not localStorage). On load the app calls `POST /v1/auth/refresh` with `{app}` to get one; the server reads only that app's cookie.
 - **Business scope:** business tokens carry no business id. Every business request names the business, and the store where it applies, in the path: `/v1/biz/businesses/{bid}/...` and `/v1/biz/businesses/{bid}/stores/{sid}/...`. The server checks that the store belongs to the business, that the user has an active `staff` row in it, that the role allows the action (§3.3), and that the store is in the staff row's `store_ids` (null = all). A token cannot be reused across businesses.
-- **Admin:** OTP + TOTP every login (TOTP secrets encrypted with `TOTP_ENC_KEY`; 10 recovery codes per admin, stored hashed in `admin_recovery_codes`). Refresh lifetime 12 h. Actions marked † in §3.3 require a TOTP re-prompt if the last one is older than 10 minutes (`step-up`).
+- **Admin:** SMS OTP every login, no second factor (D-264). Refresh lifetime 12 h. Actions marked † in §3.3 require a **step-up** if the last one is older than 10 minutes: a fresh SMS code to the admin's own number (`POST /v1/auth/step-up/send`, then `/verify`), which stamps the sign-in's session (`sessions.step_up_at`, copied on refresh); the access token does not change. The fifth wrong step-up code ends the admin's admin-app sessions. SMS step-up does not protect against a SIM swap (accepted, D-264).
 - **CSRF:** the refresh endpoint checks `Origin` against the allow-list and requires a custom header (`X-TZ-Client`), on top of `SameSite=Strict`. All other mutating endpoints use Bearer tokens (not cookies), so they are not CSRF-able.
 
 ### 3.2 Path namespaces (D-10)
@@ -306,7 +306,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
 
 Source of truth for every role check. It covers every action used in [04-api.md](04-api.md). Policy code lives in `internal/platform/authz/policy/<domain>.go`, one golden table per domain; a test enumerates every (role × action) pair and compares it with the golden table, so a permission change is always a visible diff. The lead generates `docs/generated/permissions.md` from the policy files.
 
-✓ allowed · – refused · † step-up (admin TOTP within 10 min).
+✓ allowed · – refused · † step-up (a fresh admin SMS code within 10 min, D-264).
 
 **Business roles** (paths under `/v1/biz/businesses/{bid}`; `S/` = `…/stores/{sid}`). Creating a business needs only a signed-in user, who becomes its owner. There is no business-delete endpoint in v1; an owner who wants to close the business asks support (D-66).
 
@@ -436,8 +436,8 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 | notify | `admin.integrations.view` | flags on/off, keys `set`/`missing` | – | – | – | – | – | ✓ | ✓ |
 | settings | `admin.settings.view` | list, history | – | – | – | – | – | ✓ | ✓ |
 | settings | `admin.settings.edit` † | keys that are not money settings | – | – | – | – | – | ✓ | ✓ |
-| settings | `admin.settings.edit_money` † | keys with unit `paise`, `bp` or `credits` | – | – | – | – | – | – | ✓ |
-| users | `admin.users.manage` † | invite, roles, disable, reset TOTP | – | – | – | – | – | – | ✓ |
+| settings | `admin.settings.edit_money` † | keys with unit `paise`, `bp` or `credits`, and the `access` group (admin sign-in limits, D-264) | – | – | – | – | – | – | ✓ |
+| users | `admin.users.manage` † | invite, roles, disable | – | – | – | – | – | – | ✓ |
 | audit | `admin.audit.view` | audit search | – | – | – | – | – | ✓ | ✓ |
 
 - AI drafts in the admin console need the action of the screen they sit on: `catalogue_cleanup` → `admin.catalogue.queue`, `ticket_triage` → `admin.support.tickets`, `risk_summary` → `admin.risk.view`.
@@ -569,7 +569,6 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 | `PII_ENC_KEY` | AES-256-GCM for phone, PAN, GSTIN, UPI ID and bank details |
 | `PII_HASH_KEY` | HMAC for lookups |
 | `DEVICE_SECRET_ENC_KEY` | Counter-code device secrets |
-| `TOTP_ENC_KEY` | Admin TOTP secrets |
 | `SHARE_PREVIEW_KEY` | Shared with the customer Pages Function: a share-link preview read forwards the visitor's IP with it, so the API rate-limits and counts opens per visitor, not per Cloudflare IP (W3-16). `make setup` generates it locally and `make env-check` lists it with the other app keys. The API starts without it (it is not in `config.AppKeyNames`); previews are then counted by Cloudflare IP. Prod needs the same value set on both the Pages project and the API |
 
 - `make setup` generates any missing key into `.env.local` (git-ignored) silently, printing only `generated: NAME`.

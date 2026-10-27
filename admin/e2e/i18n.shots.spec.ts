@@ -22,7 +22,6 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript((lang) => {
     localStorage.setItem('todayz.lang', lang);
     localStorage.setItem('todayz.hasSession.admin', '1');
-    sessionStorage.setItem('todayz.admin.2fa', String(Date.now()));
   }, LANG);
 });
 

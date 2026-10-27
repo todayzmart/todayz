@@ -25,11 +25,8 @@ type SessionState struct {
 	// Roles are the admin's live roles (admin app only); an admin whose
 	// admin_users row is disabled has an inactive session instead.
 	Roles []string
-	// StepUpAt is the session's last TOTP verification (admin app; zero if none).
+	// StepUpAt is the sign-in's last SMS step-up (admin app; zero if none).
 	StepUpAt time.Time
-	// TOTPWaived is true when the admin authenticator step is switched off
-	// (local and test only, D-244): the session counts as otp+totp.
-	TOTPWaived bool
 }
 
 // SessionChecker looks a session up by primary key. internal/identity
@@ -77,16 +74,8 @@ func (a *Authenticator) Authenticate(ctx context.Context, raw string) (Principal
 	}
 	if p.App == AppAdmin {
 		p.Roles = slices.Clone(st.Roles)
+		// The step-up time comes from the session row, never the token.
 		p.StepUpAt = st.StepUpAt
-		// The token's amr is a claim; the session row is the truth. An
-		// otp+totp token whose sign-in holds no TOTP verification (it was
-		// reset) is only an OTP session.
-		switch {
-		case st.TOTPWaived:
-			p.AMR = AMROTPTOTP
-		case p.AMR == AMROTPTOTP && st.StepUpAt.IsZero():
-			p.AMR = AMROTP
-		}
 	}
 	return p, nil
 }

@@ -1,6 +1,6 @@
 {
   "adminUsers.sub": {
-    "defaultMessage": "Who can open this console and with which roles. Every change needs a fresh authenticator code and a reason.",
+    "defaultMessage": "Who can open this console and with which roles. Every change needs a fresh SMS code and a reason.",
     "description": "A-18 Admin users: Page subtitle"
   },
   "adminUsers.invite": {
@@ -26,10 +26,6 @@
   "adminUsers.col.roles": {
     "defaultMessage": "Roles",
     "description": "A-18 Admin users: Column and detail label: the admin roles"
-  },
-  "adminUsers.col.totp": {
-    "defaultMessage": "Authenticator",
-    "description": "A-18 Admin users: Column and detail label: whether the authenticator app is set up"
   },
   "adminUsers.col.lastActive": {
     "defaultMessage": "Last active",
@@ -66,14 +62,6 @@
   "adminUsers.pick.notListed": {
     "defaultMessage": "That account is not in this list. Try the other tab.",
     "description": "A-18 Admin users: Side panel when the chosen account is not in the loaded list"
-  },
-  "adminUsers.totp.on": {
-    "defaultMessage": "Set up",
-    "description": "A-18 Admin users: Pill: authenticator set up"
-  },
-  "adminUsers.totp.off": {
-    "defaultMessage": "Not set up",
-    "description": "A-18 Admin users: Pill: authenticator not set up yet; asked at next sign-in"
   },
   "adminUsers.status.active": {
     "defaultMessage": "Active",
@@ -116,7 +104,7 @@
     "description": "A-18 Admin users: Invite dialog title"
   },
   "adminUsers.invite.body": {
-    "defaultMessage": "They sign in with an SMS code to this number and set up their authenticator on first sign-in. A number that already has a TodayZ account keeps it.",
+    "defaultMessage": "They sign in with an SMS code to this number. A number that already has a TodayZ account keeps it.",
     "description": "A-18 Admin users: Invite dialog body"
   },
   "adminUsers.invite.phone": {
@@ -183,18 +171,6 @@
     "defaultMessage": "They can sign in again with the same roles.",
     "description": "A-18 Admin users: Enable dialog body"
   },
-  "adminUsers.reset": {
-    "defaultMessage": "Reset authenticator",
-    "description": "A-18 Admin users: Button: clear an admin's authenticator and recovery codes"
-  },
-  "adminUsers.reset.title": {
-    "defaultMessage": "Reset the authenticator for {name}?",
-    "description": "A-18 Admin users: Reset dialog title"
-  },
-  "adminUsers.reset.body": {
-    "defaultMessage": "For a lost phone. Their authenticator and recovery codes stop working, they are signed out, and they set up a new authenticator at next sign-in.",
-    "description": "A-18 Admin users: Reset dialog body"
-  },
   "adminUsers.done.invite": {
     "defaultMessage": "{name} can now sign in to the console.",
     "description": "A-18 Admin users: Toast after an invite"
@@ -211,10 +187,6 @@
     "defaultMessage": "{name} can sign in again.",
     "description": "A-18 Admin users: Toast after enabling"
   },
-  "adminUsers.done.reset": {
-    "defaultMessage": "Authenticator reset for {name}.",
-    "description": "A-18 Admin users: Toast after an authenticator reset"
-  },
   "adminUsers.error.exists": {
     "defaultMessage": "This number already has admin access.",
     "description": "A-18 Admin users: Invite error: the number is already an admin"
@@ -226,5 +198,37 @@
   "adminUsers.error.refused": {
     "defaultMessage": "Not allowed: nobody changes their own access, and one active super admin must remain.",
     "description": "A-18 Admin users: Change error: self-change or last super admin"
+  },
+  "adminUsers.detail.signIn": {
+    "defaultMessage": "Sign-in",
+    "description": "A-18 Admin users: Detail label for the sign-in lock row, shown only while the admin's sign-in is locked (D-264)"
+  },
+  "adminUsers.signInLocked": {
+    "defaultMessage": "Locked",
+    "description": "A-18 Admin users: Pill when the admin's sign-in is locked after too many wrong codes (D-264)"
+  },
+  "adminUsers.signInLockedUntil": {
+    "defaultMessage": "until {when}",
+    "description": "A-18 Admin users: After the Locked pill. {when} is when the lock ends"
+  },
+  "adminUsers.unlock": {
+    "defaultMessage": "Unlock sign-in",
+    "description": "A-18 Admin users: Button shown only while the admin's sign-in is locked; also the dialog's confirm button (D-264)"
+  },
+  "adminUsers.unlock.title": {
+    "defaultMessage": "Unlock sign-in for {name}?",
+    "description": "A-18 Admin users: Unlock dialog title. {name} is the admin's name"
+  },
+  "adminUsers.unlock.body": {
+    "defaultMessage": "Their sign-in was locked after too many wrong codes. Unlock it only once you have checked with them, by a call you place yourself, that they are the one trying to sign in. Their wrong-code count starts again from zero.",
+    "description": "A-18 Admin users: Unlock dialog body"
+  },
+  "adminUsers.done.unlock": {
+    "defaultMessage": "{name} can sign in again.",
+    "description": "A-18 Admin users: Toast after unlocking an admin's sign-in"
+  },
+  "adminUsers.error.notLocked": {
+    "defaultMessage": "Not allowed: their sign-in is not locked any more, and nobody unlocks their own.",
+    "description": "A-18 Admin users: Unlock error: the lock has ended or was already lifted, or it is the admin's own account"
   }
 }

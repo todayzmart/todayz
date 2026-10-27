@@ -23,6 +23,7 @@ export function usePhoneOtpLabels(): PhoneOtpLabels {
         wrongCode: intl.formatMessage({ id: 'auth.error.wrongCode' }),
         expired: intl.formatMessage({ id: 'auth.error.expired' }),
         locked: intl.formatMessage({ id: 'auth.error.locked' }),
+        signinLocked: intl.formatMessage({ id: 'auth.error.signinLocked' }),
         rateLimited: intl.formatMessage({ id: 'auth.error.rateLimited' }),
         blocked: intl.formatMessage({ id: 'auth.error.blocked' }),
         network: intl.formatMessage({ id: 'auth.error.network' }),

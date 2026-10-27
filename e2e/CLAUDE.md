@@ -24,9 +24,12 @@ contract/     Schemathesis (W0-04): run.sh smoke|full, hooks.py (the todayz_prob
               (uv-compiled, hash-pinned, D-88). The venv lives in .tools/schemathesis (make setup).
               out/ (reports) is git-ignored.
 fixtures/     @todayz/e2e-fixtures (W2-13): seed.ts (seed ids, slugs, prices, test people),
-              api.ts (JSON client, ULID, TOTP), principals.ts (sign-in once per run through the
-              mocks' OTP, session kept in a 0600 temp file), journey.ts (Shop, Customer, clock and
-              browser helpers, `test` with `who`). admins.yaml holds test-only admin TOTP secrets.
+              api.ts (JSON client, ULID, the POS counter-code TOTP), principals.ts (sign-in once
+              per run through the mocks' OTP, session kept in a 0600 temp file; an admin's
+              `stepUp()` does the SMS step-up through the mocks too and reuses it for 8 min,
+              D-264), journey.ts (Shop, Customer, clock and browser helpers, `test` with `who`,
+              `passStepUpDialog` for the admin console's dialog). admins.yaml holds test admins
+              (reserved phones and roles, no secrets).
 journeys/     @todayz/e2e-journeys (W2-13): Playwright multi-context journeys, specs/NN-e2e-XX-*.
               globalSetup opens SL and SL2 all day and globalTeardown restores their hours and
               resets the test clock. Specs that move the clock run last (20-*, 21-*).

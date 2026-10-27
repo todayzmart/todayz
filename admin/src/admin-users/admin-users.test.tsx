@@ -4,6 +4,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { NOW, emptyAudit } from '../test/fixtures';
 import { adminMe, json, problem, renderAt, type Handler } from '../test/render';
+import { passStepUp, stepUpHandler } from '../test/step-up';
 import { phoneOk } from './labels';
 import { validateAdminUsersSearch } from './search';
 
@@ -17,12 +18,12 @@ function account(over: Partial<AdminUser> = {}): AdminUser {
     phoneMasked: '90•••••311',
     roles: ['support'],
     status: 'active',
-    totpEnrolled: true,
     createdBy: SELF_ID,
     createdByName: 'Asha Rao',
     createdAt: '2026-10-20T09:30:00Z',
     disabledAt: null,
     lastActiveAt: '2026-10-25T10:12:00Z',
+    signInLockedUntil: null,
     version: 1,
     ...over,
   };
@@ -47,7 +48,7 @@ function api(opts: { start?: AdminUser; stepUp?: boolean } = {}): Api {
     if (c.method !== 'GET' && c.path.startsWith('/v1/admin/users') && state.stepUpNeeded) return problem(403, 'step_up_required');
     if (c.path === '/v1/admin/users' && c.method === 'POST') {
       const b = c.body as { name: string; roles: AdminUser['roles'] };
-      return json(201, account({ id: '01JADM1N0000000000000000N2', name: b.name, roles: b.roles, totpEnrolled: false, lastActiveAt: null }));
+      return json(201, account({ id: '01JADM1N0000000000000000N2', name: b.name, roles: b.roles, lastActiveAt: null }));
     }
     if (c.path === `/v1/admin/users/${MEERA_ID}` && c.method === 'PATCH') {
       const b = c.body as AdminUserChange;
@@ -60,27 +61,15 @@ function api(opts: { start?: AdminUser; stepUp?: boolean } = {}): Api {
       };
       return json(200, current);
     }
-    if (c.path === `/v1/admin/users/${MEERA_ID}/reset-totp`) {
-      current = { ...current, totpEnrolled: false, version: current.version + 1 };
+    if (c.path === `/v1/admin/users/${MEERA_ID}/unlock-sign-in` && c.method === 'POST') {
+      if (!current.signInLockedUntil) return problem(409, 'invalid_transition');
+      current = { ...current, signInLockedUntil: null };
       return json(200, current);
     }
     if (c.path === '/v1/admin/audit-log/subject') return json(200, emptyAudit);
     return undefined;
   };
   return state;
-}
-
-function stepUpVerify(state: Api): Handler {
-  return (c) => {
-    if (c.path !== '/v1/auth/totp/verify') return undefined;
-    state.stepUpNeeded = false;
-    return json(200, { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' });
-  };
-}
-
-async function typeCode(code: string) {
-  const boxes = (await screen.findByRole('group', { name: 'Authenticator code' })).querySelectorAll('input');
-  for (const [i, d] of code.split('').entries()) fireEvent.change(boxes[i] as HTMLInputElement, { target: { value: d } });
 }
 
 /** A toast: the list refetch after a change re-renders the toast region, so query it afresh each try. */
@@ -167,7 +156,7 @@ describe('A-18 admin users', () => {
 
   it('asks for a fresh code, then changes roles with the version it read', async () => {
     const a = api({ stepUp: true });
-    const { calls } = renderAt(`/admin-users?admin=${MEERA_ID}`, { roles: ['super_admin'], handlers: [a.handler, stepUpVerify(a)] });
+    const { calls } = renderAt(`/admin-users?admin=${MEERA_ID}`, { roles: ['super_admin'], handlers: [a.handler, stepUpHandler(a)] });
     fireEvent.click(await screen.findByRole('button', { name: 'Change roles' }));
     const dialog = await screen.findByRole('dialog', { name: 'Change roles for Meera' });
     expect(within(dialog).getByText('These are the roles they have now.')).toBeInTheDocument();
@@ -175,8 +164,7 @@ describe('A-18 admin users', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'reviews suggestions too' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Change roles' }));
 
-    await screen.findByRole('dialog', { name: 'Confirm it is you' });
-    await typeCode('123456');
+    await passStepUp();
     await sees('Roles changed for Meera.');
     const patches = calls.filter((c) => c.method === 'PATCH');
     expect(patches).toHaveLength(2);
@@ -196,7 +184,7 @@ describe('A-18 admin users', () => {
     expect(calls.find((c) => c.method === 'PATCH')?.body).toEqual({ status: 'disabled', version: 1, reason: 'left the team' });
   });
 
-  it('resets the authenticator and re-enables a disabled account', async () => {
+  it('re-enables a disabled account and offers no authenticator reset (D-264)', async () => {
     const { calls } = renderAt(`/admin-users?status=disabled&admin=${MEERA_ID}`, {
       roles: ['super_admin'],
       handlers: [api({ start: account({ status: 'disabled', disabledAt: NOW }) }).handler],
@@ -204,18 +192,65 @@ describe('A-18 admin users', () => {
     expect(await screen.findByRole('heading', { name: 'Meera' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Change roles' })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Reset authenticator' }));
-    let dialog = await screen.findByRole('dialog', { name: 'Reset the authenticator for Meera?' });
-    fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'lost her phone' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Reset authenticator' }));
-    await sees('Authenticator reset for Meera.');
-    expect(calls.find((c) => c.path.endsWith('/reset-totp'))?.body).toEqual({ reason: 'lost her phone' });
+    expect(screen.queryByRole('button', { name: /authenticator/i })).not.toBeInTheDocument();
+    expect(screen.queryByText('Authenticator')).not.toBeInTheDocument();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Enable' }));
-    dialog = await screen.findByRole('dialog', { name: 'Enable Meera?' });
+    const dialog = await screen.findByRole('dialog', { name: 'Enable Meera?' });
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'back from leave' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Enable' }));
     await sees('Meera can sign in again.');
-    expect(calls.find((c) => c.method === 'PATCH')?.body).toEqual({ status: 'active', version: 2, reason: 'back from leave' });
+    expect(calls.find((c) => c.method === 'PATCH')?.body).toEqual({ status: 'active', version: 1, reason: 'back from leave' });
+  });
+
+  it('offers "Unlock sign-in" only while the sign-in is locked (D-264)', async () => {
+    renderAt(`/admin-users?admin=${MEERA_ID}`, { roles: ['super_admin'], handlers: [api().handler] });
+    expect(await screen.findByRole('heading', { name: 'Meera' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Disable' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Unlock sign-in' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Locked')).not.toBeInTheDocument();
+  });
+
+  it('unlocks a locked sign-in after a fresh code, with a reason (D-264)', async () => {
+    const a = api({ start: account({ signInLockedUntil: '2026-10-28T06:00:00Z' }), stepUp: true });
+    const { calls } = renderAt(`/admin-users?admin=${MEERA_ID}`, { roles: ['super_admin'], handlers: [a.handler, stepUpHandler(a)] });
+    expect(await screen.findByText('Locked')).toBeInTheDocument();
+    expect(screen.getByText(/^until /)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Unlock sign-in' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Unlock sign-in for Meera?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Unlock sign-in' }));
+    expect(await within(dialog).findByText(/Write a reason/)).toBeInTheDocument();
+    fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'called her back on the office line' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Unlock sign-in' }));
+
+    await passStepUp();
+    await sees('Meera can sign in again.');
+    const posts = calls.filter((c) => c.method === 'POST' && c.path === `/v1/admin/users/${MEERA_ID}/unlock-sign-in`);
+    expect(posts).toHaveLength(2);
+    expect(posts[1]?.body).toEqual({ reason: 'called her back on the office line' });
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Unlock sign-in' })).not.toBeInTheDocument());
+    expect(screen.queryByText('Locked')).not.toBeInTheDocument();
+  });
+
+  it('says so when the lock has already gone (D-264)', async () => {
+    const gone: Handler = (c) => (c.method === 'POST' && c.path.endsWith('/unlock-sign-in') ? problem(409, 'invalid_transition') : undefined);
+    renderAt(`/admin-users?admin=${MEERA_ID}`, {
+      roles: ['super_admin'],
+      handlers: [gone, api({ start: account({ signInLockedUntil: '2026-10-28T06:00:00Z' }) }).handler],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Unlock sign-in' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Unlock sign-in for Meera?' });
+    fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'checked' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Unlock sign-in' }));
+    expect(await within(dialog).findByText(/their sign-in is not locked any more/)).toBeInTheDocument();
+  });
+
+  it('never offers to unlock your own sign-in', async () => {
+    const lockedSelf = { ...self, signInLockedUntil: '2026-10-28T06:00:00Z' };
+    const h: Handler = (c) =>
+      c.path === '/v1/admin/users' && c.method === 'GET' ? json(200, { items: [account(), lockedSelf], nextCursor: null, serverNow: NOW }) : undefined;
+    renderAt(`/admin-users?admin=${SELF_ID}`, { roles: ['super_admin'], handlers: [h, api().handler] });
+    expect(await screen.findByText('This is your account. Another super admin changes your access.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Unlock sign-in' })).not.toBeInTheDocument();
   });
 });

@@ -4,6 +4,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { NOW } from '../test/fixtures';
 import { json, problem, renderAt, type Handler } from '../test/render';
+import { passStepUp, stepUpHandler } from '../test/step-up';
 import { lastClosedPeriod, validatePayoutsSearch } from './search';
 
 const BID = '01JB0BZ1A2B3C4D5E6F7G8H9J0';
@@ -111,19 +112,6 @@ function api(opts: { stepUp?: boolean; amountNow?: number } = {}): Api {
   return state;
 }
 
-function stepUpVerify(state: Api): Handler {
-  return (c) => {
-    if (c.path !== '/v1/auth/totp/verify') return undefined;
-    state.stepUpNeeded = false;
-    return json(200, { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' });
-  };
-}
-
-async function typeCode(code: string) {
-  const boxes = (await screen.findByRole('group', { name: 'Authenticator code' })).querySelectorAll('input');
-  for (const [i, d] of code.split('').entries()) fireEvent.change(boxes[i] as HTMLInputElement, { target: { value: d } });
-}
-
 /** A toast moves out of a closing dialog's top layer into the page, so look it up each try. */
 async function toastSays(text: string) {
   await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(text));
@@ -184,7 +172,7 @@ describe('A-11 payouts', () => {
 
   it('marks paid after a step-up with the UTR, the amount on screen, a reason and an Idempotency-Key', async () => {
     const a = api({ stepUp: true });
-    const { calls } = renderAt(at, { roles: ['finance'], handlers: [a.handler, stepUpVerify(a)] });
+    const { calls } = renderAt(at, { roles: ['finance'], handlers: [a.handler, stepUpHandler(a)] });
     const panel = await screen.findByRole('complementary', { name: 'Sri Lakshmi Stores' });
     fireEvent.click(within(panel).getByRole('button', { name: 'Mark paid' }));
     const dialog = await screen.findByRole('dialog', { name: 'Mark the payout for Sri Lakshmi Stores paid?' });
@@ -198,8 +186,7 @@ describe('A-11 payouts', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'September payout, HDFC batch' } });
     confirm();
 
-    await screen.findByRole('dialog', { name: 'Confirm it is you' });
-    await typeCode('123456');
+    await passStepUp();
     await toastSays('Payout for Sri Lakshmi Stores marked paid');
     const posts = calls.filter((c) => c.path === `${base}/mark-paid`);
     expect(posts).toHaveLength(2);
@@ -241,10 +228,9 @@ describe('A-11 payouts', () => {
 
   it('exports the month after a step-up, with the CSV Accept header', async () => {
     const a = api({ stepUp: true });
-    const { calls } = renderAt('/payouts?period=2026-09', { roles: ['finance'], handlers: [a.handler, stepUpVerify(a)] });
+    const { calls } = renderAt('/payouts?period=2026-09', { roles: ['finance'], handlers: [a.handler, stepUpHandler(a)] });
     fireEvent.click(await screen.findByRole('button', { name: 'Export CSV' }));
-    await screen.findByRole('dialog', { name: 'Confirm it is you' });
-    await typeCode('123456');
+    await passStepUp();
     await toastSays('Payout file for 2026-09 saved. It holds bank details: keep it private.');
     const gets = calls.filter((c) => c.path === '/v1/admin/payout-exports');
     expect(gets).toHaveLength(2);

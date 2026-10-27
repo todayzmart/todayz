@@ -1,8 +1,9 @@
 # Paths: domain "admin-users" (owner W3-05): A-18 admin users and roles (04 §2.7, D-64).
 #
 # `super_admin` only. Reads are admin.users.view; invite, change and the
-# authenticator reset are admin.users.manage, which needs a fresh step-up
-# (`403 step_up_required` otherwise). Every change is audited with its reason.
+# sign-in unlock are admin.users.manage, which needs a fresh SMS step-up
+# (D-264; `403 step_up_required` otherwise). Every change is audited with its
+# reason.
 /v1/admin/users:
   get:
     operationId: listAdminUsers
@@ -31,12 +32,12 @@
                   phoneMasked: "90•••••311"
                   roles: [support]
                   status: active
-                  totpEnrolled: true
                   createdBy: 01JB0SAD0A2B3C4D5E6F7G8H9J
                   createdByName: Ravi
                   createdAt: "2026-10-20T09:30:00Z"
                   disabledAt: null
                   lastActiveAt: "2026-10-25T10:12:00Z"
+                  signInLockedUntil: null
                   version: 1
               nextCursor: null
               serverNow: "2026-10-25T11:00:00Z"
@@ -48,7 +49,7 @@
     summary: Give a phone number admin access with roles (step-up, audited)
     description: >-
       A POST body so the phone never sits in a URL. The person signs in with an SMS code to that
-      number and sets up their authenticator on first sign-in. A number that already has an account
+      number (no authenticator, D-264). A number that already has an account
       (a customer or a shop) keeps it and gains admin access; one that is already an admin is
       `409 conflict`.
     x-idempotency: none
@@ -72,7 +73,6 @@
               $ref: ../schemas/admin-users.yaml#/AdminUser
             example:
               <<: *admin
-              totpEnrolled: false
               lastActiveAt: null
       default: *problem
 /v1/admin/users/{adminId}:
@@ -113,33 +113,33 @@
               roles: [support, catalogue]
               version: 2
       default: *problem
-/v1/admin/users/{adminId}/reset-totp:
+/v1/admin/users/{adminId}/unlock-sign-in:
   parameters: *adminParam
   post:
-    operationId: resetAdminUserTotp
+    operationId: unlockAdminSignIn
     tags: [admin-users]
-    summary: Clear an admin's authenticator and recovery codes (step-up, audited)
+    summary: Lift the lock on an admin's sign-in after too many wrong codes (step-up, audited)
     description: >-
-      For a lost phone. Every admin session the person has ends, and their next sign-in sets up a new
-      authenticator. Nobody resets their own (`409 invalid_transition`).
+      After `admin_signin_max_failures` wrong sign-in codes within `admin_signin_failure_window_hours`
+      the number's admin sign-in is locked for `admin_signin_lock_hours` (D-264, 01 §2). Another
+      super admin can lift it here; the count of wrong codes starts again. Nobody unlocks their own,
+      and an admin whose sign-in is not locked cannot be unlocked: both `409 invalid_transition`.
     x-idempotency: none
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: ../schemas/admin-users.yaml#/AdminUserTOTPReset
+            $ref: ../schemas/admin-users.yaml#/AdminSignInUnlock
           example:
-            reason: Lost her phone; called from the office line
+            reason: Mistyped codes on a new phone; called from the office line
     responses:
       "200":
-        description: The admin after the reset
+        description: The admin after the unlock
         content:
           application/json:
             schema:
               $ref: ../schemas/admin-users.yaml#/AdminUser
             example:
               <<: *admin
-              totpEnrolled: false
-              version: 2
       default: *problem

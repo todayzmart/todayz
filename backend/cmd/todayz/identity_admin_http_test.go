@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -29,59 +30,31 @@ func (a *identityAPI) signInApp(app string) (map[string]any, *http.Cookie) {
 
 func bearer(tok string) map[string]string { return map[string]string{"Authorization": "Bearer " + tok} }
 
-// AU-11/AU-12 over HTTP, through the real pipeline: slot 11 keeps an
-// OTP-only admin token on /v1/auth, enrolment and verify turn it into
-// otp+totp, and W1-01's gate behind W1-11's admin-jobs API reads the live
-// roles of the session.
-func TestIdentityHTTPAdminTOTP(t *testing.T) {
+// AU-11/AU-12 over HTTP, through the real pipeline (D-264): the SMS code
+// alone signs an admin in and reaches /v1/admin, W1-01's gate behind W1-11's
+// admin-jobs API reads the live roles of the session, and the SMS step-up
+// pair sends to the admin's own number and stamps the sign-in.
+func TestIdentityHTTPAdminSMS(t *testing.T) {
 	a := newIdentityAPI(t)
 	cust, _ := a.signIn()
 	me := decode(t, a.do(http.MethodGet, "/v1/me", "", bearer(cust)))
 	_, err := a.db.OwnerPool.Exec(context.Background(), `INSERT INTO admin_users (user_id, roles) SELECT id, ARRAY['support'] FROM users WHERE id = $1`, ids.UUID(mustID(t, me["id"].(string))))
 	require.NoError(t, err)
 
-	out, otpCookie := a.signInApp("admin")
-	require.Equal(t, "totp_enrol", out["nextStep"])
-	otpOnly := out["accessToken"].(string)
-	w := a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(otpOnly))
-	require.Equal(t, http.StatusForbidden, w.Code, "an OTP-only admin token never reaches /v1/admin")
-	require.Equal(t, http.StatusForbidden, a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(cust)).Code, "nor a customer token")
-	// L7: the admin app's telemetry intake takes an OTP-only token on the
-	// exact paths only; anything under them is refused by authn.
+	out, _ := a.signInApp("admin")
+	require.NotContains(t, out, "nextStep", "no second factor to set up")
+	adm := out["accessToken"].(string)
+	w := a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(adm))
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	require.Equal(t, http.StatusForbidden, a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(cust)).Code, "a customer token never reaches /v1/admin")
 	rum := `{"app":"admin","release":"admin@3f2a9c1","platform":"web","samples":[{"type":"vital","name":"LCP","value":900,"route":"/","t":1792660000000}]}`
-	w = a.do(http.MethodPost, "/v1/rum", rum, bearer(otpOnly))
+	w = a.do(http.MethodPost, "/v1/rum", rum, bearer(adm))
 	require.Equal(t, http.StatusNoContent, w.Code, w.Body.String())
-	for _, p := range []string{"/v1/rum/x", "/v1/rum/"} {
-		require.Equal(t, http.StatusForbidden, a.do(http.MethodPost, p, rum, bearer(otpOnly)).Code, p)
-	}
-
-	w = a.do(http.MethodPost, "/v1/auth/totp/enrol", "", bearer(otpOnly))
-	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
-	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
-	enr := decode(t, w)
-	require.Len(t, enr["recoveryCodes"], 10)
-	secret, err := identity.DecodeTOTPSecret(enr["secret"].(string))
-	require.NoError(t, err)
-
-	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"`+identity.TOTPCode(secret, a.clk.Now())+`","purpose":"login"}`, bearer(otpOnly))
-	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
-	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
-	// L9: the login verify rotates the sign-in and sets the new cookie.
-	rotated := refreshCookieOf(t, w)
-	require.Equal(t, otpCookie.Name, rotated.Name)
-	require.Equal(t, "/v1/auth", rotated.Path)
-	require.True(t, rotated.HttpOnly)
-	require.Positive(t, rotated.MaxAge)
-	require.NotEqual(t, otpCookie.Value, rotated.Value, "a new refresh token")
-	full := decode(t, w)["accessToken"].(string)
-
-	w = a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(full))
-	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 
 	// support may read but not act; the role is read from the session, so a
 	// grant applies to the token already held.
 	pause := func() int {
-		return a.do(http.MethodPost, "/v1/admin/jobs/identity_purge/pause", `{"reason":"holding the purge"}`, bearer(full)).Code
+		return a.do(http.MethodPost, "/v1/admin/jobs/identity_purge/pause", `{"reason":"holding the purge"}`, bearer(adm)).Code
 	}
 	require.Equal(t, http.StatusForbidden, pause())
 	_, err = a.db.OwnerPool.Exec(context.Background(), `UPDATE admin_users SET roles = ARRAY['admin']`)
@@ -92,13 +65,34 @@ func TestIdentityHTTPAdminTOTP(t *testing.T) {
 		`SELECT actor_id::text FROM audit_log WHERE action = 'jobs.pause'`).Scan(&actor))
 	require.Equal(t, ids.UUID(mustID(t, me["id"].(string))).String(), actor, "the audit actor is the admin's user id")
 
-	// Step-up: a later verify with purpose step_up re-confirms the session.
-	a.clk.Advance(authn.StepUpWindow + time.Second)
-	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"`+identity.TOTPCode(secret, a.clk.Now())+`","purpose":"step_up"}`, bearer(full))
+	// The SMS step-up: only an admin sign-in may ask, the body names no number.
+	require.Equal(t, http.StatusUnauthorized, a.do(http.MethodPost, "/v1/auth/step-up/send", "", nil).Code, "anonymous")
+	require.Equal(t, http.StatusForbidden, a.do(http.MethodPost, "/v1/auth/step-up/send", "", bearer(cust)).Code, "a customer sign-in")
+	w = a.do(http.MethodPost, "/v1/auth/step-up/send", "", bearer(adm))
 	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
-	require.Empty(t, w.Header().Values("Set-Cookie"), "step_up leaves the cookie")
-	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"12345","purpose":"login"}`, bearer(full))
+	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+	sent := decode(t, w)
+	require.EqualValues(t, 30, sent["resendAfter"])
+	reqID := sent["requestId"].(string)
+	verify := func(tok, code string) *httptest.ResponseRecorder {
+		return a.do(http.MethodPost, "/v1/auth/step-up/verify", `{"requestId":"`+reqID+`","code":"`+code+`"}`, bearer(tok))
+	}
+	w = verify(adm, "12345")
 	require.Equal(t, http.StatusUnprocessableEntity, w.Code, "the contract refuses a malformed code")
+	w = verify(adm, "999999")
+	require.Equal(t, http.StatusUnprocessableEntity, w.Code, w.Body.String())
+	require.Equal(t, "code_invalid", decode(t, w)["code"])
+	require.Equal(t, http.StatusForbidden, verify(cust, testOTP).Code, "a customer sign-in")
+	w = verify(adm, testOTP)
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+	require.Empty(t, w.Header().Values("Set-Cookie"), "a step-up leaves the refresh cookie")
+	until, err := time.Parse(time.RFC3339, decode(t, w)["validUntil"].(string))
+	require.NoError(t, err)
+	require.Equal(t, a.clk.Now().Add(authn.StepUpWindow).UTC(), until.UTC())
+	w = verify(adm, testOTP)
+	require.Equal(t, http.StatusUnauthorized, w.Code, "a code works once")
+	require.Equal(t, "otp_expired", decode(t, w)["code"])
 }
 
 // AU-13 over HTTP: logout-all needs the app's origin and a live cookie,

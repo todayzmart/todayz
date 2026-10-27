@@ -74,7 +74,7 @@ func TestContractSmoke(t *testing.T) {
 	cancel()
 	require.Equal(t, 0, <-apiDone, apiOut.String())
 	all := report + apiOut.String()
-	for _, k := range []string{"PII_HASH_KEY", "TOTP_ENC_KEY", "JWT_SIGNING_KEYS", "PII_ENC_KEY"} {
+	for _, k := range []string{"PII_HASH_KEY", "DEVICE_SECRET_ENC_KEY", "JWT_SIGNING_KEYS", "PII_ENC_KEY"} {
 		require.NotContains(t, all, e[k], "%s reached the output", k)
 	}
 }

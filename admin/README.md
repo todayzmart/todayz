@@ -1,6 +1,6 @@
 # Admin console
 
-The admin console for staff. Seven RBAC roles; sign-in is a code by SMS then a TOTP code.
+The admin console for staff. Seven RBAC roles; sign-in is a code by SMS alone, and a † action (money, settings, admin users, `money` jobs) asks for a fresh SMS code in the step-up dialog (D-264). Too many wrong sign-in codes lock a number's admin sign-in; another super admin unlocks it on A-18 Admin users.
 
 | | |
 |---|---|
@@ -32,7 +32,7 @@ Feature folders under `src/`:
 | `businesses`, `stores`, `customers`, `orders`, `reviews`, `risk` | Marketplace operations |
 | `credits`, `payouts`, `referrals`, `banners`, `notifications` | Money and campaigns |
 | `catalogue`, `field`, `support`, `ai-assist` | Catalogue, field agents, support |
-| `admin-users`, `settings`, `shell`, `routes`, `app`, `test` | Staff, roles, `platform_settings` |
+| `admin-users`, `settings`, `shell`, `routes`, `app`, `test` | Staff, roles, sign-in unlock, `platform_settings` |
 
 ## Tech
 

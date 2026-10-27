@@ -59,6 +59,7 @@ var groupPrefixes = []struct {
 	{"ask_", "asks"}, {"site_marquee", "asks"}, {"refine_ai", "asks"}, {"substitute_", "asks"}, {"share_card", "asks"},
 	{"basket_", "baskets"},
 	{"customer_", "customers"}, {"profile_photo_", "customers"},
+	{"admin_signin_", "access"}, {"admin_step_up_", "access"},
 	{"risk_", "risk"},
 	{"support_", "support"},
 	{"feature_", "features"}, {"notify_", "features"},
@@ -69,7 +70,7 @@ var groupPrefixes = []struct {
 // groupOrder is the A-17 table's order of groups.
 var groupOrder = []api.AdminSettingGroup{
 	"orders", "stock", "credits", "reviews", "referrals", "pos", "search", "insights", "field", "jobs",
-	"asks", "baskets", "customers", "risk", "support", "features", "ai", "clients", "other",
+	"asks", "baskets", "customers", "access", "risk", "support", "features", "ai", "clients", "other",
 }
 
 func settingGroup(key string) api.AdminSettingGroup {
@@ -82,6 +83,11 @@ func settingGroup(key string) api.AdminSettingGroup {
 }
 
 func moneyUnit(unit string) bool { return unit == "paise" || unit == "bp" || unit == "credits" }
+
+// superOnly says whether only a super_admin may change the key: the money
+// units (D-38, D-64) and the "access" group, the admin sign-in and step-up
+// limits that guard the console itself (D-264 review).
+func superOnly(key, unit string) bool { return moneyUnit(unit) || settingGroup(key) == "access" }
 
 // semver is the form min_client_version_* takes (the apps compare it).
 // unitRange is the widest value any key of a unit may take, whatever its own min and max say: a
@@ -105,14 +111,14 @@ var aiModels = []string{"claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-
 
 var semver = regexp.MustCompile(`^(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})$`)
 
-// canEdit says whether p's roles may change a setting of this unit; a stale
-// step-up does not count against it (the save asks for one).
-func (s *Service) canEdit(ctx context.Context, p authn.Principal, unit string) bool {
+// canEdit says whether p's roles may change a setting (super is superOnly);
+// a stale step-up does not count against it (the save asks for one).
+func (s *Service) canEdit(ctx context.Context, p authn.Principal, super bool) bool {
 	if s.az == nil {
 		return false
 	}
 	action := policy.AdminSettingsEdit
-	if moneyUnit(unit) {
+	if super {
 		action = policy.AdminSettingsEditMoney
 	}
 	_, err := s.az.Check(ctx, p, action, authz.Scope{})
@@ -129,20 +135,21 @@ type settingRow struct {
 	version                int32
 }
 
-func (s *Service) settingView(ctx context.Context, p authn.Principal, r settingRow, edit map[string]bool) (api.AdminSetting, error) {
+func (s *Service) settingView(ctx context.Context, p authn.Principal, r settingRow, edit map[bool]bool) (api.AdminSetting, error) {
 	var v any
 	if err := json.Unmarshal(r.value, &v); err != nil {
 		return api.AdminSetting{}, err
 	}
 	money := moneyUnit(r.unit)
-	editable, ok := edit[r.unit]
+	super := superOnly(r.key, r.unit)
+	editable, ok := edit[super]
 	if !ok {
-		editable = s.canEdit(ctx, p, r.unit)
-		edit[r.unit] = editable
+		editable = s.canEdit(ctx, p, super)
+		edit[super] = editable
 	}
 	return api.AdminSetting{
 		Key: r.key, Group: settingGroup(r.key), Unit: api.AdminSettingUnit(r.unit), Value: v,
-		Min: r.min, Max: r.max, Description: r.description, Money: money, Editable: editable,
+		Min: r.min, Max: r.max, Description: r.description, Money: money, SuperAdminOnly: super, Editable: editable,
 		UpdatedBy: r.updatedBy, UpdatedByName: r.updatedByName, UpdatedAt: r.updatedAt.UTC(),
 		Version: int(r.version),
 	}, nil
@@ -156,7 +163,7 @@ func (s *Service) listSettings(ctx context.Context, p authn.Principal) (api.Admi
 	if err != nil {
 		return api.AdminSettingList{}, err
 	}
-	edit := map[string]bool{}
+	edit := map[bool]bool{}
 	items := make([]api.AdminSetting, 0, len(rows))
 	for _, r := range rows {
 		it, err := s.settingView(ctx, p, settingRow{
@@ -194,7 +201,7 @@ func (s *Service) setting(ctx context.Context, p authn.Principal, key string) (a
 	return s.settingView(ctx, p, settingRow{
 		key: r.Key, unit: r.Unit, description: r.Description, value: r.Value, min: r.Min, max: r.Max,
 		updatedBy: optID(r.UpdatedBy), updatedByName: r.UpdatedByName, updatedAt: r.UpdatedAt, version: r.Version,
-	}, map[string]bool{})
+	}, map[bool]bool{})
 }
 
 // settingValue checks v against the setting's unit and range and returns its
@@ -277,7 +284,7 @@ func (s *Service) updateSetting(ctx context.Context, p authn.Principal, key stri
 		if err != nil {
 			return err
 		}
-		if moneyUnit(cur.Unit) {
+		if superOnly(key, cur.Unit) {
 			if s.az == nil {
 				return problem.New(genproblems.Forbidden, "")
 			}

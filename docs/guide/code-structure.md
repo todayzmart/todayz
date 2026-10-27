@@ -2,7 +2,7 @@
 
 Where everything is in the repo, and how each folder is organised.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 713c1cae (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Use this page to find the file for a change. For how the pieces work together read [architecture.md](architecture.md), and for journeys read [flows.md](flows.md). Rules for each folder are in its own `CLAUDE.md`.
 
@@ -42,7 +42,7 @@ backend/
 
 | Path | What is in it | Edit by hand? |
 |---|---|---|
-| `backend/cmd/todayz` | `main.go` (subcommands), `api.go`, `worker.go`, `routes.go` and one `routes_<domain>.go` per domain, `*_seams.go` (wiring between domains), `security.go`, `ai.go`, `rollup.go`, `images.go`, `migrate.go`, plus the HTTP tests (`*_http_test.go`) | yes |
+| `backend/cmd/todayz` | `main.go` (subcommands), `api.go`, `worker.go`, `routes.go` and one `routes_<domain>.go` per domain, `*_seams.go` (wiring between domains), `security.go`, `ai.go`, `rollup.go`, `images.go`, `admin_cli.go` (break-glass sign-in unlock), `migrate.go`, plus the HTTP tests (`*_http_test.go`) | yes |
 | `backend/api` | `root.yaml`, `paths/<domain>.yaml`, `schemas/<domain>.yaml`, `problems/<domain>.yaml`, `common/`, `redocly.yaml`; `openapi.yaml` is the bundle | the split files yes, the bundle no |
 | `backend/db/migrations` | `NNNNN_<wave>_<name>.sql` files, 65 at this commit, and a [README](../../backend/db/migrations/README.md) | add new files only |
 | `backend/db/queries` | `<domain>/*.sql` with sqlc annotations | yes |
@@ -68,7 +68,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/catalogue` | Products, store items, stock movements, batches, photos; the single stock writer | `catalogue.go`, `writer.go`, `movements.go`, `photos.go` |
 | `backend/internal/coach` | The shop coach: detectors, feed, runs, templates | `coach.go`, `feed.go`, `runs.go` |
 | `backend/internal/credits` | The credits ledger: wallet, lots, holds, cashback, expiry, adjustments | `credits.go`, `adjustments.go`, `reads.go`, `jobs.go` |
-| `backend/internal/identity` | Sign-in (OTP), sessions, refresh rotation, TOTP, addresses, profile photo, accounts | `identity.go`, `otp.go`, `session.go`, `totp.go` |
+| `backend/internal/identity` | Sign-in (OTP), sessions, refresh rotation, admin SMS step-up, addresses, profile photo, accounts | `identity.go`, `otp.go`, `session.go`, `stepup.go` |
 | `backend/internal/imageimport` | Drafts product images from Open Food, Beauty and Products Facts | `imageimport.go`, `sources.go` |
 | `backend/internal/insights` | Business Overview and Demand insights reads | `service.go`, `overview.go`, `analytics.go` |
 | `backend/internal/jobs` | Registry of every job kind, one file per domain | `jobs.go`, `orders.go`, `credits.go` |
@@ -186,7 +186,7 @@ The three apps share one shape: React 19, Vite, TanStack Router (file based) and
 - **Feature folders** hold the screens and their data hooks. Customer examples: `search`, `store`, `product`, `cart`, `checkout`, `orders`, `asks`, `basket`, `account`. Business examples: `pos`, `stock`, `orders`, `credits`, `statements`, `coach`, `ai-drafts`, `onboarding`, `sync`. Admin examples: `businesses`, `catalogue`, `orders`, `payouts`, `risk`, `jobs`, `system`, `settings`.
 - **`routeTree.gen.ts` is generated and git-ignored.** `make gen` writes it. Never edit it.
 - **Business specifics.** `business/src/sync` is the offline engine (`engine.ts`, `idb.ts`, `storage.ts`) and `business/src/pos` is the counter. Both are described in [flows.md](flows.md#7-pos-sale-offline-then-sync).
-- **Admin specifics.** `admin/src/app` has the TOTP step-up (`StepUpDialog.tsx`, `second-factor.tsx`, `totp.ts`) and `ReasonDialog.tsx` for audited actions.
+- **Admin specifics.** `admin/src/app` has the SMS step-up dialog (`StepUpDialog.tsx`, D-264) and `ReasonDialog.tsx` for audited actions.
 - **Labels and text** come from `@todayz/i18n` through `app/i18n.ts`; no user-facing string is inline.
 - **API calls** go through `@todayz/api-client`; no app builds its own fetch.
 

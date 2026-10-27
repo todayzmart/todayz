@@ -2,7 +2,7 @@
 
 How to set up a Mac and run the whole TodayZ stack on it, with no cloud account and no provider keys.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Everything is driven by `make` from the repo root. The targets are fixed (D-56); each package adds its own steps in [mk/](../../mk/), nobody edits the root [Makefile](../../Makefile). The full stack config is explained in [infra/local/README.md](../../infra/local/README.md).
 
@@ -95,13 +95,13 @@ Seeded people, by role (names and ids are in [identity.go](../../backend/interna
 | Customers (three, in English, Kannada and Hindi; one has no name yet, so it acts as a new user) | Customer app: search, book, orders, wallet |
 | Owner, manager and cashier of Sri Lakshmi (the main seeded shop; the owner also owns a second shop) | Business app with each role's permissions: the cashier cannot cancel or change settings |
 | Owners of Annapurna Provisions and Nandi (other shops) | Cross-shop flows such as asking nearby shops |
-| Admin staff in `e2e/fixtures/admins.yaml`: field agent, support, catalogue, analyst, admin, two finance, two super admin, one not yet enrolled | Admin console with each of the seven roles. The file holds test-only TOTP secrets; never reuse them anywhere real |
+| Admin staff in `e2e/fixtures/admins.yaml`: field agent, support, catalogue, analyst, admin, two finance, two super admin, one who has never signed in | Admin console with each of the seven roles. The file holds reserved test phones and roles only, no secrets (D-264) |
 
 Every seeded phone is in a reserved test block (see the comment in identity.go). To sign in locally:
 
 - **Mock SMS.** The API sends the code to the mocks server, not to a carrier. Open https://mocks.todayz.localhost to read the SMS, or ask `GET /_mock/sms/latest-otp?to=<phone>` ([mocks README](../../e2e/mocks/README.md)). The journeys read the code this way.
 - **Reserved numbers.** In local and test mode the reserved test numbers also accept a fixed development code; the seed comment names it. Staging and prod never run the seed and never accept it.
-- **Admin console** needs a second step: after the SMS code, an authenticator code. The seeded admins use the test secrets in `admins.yaml`; the Playwright stack journey reads `TZ_ADMIN_PHONE` for a seeded staff number.
+- **Admin console** signs in with the SMS code alone (D-264). A † action (payouts, credits, settings, admin users, `money` jobs) asks for a fresh SMS code: tap "Send code" in the dialog and read it from the mocks server like the sign-in code. The Playwright stack journey reads `TZ_ADMIN_PHONE` for a seeded staff number.
 - **Business app** after sign-in asks you to choose a shop; a one-shop account skips that screen.
 
 Local Turnstile is also a mock (`TURNSTILE_API_URL`), so no captcha appears.

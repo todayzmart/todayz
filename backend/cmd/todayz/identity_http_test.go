@@ -20,6 +20,7 @@ import (
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/idempotency"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/testclock"
 	"github.com/todayz/backend/internal/testkit"
 )
@@ -54,6 +55,8 @@ func newIdentityAPI(t *testing.T) *identityAPI {
 		Config: cfg, Log: log, Clock: clk,
 		DB: db.New(tdb.Pool), Ready: &health.Readiness{},
 		TestClock: testclock.New(clock.NewOffset(nil), nopStore{}, log),
+		// The admin sign-in lock and step-up limits are settings (D-264).
+		Settings: settings.NewCache(settings.PGLoader(tdb.Pool), settings.Options{Log: log}),
 	}
 	h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
 	require.NoError(t, err)

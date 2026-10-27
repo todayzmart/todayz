@@ -93,7 +93,7 @@ func New(tables []Table, o Options) (*Engine, error) {
 func (e *Engine) Has(action string) bool { _, ok := e.actions[action]; return ok }
 
 // Errors from Check are problems: 401 unauthorized (anonymous), 403
-// forbidden (refused), 403 step_up_required (a † action with stale TOTP),
+// forbidden (refused), 403 step_up_required (a † action without a fresh SMS step-up),
 // 500 internal (unknown action, a failed lookup).
 func refused() error { return problem.New(genproblems.Forbidden, "") }
 
@@ -164,7 +164,7 @@ func (e *Engine) checkBusiness(ctx context.Context, p authn.Principal, a Action,
 }
 
 func (e *Engine) checkAdmin(p authn.Principal, a Action, d Decision) (Decision, error) {
-	if p.App != authn.AppAdmin || p.AMR != authn.AMROTPTOTP {
+	if p.App != authn.AppAdmin {
 		return Decision{}, refused()
 	}
 	for _, r := range p.Roles {

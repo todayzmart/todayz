@@ -518,13 +518,17 @@ WHERE id = @id AND status = 'pending_review' AND moderation = 'needs_review';
 
 -- name: ListAdminUsers :many
 -- Newest first, keyset on (created_at, user_id). lastActiveAt is the latest
--- use of any admin session.
-SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+-- use of any admin session. signin_locked_until is the admin sign-in lock of
+-- their number (D-264), which may have run out (the service shows only a live
+-- one). GetAdminUser selects the same columns.
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.created_by, cb.name AS created_by_name,
   au.created_at, au.disabled_at, au.version,
-  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at,
+  l.locked_until AS signin_locked_until
 FROM admin_users au JOIN users u ON u.id = au.user_id
 LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
 LEFT JOIN users cb ON cb.id = au.created_by
+LEFT JOIN admin_signin_locks l ON l.phone_hash = pi.phone_hash
 WHERE (au.disabled_at IS NOT NULL) = @disabled::bool
   AND (sqlc.narg(after_at)::timestamptz IS NULL
        OR (au.created_at, au.user_id) < (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
@@ -532,12 +536,14 @@ ORDER BY au.created_at DESC, au.user_id DESC
 LIMIT @lim;
 
 -- name: GetAdminUser :one
-SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.created_by, cb.name AS created_by_name,
   au.created_at, au.disabled_at, au.version,
-  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at,
+  l.locked_until AS signin_locked_until
 FROM admin_users au JOIN users u ON u.id = au.user_id
 LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
 LEFT JOIN users cb ON cb.id = au.created_by
+LEFT JOIN admin_signin_locks l ON l.phone_hash = pi.phone_hash
 WHERE au.user_id = @id;
 
 -- name: LockAdminUsers :exec
@@ -552,8 +558,8 @@ SELECT au.roles, au.disabled_at, u.status FROM admin_users au JOIN users u ON u.
 WHERE au.user_id = @id;
 
 -- name: LockAdminTargetUser :one
--- The target's users row, taken as identity's LockUser takes it. Disable and
--- the authenticator reset revoke the target's sessions, so they run one at a
+-- The target's users row, taken as identity's LockUser takes it. Disable
+-- revokes the target's sessions, so it runs one at a
 -- time with refresh and every other revoke path, and no revocation misses a
 -- row a concurrent rotation inserts. Lock order: the A-18 advisory lock,
 -- users, admin_users, sessions.
@@ -581,14 +587,6 @@ VALUES (@user_id, @roles::text[], @created_by, @now, @now);
 UPDATE admin_users SET roles = @roles::text[], disabled_at = sqlc.narg(disabled_at)::timestamptz,
   version = version + 1, updated_at = @now
 WHERE user_id = @id;
-
--- name: ResetAdminTOTP :exec
-UPDATE admin_users SET totp_secret_enc = NULL, totp_enabled_at = NULL, totp_last_step = NULL, totp_failures = 0,
-  version = version + 1, updated_at = @now
-WHERE user_id = @id;
-
--- name: DeleteAdminRecoveryCodes :execrows
-DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
 
 -- name: RevokeAdminSessions :execrows
 UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'admin'

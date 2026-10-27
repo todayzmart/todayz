@@ -79,7 +79,7 @@ func NewTokens(keys *KeySet, c clock.Clock) *Tokens { return &Tokens{keys: keys,
 // Issue signs an access token for p (UserID, App, SessionID, Roles, AMR are
 // read; the times are set here) and returns it with its expiry.
 func (t *Tokens) Issue(p Principal) (string, time.Time, error) {
-	if p.IsAnonymous() || !p.App.Valid() || p.SessionID == ids.Zero || (p.AMR != AMROTP && p.AMR != AMROTPTOTP) {
+	if p.IsAnonymous() || !p.App.Valid() || p.SessionID == ids.Zero || p.AMR != AMROTP {
 		return "", time.Time{}, errors.New("authn: issue: incomplete principal")
 	}
 	now := t.clock.Now().UTC().Truncate(time.Second)
@@ -150,7 +150,7 @@ func (t *Tokens) Verify(raw string) (Principal, error) {
 	if err != nil {
 		return Principal{}, ErrInvalidToken
 	}
-	if c.AMR != AMROTP && c.AMR != AMROTPTOTP {
+	if c.AMR != AMROTP {
 		return Principal{}, ErrInvalidToken
 	}
 	if c.ExpiresAt == nil || c.IssuedAt == nil {

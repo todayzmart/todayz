@@ -19,6 +19,7 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/reqctx"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -45,6 +46,11 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 	if !app.Valid() {
 		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.app", "unknown app")
 	}
+	if purpose == PurposeStepUp && app == authn.AppAdmin {
+		// The admin step-up goes to the signed-in admin's own number
+		// (SendStepUp), never to a number a caller names (D-264).
+		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.purpose", "an admin step-up is POST /v1/auth/step-up/send")
+	}
 
 	clientIP := reqctx.ClientIP(ctx)
 	human, err := s.human.Verify(ctx, turnstileToken, clientIP)
@@ -56,13 +62,36 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 		// forbidden (AU-20), and nothing is stored or sent.
 		return SendResult{}, problem.New(genproblems.Forbidden, "")
 	}
+	return s.issueCode(ctx, app, e164, purpose)
+}
 
+// issueCode checks the send limits, stores the code's HMAC for purpose and
+// app, and sends the code by SMS after commit. SendOTP and the admin step-up
+// (SendStepUp) share it. The limits (01 §2): the resend gap, per number and
+// per IP an hour, every purpose counting, except the admin step-up, which has
+// its own bucket per number (D-264, adminStepUpLimit). An admin-app sign-in
+// code is refused while the number's admin sign-in is locked (D-264). e164 is
+// a normalised number; neither it nor the code is logged.
+func (s *Service) issueCode(ctx context.Context, app authn.App, e164, purpose string) (SendResult, error) {
+	adminStepUp := app == authn.AppAdmin && purpose == PurposeStepUp
+	adminLogin := app == authn.AppAdmin && purpose == PurposeLogin
+	var stepUpPerHour int64
+	if adminStepUp {
+		if s.settings == nil {
+			return SendResult{}, unavailable(ctx, errors.New("identity: the admin step-up limit needs platform_settings"))
+		}
+		n, err := s.settings.Int(ctx, settings.AdminStepUpSendsPerHour)
+		if err != nil {
+			return SendResult{}, problem.Wrap(genproblems.Internal, err)
+		}
+		stepUpPerHour = n
+	}
 	code, err := randomDigits(OTPDigits)
 	if err != nil {
 		return SendResult{}, problem.Wrap(genproblems.Internal, err)
 	}
 	phoneHash := s.hash.Phone(e164)
-	ipHash := s.hash.IPLimit(clientIP) // IPv6 by its /64 (otp_requests.ip_hash)
+	ipHash := s.hash.IPLimit(reqctx.ClientIP(ctx)) // IPv6 by its /64 (otp_requests.ip_hash)
 	phoneEnc, err := s.seal.Seal("phone", []byte(e164))
 	if err != nil {
 		return SendResult{}, problem.Wrap(genproblems.Internal, err)
@@ -82,6 +111,21 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 			}
 		}
 		now := s.clock.Now().UTC()
+		if adminLogin {
+			until, locked, err := adminSigninLock(ctx, q, phoneHash, now)
+			if err != nil {
+				return err
+			}
+			if locked {
+				return signinLocked(until, now)
+			}
+		}
+		if adminStepUp {
+			if err := s.adminStepUpLimit(ctx, q, phoneHash, now, stepUpPerHour); err != nil {
+				return err
+			}
+			return s.insertCode(ctx, q, &id, app, purpose, phoneHash, phoneEnc, ipHash, code, now)
+		}
 		since := now.Add(-OTPWindow)
 		byPhone, err := q.OtpSendsByPhoneSince(ctx, identitydb.OtpSendsByPhoneSinceParams{Since: since, PhoneHash: phoneHash})
 		if err != nil {
@@ -102,12 +146,7 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 				return limited(byIP.Oldest.Add(OTPWindow).Sub(now), OTPWindow)
 			}
 		}
-		id = ids.New(now)
-		return q.InsertOtpRequest(ctx, identitydb.InsertOtpRequestParams{
-			ID: ids.UUID(id), PhoneHash: phoneHash, PhoneEnc: phoneEnc,
-			Purpose: purpose, App: string(app), CodeHash: s.codeHash(id, code),
-			ExpiresAt: now.Add(OTPTTL), IpHash: ipHash, CreatedAt: now,
-		})
+		return s.insertCode(ctx, q, &id, app, purpose, phoneHash, phoneEnc, ipHash, code, now)
 	})
 	if err != nil {
 		return SendResult{}, asProblem(err)
@@ -117,10 +156,20 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 	// send still counts toward the limits (the row is there), so a provider
 	// outage cannot be used to bypass them.
 	if err := s.sms.SendOTP(ctx, e164, code); err != nil {
-		telemetry.Logger(ctx).ErrorContext(ctx, "identity: OTP SMS failed", "error", err, "app", string(app))
+		telemetry.Logger(ctx).ErrorContext(ctx, "identity: OTP SMS failed", "error", err, "app", string(app), "purpose", purpose)
 		return SendResult{}, problem.Wrap(genproblems.ServiceUnavailable, err)
 	}
 	return SendResult{RequestID: id, ResendAfter: OTPResendGap}, nil
+}
+
+// insertCode stores a new code's request row and sets *id to its id.
+func (s *Service) insertCode(ctx context.Context, q *identitydb.Queries, id *ids.ID, app authn.App, purpose string, phoneHash, phoneEnc, ipHash []byte, code string, now time.Time) error {
+	*id = ids.New(now)
+	return q.InsertOtpRequest(ctx, identitydb.InsertOtpRequestParams{
+		ID: ids.UUID(*id), PhoneHash: phoneHash, PhoneEnc: phoneEnc,
+		Purpose: purpose, App: string(app), CodeHash: s.codeHash(*id, code),
+		ExpiresAt: now.Add(OTPTTL), IpHash: ipHash, CreatedAt: now,
+	})
 }
 
 // VerifyInput is one verify call.
@@ -141,20 +190,12 @@ type SignIn struct {
 	RefreshToken string
 	// RefreshExpiresAt is when the refresh cookie expires.
 	RefreshExpiresAt time.Time
-	// NextStep is the admin's second factor after OTP: NextStepTOTPEnrol or
-	// NextStepTOTPVerify. Empty for the other apps and for a refresh.
-	NextStep string
 }
-
-// The admin's next step after OTP (OtpVerifyResponse.nextStep).
-const (
-	NextStepTOTPEnrol  = "totp_enrol"
-	NextStepTOTPVerify = "totp_verify"
-)
 
 // VerifyOTP checks a code and signs in: five tries per code, then locked
 // (AU-02); expired, used and unknown codes are otp_expired. The attempt count
-// commits even when the code is wrong.
+// commits even when the code is wrong. An admin-app code also counts toward
+// the number's admin sign-in lock (D-264, signin_limits.go).
 func (s *Service) VerifyOTP(ctx context.Context, in VerifyInput) (SignIn, error) {
 	if err := s.readyTokens(); err != nil {
 		return SignIn{}, unavailable(ctx, err)
@@ -192,6 +233,20 @@ func (s *Service) VerifyOTP(ctx context.Context, in VerifyInput) (SignIn, error)
 			outcome = problem.New(genproblems.OtpExpired, "")
 			return nil
 		}
+		adminLogin := in.App == authn.AppAdmin
+		if adminLogin {
+			if err := q.LockKey(ctx, adminSigninKey(row.PhoneHash)); err != nil {
+				return err
+			}
+			until, locked, err := adminSigninLock(ctx, q, row.PhoneHash, now)
+			if err != nil {
+				return err
+			}
+			if locked {
+				outcome = signinLocked(until, now) // no attempt is recorded while locked
+				return nil
+			}
+		}
 		if row.Attempts >= OTPMaxAttempts {
 			outcome = problem.New(genproblems.OtpLocked, "")
 			return nil
@@ -216,7 +271,23 @@ func (s *Service) VerifyOTP(ctx context.Context, in VerifyInput) (SignIn, error)
 		if !match {
 			left := max(OTPMaxAttempts-int(attempts), 0)
 			outcome = problem.New(genproblems.Unauthorized, "").WithExtension("attemptsLeft", left)
+			if adminLogin {
+				refusal, err := s.adminSigninFailed(ctx, q, row.PhoneHash, now)
+				if err != nil {
+					return err
+				}
+				if refusal != nil {
+					outcome = refusal
+				}
+			}
 			return nil
+		}
+		if adminLogin {
+			// A good code clears the count, whether or not signIn then lets
+			// the person in (D-264).
+			if err := q.ClearAdminSigninFailures(ctx, row.PhoneHash); err != nil {
+				return err
+			}
 		}
 		if err := q.ConsumeOtpRequest(ctx, identitydb.ConsumeOtpRequestParams{Now: now, ID: row.ID}); err != nil {
 			return err
@@ -311,10 +382,7 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		}
 	}
 
-	var (
-		roles    []string
-		nextStep string
-	)
+	var roles []string
 	switch in.App {
 	case authn.AppAdmin:
 		a, err := q.GetAdminUser(ctx, ids.UUID(userID))
@@ -324,15 +392,9 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		if err != nil {
 			return signInResult{}, nil, err
 		}
+		// D-264: the SMS code alone signs an admin in. The sign-in carries no
+		// step-up: a † action asks for a fresh step-up code first.
 		roles = a.Roles
-		switch {
-		case s.totpOff:
-			// D-244: no authenticator step locally; CheckSession waives it.
-		case a.TotpEnabledAt == nil:
-			nextStep = NextStepTOTPEnrol
-		default:
-			nextStep = NextStepTOTPVerify
-		}
 	case authn.AppCustomer:
 		if err := s.ensureCustomerProfile(ctx, q, userID, now); err != nil {
 			return signInResult{}, nil, err
@@ -364,7 +426,7 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		return signInResult{}, nil, err
 	}
 	return signInResult{
-		SignIn: SignIn{UserID: userID, IsNewUser: isNew, RefreshToken: refresh, RefreshExpiresAt: refreshExp, NextStep: nextStep},
+		SignIn: SignIn{UserID: userID, IsNewUser: isNew, RefreshToken: refresh, RefreshExpiresAt: refreshExp},
 		family: family, roles: roles,
 	}, nil, nil
 }

@@ -16,7 +16,7 @@ export interface Person {
   key: string;
   national: string;
   app: App;
-  /** The key of the admin in e2e/fixtures/admins.yaml whose test TOTP secret signs this person in. */
+  /** The key of this admin in e2e/fixtures/admins.yaml (signs in with the SMS code alone, D-264). */
   admin?: string;
 }
 

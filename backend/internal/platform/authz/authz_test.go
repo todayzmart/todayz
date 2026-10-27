@@ -62,11 +62,7 @@ func code(t *testing.T, err error) string {
 }
 
 func user(app authn.App, roles ...string) authn.Principal {
-	p := authn.Principal{UserID: ids.New(t0), App: app, SessionID: ids.New(t0), AMR: authn.AMROTP, Roles: roles}
-	if app == authn.AppAdmin {
-		p.AMR = authn.AMROTPTOTP
-	}
-	return p
+	return authn.Principal{UserID: ids.New(t0), App: app, SessionID: ids.New(t0), AMR: authn.AMROTP, Roles: roles}
 }
 
 func engine(t *testing.T, clk clock.Clock, s StaffResolver) *Engine {
@@ -173,14 +169,14 @@ func TestAdminGrantsAndStepUp(t *testing.T) {
 	_, err = e.Check(ctx, user(authn.AppAdmin), "admin.users.view", Scope{})
 	require.Equal(t, genproblems.Forbidden, code(t, err), "no roles")
 
-	noTOTP := user(authn.AppAdmin, "admin")
-	noTOTP.AMR = authn.AMROTP
-	_, err = e.Check(ctx, noTOTP, "admin.users.view", Scope{})
-	require.Equal(t, genproblems.Forbidden, code(t, err), "AU-11: an admin without TOTP")
+	// D-264: an admin signs in with the SMS OTP alone; that reaches a plain
+	// admin action without any step-up.
+	_, err = e.Check(ctx, user(authn.AppAdmin, "admin"), "admin.users.view", Scope{})
+	require.NoError(t, err, "an SMS-only admin sign-in")
 	_, err = e.Check(ctx, user(authn.AppBusiness, "super_admin"), "admin.users.view", Scope{})
 	require.Equal(t, genproblems.Forbidden, code(t, err), "roles on a non-admin token are not admin roles")
 
-	// † actions: TOTP younger than the step-up window.
+	// † actions: an SMS step-up younger than the step-up window (D-264).
 	sa := user(authn.AppAdmin, "super_admin")
 	_, err = e.Check(ctx, sa, "admin.settings.edit", Scope{})
 	require.Equal(t, genproblems.StepUpRequired, code(t, err), "never stepped up")

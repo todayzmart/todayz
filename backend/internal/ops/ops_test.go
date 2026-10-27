@@ -335,7 +335,7 @@ func TestRoleGate(t *testing.T) {
 		"admin": 200, "super_admin": 200,
 		"support": 403, "catalogue": 403, "analyst": 403, "finance": 403, "field_agent": 403,
 	} {
-		p := authn.Principal{UserID: ids.New(t0), SessionID: ids.New(t0), App: authn.AppAdmin, AMR: authn.AMROTPTOTP, Roles: []string{role}}
+		p := authn.Principal{UserID: ids.New(t0), SessionID: ids.New(t0), App: authn.AppAdmin, AMR: authn.AMROTP, Roles: []string{role}}
 		require.Equal(t, want, call(&p), role)
 	}
 	require.Equal(t, 401, call(nil))

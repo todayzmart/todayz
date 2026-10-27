@@ -57,7 +57,6 @@ OTP (D-15): an OTP is never logged in any environment. In `local` and `test`, th
 | `PII_ENC_KEY` | AES-256-GCM for phone, PAN, GSTIN, UPI ID and bank details |
 | `PII_HASH_KEY` | HMAC for PII lookups |
 | `DEVICE_SECRET_ENC_KEY` | Counter-code device secrets |
-| `TOTP_ENC_KEY` | Admin TOTP secrets |
 | `SHARE_PREVIEW_KEY` | Shared with the customer Pages Function: a share-link preview read forwards the visitor's IP with it, so the API rate-limits and counts opens per visitor, not per Cloudflare IP (W3-16). `make setup` generates it locally and `make env-check` lists it with the other app keys. The API starts without it (it is not in `config.AppKeyNames`); previews are then counted by Cloudflare IP. Prod needs the same value set on both the Pages project and the API |
 
 - `make setup` generates any missing key into `.env.local` and prints only `generated: NAME`, never the value.
@@ -259,7 +258,7 @@ The founder's yes on the prod plan summary comes before step 4 (D-254).
   - From an SSM session on the api instance and on the worker instance, using the instance role, run `aws pinpoint-sms-voice-v2 send-text-message --dry-run` with the sender ID as `--origination-identity`, a sandbox-verified number and both DLT ids. It must succeed, which proves the policy's IAM resource types (`sender-id`, `opt-out-list`). `AccessDeniedException` means a resource type is missing from `policies/sms-send.json`.
   - The app's first OTP must not log `credentials: imds token timeout`. Beanstalk has no IMDS hop-limit option, so we rely on the AL2023 default of 2, and this proves it from inside the container.
 - [ ] Privacy policy, terms, grievance officer contact live; consent text in sign-up.
-- [ ] Super admin accounts with TOTP; no shared accounts.
+- [ ] Super admin accounts on the person's own phone number (SMS step-up, D-264); no shared accounts.
 - [ ] `platform_settings` reviewed by the founders (timers, credit caps, referral amounts).
 - [ ] Old site redirect map tested; sitemap submitted to Search Console.
 - [ ] Sentry releases and source maps working; Grafana dashboards show prod data.

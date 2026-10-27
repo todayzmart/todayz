@@ -92,7 +92,7 @@ const (
 	AccessTTL         = 15 * time.Minute
 	RefreshTTL        = 30 * 24 * time.Hour // customer and business
 	AdminRefreshTTL   = 12 * time.Hour
-	StepUpWindow      = 10 * time.Minute // admin TOTP re-prompt (02 §3.3 †)
+	StepUpWindow      = 10 * time.Minute // admin SMS step-up for † actions (02 §3.3, D-264)
 	RefreshCookiePath = "/v1/auth"
 )
 
@@ -107,10 +107,11 @@ func (a App) RefreshTTL() time.Duration {
 // AMR is how the session was authenticated (RFC 8176 style).
 type AMR string
 
-// The two authentication methods.
+// The authentication method. Every app signs in with the SMS OTP alone; the
+// admin authenticator (amr otp+totp) is gone (D-264), so a token carrying it
+// no longer verifies and the client refreshes into an otp one.
 const (
-	AMROTP     AMR = "otp"      // SMS OTP only
-	AMROTPTOTP AMR = "otp+totp" // SMS OTP and the admin's TOTP (D-14, AU-11)
+	AMROTP AMR = "otp" // SMS OTP
 )
 
 // Principal is an authenticated caller. The zero value is anonymous.
@@ -126,8 +127,9 @@ type Principal struct {
 	// IssuedAt and ExpiresAt are the access token's.
 	IssuedAt  time.Time
 	ExpiresAt time.Time
-	// StepUpAt is when the admin last verified TOTP in this session (zero if
-	// never). authz compares it with StepUpWindow for † actions.
+	// StepUpAt is when the admin last passed an SMS step-up in this sign-in
+	// (zero if never, D-264). authz compares it with StepUpWindow for †
+	// actions.
 	StepUpAt time.Time
 }
 

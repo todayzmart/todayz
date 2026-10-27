@@ -9,14 +9,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
 // W3-05 A-18: admin users. super_admin only; invite by phone, change roles,
-// disable and re-enable, reset the authenticator; every change needs a fresh
-// step-up and is audited. Nobody changes themselves.
+// disable and re-enable; every change needs a fresh SMS step-up (D-264) and
+// is audited. Nobody changes themselves.
 func TestAdminUsersHTTP(t *testing.T) {
 	o := newOrderShop(t)
 	desk := newAdminDesk(o, "admin")
@@ -39,7 +38,7 @@ func TestAdminUsersHTTP(t *testing.T) {
 	me := r.body["items"].([]any)[0].(map[string]any)
 	self := me["id"].(string)
 	require.Equal(t, "90•••••021", me["phoneMasked"])
-	require.Equal(t, true, me["totpEnrolled"])
+	require.NotContains(t, me, "totpEnrolled", "D-264: there is no authenticator")
 	require.NotNil(t, me["lastActiveAt"])
 	require.Nil(t, me["createdBy"])
 
@@ -49,7 +48,6 @@ func TestAdminUsersHTTP(t *testing.T) {
 	meera := r.body["id"].(string)
 	require.Equal(t, "Meera", r.body["name"])
 	require.Equal(t, []any{"catalogue", "support"}, r.body["roles"])
-	require.Equal(t, false, r.body["totpEnrolled"])
 	require.Equal(t, self, r.body["createdBy"])
 	require.Equal(t, "90•••••031", r.body["phoneMasked"])
 	require.Nil(t, r.body["lastActiveAt"])
@@ -78,7 +76,7 @@ func TestAdminUsersHTTP(t *testing.T) {
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM phone_identities pi JOIN users u ON u.id = pi.user_id WHERE u.name = 'X'`))
 
-	// The invited person signs in and is asked to set up the authenticator.
+	// The invited person signs in with the SMS code alone (D-264).
 	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
 		"phone": "+919000000031", "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
 	}, nil)
@@ -87,7 +85,8 @@ func TestAdminUsersHTTP(t *testing.T) {
 		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
 	}, nil)
 	require.Equal(t, http.StatusOK, w.code, w.raw)
-	require.Equal(t, identity.NextStepTOTPEnrol, w.body["nextStep"])
+	require.NotContains(t, w.body, "nextStep")
+	require.NotEmpty(t, w.body["accessToken"])
 	require.Equal(t, 1, adminSessions(meera))
 
 	// Roles change with the version read; a stale one is a conflict.
@@ -123,12 +122,12 @@ func TestAdminUsersHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, "active", r.body["status"])
 
-	// Nobody changes or resets themselves.
+	// Nobody changes themselves.
 	r = patch("/v1/admin/users/"+self, map[string]any{"status": "disabled", "version": 1, "reason": "me"})
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 	require.Equal(t, "invalid_transition", problemCode(r))
 	r = post("/v1/admin/users/"+self+"/reset-totp", map[string]any{"reason": "me"})
-	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, http.StatusNotFound, r.code, "D-264: the authenticator reset is gone: %s", r.raw)
 
 	// With two active super admins, one may be demoted. The last-one guard
 	// cannot be reached over HTTP (the caller is always a second active
@@ -137,28 +136,15 @@ func TestAdminUsersHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, []any{"admin"}, r.body["roles"])
 
-	// Reset clears the authenticator and recovery codes and ends the sessions.
-	a.exec(`UPDATE admin_users SET totp_secret_enc = '\x00', totp_enabled_at = now(), totp_failures = 2 WHERE user_id = $1`, uuidOf(t, meera))
-	a.exec(`INSERT INTO admin_recovery_codes (id, admin_id, code_hash) VALUES ($1, $2, decode(repeat('ab', 32), 'hex'))`, uuidOf(t, ids.New(a.clk.Now()).String()), uuidOf(t, meera))
-	a.exec(`INSERT INTO sessions (id, user_id, app, family_id, refresh_hash, expires_at, last_used_at, created_at)
-		VALUES ($1, $2, 'admin', $1, decode(repeat('cd', 32), 'hex'), now() + interval '1 day', now(), now())`, uuidOf(t, ids.New(a.clk.Now()).String()), uuidOf(t, meera))
-	r = post("/v1/admin/users/"+meera+"/reset-totp", map[string]any{"reason": "lost her phone"})
-	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, false, r.body["totpEnrolled"])
-	require.Equal(t, 0, a.count(`SELECT count(*) FROM admin_recovery_codes WHERE admin_id = $1`, uuidOf(t, meera)))
-	require.Equal(t, 0, a.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND (totp_secret_enc IS NOT NULL OR totp_failures <> 0)`, uuidOf(t, meera)))
-	require.Equal(t, 0, adminSessions(meera))
-
 	// Every change is audited with its reason; no audit row holds a phone.
 	require.Equal(t, 2, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.invite' AND subject_type = 'admin_user'`))
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.disable' AND subject_id = $1 AND after ->> 'reason' = 'left the team'`, meera))
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.enable' AND subject_id = $1`, meera))
-	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.totp_reset' AND subject_id = $1 AND (after ->> 'sessionsRevoked')::int = 1`, meera))
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE subject_type = 'admin_user' AND (before::text LIKE '%90000000%' OR after::text LIKE '%90000000%')`))
 
 	// A stale step-up is asked again; reading needs none.
 	a.clk.Advance(authn.StepUpWindow + time.Second)
-	r = patch("/v1/admin/users/"+meera, map[string]any{"roles": []string{"analyst"}, "version": 5, "reason": "moves"})
+	r = patch("/v1/admin/users/"+meera, map[string]any{"roles": []string{"analyst"}, "version": 4, "reason": "moves"})
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
 	require.Equal(t, "step_up_required", problemCode(r))
 	r = get("/v1/admin/users")
@@ -180,7 +166,7 @@ func TestAdminUsersDisabledTokenHTTP(t *testing.T) {
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.invite' AND subject_id = $1 AND after ->> 'phone' = '90•••••041' AND (after ->> 'newAccount')::bool`, asha))
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE after::text LIKE '%9000000041%' OR before::text LIKE '%9000000041%'`))
 
-	// Asha signs in with both steps and can read orders.
+	// Asha signs in with the SMS code and can read orders.
 	ashaTok, ashaCookie := adminSignIn(o, "+919000000041")
 	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
@@ -213,9 +199,9 @@ func TestAdminUsersDisabledTokenHTTP(t *testing.T) {
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_at IS NULL`, uuidOf(t, asha)))
 }
 
-// adminSignIn signs an invited number into the admin app with both steps
-// (first sign-in: it enrols the authenticator) and returns the access token
-// and the refresh cookie.
+// adminSignIn signs an invited number into the admin app with the SMS code
+// alone (D-264), passes the SMS step-up, and returns the access token and the
+// refresh cookie.
 func adminSignIn(o *orderShop, phone string) (string, *http.Cookie) {
 	t, a := o.t, o.a
 	t.Helper()
@@ -227,15 +213,10 @@ func adminSignIn(o *orderShop, phone string) (string, *http.Cookie) {
 		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
 	}, nil)
 	require.Equal(t, http.StatusOK, w.code, w.raw)
-	first := w.body["accessToken"].(string)
-	e := a.call(first, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
-	require.Equal(t, http.StatusOK, e.code, e.raw)
-	secret, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
-	require.NoError(t, err)
-	a.clk.Advance(31 * time.Second)
-	v := a.call(first, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(secret, a.clk.Now()), "purpose": "login"}, nil)
-	require.Equal(t, http.StatusOK, v.code, v.raw)
-	return v.body["accessToken"].(string), cookieOf(t, v)
+	require.NotContains(t, w.body, "nextStep")
+	tok := w.body["accessToken"].(string)
+	a.stepUp(tok)
+	return tok, cookieOf(t, w)
 }
 
 func adminRefresh(o *orderShop, c *http.Cookie) resp {
@@ -342,8 +323,8 @@ func TestAdminUsersActorRecheckHTTP(t *testing.T) {
 		{"update, actor demoted", `UPDATE admin_users SET roles = ARRAY['admin'] WHERE user_id = $1`, func() resp {
 			return a.call(tok, http.MethodPatch, "/v1/admin/users/"+dev, map[string]any{"status": "disabled", "version": 1, "reason": "late"}, nil)
 		}},
-		{"reset, actor blocked", `UPDATE users SET status = 'blocked' WHERE id = $1`, func() resp {
-			return a.call(tok, http.MethodPost, "/v1/admin/users/"+dev+"/reset-totp", map[string]any{"reason": "late"}, nil)
+		{"roles, actor blocked", `UPDATE users SET status = 'blocked' WHERE id = $1`, func() resp {
+			return a.call(tok, http.MethodPatch, "/v1/admin/users/"+dev, map[string]any{"roles": []string{"catalogue"}, "version": 1, "reason": "late"}, nil)
 		}},
 	} {
 		tx, err := a.tdb.OwnerPool.Begin(ctx)

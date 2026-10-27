@@ -1,7 +1,7 @@
 import { configure } from '@todayz/api-client';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PhoneOtpFlow, type PhoneOtpLabels } from './phone-otp';
+import { PhoneOtpFlow, otpErrorMessage, type PhoneOtpLabels } from './phone-otp';
 import type { Session } from './session';
 import { TURNSTILE_TEST_SITE_KEY } from './turnstile';
 
@@ -57,5 +57,79 @@ describe('PhoneOtpFlow WebOTP', () => {
     view.rerender(ui(() => undefined));
     view.rerender(ui(() => undefined));
     expect(get).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('PhoneOtpFlow sign-in lock (D-264)', () => {
+  afterEach(() => configure({}));
+
+  function problem(code: string, status: number, headers: Record<string, string> = {}) {
+    return new Response(JSON.stringify({ type: 'about:blank', code, status, title: code }), {
+      status,
+      headers: { 'content-type': 'application/problem+json', ...headers },
+    });
+  }
+
+  it('maps signin_locked to its own kind, falling back to the locked message', () => {
+    const l = labels();
+    expect(otpErrorMessage(l.errors, 'signinLocked')).toBe('l');
+    expect(otpErrorMessage({ ...l.errors, signinLocked: 'sl' }, 'signinLocked')).toBe('sl');
+    expect(otpErrorMessage(l.errors, 'rateLimited')).toBe('r');
+  });
+
+  it('shows the lock on send without an hours-long countdown', async () => {
+    configure({
+      baseUrl: 'https://api.test',
+      fetch: (async () => problem('signin_locked', 429, { 'retry-after': '86400' })) as typeof fetch,
+    });
+    const session = { app: 'admin', signIn: vi.fn() } as unknown as Session;
+    render(
+      <PhoneOtpFlow
+        session={session}
+        siteKey={TURNSTILE_TEST_SITE_KEY}
+        labels={{ ...labels(), errors: { ...labels().errors, signinLocked: 'Sign-in locked' } }}
+        onSignedIn={() => undefined}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Mobile number'), { target: { value: '9000000011' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+    await screen.findByText('Sign-in locked');
+    expect(screen.getByRole('button', { name: 'Send code' })).toBeEnabled();
+    expect(screen.queryByText(/Resend in/)).toBeNull();
+  });
+
+  it('shows the lock when the tenth wrong code trips it on verify', async () => {
+    let calls = 0;
+    configure({
+      baseUrl: 'https://api.test',
+      fetch: (async () => {
+        calls += 1;
+        if (calls === 1) {
+          return new Response(JSON.stringify({ requestId: 'req-1', resendAfter: 30 }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+        return problem('signin_locked', 429, { 'retry-after': '86400' });
+      }) as typeof fetch,
+    });
+    const session = { app: 'admin', signIn: vi.fn() } as unknown as Session;
+    render(
+      <PhoneOtpFlow
+        session={session}
+        siteKey={TURNSTILE_TEST_SITE_KEY}
+        labels={{ ...labels(), errors: { ...labels().errors, signinLocked: 'Sign-in locked' } }}
+        onSignedIn={() => undefined}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Mobile number'), { target: { value: '9000000011' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+    await screen.findByText(/Sent to/);
+    // Autofill: the whole code lands in the first box.
+    const first = screen.getByRole('group', { name: 'Enter the 6-digit code' }).querySelector('input') as HTMLInputElement;
+    fireEvent.change(first, { target: { value: '123456' } });
+    await waitFor(() => expect(calls).toBe(2));
+    await screen.findByText('Sign-in locked');
+    expect(session.signIn).not.toHaveBeenCalled();
   });
 });

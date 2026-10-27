@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
@@ -354,16 +353,14 @@ func TestAdminSettingsHTTP(t *testing.T) {
 	r = patch("feature_voice_enabled", change(false))
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 
-	// A stale step-up is asked again; a step_up verify re-confirms it.
+	// A stale step-up is asked again; a new SMS step-up re-confirms it.
 	a.clk.Advance(authn.StepUpWindow + time.Second)
 	r = patch("ask_max_stores", change(10))
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
 	require.Equal(t, "step_up_required", problemCode(r))
 	r = get("/v1/admin/settings")
 	require.Equal(t, http.StatusOK, r.code, "reading needs no step-up")
-	a.clk.Advance(31 * time.Second)
-	v := a.call(tok, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(desk.secret, a.clk.Now()), "purpose": "step_up"}, nil)
-	require.Equal(t, http.StatusOK, v.code, v.raw)
+	a.stepUp(tok) // D-264: a fresh SMS step-up
 	r = patch("ask_max_stores", change(10))
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 

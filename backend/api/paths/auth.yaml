@@ -1,7 +1,7 @@
-# Paths: domain "auth" (owner W1-01): sign-in, OTP, TOTP, refresh, sign-out (04 §2.1).
+# Paths: domain "auth" (owner W1-01): sign-in, OTP, refresh, sign-out, admin step-up (04 §2.1).
 #
-# Phase A: OTP send and verify, refresh, logout. Phase B: logout-all and
-# totp/enrol, totp/verify, totp/recover (bearer, admin app). Every operation: `tags: [auth]`, an
+# Phase A: OTP send and verify, refresh, logout. Phase B: logout-all. D-264: the
+# admin SMS step-up, step-up/send and step-up/verify (bearer, admin app). Every operation: `tags: [auth]`, an
 # operationId unique across the API, an example per request and success response,
 # and `default: {$ref: ../common/responses.yaml#/Problem}`.
 /v1/auth/otp/send:
@@ -52,8 +52,8 @@
       sixth try is `429 otp_locked` even with the right code (AU-02). A code older than 5 min, used,
       or unknown is `401 otp_expired`. A blocked account is `403 account_blocked`. On success the
       app's refresh cookie is set (D-14) and the account is created if new (`isNewUser`). An admin
-      gets an `amr` `otp` token and `nextStep` (TOTP enrol or verify, AU-11). A `step_up` code
-      never signs in (`401 otp_expired`).
+      is signed in by the code alone (D-264); a † action later needs an SMS step-up
+      (`POST /v1/auth/step-up/send`). A `step_up` code never signs in (`401 otp_expired`).
     security: []
     x-problems: [otp_locked, otp_expired, account_blocked]
     requestBody:
@@ -216,21 +216,21 @@
               type: string
       default:
         $ref: ../common/responses.yaml#/Problem
-/v1/auth/totp/enrol:
+/v1/auth/step-up/send:
   post:
-    operationId: enrolTotp
+    operationId: sendStepUp
     tags: [auth]
-    summary: Start the admin's authenticator enrolment
+    summary: Send the signed-in admin a step-up code by SMS
     description: |
-      Admin app only, after the OTP step (`amr` `otp`). Makes a new authenticator secret and 10
-      single-use recovery codes and answers them once (D-60); the server keeps the secret
-      encrypted (`TOTP_ENC_KEY`) and the codes hashed only. The enrolment is pending until
-      `POST /v1/auth/totp/verify` with `purpose: login` accepts a code from it. Calling it again
-      while pending replaces the secret and the codes. An admin already enrolled gets
-      `409 conflict` (a super admin resets an enrolment, W3-05); any other app `403 forbidden`.
+      Admin app only (D-264). Sends a fresh 6-digit code to the admin's own number, the one they
+      sign in with; the client never names a number. A † action (02 §3.3) needs a step-up younger
+      than 10 minutes, else `403 step_up_required`. The code lives 5 minutes. The sign-in code's
+      limits apply and count together with sign-in sends: resend after 30 s, at most 5 sends per
+      number and 20 per IP an hour (`429 rate_limited` with `Retry-After`). The code and the
+      number are never logged (D-15). Any other app is `403 forbidden`.
     responses:
       "200":
-        description: The secret and recovery codes, shown once
+        description: A step-up code was sent
         headers:
           Cache-Control:
             description: Always `no-store`.
@@ -239,47 +239,38 @@
         content:
           application/json:
             schema:
-              $ref: ../schemas/auth.yaml#/TotpEnrolResponse
+              $ref: ../schemas/auth.yaml#/OtpSendResponse
             example:
-              secret: JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
-              otpauthUri: otpauth://totp/TodayZ:01JB0S1W6W8ZV7T1C3A6M9N4PQ?algorithm=SHA1&digits=6&issuer=TodayZ&period=30&secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
-              recoveryCodes: [M9S3-46Q3-D25V-T4F5, V37E-3S3E-28JT-97KB, 6CQ6-43DZ-VMXX-QKFB, F5KZ-NWJ4-7TAN-9ZT2, 4MNP-ZX45-HY43-KWJR, P1XP-A7Z3-DJ8F-SSZ5, AWSH-8VHT-PRE9-5B9E, E0ZB-GJ09-TQM8-3XSS, SS6Y-S3C4-DWA7-N360, 96Q1-4DR9-GPQY-77ZX]
+              requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              resendAfter: 30
       default:
         $ref: ../common/responses.yaml#/Problem
-/v1/auth/totp/verify:
+/v1/auth/step-up/verify:
   post:
-    operationId: verifyTotp
+    operationId: verifyStepUp
     tags: [auth]
-    summary: Verify an authenticator code (second factor or step-up)
+    summary: Confirm a step-up code
     description: |
-      Admin app only. `purpose: login` is the second factor after OTP (it also confirms a pending
-      enrolment); `purpose: step_up` re-confirms within a session that already passed TOTP, for
-      the actions marked † in 02 §3.3 (valid 10 min, else `403 step_up_required`). One 30-second
-      step either side is accepted, and each step once. A wrong code is `422 code_invalid` with
-      `extensions.attemptsLeft`; after 5 wrong codes in a row every admin session of the admin
-      ends and the answer is `429 otp_locked` (sign in again). The answer is a new access token
-      with `amr` `otp+totp`. `purpose: login` also rotates the refresh cookie (the sign-in is
-      elevated, so the token from the OTP step stops working: it is `rotated`, with the usual
-      30-second grace, and a later use of it is reuse) and the response sets the new cookie;
-      `step_up` leaves the cookie as it is.
-    x-problems: [otp_locked, code_invalid]
+      Admin app only (D-264). The code must be one `step-up/send` sent to this admin, unused and
+      younger than 5 minutes, else `401 otp_expired`. A wrong code is `422 code_invalid` with
+      `extensions.attemptsLeft`; the fifth wrong code for one request ends every admin session of
+      the admin and answers `429 otp_locked` (sign in again). A good code marks this sign-in as
+      stepped up until `validUntil` (10 minutes); the access token and the refresh cookie stay as
+      they are.
+    x-problems: [otp_locked, otp_expired, code_invalid]
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: ../schemas/auth.yaml#/TotpVerifyRequest
+            $ref: ../schemas/auth.yaml#/StepUpVerifyRequest
           example:
-            code: "123456"
-            purpose: login
+            requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+            code: "000000"
     responses:
       "200":
-        description: Verified
+        description: Stepped up
         headers:
-          Set-Cookie:
-            description: "`purpose: login` only: the rotated admin refresh cookie, same attributes as at sign-in."
-            schema:
-              type: string
           Cache-Control:
             description: Always `no-store`.
             schema:
@@ -287,54 +278,8 @@
         content:
           application/json:
             schema:
-              $ref: ../schemas/auth.yaml#/AccessTokenResponse
+              $ref: ../schemas/auth.yaml#/StepUpVerifyResponse
             example:
-              accessToken: EXAMPLE.ACCESS.TOKEN
-              tokenType: Bearer
-              expiresAt: "2026-10-22T09:45:00Z"
-      default:
-        $ref: ../common/responses.yaml#/Problem
-/v1/auth/totp/recover:
-  post:
-    operationId: recoverTotp
-    tags: [auth]
-    summary: Use a recovery code instead of the authenticator
-    description: |
-      Admin app only, for an enrolled admin who lost the authenticator. Each code works once
-      (`admin_recovery_codes`, D-60); hyphens, spaces and case are ignored. Success counts as a
-      TOTP verification (amr `otp+totp`) and says how many codes are left; like `totp/verify` with
-      `purpose: login` it rotates the refresh cookie and the response sets the new one. Wrong
-      codes count toward the same limit as `totp/verify` (`422 code_invalid`, then
-      `429 otp_locked`).
-    x-problems: [otp_locked, code_invalid]
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: ../schemas/auth.yaml#/TotpRecoverRequest
-          example:
-            recoveryCode: M9S3-46Q3-D25V-T4F5
-    responses:
-      "200":
-        description: Verified with a recovery code
-        headers:
-          Set-Cookie:
-            description: The rotated admin refresh cookie, same attributes as at sign-in.
-            schema:
-              type: string
-          Cache-Control:
-            description: Always `no-store`.
-            schema:
-              type: string
-        content:
-          application/json:
-            schema:
-              $ref: ../schemas/auth.yaml#/TotpRecoverResponse
-            example:
-              accessToken: EXAMPLE.ACCESS.TOKEN
-              tokenType: Bearer
-              expiresAt: "2026-10-22T09:45:00Z"
-              recoveryCodesLeft: 9
+              validUntil: "2026-10-22T09:55:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem

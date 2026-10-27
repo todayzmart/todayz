@@ -1,6 +1,7 @@
 # Paths: domain "admin-settings" (owner W3-05): A-17 platform settings (04 §2.7, 01 §17).
 # Roles are in internal/platform/authz/policy/admin.go: `admin` and `super_admin` read and change
-# settings with a fresh step-up; money settings (unit paise, bp or credits) are super_admin only (D-64).
+# settings with a fresh step-up; money settings (unit paise, bp or credits, D-64) and the access group
+# (admin_signin_*, admin_step_up_*, D-264) are super_admin only.
 /v1/admin/settings:
   get:
     operationId: listAdminSettings
@@ -8,7 +9,8 @@
     summary: Every platform setting with its unit, range and group (A-17)
     description: >-
       Every `platform_settings` row in 01 §17 order of groups, then by key. `editable` says whether the
-      caller may change it (money settings are super_admin only). `providers` lists each provider key's
+      caller may change it; `superAdminOnly` marks the keys only super_admin changes (money settings and
+      the access group). `providers` lists each provider key's
       environment variable name with whether it is set, never the value or any part of it (D-19).
     responses:
       "200":
@@ -27,6 +29,7 @@
                   max: 1000
                   description: Credits and payouts. 01 §7
                   money: true
+                  superAdminOnly: true
                   editable: true
                   updatedBy: null
                   updatedByName: null
@@ -51,8 +54,9 @@
     tags: [admin-settings]
     summary: Change one setting, with a reason (audited, step-up)
     description: >-
-      Needs a TOTP step-up younger than 10 minutes (else `403 step_up_required`). A money setting (unit
-      `paise`, `bp` or `credits`) needs `super_admin` (else `403 forbidden`). The value must match the unit
+      Needs an SMS step-up younger than 10 minutes (D-264) (else `403 step_up_required`). A money setting (unit
+      `paise`, `bp` or `credits`) or a key of the access group (the admin sign-in and step-up limits,
+      D-264) needs `super_admin` (else `403 forbidden`). The value must match the unit
       (a whole number, `true`/`false`, or text) and lie within the setting's min and max, else
       `422 validation_failed` on `body.value`. Sending the current value changes nothing and writes no
       audit row. Every API and worker instance picks the new value up within moments.
@@ -83,6 +87,7 @@
                 max: 1000
                 description: Credits and payouts. 01 §7
                 money: true
+                superAdminOnly: true
                 editable: true
                 updatedBy: 01JB0ADM1A2B3C4D5E6F7G8H9J
                 updatedByName: Asha

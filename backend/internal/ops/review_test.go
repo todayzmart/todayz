@@ -198,7 +198,7 @@ func TestNilAuthorizerFailsClosed(t *testing.T) {
 	Register(r, NewFromConfig(&config.Config{Env: config.EnvLocal}, nil, clock.NewFake(t0)), nil)
 	for _, role := range []string{"super_admin", "admin", "support"} {
 		req := httptest.NewRequest(http.MethodGet, "/v1/admin/system", nil)
-		p := authn.Principal{UserID: ids.New(t0), SessionID: ids.New(t0), App: authn.AppAdmin, AMR: authn.AMROTPTOTP, Roles: []string{role}}
+		p := authn.Principal{UserID: ids.New(t0), SessionID: ids.New(t0), App: authn.AppAdmin, AMR: authn.AMROTP, Roles: []string{role}}
 		req = req.WithContext(authn.WithPrincipal(req.Context(), p))
 		rec := httptest.NewRecorder()
 		r.ServeHTTP(rec, req)

@@ -244,7 +244,7 @@
     "description": "A-21 Jobs: timerNote"
   },
   "jobs.moneyNote": {
-    "defaultMessage": "Money jobs can be run, paused or retried by a super admin only, after a fresh authenticator code.",
+    "defaultMessage": "Money jobs can be run, paused or retried by a super admin only, after a fresh SMS code.",
     "description": "A-21 Jobs: moneyNote"
   },
   "jobs.pick": {
@@ -416,7 +416,7 @@
     "description": "A-21 Jobs: error running"
   },
   "jobs.error.stepUp": {
-    "defaultMessage": "Enter a fresh authenticator code to do this.",
+    "defaultMessage": "Confirm with a fresh SMS code to do this.",
     "description": "A-21 Jobs: error stepUp"
   },
   "jobs.audit.kind": {

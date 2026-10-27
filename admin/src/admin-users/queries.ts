@@ -1,4 +1,5 @@
-import { inviteAdminUser, listAdminUsers, resetAdminUserTotp, updateAdminUser } from '@todayz/api-client/gen/admin-users/admin-users';
+import { inviteAdminUser, listAdminUsers, unlockAdminSignIn, updateAdminUser } from '@todayz/api-client/gen/admin-users/admin-users';
+import type { AdminSignInUnlock } from '@todayz/api-client/gen/model/adminSignInUnlock';
 import type { AdminUserChange } from '@todayz/api-client/gen/model/adminUserChange';
 import type { AdminUserInvite } from '@todayz/api-client/gen/model/adminUserInvite';
 import type { AdminUserStatus } from '@todayz/api-client/gen/model/adminUserStatus';
@@ -33,12 +34,22 @@ export function useInvite() {
   });
 }
 
-export type AccountMove = { kind: 'change'; body: AdminUserChange } | { kind: 'reset'; reason: string };
-
 export function useAccountMove(adminId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (m: AccountMove) => (m.kind === 'change' ? updateAdminUser(adminId, m.body) : resetAdminUserTotp(adminId, { reason: m.reason })),
+    mutationFn: (body: AdminUserChange) => updateAdminUser(adminId, body),
+    onSettled: () => refresh(qc, adminId),
+  });
+}
+
+/**
+ * Lift an admin's sign-in lock (D-264, †). Not idempotency-keyed: a second unlock of the same admin
+ * is `409 invalid_transition` (nothing is locked any more), so a retry changes nothing twice.
+ */
+export function useUnlockSignIn(adminId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: AdminSignInUnlock) => unlockAdminSignIn(adminId, body),
     onSettled: () => refresh(qc, adminId),
   });
 }

@@ -33,7 +33,7 @@ Related starting points: [root README](../../README.md), [AGENTS.md](../../AGENT
 
 | Feature | Customer app | Shop app (business) | Admin console | Site | Backend jobs |
 |---|---|---|---|---|---|
-| [Auth and accounts](auth-and-accounts.md) | Live | Live | Live (TOTP) | - | Live |
+| [Auth and accounts](auth-and-accounts.md) | Live | Live | Live (SMS step-up) | - | Live |
 | [Stores and onboarding](stores-and-onboarding.md) | Live (shop page) | Live | Live | - | Live |
 | [Catalogue and stock](catalogue-and-stock.md) | Live (view) | Live | Live | - | Live |
 | [Search and discovery](search-and-discovery.md) | Live (map is a card) | Live (reviews) | Live (moderation) | - | Live |

@@ -1,6 +1,6 @@
 package mw
 
-// Slot 11 · authn · owner W1-01 (02 §2.4, §3; 04 §1.3; D-14, D-100).
+// Slot 11 · authn · owner W1-01 (02 §2.4, §3; 04 §1.3; D-14, D-100, D-264).
 //
 // Contract for every later slot and handler:
 //
@@ -18,10 +18,9 @@ package mw
 //     that bearer; a 401 there would stop it from ever refreshing.
 //   - Namespaces, before chi and the validator: /v1/me, /v1/biz and /v1/admin
 //     refuse an anonymous caller with 401. /v1/biz needs a business-app token
-//     and /v1/admin an admin-app token with amr otp+totp (AU-11), else 403
-//     forbidden. An admin-app token without TOTP reaches /v1/auth/* and the
-//     telemetry intake (otpAdminPaths: /v1/rum, /v1/events) only, so the admin
-//     app's RUM and events from the TOTP screens are not refused.
+//     and /v1/admin an admin-app token, else 403 forbidden. An admin signs in
+//     with the SMS OTP alone (D-264); a † action's fresh SMS step-up is
+//     checked per action by authz, not here.
 //   - Per-action permission is slot 15 (authz), not here.
 
 import (
@@ -71,21 +70,13 @@ func Authn(a Authenticator) func(http.Handler) http.Handler {
 // cookieAuthPaths are the routes that never read a bearer token. Matched
 // exactly: slot 8 (pathguard) has refused any path two routers could read
 // differently, and a lookalike (a trailing slash) keeps the bearer check.
-// /v1/auth/* routes that need the bearer (/v1/auth/totp/*) are not here.
+// /v1/auth/* routes that need the bearer (/v1/auth/step-up/*) are not here.
 var cookieAuthPaths = map[string]bool{
 	"/v1/auth/otp/send":   true,
 	"/v1/auth/otp/verify": true,
 	"/v1/auth/refresh":    true,
 	"/v1/auth/logout":     true,
 	"/v1/auth/logout-all": true,
-}
-
-// otpAdminPaths are the routes outside /v1/auth an admin-app token without
-// TOTP may reach: the telemetry intake, which any caller, anonymous included,
-// may post to. Matched exactly, like cookieAuthPaths.
-var otpAdminPaths = map[string]bool{
-	"/v1/rum":    true,
-	"/v1/events": true,
 }
 
 // bearer extracts the token from exactly one "Bearer <token>" header.
@@ -117,13 +108,9 @@ func guardNamespace(path string, p authn.Principal) error {
 		return problem.New(genproblems.Unauthorized, "")
 	case !signedIn:
 		return nil
-	case p.App == authn.AppAdmin && p.AMR != authn.AMROTPTOTP && !under(path, "/v1/auth") && !otpAdminPaths[path]:
-		// An admin who has not passed TOTP may only finish signing in (AU-11)
-		// and report telemetry.
-		return problem.New(genproblems.Forbidden, "")
 	case under(path, "/v1/biz") && p.App != authn.AppBusiness:
 		return problem.New(genproblems.Forbidden, "")
-	case under(path, "/v1/admin") && (p.App != authn.AppAdmin || p.AMR != authn.AMROTPTOTP):
+	case under(path, "/v1/admin") && p.App != authn.AppAdmin:
 		return problem.New(genproblems.Forbidden, "")
 	}
 	return nil

@@ -183,7 +183,7 @@ Estimated from the ap-south-1 list prices at 730 hours a month, in USD, before G
 | Application Load Balancer | hours and LCUs | 24 |
 | NAT gateway (one) | hours and about 50 GB processed, plus ECR and Secrets Manager traffic (no interface endpoints, D-263) | 47 |
 | Public IPv4 (NAT EIP, 2 ALB addresses) | $0.005/h each | 11 |
-| Secrets Manager | 23 secrets (22 app plus the RDS master) | 9 |
+| Secrets Manager | 22 secrets (21 app plus the RDS master; `TOTP_ENC_KEY` went with D-264) | 9 |
 | CloudWatch | Beanstalk, flow, RDS and ops logs about 20 GB; 11 alarms; one custom metric | 18 |
 | DR: AWS Backup weekly snapshot copy to ap-southeast-1 | storage and cross-region transfer | 6 |
 | ECR, S3 (ALB logs, app versions, state), ECS ops tasks, data out | | 5 |
@@ -203,3 +203,39 @@ The brief expected $220–250. The interface endpoints ($48) were dropped on the
 - **Worker tier.** Beanstalk's Worker tier makes an SQS queue and `sqsd` that the River worker does not use. The environment's health is the container's, not `/readyz` on 8181 (09 §3.2). W5-04 decides whether to move it to a load-balancer-less WebServer environment.
 - **Cloudflare-only ALB (go-live C5).** The ALB security group takes only Cloudflare ranges (`modules/edge`), but the app still trusts `CF-Connecting-IP` from any peer.
 - **Not in this branch** (W5-03): CSP report endpoint (C4), the certificate and uptime alerts, and the cloud restore drill (C6).
+
+## 8. Break glass: unlock an admin's sign-in (D-264)
+
+Use this only when every super admin is locked out of admin sign-in (10 wrong codes in 24 h lock a number for 24 h) and nobody is left to press "Unlock sign-in" on A-18. Otherwise another super admin unlocks on A-18.
+
+`todayz admin unlock-sign-in` lifts that number's admin sign-in lock and clears its failure count. It writes audit `admin_user.unlock_sign_in` with the system actor, the reason and `via: break_glass`, and prints only the admin's user id. It runs as `todayz_app` on the migrate ops task: that task already holds `DATABASE_URL` and the app keys, and its latest revision is the last migrated release. That release must include D-264.
+
+The image has no shell, and a Fargate task has no stdin, so the number goes in as a container override environment value (`--phone-env`), never as a command argument:
+
+```bash
+# §1 shell setup first.
+CFG="$(aws ssm get-parameter --name /todayz/prod/ops/run-task --query Parameter.Value --output text)"
+CLUSTER="$(jq -r .cluster <<<"$CFG")"
+NET="$(jq -c '{awsvpcConfiguration: {subnets: .subnets, securityGroups: .securityGroups, assignPublicIp: "DISABLED"}}' <<<"$CFG")"
+read -rs -p 'Admin number (+91 and 10 digits): ' PHONE; echo   # typed, not echoed, not in the history
+REASON='every super admin locked out; <who asked, ticket>'      # 1-500 characters, no phone number
+umask 077
+PHONE="$PHONE" jq -n --arg reason "$REASON" '{containerOverrides: [{name: "migrate",
+  command: ["admin", "unlock-sign-in", "--phone-env", "BREAK_GLASS_PHONE", "--reason", $reason],
+  environment: [{name: "BREAK_GLASS_PHONE", value: $ENV.PHONE}]}]}' > .cache/deploy/unlock.json
+unset PHONE
+TASK="$(aws ecs run-task --cluster "$CLUSTER" --launch-type FARGATE --task-definition "$(jq -r .migrate <<<"$CFG")" \
+  --network-configuration "$NET" --overrides file://.cache/deploy/unlock.json --started-by break-glass \
+  --query 'tasks[0].taskArn' --output text)"
+rm -f .cache/deploy/unlock.json
+aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$TASK"
+aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK" --query 'tasks[0].containers[0].exitCode' --output text
+aws logs get-log-events --log-group-name "$(jq -r .logGroup <<<"$CFG")" --log-stream-name "ops/migrate/${TASK##*/}" \
+  --start-from-head --query 'events[].message' --output text | tr '\t' '\n'
+```
+
+- **Exit 0:** done. The log line names `user_id` and `lock_lifted` (false when there was no live lock; the count is still cleared). The admin can sign in at once.
+- **Exit 1:** the number belongs to no admin account; nothing changed. A disabled admin is unlocked too, but sign-in still refuses them until they are enabled again.
+- **Exit 2:** a bad number (it must be +91 and 10 digits) or a bad reason; nothing changed.
+- **Where the number is kept.** It is not in the shell history, the process list, the task's command or any log line. AWS does keep the RunTask request, overrides included, in CloudTrail (90 days of event history) and on the stopped task for about an hour. Only account administrators can read either. If that is not acceptable, the alternative is a Terraform change: give the ops execution role read access to a short-lived S3 environment file, or turn on ECS Exec. That is the lead's call.
+- Locally, or anywhere with a shell: `todayz admin unlock-sign-in --phone-file FILE --reason TEXT`, or `--phone-file -` to read stdin.

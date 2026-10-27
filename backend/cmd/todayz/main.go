@@ -4,6 +4,7 @@
 //	todayz worker                   River worker; health on WORKER_ADDR
 //	todayz migrate up|down|status   schema migrations, as todayz_owner (DATABASE_MIGRATE_URL)
 //	todayz seed dev|demo|test       seed data, as todayz_app (DATABASE_URL); refused in staging and prod
+//	todayz admin unlock-sign-in     break-glass admin sign-in unlock (D-264), as todayz_app
 //	todayz version                  build info as JSON
 //
 // Configuration is environment only (internal/platform/config). Logs are
@@ -34,6 +35,10 @@ commands:
   ai eval <feature|all> [--live]  run AI evals on recorded replies; --live calls the model (own key, make ai-eval)
   images import [--dry-run] [--limit N] [--source off|obf|opf] [--report FILE]
                             draft product images from Open Food/Beauty/Products Facts (D-252)
+  admin unlock-sign-in --phone-file FILE|- --reason TEXT
+  admin unlock-sign-in --phone-env NAME --reason TEXT
+                            lift an admin's sign-in lock when no super admin can (D-264);
+                            the number is read from FILE, stdin or the variable NAME, never printed
   version                   print build info
 `
 
@@ -90,6 +95,8 @@ func run(ctx context.Context, args []string, getenv config.Getenv, stdout, stder
 		err = runAI(ctx, rest, getenv, stdout)
 	case "images":
 		err = runImages(ctx, rest, getenv, stdout)
+	case "admin":
+		err = runAdmin(ctx, rest, getenv, os.Stdin, stdout)
 	case "help", "-h", "--help":
 		_, _ = fmt.Fprint(stdout, usage)
 		return 0

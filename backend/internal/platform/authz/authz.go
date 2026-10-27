@@ -106,7 +106,7 @@ const (
 	// KindBusiness: a staff member of the scope's business, by role (Grants
 	// over BusinessRoles), with the store in their store_ids.
 	KindBusiness
-	// KindAdmin: an admin with TOTP, by role (Grants over AdminRoles).
+	// KindAdmin: an admin-app sign-in, by role (Grants over AdminRoles).
 	KindAdmin
 )
 
@@ -129,8 +129,9 @@ type Action struct {
 	// KindAdmin (keys from AdminRoles). A missing role is Deny. Empty for the
 	// other kinds.
 	Grants map[Role]Grant
-	// StepUp marks a † action: the admin's TOTP must be younger than
-	// authn.StepUpWindow, else 403 step_up_required. KindAdmin only.
+	// StepUp marks a † action: the sign-in's last SMS step-up (D-264) must be
+	// younger than authn.StepUpWindow, else 403 step_up_required. KindAdmin
+	// only.
 	StepUp bool
 	// Doc is the "Used by" column.
 	Doc string

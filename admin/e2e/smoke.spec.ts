@@ -22,8 +22,6 @@ test.beforeEach(async ({ page }, info) => {
   if (!info.title.startsWith('signed out')) {
     await page.addInitScript(() => localStorage.setItem('todayz.hasSession.admin', '1'));
   }
-  // Routing hint only (the API checks the token): this tab already passed the authenticator step.
-  await page.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
 });
 
 test.afterEach(() => {
@@ -84,11 +82,10 @@ test('signed out: any page opens the sign-in screen (A-01)', async ({ page }) =>
   await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0);
 });
 
-test('signed in without the authenticator step: held at the two-step check', async ({ page }) => {
-  await page.addInitScript(() => sessionStorage.removeItem('todayz.admin.2fa'));
-  await answer(page, '/v1/auth/totp/enrol', 409, problem(409, 'conflict'));
+test('signed in: the SMS sign-in alone opens the shell, with no two-step page (D-264)', async ({ page }) => {
   await page.goto('/stores');
-  await expect(page).toHaveURL(/\/two-step\?next=%2Fstores$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Two-step check' })).toBeVisible();
-  await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0);
+  await expect(page).toHaveURL(/\/stores$/);
+  await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+  await page.goto('/two-step');
+  await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
 });

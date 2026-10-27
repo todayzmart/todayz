@@ -227,7 +227,7 @@ func newAPI(t *testing.T, worker bool) *apiHarness {
 }
 
 // callerAuthenticator is slot 11's seam in tests: the bearer token is a
-// caller name, signed in as an admin-app session that has passed TOTP
+// caller name, signed in as an admin-app session (phone OTP, D-264)
 // (W1-01's namespace rule for /v1/admin, AU-11). Role and step-up checks
 // stay with the fake gate.
 type callerAuthenticator struct{ a *apiHarness }
@@ -237,7 +237,7 @@ func (s callerAuthenticator) Authenticate(_ context.Context, tok string) (authn.
 	if !ok {
 		return authn.Principal{}, problem.New(genproblems.Unauthorized, "")
 	}
-	return authn.Principal{UserID: c.admin.ID, App: authn.AppAdmin, SessionID: c.admin.ID, AMR: authn.AMROTPTOTP}, nil
+	return authn.Principal{UserID: c.admin.ID, App: authn.AppAdmin, SessionID: c.admin.ID, AMR: authn.AMROTP}, nil
 }
 
 // resp is one answer.

@@ -2,7 +2,7 @@
 
 The main journeys through TodayZ, step by step, with the endpoints and packages each step touches.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 How to read this page: each flow has a diagram and a short walk-through. Endpoints are written as in the OpenAPI files under [backend/api/paths](../../backend/api/paths). Packages are under `backend/internal`. Timer lengths, fees and limits are never written here: each is a `platform_settings` key listed in [01-product-rules.md](../plan/01-product-rules.md). For the bigger picture see [architecture.md](architecture.md).
 
@@ -50,6 +50,8 @@ sequenceDiagram
 - **Refresh grace (D-239).** If the same old token arrives again within `RotationGrace` (a code constant in `session.go`), the caller is not logged out. The server derives the same successor token again from `sessions.successor_salt` with an HMAC, so a lost response or a second tab racing the first gets a working token. The salt is never sent to a client. A token older than the window is reuse.
 - `/v1/auth/logout` ends one session. `/v1/auth/logout-all` ends every session of the user.
 - The browser side is `@todayz/auth` (`shared/auth`): `session.ts` holds the token in memory, retries once after a 401, and `phone-otp.tsx` is the sign-in form.
+- **Admins (D-264)** sign in the same way, with no second step. A † admin action answers `403 step_up_required` unless the sign-in passed an SMS step-up in the last 10 minutes. The admin app's `StepUpDialog` then calls `POST /v1/auth/step-up/send` (bearer only, never the refresh cookie, no body; the code goes to the admin's own number, with a resend gap between step-up codes and an hourly bucket of its own, apart from the sign-in limits) and `POST /v1/auth/step-up/verify` with `{requestId, code}`. A right code stamps `sessions.step_up_at` on the live row (refresh copies it), and the dialog retries the action with the same token. The fifth wrong code ends every admin session of the person (`429 otp_locked`). Code: `backend/internal/identity/stepup.go`, `backend/internal/platform/authz` (engine and `AdminGate`).
+- **Admin sign-in lock (D-264).** Wrong admin-app sign-in codes are counted per number across requests (`admin_signin_failures`); too many inside the window lock that number's admin sign-in (`admin_signin_locks`), and both `otp/send` and `otp/verify` answer `429 signin_locked` until the lock ends or another super admin calls `POST /v1/admin/users/{adminId}/unlock-sign-in` from A-18 (step-up, audited). A right code clears the count. The numbers are the `admin_signin_*` settings. Code: `backend/internal/identity/signin_limits.go`, `backend/internal/admin/users.go`.
 
 ## 2. Search nearby and book for pickup
 
@@ -318,7 +320,7 @@ sequenceDiagram
   O->>B: create business, add store, upload documents and KYC
   B->>DB: business status pending
   A->>B: GET /v1/admin/businesses
-  A->>B: POST .../kyc/reveal (step-up, audited)
+  A->>B: POST .../kyc/reveal (audited)
   A->>B: POST .../documents/{docId}/review
   A->>B: POST .../businesses/{businessId}/verify
   B->>DB: status verified, audit row
@@ -327,7 +329,7 @@ sequenceDiagram
 ```
 
 - The owner onboards in the business app (`business/src/onboarding`), served by `backend/internal/business`. Field agents can onboard shops for an owner (D-39, `backend/internal/business/agent*.go`, and the `field_*` tables).
-- An admin reviews at `/v1/admin/businesses/{businessId}`: `request-info`, `reject`, `verify`, `suspend` and `reinstate`. Reading sensitive KYC values needs `kyc/reveal`, which needs TOTP step-up and writes an audit row (`backend/internal/platform/audit`).
+- An admin reviews at `/v1/admin/businesses/{businessId}`: `request-info`, `reject`, `verify`, `suspend` and `reinstate`. Reading sensitive KYC values needs `kyc/reveal` (`admin.kyc.reveal`, no step-up), which writes an audit row (`backend/internal/platform/audit`).
 - A store appears in search only when the store is `live` and its business is `verified` (D-40). `/v1/admin/stores/{storeId}` has `review`, `force-close`, `reopen` and `strikes/reset`.
 - Every admin write is audited; the actor, reason and before and after are in `audit_log`.
 

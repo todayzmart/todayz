@@ -65,7 +65,7 @@ export type JobMove = { kind: 'run'; reason: string; periodKey?: string } | { ki
 /**
  * Run now, pause and resume (each audited on the kind, `job_kind`). One Idempotency-Key per
  * change, so a network retry cannot queue a second run. A `money` kind answers
- * `403 step_up_required` until the super_admin has a fresh second factor.
+ * `403 step_up_required` until the super_admin has passed a fresh SMS step-up (D-264).
  */
 export function useJobMove(job: string) {
   const qc = useQueryClient();

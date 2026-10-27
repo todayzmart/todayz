@@ -68,8 +68,9 @@ func TestAdminNotificationsHTTP(t *testing.T) {
 	// Integrations: names and set/missing only, the switch, the last failure.
 	at := a.clk.Now()
 	nid := uuidOf(t, ids.New(at).String())
-	var cust string
-	o.login(&cust, adminPhone, "customer")
+	// The admin's own customer sign-in (newAdminDesk): one SMS fewer than a
+	// new sign-in, which the shared per-IP limit has no room for (D-264).
+	cust := desk.cust
 	me := a.call(cust, http.MethodGet, "/v1/me", nil, nil)
 	require.Equal(t, http.StatusOK, me.code, me.raw)
 	a.exec(`INSERT INTO notifications (id, app, user_id, kind, created_at) VALUES ($1, 'customer', $2, 'order_update', $3)`, nid, uuidOf(t, me.body["id"].(string)), at)

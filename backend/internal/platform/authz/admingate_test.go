@@ -34,11 +34,11 @@ func TestAdminGate(t *testing.T) {
 			require.Equal(t, genproblems.Forbidden, code(t, err), app)
 		}
 	})
-	t.Run("an admin without totp is 403", func(t *testing.T) {
+	t.Run("an SMS-only admin sign-in passes without step-up (D-264)", func(t *testing.T) {
 		p := fresh
-		p.AMR = authn.AMROTP
+		p.StepUpAt = time.Time{}
 		_, err := g.Require(as(p), []Role{Support}, false)
-		require.Equal(t, genproblems.Forbidden, code(t, err))
+		require.NoError(t, err)
 	})
 	t.Run("role", func(t *testing.T) {
 		got, err := g.Require(as(fresh), []Role{Finance, Support}, false)
@@ -87,7 +87,7 @@ func TestAdminGate(t *testing.T) {
 		_, err = g.Require(as(p), []Role{Support}, true)
 		require.Equal(t, genproblems.StepUpRequired, code(t, err))
 		_, err = g.Require(as(p), []Role{Support}, false)
-		require.NoError(t, err, "no step-up asked: stale TOTP is fine")
+		require.NoError(t, err, "no step-up asked: a stale step-up is fine")
 		clk.Set(t0)
 	})
 	t.Run("role is checked before step-up", func(t *testing.T) {

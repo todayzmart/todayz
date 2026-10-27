@@ -279,9 +279,13 @@
     "defaultMessage": "Admin enabled",
     "description": "Audit action: an admin re-enabled another admin"
   },
+  "audit.action.adminUserUnlockSignIn": {
+    "defaultMessage": "Admin sign-in unlocked",
+    "description": "Audit action: a super admin lifted another admin's sign-in lock after too many wrong codes (D-264)"
+  },
   "audit.action.adminUserTotpReset": {
     "defaultMessage": "Authenticator reset",
-    "description": "Audit action: an admin cleared another admin's authenticator"
+    "description": "Audit action, kept for entries written before D-264 removed the admin authenticator: an admin cleared another admin's authenticator"
   },
   "audit.action.notificationTestSend": {
     "defaultMessage": "Test notification sent",

@@ -353,8 +353,8 @@ describe('credentials on every auth call (review 1)', () => {
       '/v1/auth/refresh',
       '/v1/auth/logout',
       '/v1/auth/logout-all',
-      '/v1/auth/totp/verify',
-      '/v1/auth/totp/recover',
+      '/v1/auth/step-up/send',
+      '/v1/auth/step-up/verify',
     ];
     for (const path of routes) await request(path, { method: 'POST', body: '{}' }).catch(() => undefined);
     await request('/v1/me');
@@ -362,8 +362,8 @@ describe('credentials on every auth call (review 1)', () => {
       const c = server.calls.find((x) => x.path === path);
       expect(c, path).toBeDefined();
       expect(c?.credentials, path).toBe('include');
-      // The TOTP routes are bearer-authenticated (the SMS step has already signed the person in).
-      if (!path.includes('/totp/')) expect(c?.auth, path).toBeNull();
+      // The admin step-up routes are bearer-authenticated (the person is already signed in, D-264).
+      if (!path.includes('/step-up/')) expect(c?.auth, path).toBeNull();
     }
     expect(server.calls.find((x) => x.path === '/v1/me')?.credentials).toBeUndefined();
   });

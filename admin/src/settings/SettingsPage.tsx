@@ -19,7 +19,8 @@ import styles from './settings.module.css';
 
 /**
  * A-17 Platform settings: every 01 §17 value by group with its unit, range and last change; a
- * change needs a reason and a fresh authenticator code, and money settings are super admin only.
+ * change needs a reason and a fresh SMS code (D-264), and money settings and the access group
+ * (the admin sign-in limits) are super admin only.
  * Provider keys show set or missing, never a value (D-19).
  */
 export function SettingsPage({ search }: { search: SettingsSearch }) {
@@ -97,7 +98,7 @@ export function SettingsPage({ search }: { search: SettingsSearch }) {
               {intl.formatMessage({ id: 'settings.change' })}
             </Button>
           ) : (
-            <span className={css.muted}>{intl.formatMessage({ id: row.original.money ? 'settings.superOnly' : 'settings.readOnly' })}</span>
+            <span className={css.muted}>{intl.formatMessage({ id: row.original.superAdminOnly ? 'settings.superOnly' : 'settings.readOnly' })}</span>
           ),
       },
     ],

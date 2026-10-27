@@ -3,7 +3,7 @@ package policy
 import "github.com/todayz/backend/internal/platform/authz"
 
 // Admin console actions (W3-05, 02 §3.3 admin table, D-64). Every action here is
-// KindAdmin: the slot-11 admin session (otp+totp) and its live roles. The admin
+// KindAdmin: the slot-11 admin session (SMS OTP, D-264) and its live roles. The admin
 // order cancel is orders' (policy/orders.go), review moderation is reviews'
 // (policy/reviews.go) and the jobs console is W1-11's adminapi gate.
 const (
@@ -98,11 +98,11 @@ func init() {
 		{Name: AdminNotifyManage, Kind: authz.KindAdmin, Grants: admins, Doc: "POST /v1/admin/notification-templates/test-send: to the caller's own in-app inbox only, never SMS; audited. No PATCH: texts stay code-owned (D-224)"},
 
 		{Name: AdminSettingsView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/settings, .../{key}/history (A-17)"},
-		{Name: AdminSettingsEdit, Kind: authz.KindAdmin, Grants: admins, StepUp: true, Doc: "PATCH /v1/admin/settings/{key}: keys that are not money settings; audited"},
-		{Name: AdminSettingsEditMoney, Kind: authz.KindAdmin, Grants: grant(authz.SuperAdmin), StepUp: true, Doc: "PATCH /v1/admin/settings/{key} on a key with unit paise, bp or credits (D-38, D-64)"},
+		{Name: AdminSettingsEdit, Kind: authz.KindAdmin, Grants: admins, StepUp: true, Doc: "PATCH /v1/admin/settings/{key}: keys that are neither money settings nor in the access group; audited"},
+		{Name: AdminSettingsEditMoney, Kind: authz.KindAdmin, Grants: grant(authz.SuperAdmin), StepUp: true, Doc: "PATCH /v1/admin/settings/{key} on a key with unit paise, bp or credits (D-38, D-64), or in the access group (admin_signin_*, admin_step_up_*; D-264)"},
 
 		{Name: AdminUsersView, Kind: authz.KindAdmin, Grants: grant(authz.SuperAdmin), Doc: "GET /v1/admin/users (A-18)"},
-		{Name: AdminUsersManage, Kind: authz.KindAdmin, Grants: grant(authz.SuperAdmin), StepUp: true, Doc: "POST /v1/admin/users, PATCH .../{adminId}, POST .../reset-totp (A-18): step-up, audited"},
+		{Name: AdminUsersManage, Kind: authz.KindAdmin, Grants: grant(authz.SuperAdmin), StepUp: true, Doc: "POST /v1/admin/users, PATCH .../{adminId}, POST .../{adminId}/unlock-sign-in (A-18): step-up, audited"},
 
 		{Name: AdminAuditView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/audit-log (A-19)"},
 		{Name: AdminAuditSubject, Kind: authz.KindAdmin, Grants: panel, Doc: "GET /v1/admin/audit-log/subject: one subject's history for a screen's audit panel, only when the caller may view that subject"},

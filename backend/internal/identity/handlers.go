@@ -34,10 +34,10 @@ const maxPatchBody = 1 << 20
 
 // authOps and meOps map every operation of the two strict servers to its
 // action (slot 15). OTP send and verify are public; refresh, logout and
-// logout-all authenticate by their cookie inside the handler. The TOTP routes
-// are not in the policy tables either: they are how an admin gets the
-// otp+totp session that every admin action needs, so the handler checks the
-// caller (an admin-app bearer, any amr) itself.
+// logout-all authenticate by their cookie inside the handler. The admin
+// step-up routes (D-264) are not in the policy tables either: every admin,
+// whatever the role, steps up for their own sign-in, so the handler checks
+// the caller (an admin-app bearer) itself.
 var (
 	authOps = map[string]string{
 		"SendOtp":        authz.Public,
@@ -45,9 +45,8 @@ var (
 		"RefreshSession": authz.Public,
 		"Logout":         authz.Public,
 		"LogoutAll":      authz.Public,
-		"EnrolTotp":      authz.Public,
-		"VerifyTotp":     authz.Public,
-		"RecoverTotp":    authz.Public,
+		"SendStepUp":     authz.Public,
+		"VerifyStepUp":   authz.Public,
 	}
 	meOps = map[string]string{
 		"GetMe":    policy.MeView,
@@ -228,9 +227,6 @@ func (h authHandlers) VerifyOtp(ctx context.Context, req authapi.VerifyOtpReques
 		AccessToken: in.AccessToken, ExpiresAt: in.ExpiresAt.UTC(), IsNewUser: in.IsNewUser,
 		TokenType: authapi.OtpVerifyResponseTokenTypeBearer, UserId: in.UserID.String(),
 	}
-	if in.NextStep != "" {
-		body.NextStep = ptr(authapi.OtpVerifyResponseNextStep(in.NextStep))
-	}
 	return authapi.VerifyOtp200JSONResponse{
 		Body: body,
 		Headers: authapi.VerifyOtp200ResponseHeaders{
@@ -342,8 +338,8 @@ func (h authHandlers) LogoutAll(ctx context.Context, req authapi.LogoutAllReques
 	return authapi.LogoutAll204Response{Headers: authapi.LogoutAll204ResponseHeaders{SetCookie: ptr(clearCookie(app))}}, nil
 }
 
-// adminCaller is the principal of a TOTP route: an admin-app bearer token
-// with any amr (slot 11 already refused a bad one).
+// adminCaller is the principal of a step-up route: an admin-app bearer token
+// of a live sign-in (slot 11 already refused a bad one).
 func adminCaller(ctx context.Context) (authn.Principal, error) {
 	p, err := principal(ctx)
 	if err != nil {
@@ -355,22 +351,22 @@ func adminCaller(ctx context.Context) (authn.Principal, error) {
 	return p, nil
 }
 
-func (h authHandlers) EnrolTotp(ctx context.Context, _ authapi.EnrolTotpRequestObject) (authapi.EnrolTotpResponseObject, error) {
+func (h authHandlers) SendStepUp(ctx context.Context, _ authapi.SendStepUpRequestObject) (authapi.SendStepUpResponseObject, error) {
 	p, err := adminCaller(ctx)
 	if err != nil {
 		return nil, err
 	}
-	e, err := h.s.EnrolTOTP(ctx, p)
+	res, err := h.s.SendStepUp(ctx, p)
 	if err != nil {
 		return nil, err
 	}
-	return authapi.EnrolTotp200JSONResponse{
-		Body:    authapi.TotpEnrolResponse{Secret: e.Secret, OtpauthUri: e.URI, RecoveryCodes: e.RecoveryCodes},
-		Headers: authapi.EnrolTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+	return authapi.SendStepUp200JSONResponse{
+		Body:    authapi.OtpSendResponse{RequestId: res.RequestID.String(), ResendAfter: int((res.ResendAfter + time.Second - 1) / time.Second)},
+		Headers: authapi.SendStepUp200ResponseHeaders{CacheControl: ptr(noStore)},
 	}, nil
 }
 
-func (h authHandlers) VerifyTotp(ctx context.Context, req authapi.VerifyTotpRequestObject) (authapi.VerifyTotpResponseObject, error) {
+func (h authHandlers) VerifyStepUp(ctx context.Context, req authapi.VerifyStepUpRequestObject) (authapi.VerifyStepUpResponseObject, error) {
 	if req.Body == nil {
 		return nil, problem.New(genproblems.BadRequest, "")
 	}
@@ -378,43 +374,13 @@ func (h authHandlers) VerifyTotp(ctx context.Context, req authapi.VerifyTotpRequ
 	if err != nil {
 		return nil, err
 	}
-	res, err := h.s.VerifyTOTP(ctx, p, req.Body.Code, string(req.Body.Purpose))
+	until, err := h.s.VerifyStepUp(ctx, p, req.Body.RequestId, req.Body.Code)
 	if err != nil {
 		return nil, err
 	}
-	hdr := authapi.VerifyTotp200ResponseHeaders{CacheControl: ptr(noStore)}
-	if res.RefreshToken != "" { // purpose login rotated the sign-in
-		hdr.SetCookie = ptr(refreshCookie(authn.AppAdmin, res.RefreshToken, res.RefreshExpiresAt, h.s.clock.Now()))
-	}
-	return authapi.VerifyTotp200JSONResponse{
-		Body: authapi.AccessTokenResponse{
-			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(), TokenType: authapi.AccessTokenResponseTokenTypeBearer,
-		},
-		Headers: hdr,
-	}, nil
-}
-
-func (h authHandlers) RecoverTotp(ctx context.Context, req authapi.RecoverTotpRequestObject) (authapi.RecoverTotpResponseObject, error) {
-	if req.Body == nil {
-		return nil, problem.New(genproblems.BadRequest, "")
-	}
-	p, err := adminCaller(ctx)
-	if err != nil {
-		return nil, err
-	}
-	res, err := h.s.RecoverTOTP(ctx, p, req.Body.RecoveryCode)
-	if err != nil {
-		return nil, err
-	}
-	return authapi.RecoverTotp200JSONResponse{
-		Body: authapi.TotpRecoverResponse{
-			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(),
-			TokenType: authapi.TotpRecoverResponseTokenTypeBearer, RecoveryCodesLeft: res.RecoveryCodesLeft,
-		},
-		Headers: authapi.RecoverTotp200ResponseHeaders{
-			CacheControl: ptr(noStore),
-			SetCookie:    ptr(refreshCookie(authn.AppAdmin, res.RefreshToken, res.RefreshExpiresAt, h.s.clock.Now())),
-		},
+	return authapi.VerifyStepUp200JSONResponse{
+		Body:    authapi.StepUpVerifyResponse{ValidUntil: until.UTC()},
+		Headers: authapi.VerifyStepUp200ResponseHeaders{CacheControl: ptr(noStore)},
 	}, nil
 }
 

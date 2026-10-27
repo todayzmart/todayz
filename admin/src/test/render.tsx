@@ -4,7 +4,6 @@ import { asMessages, type Messages } from '@todayz/i18n';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { render } from '@testing-library/react';
 import { App } from '../app/App';
-import { createSecondFactor, type SecondFactor } from '../app/second-factor';
 import { makeQueryClient, makeRouter } from '../app/router';
 
 export interface Call {
@@ -33,8 +32,6 @@ export interface RenderOptions {
   messages?: Messages;
   /** Start signed in (default) or signed out (the refresh answers 401). */
   signedIn?: boolean;
-  /** Start with the authenticator step passed (default when signed in) or not. */
-  secondFactor?: boolean;
   /** Answers per request; the first handler that returns a Response wins. */
   handlers?: Handler[];
   /** Admin roles `GET /v1/me` answers with when no handler does (default super_admin). */
@@ -91,14 +88,12 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
     session.signIn({ accessToken: 'test-token', expiresAt: new Date(Date.now() + 3_600_000).toISOString(), userId: 'u1' });
   }
   sessionStorage.clear();
-  if (opts.signedIn !== false && opts.secondFactor !== false) sessionStorage.setItem('todayz.admin.2fa', 'test');
-  const factor: SecondFactor = createSecondFactor();
   const update: UpdateController = createUpdateController();
   const queryClient = makeQueryClient();
   const history = createMemoryHistory({ initialEntries: [path] });
   const router = makeRouter(queryClient, history);
   const view = render(
-    <App messages={opts.messages ?? asMessages(en)} router={router} queryClient={queryClient} session={session} update={update} factor={factor} />,
+    <App messages={opts.messages ?? asMessages(en)} router={router} queryClient={queryClient} session={session} update={update} />,
   );
-  return { ...view, history, router, session, update, factor, calls };
+  return { ...view, history, router, session, update, calls };
 }

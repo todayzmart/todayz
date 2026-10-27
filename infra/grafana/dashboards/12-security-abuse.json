@@ -455,7 +455,7 @@
     {
       "type": "table",
       "title": "Admin sign-ins and step-ups",
-      "description": "Admin sessions started per hour.",
+      "description": "Admin session rows started per hour (sign-ins and refreshes); with_sms_step_up has passed the SMS step-up (D-264).",
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "todayz-postgres"
@@ -470,7 +470,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT $__timeGroupAlias(created_at, '1h'), count(*) AS sign_ins, count(*) FILTER (WHERE totp_verified_at IS NOT NULL) AS with_totp\nFROM sessions WHERE app = 'admin' AND $__timeFilter(created_at) GROUP BY 1 ORDER BY 1 DESC"
+          "rawSql": "SELECT $__timeGroupAlias(created_at, '1h'), count(*) AS sign_ins, count(*) FILTER (WHERE step_up_at IS NOT NULL) AS with_sms_step_up\nFROM sessions WHERE app = 'admin' AND $__timeFilter(created_at) GROUP BY 1 ORDER BY 1 DESC"
         }
       ],
       "fieldConfig": {

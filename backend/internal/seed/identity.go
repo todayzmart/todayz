@@ -13,7 +13,6 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -145,25 +144,20 @@ func seedUser(ctx context.Context, d Deps, seal *pii.Sealer, hash *pii.Hasher, u
 // The admins live in a YAML file whose path is SEED_ADMINS_FILE; the backend
 // never looks under e2e/ by itself (infra/local/local.env points the variable
 // at e2e/fixtures/admins.yaml, relative to the repo root where make runs).
-// Each admin is a user with a reserved test phone, an admin_users row with
-// its roles and, unless totp_secret is empty, a TOTP secret sealed under
-// TOTP_ENC_KEY with totp_enabled_at set (pre-enrolled). An admin with an
-// empty totp_secret is unenrolled (A-01 first-login enrolment). No recovery
-// codes are seeded: enrolment through the API makes them.
+// Each admin is a user with a reserved test phone and an admin_users row with
+// its roles. An admin signs in with the SMS OTP alone and passes an SMS
+// step-up for † actions (D-264): there is no authenticator to seed.
 //
 // With SEED_ADMINS_FILE unset no admins are seeded and the variable's name is
 // logged. With it set, the seed refuses unless APP_ENV is local or test (the
-// secrets are deterministic test values). Nothing here logs a phone or a
-// secret, and an error names the admin by its key only.
+// admins are test people on reserved numbers). Nothing here logs a phone, and
+// an error names the admin by its key only.
 
 // seedAdminsFileEnv is the variable holding the fixture path.
 const seedAdminsFileEnv = "SEED_ADMINS_FILE"
 
 // maxSeedAdminsFile caps the read; the fixture is about a kilobyte.
 const maxSeedAdminsFile = 64 << 10
-
-// minSeedTOTPSecret is the shortest seeded secret (RFC 4226 §4: at least 128 bits).
-const minSeedTOTPSecret = 16
 
 // getenv reads the environment; tests replace it.
 var getenv = os.Getenv
@@ -173,13 +167,12 @@ type seedAdminFile struct {
 }
 
 type seedAdmin struct {
-	Key        string   `yaml:"key"`
-	ID         string   `yaml:"id"` // fixed ULID ending in N0xx (phoneIdentityID)
-	Phone      string   `yaml:"phone"`
-	Name       string   `yaml:"name"`
-	Lang       string   `yaml:"lang"`
-	Roles      []string `yaml:"roles"`
-	TOTPSecret string   `yaml:"totp_secret"` // base32; empty: not enrolled
+	Key   string   `yaml:"key"`
+	ID    string   `yaml:"id"` // fixed ULID ending in N0xx (phoneIdentityID)
+	Phone string   `yaml:"phone"`
+	Name  string   `yaml:"name"`
+	Lang  string   `yaml:"lang"`
+	Roles []string `yaml:"roles"`
 }
 
 // seedAdmins seeds the admins of SEED_ADMINS_FILE (see above).
@@ -192,50 +185,28 @@ func seedAdmins(ctx context.Context, d Deps, seal *pii.Sealer, hash *pii.Hasher,
 	if env := config.Env(getenv("APP_ENV")); env != config.EnvLocal && env != config.EnvTest {
 		return fmt.Errorf("admins: refused: APP_ENV is %q; %s is seeded only in local and test", env, seedAdminsFileEnv)
 	}
-	if !d.Keys.TOTPEncKey.IsSet() {
-		d.Log.WarnContext(ctx, "seed identity: TOTP_ENC_KEY unset; no admins seeded (run make setup)")
-		return nil
-	}
-	totpSeal, err := pii.NewSealer(d.Keys.TOTPEncKey.Bytes())
-	if err != nil {
-		return fmt.Errorf("TOTP_ENC_KEY: %w", err)
-	}
 	admins, err := loadSeedAdmins(path)
 	if err != nil {
 		return err
 	}
 	q := d.DB.Q(ctx)
-	enrolled := 0
 	for _, a := range admins {
 		u := identityUser{Key: a.Key, ID: a.ID, Phone: a.Phone, Name: a.Name, Lang: a.Lang}
 		if err := seedUser(ctx, d, seal, hash, u, now); err != nil {
 			return err
 		}
-		var secretEnc []byte
-		var enabledAt *time.Time
-		if a.TOTPSecret != "" {
-			secret, err := identity.DecodeTOTPSecret(a.TOTPSecret)
-			if err != nil {
-				return fmt.Errorf("admin %s: totp_secret is not valid base32", a.Key)
-			}
-			if secretEnc, err = totpSeal.Seal(identity.TOTPSealFieldFor(mustID(a.ID)), secret); err != nil {
-				return fmt.Errorf("admin %s: %w", a.Key, err)
-			}
-			enabledAt = &now
-			enrolled++
-		}
-		if _, err := q.Exec(ctx, `INSERT INTO admin_users (user_id, roles, totp_secret_enc, totp_enabled_at, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, $5) ON CONFLICT DO NOTHING`,
-			ids.UUID(mustID(a.ID)), a.Roles, secretEnc, enabledAt, now); err != nil {
+		if _, err := q.Exec(ctx, `INSERT INTO admin_users (user_id, roles, created_at, updated_at)
+			VALUES ($1, $2, $3, $3) ON CONFLICT DO NOTHING`,
+			ids.UUID(mustID(a.ID)), a.Roles, now); err != nil {
 			return fmt.Errorf("admin %s: %w", a.Key, err)
 		}
 	}
-	d.Log.InfoContext(ctx, "seed identity: admins seeded", slog.Int("admins", len(admins)), slog.Int("enrolled", enrolled))
+	d.Log.InfoContext(ctx, "seed identity: admins seeded", slog.Int("admins", len(admins)))
 	return nil
 }
 
-// loadSeedAdmins reads and checks the fixture. Errors never quote a phone or
-// a secret from it.
+// loadSeedAdmins reads and checks the fixture. Errors never quote a phone
+// from it.
 func loadSeedAdmins(path string) ([]seedAdmin, error) {
 	f, err := os.Open(path) // #nosec G304 -- the path is the operator's SEED_ADMINS_FILE, local/test only
 	if err != nil {
@@ -322,12 +293,6 @@ func checkSeedAdmins(admins []seedAdmin) error {
 		for j, r := range a.Roles {
 			if !authz.IsAdminRole(r) || slices.Contains(a.Roles[:j], r) {
 				return fmt.Errorf("admin %s: role %q is not a D-64 admin role or is repeated", a.Key, r)
-			}
-		}
-		if a.TOTPSecret != "" {
-			secret, err := identity.DecodeTOTPSecret(a.TOTPSecret)
-			if err != nil || len(secret) < minSeedTOTPSecret {
-				return fmt.Errorf("admin %s: totp_secret must be base32 of at least %d bytes", a.Key, minSeedTOTPSecret)
 			}
 		}
 	}

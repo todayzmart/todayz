@@ -12,15 +12,57 @@
 SELECT pg_advisory_xact_lock(hashtextextended(@key::text, 0));
 
 -- name: OtpSendsByPhoneSince :one
--- oldest and latest are @since when there is no row (sends = 0).
+-- The 01 §2 sign-in limits. oldest and latest are @since when there is no row
+-- (sends = 0). Admin step-up codes have their own bucket (D-264,
+-- AdminStepUpSendsSince) and are left out here.
 SELECT count(*)::int AS sends,
   COALESCE(min(created_at), @since::timestamptz)::timestamptz AS oldest,
   COALESCE(max(created_at), @since::timestamptz)::timestamptz AS latest
-FROM otp_requests WHERE phone_hash = @phone_hash AND created_at > @since::timestamptz;
+FROM otp_requests WHERE phone_hash = @phone_hash AND created_at > @since::timestamptz
+  AND NOT (purpose = 'step_up' AND app = 'admin');
 
 -- name: OtpSendsByIPSince :one
 SELECT count(*)::int AS sends, COALESCE(min(created_at), @since::timestamptz)::timestamptz AS oldest
-FROM otp_requests WHERE ip_hash = @ip_hash AND created_at > @since::timestamptz;
+FROM otp_requests WHERE ip_hash = @ip_hash AND created_at > @since::timestamptz
+  AND NOT (purpose = 'step_up' AND app = 'admin');
+
+-- name: AdminStepUpSendsSince :one
+-- The admin step-up bucket of one number (D-264: admin_step_up_sends_per_hour
+-- and the resend gap between step-up codes).
+SELECT count(*)::int AS sends,
+  COALESCE(min(created_at), @since::timestamptz)::timestamptz AS oldest,
+  COALESCE(max(created_at), @since::timestamptz)::timestamptz AS latest
+FROM otp_requests WHERE phone_hash = @phone_hash AND created_at > @since::timestamptz
+  AND purpose = 'step_up' AND app = 'admin';
+
+-- name: AdminSigninLockedUntil :one
+-- The number's admin sign-in lock (D-264); no row when it has none.
+SELECT locked_until FROM admin_signin_locks WHERE phone_hash = @phone_hash;
+
+-- name: InsertAdminSigninFailure :exec
+INSERT INTO admin_signin_failures (id, phone_hash, failed_at) VALUES (@id, @phone_hash, @failed_at);
+
+-- name: CountAdminSigninFailuresSince :one
+SELECT count(*)::int FROM admin_signin_failures
+WHERE phone_hash = @phone_hash AND failed_at > @since::timestamptz;
+
+-- name: LockAdminSignin :exec
+-- A lock replaces one that has run out.
+INSERT INTO admin_signin_locks (phone_hash, locked_at, locked_until) VALUES (@phone_hash, @now, @locked_until)
+ON CONFLICT (phone_hash) DO UPDATE SET locked_at = EXCLUDED.locked_at, locked_until = EXCLUDED.locked_until;
+
+-- name: ClearAdminSigninFailures :exec
+DELETE FROM admin_signin_failures WHERE phone_hash = @phone_hash;
+
+-- name: DeleteAdminSigninLock :one
+-- An unlock (A-18). No row when the number had no lock.
+DELETE FROM admin_signin_locks WHERE phone_hash = @phone_hash RETURNING locked_until;
+
+-- name: PurgeAdminSigninFailures :execrows
+DELETE FROM admin_signin_failures WHERE failed_at < @before;
+
+-- name: PurgeAdminSigninLocks :execrows
+DELETE FROM admin_signin_locks WHERE locked_until < @before;
 
 -- name: InsertOtpRequest :exec
 INSERT INTO otp_requests (id, phone_hash, phone_enc, purpose, app, code_hash, expires_at, ip_hash, created_at)
@@ -31,8 +73,9 @@ SELECT id, phone_hash, phone_enc, purpose, app, code_hash, expires_at, attempts,
 FROM otp_requests WHERE id = @id FOR UPDATE;
 
 -- name: GetStepUpOtpRequestForUpdate :one
--- Deletion's read of its code: only a step_up row is locked (a login row may
--- be held by a sign-in that waits for the user's row deletion holds).
+-- The read of a step-up code (account deletion, the admin step-up), taken
+-- after the users row: only a step_up row is locked (a login row may be held
+-- by a sign-in that waits for the user's row these paths hold).
 SELECT id, phone_hash, phone_enc, purpose, app, code_hash, expires_at, attempts, consumed_at
 FROM otp_requests WHERE id = @id AND purpose = 'step_up' FOR UPDATE;
 
@@ -89,7 +132,7 @@ ON CONFLICT DO NOTHING;
 SELECT user_id, referral_code, limited_until FROM customer_profiles WHERE user_id = @user_id;
 
 -- name: GetAdminUser :one
-SELECT user_id, roles, totp_enabled_at, disabled_at FROM admin_users WHERE user_id = @user_id;
+SELECT user_id, roles, disabled_at FROM admin_users WHERE user_id = @user_id;
 
 ------------------------------------------------------------------------------
 -- Devices and sessions (02 §3.1)
@@ -104,9 +147,9 @@ RETURNING id;
 
 -- name: InsertSession :exec
 INSERT INTO sessions (id, user_id, app, family_id, refresh_hash, expires_at, device_id,
-  user_agent, ip_hash, last_used_at, totp_verified_at, created_at)
+  user_agent, ip_hash, last_used_at, step_up_at, created_at)
 VALUES (@id, @user_id, @app, @family_id, @refresh_hash, @expires_at, sqlc.narg(device_id),
-  sqlc.narg(user_agent), sqlc.narg(ip_hash), @now, sqlc.narg(totp_verified_at), @now);
+  sqlc.narg(user_agent), sqlc.narg(ip_hash), @now, sqlc.narg(step_up_at), @now);
 
 -- name: GetSessionUserByRefreshHash :one
 -- The user of a refresh token, unlocked (a session's user never changes), so
@@ -115,7 +158,7 @@ SELECT user_id FROM sessions WHERE refresh_hash = @refresh_hash;
 
 -- name: GetSessionByRefreshHashForUpdate :one
 SELECT s.id, s.user_id, s.app, s.family_id, s.expires_at, s.revoked_at, s.revoked_reason,
-  s.device_id, s.totp_verified_at, s.successor_id, s.successor_salt, u.status AS user_status
+  s.device_id, s.step_up_at, s.successor_id, s.successor_salt, u.status AS user_status
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.refresh_hash = @refresh_hash
 FOR UPDATE OF s;
@@ -131,7 +174,7 @@ WHERE id = @id AND revoked_at IS NULL;
 -- name: GetSessionForUpdate :one
 -- A rotated row's successor, for the lost-response replay (D-239). Taken
 -- after the users row and the rotated row (lock order: users, sessions).
-SELECT id, user_id, app, family_id, refresh_hash, expires_at, revoked_at, totp_verified_at
+SELECT id, user_id, app, family_id, refresh_hash, expires_at, revoked_at
 FROM sessions WHERE id = @id
 FOR UPDATE;
 
@@ -143,8 +186,8 @@ WHERE family_id = @family_id AND revoked_at IS NULL;
 -- Is this sign-in (family) still live, and is its user active?
 SELECT u.status,
   COALESCE(bool_or(s.revoked_at IS NULL AND s.expires_at > @now::timestamptz), false)::bool AS live,
-  count(s.totp_verified_at) > 0 AS has_totp,
-  COALESCE(max(s.totp_verified_at), @now::timestamptz)::timestamptz AS totp_verified_at
+  count(s.step_up_at) > 0 AS has_step_up,
+  COALESCE(max(s.step_up_at), @now::timestamptz)::timestamptz AS step_up_at
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.family_id = @family_id AND s.user_id = @user_id AND s.app = @app
 GROUP BY u.status;
@@ -155,60 +198,17 @@ GROUP BY u.status;
 DELETE FROM sessions WHERE coalesce(revoked_at, expires_at) < @before::timestamptz;
 
 ------------------------------------------------------------------------------
--- Admin TOTP and recovery codes (W1-01 phase B; 02 §3.2, D-60)
+-- Admin SMS step-up (D-264; 01 §2)
 ------------------------------------------------------------------------------
 
--- name: GetAdminForUpdate :one
-SELECT user_id, roles, totp_secret_enc, totp_enabled_at, disabled_at, totp_last_step, totp_failures
-FROM admin_users WHERE user_id = @user_id FOR UPDATE;
+-- name: GetPhoneByUser :one
+-- The admin's own number, where a step-up code goes: never from the client.
+SELECT phone_hash, phone_enc FROM phone_identities WHERE user_id = @user_id;
 
--- name: SetPendingTotp :exec
--- A new, unconfirmed secret: totp_enabled_at stays NULL until a code verifies.
-UPDATE admin_users SET totp_secret_enc = @secret_enc, totp_enabled_at = NULL,
-  totp_last_step = NULL, totp_failures = 0, version = version + 1
-WHERE user_id = @user_id AND totp_enabled_at IS NULL;
-
--- name: DeleteRecoveryCodes :exec
-DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
-
--- name: InsertRecoveryCode :exec
-INSERT INTO admin_recovery_codes (id, admin_id, code_hash, created_at)
-VALUES (@id, @admin_id, @code_hash, @now);
-
--- name: RecordTotpSuccess :exec
--- Confirms a pending enrolment too (totp_enabled_at is set once).
-UPDATE admin_users SET totp_enabled_at = COALESCE(totp_enabled_at, @now::timestamptz),
-  totp_last_step = COALESCE(sqlc.narg(step)::bigint, totp_last_step), totp_failures = 0
-WHERE user_id = @user_id;
-
--- name: RecordTotpFailure :one
-UPDATE admin_users SET totp_failures = totp_failures + 1 WHERE user_id = @user_id
-RETURNING totp_failures;
-
--- name: ResetTotpFailures :exec
-UPDATE admin_users SET totp_failures = 0 WHERE user_id = @user_id;
-
--- name: UseRecoveryCode :one
-UPDATE admin_recovery_codes SET used_at = @now::timestamptz
-WHERE admin_id = @admin_id AND code_hash = @code_hash AND used_at IS NULL
-RETURNING id;
-
--- name: CountUnusedRecoveryCodes :one
-SELECT count(*)::int FROM admin_recovery_codes WHERE admin_id = @admin_id AND used_at IS NULL;
-
--- name: RotateAdminFamily :many
--- A login-purpose TOTP verification or recovery rotates the sign-in: its live
--- rows become rotated (the usual grace applies to their tokens) and the caller
--- inserts the elevated row. No rows: the sign-in is no longer live.
-UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'rotated'
-WHERE family_id = @family_id AND user_id = @user_id AND app = 'admin'
-  AND revoked_at IS NULL AND expires_at > @now::timestamptz
-RETURNING expires_at, device_id, user_agent;
-
--- name: SetFamilyTotpVerified :execrows
--- Marks the live row of a sign-in (family) as TOTP-verified now; refresh
+-- name: SetFamilyStepUp :execrows
+-- Marks the live row of an admin sign-in (family) as stepped up now; refresh
 -- copies it to the next row. 0 rows: the sign-in is no longer live.
-UPDATE sessions SET totp_verified_at = @now::timestamptz
+UPDATE sessions SET step_up_at = @now::timestamptz
 WHERE family_id = @family_id AND user_id = @user_id AND app = 'admin'
   AND revoked_at IS NULL AND expires_at > @now::timestamptz;
 
@@ -226,8 +226,8 @@ WHERE user_id = @user_id AND revoked_at IS NULL;
 
 -- name: LockUser :one
 -- The lock of every path that rotates or revokes a user's sessions: refresh
--- (its reuse branch revokes a family), logout, logout-all, the admin TOTP
--- flows (rotation, the lockout) and deletion. They run one at a time per
+-- (its reuse branch revokes a family), logout, logout-all, the admin SMS
+-- step-up (its lockout) and deletion. They run one at a time per
 -- user, so no revocation misses a row a concurrent rotation inserts. It does
 -- not conflict with the KEY SHARE lock a foreign key takes (no deadlock with
 -- inserts that reference the user). Lock order: users, then admin_users,
@@ -265,12 +265,6 @@ UPDATE devices SET device_key = @device_key, version = version + 1 WHERE id = @i
 -- name: ScrubSessionPII :exec
 UPDATE sessions SET user_agent = NULL, ip_hash = NULL
 WHERE user_id = @user_id AND (user_agent IS NOT NULL OR ip_hash IS NOT NULL);
-
--- name: ClearAdminTotp :exec
--- A deleted (disabled) admin keeps no authenticator secret.
-UPDATE admin_users SET totp_secret_enc = NULL, totp_enabled_at = NULL, totp_last_step = NULL,
-  totp_failures = 0, version = version + 1
-WHERE user_id = @user_id;
 
 -- name: DeleteAddresses :exec
 DELETE FROM addresses WHERE user_id = @user_id;

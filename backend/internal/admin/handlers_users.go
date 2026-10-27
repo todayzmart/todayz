@@ -10,10 +10,11 @@ import (
 // UserOps maps the admin-users operations to their authz actions (A-18):
 // super_admin only, and every change needs a fresh step-up.
 var UserOps = map[string]string{
-	"ListAdminUsers":     policy.AdminUsersView,
-	"InviteAdminUser":    policy.AdminUsersManage,
-	"UpdateAdminUser":    policy.AdminUsersManage,
-	"ResetAdminUserTotp": policy.AdminUsersManage,
+	"ListAdminUsers":  policy.AdminUsersView,
+	"InviteAdminUser": policy.AdminUsersManage,
+	"UpdateAdminUser": policy.AdminUsersManage,
+	// D-264: lifts the lock after too many wrong sign-in codes.
+	"UnlockAdminSignIn": policy.AdminUsersManage,
 }
 
 type userHandlers struct{ s *Service }
@@ -58,15 +59,15 @@ func (h userHandlers) UpdateAdminUser(ctx context.Context, req api.UpdateAdminUs
 	return api.UpdateAdminUser200JSONResponse(out), nil
 }
 
-// ResetAdminUserTotp implements POST /v1/admin/users/{adminId}/reset-totp.
-func (h userHandlers) ResetAdminUserTotp(ctx context.Context, req api.ResetAdminUserTotpRequestObject) (api.ResetAdminUserTotpResponseObject, error) {
+// UnlockAdminSignIn implements POST /v1/admin/users/{adminId}/unlock-sign-in.
+func (h userHandlers) UnlockAdminSignIn(ctx context.Context, req api.UnlockAdminSignInRequestObject) (api.UnlockAdminSignInResponseObject, error) {
 	actor, id, err := adminCall(ctx, req.AdminId, req.Body != nil)
 	if err != nil {
 		return nil, err
 	}
-	out, err := h.s.resetAdminTOTP(ctx, actor, id, *req.Body)
+	out, err := h.s.unlockAdminSignIn(ctx, actor, id, *req.Body)
 	if err != nil {
 		return nil, asProblem(err)
 	}
-	return api.ResetAdminUserTotp200JSONResponse(out), nil
+	return api.UnlockAdminSignIn200JSONResponse(out), nil
 }

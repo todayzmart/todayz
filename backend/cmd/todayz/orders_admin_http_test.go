@@ -8,59 +8,34 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/orders"
-	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
 
 const adminPhone = "+919000000021"
 
-// adminDesk signs a support person in to the admin app (OTP, then TOTP).
+// adminDesk signs a support person in to the admin app (SMS OTP, D-264).
 type adminDesk struct {
-	o      *orderShop
-	secret []byte
+	o    *orderShop
+	cust string // the same person's customer sign-in (kept fresh by o.refresh)
 }
 
 // newAdminDesk makes the user (a customer sign-in creates it) an admin with
 // roles.
 func newAdminDesk(o *orderShop, roles ...string) *adminDesk {
 	o.t.Helper()
-	var cust string
-	o.login(&cust, adminPhone, "customer")
-	me := o.a.call(cust, http.MethodGet, "/v1/me", nil, nil)
+	d := &adminDesk{o: o}
+	o.login(&d.cust, adminPhone, "customer")
+	me := o.a.call(d.cust, http.MethodGet, "/v1/me", nil, nil)
 	require.Equal(o.t, http.StatusOK, me.code, me.raw)
 	o.a.exec(`INSERT INTO admin_users (user_id, roles) VALUES ($1, $2)`, uuidOf(o.t, me.body["id"].(string)), roles)
-	return &adminDesk{o: o}
+	return d
 }
 
-// token signs in afresh at the clock's time and returns an otp+totp token.
+// token signs in afresh at the clock's time and passes the SMS step-up.
 func (d *adminDesk) token() string {
-	o := d.o
-	t := o.t
-	t.Helper()
-	a := o.a
-	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
-		"phone": adminPhone, "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
-	}, nil)
-	require.Equal(t, http.StatusOK, w.code, "otp send: %d", w.code)
-	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
-		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
-	}, map[string]string{"User-Agent": "orders-admin-test"})
-	require.Equal(t, http.StatusOK, w.code, "otp verify: %d", w.code)
-	tok := w.body["accessToken"].(string)
-	if d.secret == nil {
-		require.Equal(t, identity.NextStepTOTPEnrol, w.body["nextStep"])
-		e := a.call(tok, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
-		require.Equal(t, http.StatusOK, e.code, "enrol: %d", e.code)
-		s, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
-		require.NoError(t, err)
-		d.secret = s
-	}
-	a.clk.Advance(31 * time.Second) // a fresh TOTP step
-	v := a.call(tok, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(d.secret, a.clk.Now()), "purpose": "login"}, nil)
-	require.Equal(t, http.StatusOK, v.code, "totp verify: %d", v.code)
-	return v.body["accessToken"].(string)
+	d.o.t.Helper()
+	return d.o.a.adminToken(adminPhone, "orders-admin-test")
 }
 
 func (d *adminDesk) cancel(tok, id string, body map[string]any) resp {

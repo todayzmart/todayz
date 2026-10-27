@@ -23,7 +23,7 @@ const stepUp = (e: unknown) => e instanceof ApiError && e.code === 'step_up_requ
 /**
  * A-09 Credits: find a ledger account, read its entries and the coming expiry, adjust a customer's
  * wallet, and decide pending adjustment requests. Adjusting and deciding are finance and super admin
- * (D-64) with a reason and a fresh authenticator code; the admin role reads only. An adjustment
+ * (D-64) with a reason and a fresh SMS code (D-264); the admin role reads only. An adjustment
  * above the dual-approval threshold waits for a second person, who can never be the requester (D-05).
  */
 export function CreditsPage({ search }: { search: CreditsSearch }) {

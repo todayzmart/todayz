@@ -163,7 +163,7 @@
     tags: [admin-credits]
     summary: Adjust a customer's wallet, with a reason (audited, step-up)
     description: >-
-      Finance and super_admin, with a TOTP step-up younger than 10 minutes. When the absolute amount is at
+      Finance and super_admin, with an SMS step-up younger than 10 minutes (D-264). When the absolute amount is at
       or under `admin_adjust_dual_approval_above_paise` it posts at once (`outcome: posted`, no request
       row); above it a pending request waits for a second person (`outcome: pending`), for super_admin
       too (D-05, D-73). A debit larger than the wallet's balance is `409 adjustment_insufficient_balance`.

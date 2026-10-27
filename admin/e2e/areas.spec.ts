@@ -361,12 +361,12 @@ test('A-18: a super admin invites a desk member, then disables another after a f
     phoneMasked: id === MEERA ? '90•••••311' : '90•••••412',
     roles,
     status,
-    totpEnrolled: id === MEERA,
     createdBy: '01JADMIN0000000000000000AD',
     createdByName: 'Asha Rao',
     createdAt: '2026-10-20T09:30:00Z',
     disabledAt: status === 'disabled' ? NOW : null,
     lastActiveAt: id === MEERA ? '2026-10-25T05:12:00Z' : null,
+    signInLockedUntil: null,
     version,
   });
   let meera = account(MEERA, 'Meera', ['support'], 'active', 1);
@@ -389,9 +389,11 @@ test('A-18: a super admin invites a desk member, then disables another after a f
     }
     return undefined;
   });
-  await answerWith(page, '/v1/auth/totp/verify', () => {
+  // The SMS step-up (D-264): send answers a request id, verify stamps this sign-in; the token stays.
+  await answerWith(page, '/v1/auth/step-up/send', () => ({ status: 200, body: { requestId: '01JC0000000000000000000SMS', resendAfter: 30 } }));
+  await answerWith(page, '/v1/auth/step-up/verify', () => {
     freshCode = true;
-    return { status: 200, body: { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' } };
+    return { status: 200, body: { validUntil: new Date(Date.now() + 10 * 60_000).toISOString() } };
   });
 
   await page.goto('/admin-users');
@@ -414,7 +416,9 @@ test('A-18: a super admin invites a desk member, then disables another after a f
   const disable = page.getByRole('dialog', { name: 'Disable Meera?' });
   await disable.getByLabel('Reason').fill('Left the team');
   await disable.getByRole('button', { name: 'Disable' }).click();
-  const boxes = page.getByRole('dialog', { name: 'Confirm it is you' }).getByRole('group', { name: 'Authenticator code' }).locator('input');
+  const step = page.getByRole('dialog', { name: 'Confirm it is you' });
+  await step.getByRole('button', { name: 'Send code' }).click();
+  const boxes = step.getByRole('group', { name: 'Code from the SMS' }).locator('input');
   for (const [i, d] of '123456'.split('').entries()) await boxes.nth(i).fill(d);
   await expect(page.getByText('Meera is disabled and signed out.')).toBeVisible();
   expect(sent).toEqual([

@@ -26,7 +26,7 @@ const DONE = { hold: 'payouts.done.hold', unhold: 'payouts.done.unhold', paid: '
 /**
  * A-11 Payouts: a month's statements by business, the payouts it opened, and one payout's lines,
  * hold causes and masked payee. Hold, unhold, mark paid and export are finance and super admin
- * (D-64), each with a reason and a fresh authenticator code; the admin role reads only.
+ * (D-64), each with a reason and a fresh SMS code (D-264); the admin role reads only.
  */
 export function PayoutsPage({ search }: { search: PayoutsSearch }) {
   const intl = useIntl();

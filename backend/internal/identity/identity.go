@@ -1,7 +1,7 @@
 // Package identity is sign-in and the signed-in user (W1-01; 01 §2, 02 §3,
 // 04 §2.1–2.2, D-14, D-15, D-31, D-60): SMS OTP send and verify, sessions with
-// rotating refresh tokens and reuse detection, logout and logout-all, admin
-// TOTP (enrol, verify, step-up, recovery codes), the session check behind the
+// rotating refresh tokens and reuse detection, logout and logout-all, the
+// admin SMS step-up (D-264), the session check behind the
 // access token (authn.SessionChecker), GET/PATCH /v1/me and account deletion
 // (DELETE /v1/me with the hooks other domains register).
 //
@@ -18,7 +18,6 @@
 package identity
 
 import (
-	"crypto/subtle"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -103,17 +102,12 @@ type Service struct {
 	seal     *pii.Sealer
 	hash     *pii.Hasher
 	audit    *audit.Writer
-	// totpSeal seals admin TOTP secrets under TOTP_ENC_KEY (field
-	// "totp_secret"); nil when the key is unset (TOTP answers 503).
-	totpSeal *pii.Sealer
 	// hooksMu guards hooks: domains register at mount time, DELETE /v1/me
 	// reads them per request.
 	hooksMu sync.RWMutex
 	hooks   Hooks
 	// allowTestCode accepts 000000 for the reserved test numbers (Deps.TestRoutes).
 	allowTestCode bool
-	// totpOff waives the admin authenticator step (config.AdminTOTPOff, D-244).
-	totpOff bool
 }
 
 // errUnavailable is why a service cannot serve (no database, no keys); the
@@ -132,10 +126,6 @@ func New(d Deps) (*Service, error) {
 		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens, settings: d.Settings, storage: d.Storage,
 		sms: d.SMS, human: d.Human,
 		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
-		totpOff:       d.Config.AdminTOTPOff && d.Config.Env.AllowsTestRoutes() && testclock.Loopback(d.Config.APIAddr),
-	}
-	if s.totpOff && d.Log != nil {
-		d.Log.Warn("identity: ADMIN_TOTP_OFF is set: admins sign in without the authenticator step (D-244)")
 	}
 	if s.sms == nil || s.human == nil {
 		sms, human := providers(d.Config)
@@ -159,13 +149,6 @@ func New(d Deps) (*Service, error) {
 		s.hooks.Can = append(s.hooks.Can, d.Hooks.Can...)
 		s.hooks.On = append(s.hooks.On, d.Hooks.On...)
 	}
-	if k := d.Config.Keys.TOTPEncKey; k.IsSet() {
-		seal, err := pii.NewSealer(k.Bytes())
-		if err != nil {
-			return nil, errors.New("identity: TOTP_ENC_KEY must be 32 bytes")
-		}
-		s.totpSeal = seal
-	}
 	if k := d.Config.Keys.PIIHashKey; k.IsSet() {
 		h, err := pii.NewHasher(k.Bytes())
 		if err != nil {
@@ -184,10 +167,9 @@ func New(d Deps) (*Service, error) {
 }
 
 // Preflight is the start-up check of the API (02 §8: auth refuses to start
-// without its provider): in staging and prod the PII, TOTP and JWT keys, the
+// without its provider): in staging and prod the PII and JWT keys, the
 // SMS provider (AWS region, DLT sender, entity and OTP template, D-212),
-// and Turnstile must be configured, and
-// TOTP_ENC_KEY must not be PII_ENC_KEY (one leaked key must not open both). Turnstile
+// and Turnstile must be configured. Turnstile
 // is required too (lead decision on the W1-01 review), replacing 02 §8's
 // "stricter rate limits" fallback, which named no limits. It names
 // variables, never values. New does not run it, so a router can be built
@@ -203,9 +185,6 @@ func Preflight(cfg *config.Config) error {
 	}
 	if !k.PIIHashKey.IsSet() {
 		missing = append(missing, "PII_HASH_KEY")
-	}
-	if !k.TOTPEncKey.IsSet() {
-		missing = append(missing, "TOTP_ENC_KEY")
 	}
 	if len(k.JWTSigningKeys) == 0 {
 		missing = append(missing, "JWT_SIGNING_KEYS")
@@ -230,26 +209,12 @@ func Preflight(cfg *config.Config) error {
 	if f := awssms.Forbidden(cfg); len(f) > 0 {
 		return fmt.Errorf("identity: must be unset in staging and prod: %s", strings.Join(f, ", "))
 	}
-	if subtle.ConstantTimeCompare(k.TOTPEncKey.Bytes(), k.PIIEncKey.Bytes()) == 1 {
-		return errors.New("identity: TOTP_ENC_KEY must differ from PII_ENC_KEY")
-	}
 	return nil
 }
 
 // ready reports whether sign-in can run.
 func (s *Service) ready() error {
 	if s.db == nil || s.seal == nil || s.hash == nil {
-		return errUnavailable
-	}
-	return nil
-}
-
-// readyTOTP is readyTokens plus the TOTP key.
-func (s *Service) readyTOTP() error {
-	if err := s.readyTokens(); err != nil {
-		return err
-	}
-	if s.totpSeal == nil {
 		return errUnavailable
 	}
 	return nil

@@ -1,4 +1,4 @@
-import { Customer, expect, openApp, test, URLS, waitForCredits, type Order } from '../../fixtures/journey';
+import { Customer, expect, openAdmin, passStepUpDialog, test, waitForCredits, type Order } from '../../fixtures/journey';
 import { SL_ITEMS, STORES } from '../../fixtures/seed';
 
 // E2E-12: a super admin changes `credit_max_per_order` 30 → 40 with step-up → the next checkout allows
@@ -69,7 +69,7 @@ test('E2E-12 super admin sets credit_max_per_order to 40 with step-up; checkout 
   });
 
   try {
-    await test.step('with a fresh authenticator code, the super admin sets it to 40 with a reason', async () => {
+    await test.step('with a fresh SMS code, the super admin sets it to 40 with a reason', async () => {
       await admin.stepUp();
       const r = await admin.api.call<{ setting: Setting }>('PATCH', SETTING, { value: 40, reason: 'E2E-12 festival week' });
       expect(r.status, `PATCH answered ${r.status} ${r.code}`).toBe(200);
@@ -124,9 +124,7 @@ test('E2E-12 through A-17: the super admin changes the cap on the settings scree
   test.skip((await c.wallet()).availableCredits < 40, 'the referee needs 40 credits for this check (E2E-02 and E2E-06 run first)');
   const admin = await who('superAdmin');
   const items = [{ storeItemId: SL_ITEMS.qa100.id, quantity: 5 }];
-  const app = await openApp(browser, admin, URLS.admin);
-  // Routing hint only (the API checks the token's amr): this principal passed the authenticator step.
-  await app.context.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
+  const app = await openAdmin(browser, admin);
   const { page } = app;
 
   try {
@@ -137,7 +135,7 @@ test('E2E-12 through A-17: the super admin changes the cap on the settings scree
       await expect(table.getByRole('row').filter({ hasText: KEY })).toContainText('30 credits');
     });
 
-    await test.step('change it to 40 with a reason; a stale step-up asks for the authenticator code first', async () => {
+    await test.step('change it to 40 with a reason; a stale step-up asks for a fresh SMS code first', async () => {
       await page.getByRole('button', { name: `Change ${KEY}` }).click();
       const dialog = page.getByRole('dialog', { name: `Change ${KEY}` });
       await expect(dialog.getByText('This is a money setting. It changes what customers pay or earn.')).toBeVisible();
@@ -148,10 +146,7 @@ test('E2E-12 through A-17: the super admin changes the cap on the settings scree
       const saved = page.getByText(`${KEY} saved. Every server picks it up within moments.`);
       const step = page.getByRole('dialog', { name: 'Confirm it is you' });
       await expect(saved.or(step)).toBeVisible();
-      if (await step.isVisible()) {
-        await step.getByRole('group', { name: 'Authenticator code' }).locator('input').first().click();
-        await page.keyboard.type(await admin.totpCode());
-      }
+      if (await step.isVisible()) await passStepUpDialog(page, admin);
       await expect(saved).toBeVisible();
     });
 
@@ -175,7 +170,7 @@ test('E2E-12 through A-17: the super admin changes the cap on the settings scree
     await app.close();
     let r = await admin.api.call('PATCH', SETTING, { value: 30, reason: 'E2E-12 clean-up' });
     if (r.code === 'step_up_required') {
-      await admin.stepUp();
+      await admin.stepUp({ force: true });
       r = await admin.api.call('PATCH', SETTING, { value: 30, reason: 'E2E-12 clean-up' });
     }
     expect(r.status, `restore answered ${r.status} ${r.code}`).toBe(200);

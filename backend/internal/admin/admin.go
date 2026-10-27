@@ -85,9 +85,12 @@ type Deps struct {
 }
 
 // PhoneAccounts finds or makes the account of an E.164 phone in the caller's
-// transaction, as a first sign-in would.
+// transaction, as a first sign-in would, and lifts the admin sign-in lock of a
+// user's number (D-264), also in the caller's transaction: it returns when the
+// lock would have ended, or nil when no lock held at now.
 type PhoneAccounts interface {
 	FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (PhoneAccount, error)
+	UnlockAdminSignIn(ctx context.Context, userID ids.ID, now time.Time) (*time.Time, error)
 }
 
 // PhoneAccount is the user behind a phone number.

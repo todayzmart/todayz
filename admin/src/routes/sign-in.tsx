@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 import { TURNSTILE_SITE_KEY } from '../app/env';
 import { usePhoneOtpLabels } from '../app/labels';
 import { safeNext, validateNextSearch } from '../app/next';
-import { useSecondFactor, useSecondFactorState } from '../app/second-factor';
 import styles from '../shell/shell.module.css';
 
 export const Route = createFileRoute('/sign-in')({
@@ -13,24 +12,20 @@ export const Route = createFileRoute('/sign-in')({
   component: SignIn,
 });
 
-/** A-01 step 1: mobile number and SMS code. Step 2 is the authenticator code (`/two-step`). */
+/** A-01: mobile number and SMS code; the code alone signs an admin in (D-264). */
 function SignIn() {
   const intl = useIntl();
   const session = useSession();
-  const factor = useSecondFactor();
-  const { done } = useSecondFactorState();
   const { status } = useSessionState();
   const router = useRouter();
   const { next } = Route.useSearch();
   const labels = usePhoneOtpLabels();
   const target = safeNext(next);
 
-  // The phone code is in: on to the authenticator, or straight on when this tab already passed it.
+  // Signed in (the code just now, or a cookie that was still good): on to where they were going.
   useEffect(() => {
-    if (status !== 'signedIn') return;
-    if (done) router.history.replace(target);
-    else router.history.replace(`/two-step${target === '/' ? '' : `?next=${encodeURIComponent(target)}`}`);
-  }, [status, done, router, target]);
+    if (status === 'signedIn') router.history.replace(target);
+  }, [status, router, target]);
 
   return (
     <>
@@ -41,11 +36,7 @@ function SignIn() {
         session={session}
         siteKey={TURNSTILE_SITE_KEY}
         labels={labels}
-        onSignedIn={({ nextStep }) => {
-          // No second step from the server (the authenticator is off locally, D-244): straight in.
-          if (nextStep) factor.setNextStep(nextStep);
-          else factor.markDone();
-        }}
+        onSignedIn={() => undefined}
       />
     </>
   );

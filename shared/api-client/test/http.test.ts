@@ -48,7 +48,7 @@ describe('request credentials and bearer on auth routes', () => {
   const cookieRoutes = ['otp/send', 'otp/verify', 'refresh', 'logout', 'logout-all'];
 
   it('sends the cookie to every /v1/auth/ route, and to nothing else by default', async () => {
-    for (const r of [...cookieRoutes, 'totp/verify', 'totp/recover', 'totp/enrol']) {
+    for (const r of [...cookieRoutes, 'step-up/send', 'step-up/verify']) {
       const s = stub(json({}));
       configure({ fetch: s.fetch });
       await request(`/v1/auth/${r}`, { method: 'POST' });
@@ -60,7 +60,7 @@ describe('request credentials and bearer on auth routes', () => {
     expect(call(s).init.credentials).toBeUndefined();
   });
 
-  it('never sends the bearer to the cookie routes, but does to the TOTP routes', async () => {
+  it('never sends the bearer to the cookie routes, but does to the step-up routes', async () => {
     for (const r of cookieRoutes) {
       const s = stub(json({}));
       configure({ fetch: s.fetch, token: () => 'tok' });
@@ -69,7 +69,7 @@ describe('request credentials and bearer on auth routes', () => {
     }
     const s = stub(json({}));
     configure({ fetch: s.fetch, token: () => 'tok' });
-    await request('/v1/auth/totp/verify', { method: 'POST' });
+    await request('/v1/auth/step-up/verify', { method: 'POST' });
     expect(sentHeaders(s).get('authorization')).toBe('Bearer tok');
   });
 });

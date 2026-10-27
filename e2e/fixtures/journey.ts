@@ -363,33 +363,49 @@ export async function checkoutCart(page: Page): Promise<string> {
   return new URL(page.url()).pathname.split('/').pop() ?? '';
 }
 
-/**
- * An admin console context for `who`, signed in with the principal's own session. The sessionStorage
- * flag is only a routing hint (the API checks the token's amr): this person passes the authenticator step.
- */
+/** An admin console context for `who`, signed in with the principal's own session (the SMS code alone, D-264). */
 export async function openAdmin(browser: Browser, who: Principal): Promise<AppPage> {
-  const app = await openApp(browser, who, URLS.admin);
-  await app.context.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
-  return app;
+  return openApp(browser, who, URLS.admin);
 }
 
 /**
- * Waits for `done` after an action that needs a fresh authenticator code (a † admin action, D-64):
- * if the "Confirm it is you" dialog opens, types the next unused code, then waits for `done`.
+ * Passes the console's SMS step-up dialog (D-264) on a page that holds `who`'s lent session: taps
+ * "Send code" (waiting out the 30 s gap between codes when an earlier send is that recent), reads the
+ * code from the mocks server and types it. The sign-in is then stamped, so `who.stepUp()` reuses it.
+ */
+export async function passStepUpDialog(page: Page, who: Principal) {
+  const step = page.getByRole('dialog', { name: 'Confirm it is you' });
+  const boxes = step.getByRole('group', { name: 'Code from the SMS' });
+  const send = step.getByRole('button', { name: 'Send code' });
+  const since = new Date(Date.now() - 1000).toISOString();
+  await send.click();
+  const limited = step.getByText('Too many codes asked for. Wait before you ask for another.');
+  await expect(boxes.or(limited).first()).toBeVisible();
+  if (await limited.isVisible()) {
+    await expect(send).toBeEnabled({ timeout: 40_000 });
+    await send.click();
+    await expect(boxes).toBeVisible();
+  }
+  await boxes.locator('input').first().click();
+  await page.keyboard.type(await who.smsCode(since));
+  await expect(step).toBeHidden();
+  await who.noteStepUp();
+}
+
+/**
+ * Waits for `done` after an action that needs a fresh SMS step-up (a † admin action, D-264): if the
+ * "Confirm it is you" dialog opens, passes it, then waits for `done`.
  */
 export async function expectWithStepUp(page: Page, who: Principal, done: Locator) {
   const step = page.getByRole('dialog', { name: 'Confirm it is you' });
   await expect(done.or(step).first()).toBeVisible();
-  if (await step.isVisible()) {
-    await step.getByRole('group', { name: 'Authenticator code' }).locator('input').first().click();
-    await page.keyboard.type(await who.totpCode());
-  }
+  if (await step.isVisible()) await passStepUpDialog(page, who);
   await expect(done).toBeVisible();
 }
 
 /**
  * Runs fn with admin settings (feature flags) set to `values`, then puts the earlier values back.
- * Needs a super admin: each change takes a fresh authenticator step-up.
+ * Needs a super admin: the changes take a fresh SMS step-up (reused for 8 minutes).
  */
 export async function withFlags<T>(admin: Principal, values: Record<string, unknown>, fn: () => Promise<T>): Promise<T> {
   const list = await admin.api.ok<{ items: { key: string; value: unknown }[] }>('admin lists the settings', 'GET', '/v1/admin/settings');

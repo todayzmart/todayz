@@ -1,4 +1,4 @@
-# Schemas: domain "auth" (owner W1-01): sign-in, OTP, TOTP, refresh, sign-out (04 §2.1).
+# Schemas: domain "auth" (owner W1-01): sign-in, OTP, refresh, sign-out, admin step-up (04 §2.1).
 #
 # Map of schema name -> JSON Schema; names are unique across every
 # schemas/<domain>.yaml. Request objects carry `additionalProperties: false`.
@@ -39,7 +39,7 @@ OtpSendResponse:
   type: object
   description: |
     Identical for a known and an unknown number (AU-06). `requestId` names this code in
-    `POST /v1/auth/otp/verify`.
+    `POST /v1/auth/otp/verify` (or, for an admin step-up, `POST /v1/auth/step-up/verify`).
   required: [requestId, resendAfter]
   properties:
     requestId:
@@ -47,7 +47,7 @@ OtpSendResponse:
     resendAfter:
       type: integer
       minimum: 0
-      description: Seconds until `otp/send` may be called again for this number.
+      description: Seconds until a code may be sent again to this number.
 OtpVerifyRequest:
   type: object
   additionalProperties: false
@@ -85,13 +85,6 @@ OtpVerifyResponse:
       description: True when this sign-in created the account.
     userId:
       $ref: ./common.yaml#/Ulid
-    nextStep:
-      type: string
-      description: |
-        Admin app only: the access token has `amr` `otp` and reaches `/v1/auth/*` only until the
-        second factor. `totp_enrol`: no authenticator yet (`POST /v1/auth/totp/enrol`, then
-        `totp/verify`); `totp_verify`: enrolled (`POST /v1/auth/totp/verify` or `totp/recover`).
-      enum: [totp_enrol, totp_verify]
 AccessTokenResponse:
   type: object
   description: A fresh access token. The rotated refresh token is only in the `Set-Cookie` header.
@@ -113,62 +106,22 @@ AuthAppRequest:
   properties:
     app:
       $ref: "#/AuthApp"
-TotpEnrolResponse:
-  type: object
-  description: Shown once. The client renders `otpauthUri` as a QR code and asks the admin to store the recovery codes.
-  required: [secret, otpauthUri, recoveryCodes]
-  properties:
-    secret:
-      type: string
-      description: The authenticator secret, base32 without padding, for typing in by hand. Never logged.
-    otpauthUri:
-      type: string
-      description: "`otpauth://totp/...` (SHA1, 6 digits, 30 s); the label is the user id, never the phone."
-    recoveryCodes:
-      type: array
-      description: 10 single-use codes (D-60), 16 Crockford base32 symbols (80 bits) shown as `XXXX-XXXX-XXXX-XXXX`. Never shown again.
-      minItems: 10
-      maxItems: 10
-      items:
-        type: string
-TotpVerifyRequest:
+StepUpVerifyRequest:
   type: object
   additionalProperties: false
-  required: [code, purpose]
+  required: [requestId, code]
   properties:
+    requestId:
+      $ref: ./common.yaml#/Ulid
     code:
       type: string
-      description: The 6-digit code from the authenticator app. Never logged.
+      description: The 6-digit code from the step-up SMS. Never logged (D-15).
       pattern: ^[0-9]{6}$
       maxLength: 6
-    purpose:
-      type: string
-      description: "`login`: the second factor after OTP (confirms a pending enrolment). `step_up`: re-confirm for a † action."
-      enum: [login, step_up]
-TotpRecoverRequest:
+StepUpVerifyResponse:
   type: object
-  additionalProperties: false
-  required: [recoveryCode]
+  description: This sign-in may take † actions until `validUntil` (10 minutes, D-264).
+  required: [validUntil]
   properties:
-    recoveryCode:
-      type: string
-      description: One recovery code; hyphens, spaces and case are ignored (`I` and `L` read as `1`, `O` as `0`). Never logged.
-      pattern: ^[A-Za-z0-9 -]{16,32}$
-      maxLength: 32
-TotpRecoverResponse:
-  type: object
-  description: A fresh access token with `amr` `otp+totp`, and how many recovery codes are left.
-  required: [accessToken, tokenType, expiresAt, recoveryCodesLeft]
-  properties:
-    accessToken:
-      type: string
-      description: The EdDSA access token (15 min). Keep it in memory only.
-    tokenType:
-      type: string
-      const: Bearer
-    expiresAt:
+    validUntil:
       $ref: ./common.yaml#/Timestamp
-    recoveryCodesLeft:
-      type: integer
-      minimum: 0
-      maximum: 10

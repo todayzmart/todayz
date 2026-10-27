@@ -40,12 +40,14 @@ export function useAccountError() {
   const intl = useIntl();
   const problemText = useProblemText();
   return useCallback(
-    (err: unknown, during: 'invite' | 'change'): string | null => {
+    (err: unknown, during: 'invite' | 'change' | 'unlock'): string | null => {
       if (!err) return null;
       if (err instanceof ApiError) {
         if (err.code === 'step_up_required') return null;
         if (err.code === 'conflict') return intl.formatMessage({ id: during === 'invite' ? 'adminUsers.error.exists' : 'adminUsers.error.stale' });
-        if (err.code === 'invalid_transition') return intl.formatMessage({ id: 'adminUsers.error.refused' });
+        if (err.code === 'invalid_transition') {
+          return intl.formatMessage({ id: during === 'unlock' ? 'adminUsers.error.notLocked' : 'adminUsers.error.refused' });
+        }
       }
       return problemText(err);
     },

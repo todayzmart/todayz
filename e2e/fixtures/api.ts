@@ -1,7 +1,4 @@
 import { createHash, createHmac, randomBytes } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { expect, type APIRequestContext, type APIResponse } from '@playwright/test';
 
@@ -23,7 +20,7 @@ export function ulid(at = Date.now()): string {
   return time + tail;
 }
 
-/** RFC 6238 HOTP over a base32 secret: SHA-1, `digits` digits, `period` seconds. */
+/** RFC 6238 over a base32 secret: SHA-1, `digits` digits, `period` seconds (the POS counter code, D-12). */
 export function totp(secret: string, at = Date.now(), digits = 6, period = 30): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   let bits = '';
@@ -35,16 +32,6 @@ export function totp(secret: string, at = Date.now(), digits = 6, period = 30): 
   const offset = (mac[mac.length - 1] ?? 0) & 0x0f;
   const n = (mac.readUInt32BE(offset) & 0x7fffffff) % 10 ** digits;
   return String(n).padStart(digits, '0');
-}
-
-/** The test-only TOTP secret of a seeded admin (e2e/fixtures/admins.yaml). Never print it. */
-export function adminTotpSecret(key: string): string {
-  const file = join(dirname(fileURLToPath(import.meta.url)), 'admins.yaml');
-  const text = readFileSync(file, 'utf8');
-  const block = text.split(/\n\s*- key: /).find((b) => b.startsWith(`${key}\n`));
-  const secret = block?.match(/\n\s*totp_secret:\s*"?([A-Z2-7=]+)"?/)?.[1];
-  if (!secret) throw new Error(`admins.yaml has no TOTP secret for ${key}`);
-  return secret;
 }
 
 /** A short, non-secret fingerprint for messages (never the value itself). */

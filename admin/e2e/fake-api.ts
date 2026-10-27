@@ -166,8 +166,8 @@ export const localSystem = {
 export const emptyPulseMap = { range: '7d', from: '2026-10-19', to: '2026-10-25', stores: [], demand: [], serverNow: NOW };
 
 /**
- * Signed in as staff with these roles and past the authenticator step. The session and 2FA flags are
- * routing hints only; the API checks the token.
+ * Signed in as staff with these roles (the SMS code alone signs an admin in, D-264). The session
+ * flag is a routing hint only; the API checks the token.
  */
 export async function signIn(page: Page, roles: readonly string[]) {
   await answerEmptyLists(page);
@@ -175,6 +175,5 @@ export async function signIn(page: Page, roles: readonly string[]) {
   await answerMe(page, roles);
   await page.addInitScript(() => {
     localStorage.setItem('todayz.hasSession.admin', '1');
-    sessionStorage.setItem('todayz.admin.2fa', String(Date.now()));
   });
 }

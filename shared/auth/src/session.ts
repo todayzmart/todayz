@@ -98,7 +98,7 @@ export interface Session {
   getToken(): string | null;
   /** First load: try the cookie. Resolves after the first attempt; never rejects. */
   start(): Promise<void>;
-  /** After OTP verify (or TOTP): keep the token, schedule the refresh, tell the other tabs. */
+  /** After OTP verify: keep the token, schedule the refresh, tell the other tabs. */
   signIn(grant: TokenGrant): void;
   /** Revoke this app's session on this device and forget the token everywhere. */
   signOut(): Promise<void>;

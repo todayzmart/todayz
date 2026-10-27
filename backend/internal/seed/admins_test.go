@@ -3,7 +3,6 @@ package seed
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -12,7 +11,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
@@ -35,12 +33,7 @@ func withEnv(t *testing.T, env map[string]string) {
 
 func adminKeys(t *testing.T) config.AppKeys {
 	t.Helper()
-	k := testKeys(t)
-	totp := make([]byte, 32)
-	_, err := rand.Read(totp)
-	require.NoError(t, err)
-	k.TOTPEncKey = config.NewSecret(totp)
-	return k
+	return testKeys(t)
 }
 
 func logTo(buf *bytes.Buffer) *slog.Logger {
@@ -55,29 +48,26 @@ func fixture(t *testing.T) string {
 	return repoFixture
 }
 
-// TestRepoFixtureComposition checks the committed fixture against 08 §2: one
-// enrolled admin per D-64 role, two each of finance and super_admin, and one
-// unenrolled admin.
+// TestRepoFixtureComposition checks the committed fixture against 08 §2: an
+// admin per D-64 role, two each of finance and super_admin, and the
+// never-signed-in admin.unenrolled.
 func TestRepoFixtureComposition(t *testing.T) {
 	admins, err := loadSeedAdmins(fixture(t))
 	require.NoError(t, err)
-	enrolledBy := map[string]int{}
-	unenrolled := 0
+	by := map[string]int{}
+	keys := map[string]bool{}
 	for _, a := range admins {
-		if a.TOTPSecret == "" {
-			unenrolled++
-			continue
-		}
+		keys[a.Key] = true
 		for _, r := range a.Roles {
-			enrolledBy[r]++
+			by[r]++
 		}
 	}
-	require.Equal(t, 1, unenrolled)
+	require.True(t, keys["admin.unenrolled"])
 	for _, r := range authz.AdminRoles {
-		require.GreaterOrEqual(t, enrolledBy[string(r)], 1, r)
+		require.GreaterOrEqual(t, by[string(r)], 1, r)
 	}
-	require.Equal(t, 2, enrolledBy[string(authz.Finance)])
-	require.Equal(t, 2, enrolledBy[string(authz.SuperAdmin)])
+	require.Equal(t, 2, by[string(authz.Finance)])
+	require.Equal(t, 2, by[string(authz.SuperAdmin)])
 }
 
 func TestSeedAdmins(t *testing.T) {
@@ -97,17 +87,13 @@ func TestSeedAdmins(t *testing.T) {
 	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM admin_users`).Scan(&n))
 	require.Equal(t, len(admins), n)
 
-	totpSeal, err := pii.NewSealer(keys.TOTPEncKey.Bytes())
-	require.NoError(t, err)
 	hash, err := pii.NewHasher(keys.PIIHashKey.Bytes())
 	require.NoError(t, err)
 	for _, a := range admins {
 		var roles []string
-		var enc []byte
-		var enabled *string
 		require.NoError(t, tdb.Pool.QueryRow(ctx,
-			`SELECT roles, totp_secret_enc, totp_enabled_at::text FROM admin_users WHERE user_id = $1`,
-			ids.UUID(mustID(a.ID))).Scan(&roles, &enc, &enabled), a.Key)
+			`SELECT roles FROM admin_users WHERE user_id = $1`,
+			ids.UUID(mustID(a.ID))).Scan(&roles), a.Key)
 		require.Equal(t, a.Roles, roles, a.Key)
 
 		var ph []byte
@@ -115,21 +101,7 @@ func TestSeedAdmins(t *testing.T) {
 			ids.UUID(mustID(a.ID))).Scan(&ph), a.Key)
 		require.Equal(t, hash.Phone(a.Phone), ph, "%s: sign-in finds the admin by phone", a.Key)
 
-		if a.TOTPSecret == "" {
-			require.Nil(t, enc, a.Key)
-			require.Nil(t, enabled, a.Key)
-			continue
-		}
-		require.NotNil(t, enabled, a.Key)
-		want, err := identity.DecodeTOTPSecret(a.TOTPSecret)
-		require.NoError(t, err)
-		got, err := totpSeal.Open(identity.TOTPSealFieldFor(mustID(a.ID)), enc)
-		require.NoError(t, err, "%s: sealed the way identity opens it", a.Key)
-		require.Equal(t, want, got, a.Key)
-		require.False(t, bytes.Contains(enc, want), "%s: stored sealed", a.Key)
-
-		// Nothing secret reaches the log.
-		require.NotContains(t, logs.String(), a.TOTPSecret)
+		// No phone reaches the log.
 		require.NotContains(t, logs.String(), a.Phone)
 	}
 	require.Contains(t, logs.String(), "admins seeded")
@@ -162,56 +134,38 @@ func TestSeedAdminsRefusedOutsideLocalAndTest(t *testing.T) {
 	require.Zero(t, n, "the refusal rolls the whole seed back")
 }
 
-func TestSeedAdminsWithoutTOTPKey(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "admins.yaml")
-	require.NoError(t, os.WriteFile(path, []byte(validAdminYAML), 0o600))
-	withEnv(t, map[string]string{seedAdminsFileEnv: path, "APP_ENV": "local"})
-	tdb := testkit.NewDB(t)
-	ctx := context.Background()
-	var logs bytes.Buffer
-	require.NoError(t, Run(ctx, config.EnvTest, Dev, Deps{DB: db.New(tdb.Pool), Keys: testKeys(t), Log: logTo(&logs)}))
-	var n int
-	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM admin_users`).Scan(&n))
-	require.Zero(t, n)
-	require.Contains(t, logs.String(), "TOTP_ENC_KEY unset")
-}
-
-// A made-up secret for the validation tests (base32 of 20 bytes).
-const testSecret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ" // gitleaks:allow (made-up test value)
-
 const validAdminYAML = `admins:
   - key: t.one
     id: 01KE0S1W6W8ZV7T1C3A6M9N091
     phone: "+919000000091"
     roles: [support]
-    totp_secret: ` + testSecret + `
 `
 
 func TestLoadSeedAdminsRefusesBadFiles(t *testing.T) {
-	entry := func(key, id, phone, roles, secret string) string {
-		return "  - key: " + key + "\n    id: " + id + "\n    phone: \"" + phone + "\"\n    roles: " + roles +
-			"\n    totp_secret: \"" + secret + "\"\n"
+	entry := func(key, id, phone, roles string) string {
+		return "  - key: " + key + "\n    id: " + id + "\n    phone: \"" + phone + "\"\n    roles: " + roles + "\n"
 	}
-	ok := entry("t.one", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000091", "[support]", testSecret)
+	ok := entry("t.one", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000091", "[support]")
 	cases := map[string]string{
-		"empty":            "admins: []\n",
-		"unknown field":    "admins:\n  - key: t.one\n    password: x\n",
-		"not yaml":         "admins: [\n",
-		"no key":           "admins:\n" + entry("", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000091", "[support]", testSecret),
-		"dup key":          "admins:\n" + ok + entry("t.one", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]", ""),
-		"user key":         "admins:\n" + entry("customer.asha", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]", ""),
-		"bad id":           "admins:\n" + entry("t.two", "not-a-ulid", "+919000000092", "[support]", ""),
-		"id without N":     "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9Q092", "+919000000092", "[support]", ""),
-		"id of a user":     "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N001", "+919000000092", "[support]", ""),
-		"dup id":           "admins:\n" + ok + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000092", "[support]", ""),
-		"real phone":       "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919876543210", "[support]", ""),
-		"phone of a user":  "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000001", "[support]", ""),
-		"dup phone":        "admins:\n" + ok + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000091", "[support]", ""),
-		"no roles":         "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[]", ""),
-		"business role":    "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[owner]", ""),
-		"repeated role":    "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support, support]", ""),
-		"secret not b32":   "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]", "not!base32"),
-		"secret too short": "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]", "GEZDGNBVGY3TQOJQ"),
+		"empty":           "admins: []\n",
+		"unknown field":   "admins:\n  - key: t.one\n    password: x\n",
+		"not yaml":        "admins: [\n",
+		"no key":          "admins:\n" + entry("", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000091", "[support]"),
+		"dup key":         "admins:\n" + ok + entry("t.one", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]"),
+		"user key":        "admins:\n" + entry("customer.asha", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support]"),
+		"bad id":          "admins:\n" + entry("t.two", "not-a-ulid", "+919000000092", "[support]"),
+		"id without N":    "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9Q092", "+919000000092", "[support]"),
+		"id of a user":    "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N001", "+919000000092", "[support]"),
+		"dup id":          "admins:\n" + ok + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N091", "+919000000092", "[support]"),
+		"real phone":      "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919876543210", "[support]"),
+		"phone of a user": "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000001", "[support]"),
+		"dup phone":       "admins:\n" + ok + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000091", "[support]"),
+		"no roles":        "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[]"),
+		"business role":   "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[owner]"),
+		"repeated role":   "admins:\n" + entry("t.two", "01KE0S1W6W8ZV7T1C3A6M9N092", "+919000000092", "[support, support]"),
+		// D-264: the authenticator is gone; a fixture still naming a
+		// secret is refused (KnownFields), not silently ignored.
+		"old totp_secret": "admins:\n" + ok[:len(ok)-1] + "\n    totp_secret: not-a-secret\n",
 	}
 	dir := t.TempDir()
 	for name, body := range cases {
@@ -221,9 +175,8 @@ func TestLoadSeedAdminsRefusesBadFiles(t *testing.T) {
 			_, err := loadSeedAdmins(path)
 			require.Error(t, err)
 			msg := err.Error()
-			require.NotContains(t, msg, testSecret, "an error never quotes a secret")
+			require.NotContains(t, msg, "GEZDGNBVGY3TQOJQ", "an error never quotes a value")
 			require.NotContains(t, msg, "9876543210", "an error never quotes a phone")
-			require.NotContains(t, msg, "not!base32")
 		})
 	}
 

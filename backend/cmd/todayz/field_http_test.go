@@ -15,7 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/business"
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
@@ -85,12 +84,12 @@ func newFieldAPI(t *testing.T) *fieldAPI {
 	return f
 }
 
-// fieldUser is an admin console user with roles, signed in with otp+totp.
+// fieldUser is an admin console user with roles, signed in with the SMS OTP
+// (D-264).
 type fieldUser struct {
-	a      *fieldAPI
-	phone  string
-	id     string
-	secret []byte
+	a     *fieldAPI
+	phone string
+	id    string
 }
 
 func (f *fieldAPI) user(phone string, roles ...string) *fieldUser {
@@ -103,30 +102,11 @@ func (f *fieldAPI) user(phone string, roles ...string) *fieldUser {
 	return &fieldUser{a: f, phone: phone, id: id}
 }
 
-// token signs in afresh at the clock's time (access tokens last 15 min).
+// token signs in afresh at the clock's time (access tokens last 15 min) and
+// passes the SMS step-up.
 func (u *fieldUser) token() string {
-	a, t := u.a, u.a.t
-	t.Helper()
-	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
-		"phone": u.phone, "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
-	}, nil)
-	require.Equal(t, http.StatusOK, w.code, "otp send: %d", w.code)
-	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
-		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
-	}, map[string]string{"User-Agent": "field-test"})
-	require.Equal(t, http.StatusOK, w.code, "otp verify: %d", w.code)
-	tok := w.body["accessToken"].(string)
-	if u.secret == nil {
-		e := a.call(tok, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
-		require.Equal(t, http.StatusOK, e.code, "enrol: %d", e.code)
-		s, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
-		require.NoError(t, err)
-		u.secret = s
-	}
-	a.clk.Advance(31 * time.Second) // a fresh TOTP step
-	v := a.call(tok, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(u.secret, a.clk.Now()), "purpose": "login"}, nil)
-	require.Equal(t, http.StatusOK, v.code, "totp verify: %d", v.code)
-	return v.body["accessToken"].(string)
+	u.a.t.Helper()
+	return u.a.adminToken(u.phone, "field-test")
 }
 
 var fieldHours = func() map[string]any {

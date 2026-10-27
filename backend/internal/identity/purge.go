@@ -22,15 +22,23 @@ const (
 	// token's whole life. A replay after that is a plain 401.
 	// TODO(lead): the plan names no retention for sessions; 30 days assumed.
 	SessionRetention = 30 * 24 * time.Hour
+	// AdminSigninFailureRetention keeps a wrong admin sign-in code for the
+	// longest window admin_signin_failure_window_hours may be set to (its
+	// max, 168 h), so a purge never lowers a count that still matters
+	// (D-264). Locks are deleted once they have run out.
+	AdminSigninFailureRetention = 168 * time.Hour //settings:ok the max of admin_signin_failure_window_hours
 )
 
 // PurgeResult counts the rows one purge deleted.
 type PurgeResult struct {
-	OTPRequests int64
-	Sessions    int64
+	OTPRequests         int64
+	Sessions            int64
+	AdminSigninFailures int64
+	AdminSigninLocks    int64
 }
 
-// Purge deletes OTP requests and sessions past their retention. It is
+// Purge deletes OTP requests, sessions and the admin sign-in failures and
+// locks (D-264) past their retention. It is
 // idempotent: a retried job deletes nothing it should not.
 func Purge(ctx context.Context, d *db.DB, now time.Time) (PurgeResult, error) {
 	q := identitydb.New(d.Q(ctx))
@@ -45,5 +53,15 @@ func Purge(ctx context.Context, d *db.DB, now time.Time) (PurgeResult, error) {
 		return out, fmt.Errorf("identity: purge sessions: %w", err)
 	}
 	out.Sessions = n
+	n, err = q.PurgeAdminSigninFailures(ctx, now.Add(-AdminSigninFailureRetention))
+	if err != nil {
+		return out, fmt.Errorf("identity: purge admin_signin_failures: %w", err)
+	}
+	out.AdminSigninFailures = n
+	n, err = q.PurgeAdminSigninLocks(ctx, now)
+	if err != nil {
+		return out, fmt.Errorf("identity: purge admin_signin_locks: %w", err)
+	}
+	out.AdminSigninLocks = n
 	return out, nil
 }

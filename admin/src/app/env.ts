@@ -17,8 +17,3 @@ export const GRAFANA_URL: string = (import.meta.env.VITE_GRAFANA_URL ?? (import.
   /\/+$/,
   '',
 );
-/**
- * The API signs admins in without the authenticator step (ADMIN_TOTP_OFF, local only, D-244): the
- * two-step screen is skipped, also after a reload or in a new tab. Only the dev server sets it.
- */
-export const ADMIN_TOTP_OFF: boolean = import.meta.env.VITE_ADMIN_TOTP_OFF === '1';

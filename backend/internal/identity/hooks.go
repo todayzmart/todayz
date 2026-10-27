@@ -26,8 +26,8 @@ import (
 //     500).
 //  3. identity anonymises the user (status deleted, name cleared), deletes the
 //     phone identity and addresses, scrubs device push keys and device ids,
-//     clears every session's user agent and IP hash, revokes every session
-//     and, for a disabled admin, drops the TOTP secret and recovery codes.
+//     clears every session's user agent and IP hash and revokes every
+//     session.
 //
 // Domains never import each other (backend/CLAUDE.md): a domain implements
 // the interfaces in its own package and its mountX in cmd/todayz registers

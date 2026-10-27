@@ -45,7 +45,6 @@ export async function openContext(
         localStorage.setItem('todayz.lang', l);
         if (a === 'customer') localStorage.setItem('todayz.place', place);
         if (a === 'business') localStorage.setItem('todayz.biz.store', store);
-        if (a === 'admin') sessionStorage.setItem('todayz.admin.2fa', String(Date.now()));
       } catch {
         // storage blocked: the screen shows what it shows
       }

@@ -54,10 +54,9 @@ func problemOf(t *testing.T, rec *httptest.ResponseRecorder) string {
 func TestAuthn(t *testing.T) {
 	cust := mwPrincipal(authn.AppCustomer, authn.AMROTP)
 	biz := mwPrincipal(authn.AppBusiness, authn.AMROTP)
-	admOTP := mwPrincipal(authn.AppAdmin, authn.AMROTP)
-	adm := mwPrincipal(authn.AppAdmin, authn.AMROTPTOTP)
+	adm := mwPrincipal(authn.AppAdmin, authn.AMROTP)
 	a := fakeAuth{
-		"cust": cust, "biz": biz, "adm-otp": admOTP, "adm": adm,
+		"cust": cust, "biz": biz, "adm": adm,
 		"blocked": problem.New(genproblems.AccountBlocked, ""),
 		"broken":  problem.Wrap(genproblems.Internal, errors.New("db down")),
 	}
@@ -86,14 +85,9 @@ func TestAuthn(t *testing.T) {
 		"customer biz":              {"/v1/biz/x", []string{"Bearer cust"}, 403, genproblems.Forbidden},
 		"customer admin":            {"/v1/admin/x", []string{"Bearer cust"}, 403, genproblems.Forbidden},
 		"business biz":              {"/v1/biz/x", []string{"Bearer biz"}, 204, ""},
-		"admin otp only, admin":     {"/v1/admin/x", []string{"Bearer adm-otp"}, 403, genproblems.Forbidden},
-		"admin otp only, me":        {"/v1/me", []string{"Bearer adm-otp"}, 403, genproblems.Forbidden},
-		"admin otp only, auth":      {"/v1/auth/totp/verify", []string{"Bearer adm-otp"}, 204, ""},
-		"admin otp only, rum":       {"/v1/rum", []string{"Bearer adm-otp"}, 204, ""},
-		"admin otp only, events":    {"/v1/events", []string{"Bearer adm-otp"}, 204, ""},
-		"admin otp only, rum sub":   {"/v1/rum/x", []string{"Bearer adm-otp"}, 403, genproblems.Forbidden},
-		"admin otp only, eventsx":   {"/v1/eventsx", []string{"Bearer adm-otp"}, 403, genproblems.Forbidden},
-		"admin totp":                {"/v1/admin/x", []string{"Bearer adm"}, 204, ""},
+		"admin sms, admin":          {"/v1/admin/x", []string{"Bearer adm"}, 204, ""}, // D-264
+		"admin sms, step-up":        {"/v1/auth/step-up/send", []string{"Bearer adm"}, 204, ""},
+		"admin sms, rum":            {"/v1/rum", []string{"Bearer adm"}, 204, ""},
 		"admin on biz":              {"/v1/biz/x", []string{"Bearer adm"}, 403, genproblems.Forbidden},
 		"bad token public":          {"/v1/discover", []string{"Bearer nope"}, 401, genproblems.Unauthorized},
 		"basic scheme":              {"/v1/discover", []string{"Basic abc"}, 401, genproblems.Unauthorized},
@@ -142,7 +136,7 @@ func TestAuthn(t *testing.T) {
 			require.False(t, signedIn, "%s is anonymous whatever the bearer", p)
 		}
 	}
-	for _, p := range []string{"/v1/auth/totp/verify", "/v1/auth/refresh/", "/v1/auth/refreshx", "/v1/me"} {
+	for _, p := range []string{"/v1/auth/step-up/verify", "/v1/auth/refresh/", "/v1/auth/refreshx", "/v1/me"} {
 		req := httptest.NewRequest(http.MethodPost, p, nil)
 		req.Header.Set("Authorization", "Bearer nope")
 		rec := httptest.NewRecorder()

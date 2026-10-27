@@ -143,7 +143,7 @@ describe('turnstile', () => {
 });
 
 describe('safeNext', () => {
-  const blocked = ['/sign-in', '/two-step'];
+  const blocked = ['/sign-in', '/sign-up'];
   it('keeps a path on this app, with its query and hash', () => {
     expect(safeNext('/orders/12?tab=a#top', blocked)).toBe('/orders/12?tab=a#top');
   });
@@ -164,7 +164,7 @@ describe('safeNext', () => {
       '/%2e//x',
       '/sign-in',
       '/sign-in/x?next=/',
-      '/two-step',
+      '/sign-up',
     ];
     for (const v of bad) expect(safeNext(v, blocked), String(v)).toBe('/');
   });

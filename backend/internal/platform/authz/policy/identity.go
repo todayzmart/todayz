@@ -3,9 +3,9 @@ package policy
 import "github.com/todayz/backend/internal/platform/authz"
 
 // Identity actions (W1-01). Sign-in, refresh, logout, logout-all and the
-// admin TOTP routes are authz.Public: they run before there is a principal,
-// authenticate by their own cookie, or are how an admin reaches otp+totp
-// (the handler checks the admin caller).
+// admin SMS step-up routes are authz.Public: they run before there is a
+// principal, authenticate by their own cookie, or are how an admin refreshes
+// their step-up (the handler checks the admin caller, D-264).
 const (
 	MeView   = "me.view"
 	MeEdit   = "me.edit"

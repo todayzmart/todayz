@@ -8,7 +8,6 @@ import { IntlProvider } from 'react-intl';
 import { CrashFallback } from './CrashFallback';
 import { useUpdateLabels } from './labels';
 import type { makeRouter } from './router';
-import { SecondFactorContext, type SecondFactor } from './second-factor';
 import { UpdateContext } from './update-context';
 
 /** A missing key is a bug: tests fail on it, dev and prod log it (the smoke test fails on console errors). */
@@ -23,7 +22,6 @@ interface AppProps {
   queryClient: QueryClient;
   session: Session;
   update: UpdateController;
-  factor: SecondFactor;
 }
 
 function UpdateToast({ update }: { update: UpdateController }) {
@@ -34,30 +32,21 @@ function UpdateToast({ update }: { update: UpdateController }) {
  * Formatting (numbers, dates, ₹) always uses en-IN; the pseudo-locale only swaps the messages,
  * so no extra Intl locale data is needed for it.
  */
-export function App({ messages, router, queryClient, session, update, factor }: AppProps) {
+export function App({ messages, router, queryClient, session, update }: AppProps) {
   // Another tab signed in as someone else: nothing cached for the previous person may stay.
-  useEffect(
-    () =>
-      session.onUserChange(() => {
-        queryClient.clear();
-        factor.clear();
-      }),
-    [session, queryClient, factor],
-  );
+  useEffect(() => session.onUserChange(() => queryClient.clear()), [session, queryClient]);
   return (
     <IntlProvider locale={FORMAT_LOCALE} defaultLocale={FORMAT_LOCALE} messages={messages} onError={onIntlError}>
       <ErrorBoundary fallback={(reset) => <CrashFallback reset={reset} />}>
         <SessionProvider session={session}>
-          <SecondFactorContext.Provider value={factor}>
-            <UpdateContext.Provider value={update}>
-              <ToastProvider>
-                <QueryClientProvider client={queryClient}>
-                  <RouterProvider router={router} />
-                  <UpdateToast update={update} />
-                </QueryClientProvider>
-              </ToastProvider>
-            </UpdateContext.Provider>
-          </SecondFactorContext.Provider>
+          <UpdateContext.Provider value={update}>
+            <ToastProvider>
+              <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
+                <UpdateToast update={update} />
+              </QueryClientProvider>
+            </ToastProvider>
+          </UpdateContext.Provider>
         </SessionProvider>
       </ErrorBoundary>
     </IntlProvider>

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { expect, request as playwrightRequest, type APIRequestContext, type BrowserContext } from '@playwright/test';
 
-import { Api, adminTotpSecret, totp, ulid, type Bearer } from './api';
+import { Api, ulid, type Bearer } from './api';
 import { URLS, type App, type Person } from './seed';
 
 // Each person signs in once per gate run: the API allows 20 OTP sends per client IP per hour and 5 per
@@ -36,8 +36,11 @@ interface Saved {
   userId: string;
   isNewUser: boolean;
   cookies: Cookie[];
-  /** An admin's last accepted TOTP step: the server takes each 30 s step once. */
-  totpStep?: number;
+  /**
+   * When this admin's sign-in last passed the SMS step-up (D-264), on the server's clock. Refresh keeps
+   * the stamp on the sign-in, so it lasts until a new sign-in.
+   */
+  stepUpAt?: number;
 }
 
 interface State {
@@ -117,6 +120,24 @@ async function sendOtp(request: APIRequestContext, person: Person): Promise<{ re
   }
 }
 
+/** The admin SMS step-up send (D-264): the API texts the signed-in admin's own number; the gap rule is sendOtp's. */
+async function sendStepUp(request: APIRequestContext, person: Person, bearer: string): Promise<{ requestId: string; since: string }> {
+  for (let attempt = 0; ; attempt++) {
+    const since = new Date(Date.now() - 1000).toISOString();
+    const r = await request.post(`${URLS.api}/v1/auth/step-up/send`, { headers: { Authorization: `Bearer ${bearer}` } });
+    if (r.status() === 200) return { requestId: ((await r.json()) as { requestId: string }).requestId, since };
+    const wait = Number(r.headers()['retry-after'] ?? '0');
+    if (r.status() === 429 && wait <= 35 && attempt === 0) {
+      await new Promise((done) => setTimeout(done, wait * 1000 + 500));
+      continue;
+    }
+    throw new Error(`step-up send for ${person.key} answered ${r.status()} (retry-after ${wait}s); the per-IP or per-phone hourly cap is a reason to make reset`);
+  }
+}
+
+/** A step-up younger than this (server clock) is reused; the API's window is 10 minutes (authn.StepUpWindow). */
+const STEP_UP_REUSE_MS = 8 * 60_000;
+
 /**
  * One OTP sign-in attempt that keeps no session: the verify's status and problem code (a blocked
  * account answers 403 account_blocked). Uses one of the phone's OTP sends.
@@ -160,7 +181,7 @@ export class Principal implements Bearer {
     return this.ctx;
   }
 
-  /** Signs in (OTP from the mocks, plus TOTP for an admin) unless a saved session exists. */
+  /** Signs in (OTP from the mocks; for an admin too, D-264) unless a saved session exists. */
   async open(): Promise<this> {
     const s = readState().people[this.person.key];
     if (s) {
@@ -173,69 +194,56 @@ export class Principal implements Bearer {
     return this;
   }
 
-  /** OTP (and TOTP for an admin) on this person's own request context; keeps the session. */
+  /** OTP on this person's own request context; keeps the session. The code alone signs an admin in (D-264). */
   private async signIn(): Promise<void> {
     if (!this.ctx) throw new Error(`${this.person.key} has no request context`);
     const { requestId, since } = await sendOtp(this.ctx, this.person);
     const code = await latestOtp(this.ctx, this.person.national, since);
     const v = await this.ctx.post(`${URLS.api}/v1/auth/otp/verify`, { data: { requestId, code, app: this.person.app, deviceId: ulid() } });
     expect(v.status(), `OTP verify for ${this.person.key}`).toBe(200);
-    const body = (await v.json()) as { accessToken: string; expiresAt: string; userId: string; isNewUser: boolean; nextStep?: string };
-    // A sign-in again keeps the last authenticator step used: the server takes each step once.
-    const totpStep = this.saved?.totpStep;
-    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [], ...(totpStep === undefined ? {} : { totpStep }) };
-    if (this.person.app === 'admin') {
-      expect(body.nextStep, `${this.person.key} is an enrolled admin`).toBe('totp_verify');
-      await this.totpVerify('login');
-    }
+    const body = (await v.json()) as { accessToken: string; expiresAt: string; userId: string; isNewUser: boolean };
+    expect(body, `${this.person.key}: the SMS code alone signs in, no second step (D-264)`).not.toHaveProperty('nextStep');
+    // A new sign-in starts without a step-up.
+    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [] };
     await this.persist();
   }
 
   /**
-   * A fresh authenticator code for a † admin action (D-64): the API stamps this sign-in as checked
-   * for 10 minutes and answers a new access token.
+   * A fresh SMS step-up for a † admin action (D-264): the API texts a code to this admin's own number,
+   * the code comes from the mocks server, and a right code stamps this sign-in as checked for 10
+   * minutes (the token does not change). A step-up younger than STEP_UP_REUSE_MS is reused, since
+   * every send counts toward the phone's and the IP's hourly caps; `force` skips that (after a
+   * `403 step_up_required`).
    */
-  async stepUp(): Promise<void> {
+  async stepUp(opts: { force?: boolean } = {}): Promise<void> {
     if (this.person.app !== 'admin') throw new Error(`${this.person.key} is not an admin`);
-    await this.totpVerify('step_up');
+    if (!this.saved) throw new Error(`${this.person.key} is not signed in`);
+    if (!opts.force && this.saved.stepUpAt !== undefined && this.serverNow() - this.saved.stepUpAt < STEP_UP_REUSE_MS) return;
+    const bearer = await this.token();
+    const { requestId, since } = await sendStepUp(this.request(), this.person, bearer);
+    const code = await latestOtp(this.request(), this.person.national, since);
+    const t = await this.request().post(`${URLS.api}/v1/auth/step-up/verify`, {
+      headers: { Authorization: `Bearer ${bearer}` },
+      data: { requestId, code },
+    });
+    expect(t.status(), `step-up verify for ${this.person.key}`).toBe(200);
+    await this.noteStepUp();
+  }
+
+  /** Records a step-up passed on this sign-in, here or in the console's dialog on a lent session. */
+  async noteStepUp(): Promise<void> {
+    if (!this.saved) return;
+    this.saved.stepUpAt = this.serverNow();
     await this.persist();
   }
 
-  /**
-   * The admin's authenticator code for the next unused 30 s step, for a screen that asks for one
-   * (the step-up dialog). The step is recorded as used: the server takes each step once.
-   */
-  async totpCode(): Promise<string> {
-    if (!this.saved) throw new Error(`${this.person.key} is not signed in`);
-    const secret = adminTotpSecret(this.person.admin ?? '');
-    // Not in the last seconds of a step, so the code is still current when it arrives; and a step
-    // after the last one used.
-    for (;;) {
-      // The server checks the code at its own (test clock) time.
-      const now = Date.now() + readState().clockOffsetMs;
-      const left = 30_000 - (now % 30_000);
-      const step = Math.floor(now / 30_000);
-      if (left < 4_000 || (this.saved.totpStep !== undefined && step <= this.saved.totpStep)) {
-        await new Promise((done) => setTimeout(done, left + 300));
-        continue;
-      }
-      this.saved.totpStep = step;
-      return totp(secret, now);
-    }
+  /** The newest SMS code sent to this person since `since` (ISO time). Never print it. */
+  async smsCode(since: string): Promise<string> {
+    return latestOtp(this.request(), this.person.national, since);
   }
 
-  private async totpVerify(purpose: 'login' | 'step_up'): Promise<void> {
-    if (!this.saved) throw new Error(`${this.person.key} is not signed in`);
-    const bearer = purpose === 'login' ? this.saved.token : await this.token();
-    const code = await this.totpCode();
-    const t = await this.request().post(`${URLS.api}/v1/auth/totp/verify`, {
-      headers: { Authorization: `Bearer ${bearer}` },
-      data: { code, purpose },
-    });
-    expect(t.status(), `TOTP ${purpose} for ${this.person.key}`).toBe(200);
-    const tb = (await t.json()) as { accessToken: string; expiresAt: string };
-    this.saved.token = tb.accessToken;
-    this.saved.expiresAt = Date.parse(tb.expiresAt);
+  private serverNow(): number {
+    return Date.now() + readState().clockOffsetMs;
   }
 
   async token(): Promise<string> {

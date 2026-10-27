@@ -32,7 +32,7 @@ rotation. `make env-check` shows `NAME set|missing`; nothing else should ever pr
 | `BILL_QR_SIGNING_KEY` | Yes | Bill QRs expire in 120 s. Rotate outside shop hours; a QR shown during the deploy fails and the POS refreshes it. |
 | `SHARE_PREVIEW_KEY` | Yes, both sides together | Set the same new value on the API (Secrets Manager) and on the `todayz-customer` Pages project, then deploy both. Between the two, previews are counted by Cloudflare IP (the API still starts). |
 | `ORDER_CODE_HMAC_KEY`, `PII_HASH_KEY` | **No** | Stored lookups (`code_hmac`, PII hashes) are keyed with it. A new key makes existing rows unfindable. Needs a re-hash job that does not exist yet. |
-| `ORDER_CODE_ENC_KEY`, `PII_ENC_KEY`, `DEVICE_SECRET_ENC_KEY`, `TOTP_ENC_KEY` | **No** | Stored ciphertext (order codes, phones, PAN, bank details, device secrets, admin TOTP) is sealed with one key, with no key version. A new key makes existing rows unreadable. Needs a re-encrypt job that does not exist yet. |
+| `ORDER_CODE_ENC_KEY`, `PII_ENC_KEY`, `DEVICE_SECRET_ENC_KEY` | **No** | Stored ciphertext (order codes, phones, PAN, bank details, device secrets) is sealed with one key, with no key version. A new key makes existing rows unreadable. Needs a re-encrypt job that does not exist yet. |
 
 If a **no** key leaks, it is SEV1 ([Severity levels](severity.md)). Tell the lead and the founder at
 once. Do not swap the key in place. The fix is a dual-key release (read old and new, write new), a

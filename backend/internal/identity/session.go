@@ -43,8 +43,8 @@ const (
 // presented it is returned again, with a fresh access token, and nothing is
 // written or audited. Every retry gets the same token, so two tabs or two
 // concurrent retries all converge on one cookie. When the successor has been
-// used (or revoked, or the row predates D-239 or was rotated by the TOTP
-// flows, which record no successor), the retry is a plain 401 that keeps the
+// used (or revoked, or the row predates D-239 or was rotated by the old
+// admin authenticator flows, which recorded no successor), the retry is a plain 401 that keeps the
 // cookie (graceRetry), as before.
 //
 // Past the window, presenting a rotated token is reuse: the family is
@@ -167,8 +167,8 @@ type RefreshInput struct {
 // Locks: the users row FOR NO KEY UPDATE first (lockSessionUser), then the
 // session row, then (replay only) its successor's row. Every path that
 // revokes sessions in bulk (logout, logout-all, this function's reuse branch,
-// the TOTP lockout, deletion) and every path that rotates (refresh, TOTP
-// elevation) holds that lock, so a rotation either commits before a
+// the admin step-up lockout, deletion) and every path that rotates (refresh)
+// holds that lock, so a rotation either commits before a
 // revocation starts (and its new row is revoked with the rest) or runs after
 // it (and finds its token revoked). Without that, a revocation's UPDATE,
 // whose snapshot predates the rotation's insert, would miss the new row. The
@@ -189,7 +189,6 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 		outcome error
 		family  ids.ID
 		roles   []string
-		amr     = authn.AMROTP
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
@@ -217,15 +216,15 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 		// The live row the checks below apply to: the presented one or, on a
 		// replay, its successor.
 		var (
-			replay         *replayed
-			expiresAt      = row.ExpiresAt
-			totpVerifiedAt = row.TotpVerifiedAt
+			replay    *replayed
+			expiresAt = row.ExpiresAt
 		)
 		rotated := row.RevokedAt != nil && row.RevokedReason != nil && *row.RevokedReason == reasonRotated
 		if rotated && now.Sub(*row.RevokedAt) <= RotationGrace {
 			// The admin app never replays: a copied admin token presented
-			// inside the window would otherwise get a live TOTP-verified
-			// session, and an admin who lost a response can sign in again.
+			// inside the window would otherwise get a live admin session
+			// (with its step-up), and an admin who lost a response can sign
+			// in again.
 			var r *replayed
 			if in.App != authn.AppAdmin {
 				var err error
@@ -241,7 +240,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 				outcome = graceRetry{problem.New(genproblems.Unauthorized, "")}
 				return nil
 			}
-			replay, expiresAt, totpVerifiedAt = r, r.expiresAt, r.totpVerifiedAt
+			replay, expiresAt = r, r.expiresAt
 		} else if row.RevokedAt != nil {
 			if rotated {
 				// Reuse: someone holds an old token. End the sign-in everywhere.
@@ -282,9 +281,6 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 				return err
 			}
 			roles = a.Roles
-			if totpCurrent(a.TotpEnabledAt, totpVerifiedAt) {
-				amr = authn.AMROTPTOTP
-			}
 		}
 		family = fam
 		if replay != nil {
@@ -317,7 +313,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 			ID: next, UserID: row.UserID, App: row.App, FamilyID: row.FamilyID,
 			RefreshHash: hashRefresh(refresh), ExpiresAt: exp, DeviceID: row.DeviceID,
 			UserAgent: cleanUserAgent(in.UserAgent), IpHash: s.hash.IP(reqctx.ClientIP(ctx)), Now: now,
-			TotpVerifiedAt: row.TotpVerifiedAt,
+			StepUpAt: row.StepUpAt, // the admin's step-up carries over (D-264)
 		}); err != nil {
 			return err
 		}
@@ -330,7 +326,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	if outcome != nil {
 		return SignIn{}, outcome
 	}
-	tok, exp, err := s.tokens.Issue(authn.Principal{UserID: out.UserID, App: in.App, SessionID: family, Roles: roles, AMR: amr})
+	tok, exp, err := s.tokens.Issue(authn.Principal{UserID: out.UserID, App: in.App, SessionID: family, Roles: roles, AMR: authn.AMROTP})
 	if err != nil {
 		return SignIn{}, problem.Wrap(genproblems.Internal, err)
 	}
@@ -340,9 +336,8 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 
 // replayed is a rotated token's still-unused successor (replaySuccessor).
 type replayed struct {
-	token          string
-	expiresAt      time.Time
-	totpVerifiedAt *time.Time
+	token     string
+	expiresAt time.Time
 }
 
 // replaySuccessor returns the successor of the rotated row presented with
@@ -354,7 +349,7 @@ type replayed struct {
 // users row and the presented row) and writes nothing.
 func (s *Service) replaySuccessor(ctx context.Context, q *identitydb.Queries, row identitydb.GetSessionByRefreshHashForUpdateRow, token string) (*replayed, error) {
 	if !row.SuccessorID.Valid || len(row.SuccessorSalt) != successorSaltLen {
-		return nil, nil // rotated before D-239, or by the TOTP flows
+		return nil, nil // rotated before D-239, or by the old authenticator flows
 	}
 	succ, err := q.GetSessionForUpdate(ctx, row.SuccessorID)
 	switch {
@@ -370,7 +365,7 @@ func (s *Service) replaySuccessor(ctx context.Context, q *identitydb.Queries, ro
 	if subtle.ConstantTimeCompare(hashRefresh(derived), succ.RefreshHash) != 1 {
 		return nil, nil // PII_HASH_KEY changed since the rotation
 	}
-	return &replayed{token: derived, expiresAt: succ.ExpiresAt, totpVerifiedAt: succ.TotpVerifiedAt}, nil
+	return &replayed{token: derived, expiresAt: succ.ExpiresAt}, nil
 }
 
 // lockSessionUser locks the users row of a refresh token's session (LockUser,
@@ -395,14 +390,6 @@ func lockSessionUser(ctx context.Context, q *identitydb.Queries, token string) (
 		return false, err
 	}
 	return true, nil
-}
-
-// totpCurrent reports whether a sign-in's TOTP verification at verifiedAt
-// still counts: the admin is enrolled now (totp_enabled_at) and verified at
-// or after that enrolment. A reset (W3-05) clears totp_enabled_at, so no
-// verification survives it, nor a later re-enrolment.
-func totpCurrent(enabledAt, verifiedAt *time.Time) bool {
-	return enabledAt != nil && verifiedAt != nil && !verifiedAt.Before(*enabledAt)
 }
 
 // Logout ends the sign-in (session family) of the presented refresh token.
@@ -485,13 +472,10 @@ func (s *Service) CheckSession(ctx context.Context, userID, sessionID ids.ID, ap
 			return authn.SessionState{}, fmt.Errorf("identity: admin check: %w", err)
 		}
 		out.Roles = a.Roles
-		switch {
-		case s.totpOff:
-			// D-244 (local and test only): every request counts as a fresh
-			// TOTP verification, so sign-in and † actions need no code.
-			out.StepUpAt, out.TOTPWaived = now, true
-		case st.HasTotp && totpCurrent(a.TotpEnabledAt, &st.TotpVerifiedAt):
-			out.StepUpAt = st.TotpVerifiedAt
+		if st.HasStepUp {
+			// The sign-in's last SMS step-up (D-264); a † action needs it
+			// younger than authn.StepUpWindow.
+			out.StepUpAt = st.StepUpAt
 		}
 	}
 	return out, nil

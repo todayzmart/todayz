@@ -1,6 +1,6 @@
 # backend/
 
-Go API and workers: one module, one binary (`todayz api|worker|migrate|seed|rollup|ai|images|version`).
+Go API and workers: one module, one binary (`todayz api|worker|migrate|seed|rollup|ai|images|admin|version`).
 chi, pgx v5 + sqlc, goose, River, PostGIS. Every domain package is built; the package map is in
 `docs/guide/code-structure.md` and the human entry point is `backend/README.md`.
 
@@ -30,8 +30,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 Environment (names only; values live in `.env.local`): `APP_ENV` (local|test|staging|prod),
 `DATABASE_URL` (todayz_app), `DATABASE_MIGRATE_URL` (todayz_owner), `API_ADDR` (default
 127.0.0.1:8180 locally, :8080 deployed), `WORKER_ADDR` (127.0.0.1:8181 / :8081), `API_PUBLIC_URL`,
-`LOG_LEVEL`, `TODAYZ_NO_EGRESS`, `ADMIN_TOTP_OFF` (local and test only, on loopback: admins sign in
-without the authenticator step, D-244), `SHUTDOWN_PRESTOP` and `SHUTDOWN_DRAIN` (optional Go durations,
+`LOG_LEVEL`, `TODAYZ_NO_EGRESS`, `SHUTDOWN_PRESTOP` and `SHUTDOWN_DRAIN` (optional Go durations,
 see Shutdown below), `PII_ENC_KEY` (32 bytes, required: it seals stored idempotent
 response bodies; `make setup` generates it), plus the provider keys in `internal/platform/config`.
 Secret values are `config.Secret` (prints as `[redacted]`). Config logs the names of unset

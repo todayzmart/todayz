@@ -2,7 +2,7 @@
 
 How TodayZ is put together: the parts, how they talk, and why.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 The plan lives in [docs/plan/02-architecture.md](../plan/02-architecture.md). This page describes what the code does today. When the two differ, the code wins and the plan file is fixed. Product numbers (timers, fees, limits) are never repeated here: they live in `platform_settings` and are listed in [01-product-rules.md](../plan/01-product-rules.md).
 
@@ -101,7 +101,7 @@ Rules worth knowing:
 - **Per-route policy comes from the contract.** The OpenAPI extensions `x-idempotency`, `x-upload`, `x-money` and `x-problems` become a `route.Policy` in the request context (`backend/internal/platform/httpx/route`).
 - **Idempotency is opt-in per route.** A route that declares it needs an `Idempotency-Key`. The stored response is sealed with `PII_ENC_KEY`, and a claim holds a short lease so a duplicate waits or replays (`backend/internal/platform/idempotency`). It runs after validation, so a refused request is never stored.
 - **Authentication** turns a Bearer JWT (EdDSA access token) into a principal (`backend/internal/platform/authn`). The URL namespace must match the principal: `/v1/discover` public, `/v1/me` customer, `/v1/biz/businesses/{bid}[/stores/{sid}]` staff, `/v1/admin` admin, `/v1/auth` and `/v1/public` no login, plus `/v1/rum` and `/v1/events` for telemetry.
-- **Authorization** fails closed. Each operation has a policy in `backend/internal/platform/authz/policy/<domain>.go`, tested against golden tables. Staff scope (which business and store) is resolved from the `staff` table. Admin actions need TOTP step-up (D-14).
+- **Authorization** fails closed. Each operation has a policy in `backend/internal/platform/authz/policy/<domain>.go`, tested against golden tables. Staff scope (which business and store) is resolved from the `staff` table. Admin † actions (money, settings, admin users, `money` jobs) need an SMS step-up within 10 minutes (D-264).
 - **Errors** are RFC 9457 problem documents. Codes are declared per route in `backend/api/problems/` and generated into `backend/gen/problems`.
 - **Telemetry** is added at slots 4 and 6: a trace per request, RED metrics, and a request log with a server-made request id. See [05-observability.md](../plan/05-observability.md).
 - **Money** is integer paise everywhere (D-03). `backend/internal/platform/money` has no floats.
@@ -246,7 +246,7 @@ Migrations: goose, embedded in the binary, out-of-order allowed. Database change
 
 ## 9. Auth in one paragraph
 
-Sign-in is by phone and OTP (`/v1/auth/otp/send`, `/v1/auth/otp/verify`). The API returns a short-lived EdDSA access token in the body and a refresh token in an opaque, hashed, rotating cookie, one per app (`__Secure-tz_rt_c`, `_b`, `_a` for customer, business, admin) so the three apps never share a session. A refresh rotates the token inside a session family. If the same old token is replayed after a short grace window the whole family is revoked (reuse detection). Inside the grace window a repeat caller gets the same successor token again, derived from `sessions.successor_salt` (D-239), so two tabs or a lost response do not log the user out. Admins add TOTP step-up for sensitive actions.
+Sign-in is by phone and OTP (`/v1/auth/otp/send`, `/v1/auth/otp/verify`). The API returns a short-lived EdDSA access token in the body and a refresh token in an opaque, hashed, rotating cookie, one per app (`__Secure-tz_rt_c`, `_b`, `_a` for customer, business, admin) so the three apps never share a session. A refresh rotates the token inside a session family. If the same old token is replayed after a short grace window the whole family is revoked (reuse detection). Inside the grace window a repeat caller gets the same successor token again, derived from `sessions.successor_salt` (D-239), so two tabs or a lost response do not log the user out. Admins sign in the same way, with no second factor; a † action needs a fresh SMS code to the admin's own number (`/v1/auth/step-up/send` and `/verify`), which stamps the session for 10 minutes (D-264). SMS step-up does not protect against a SIM swap; the founder accepted that.
 
 ## 10. Key design choices
 

@@ -54,7 +54,6 @@ func principal(app App) Principal {
 	p := Principal{UserID: ids.New(t0), App: app, SessionID: ids.New(t0), AMR: AMROTP}
 	if app == AppAdmin {
 		p.Roles = []string{"support"}
-		p.AMR = AMROTPTOTP
 	}
 	return p
 }
@@ -98,6 +97,7 @@ func TestIssueRefusesIncompletePrincipals(t *testing.T) {
 		"no app":     func(p *Principal) { p.App = "" },
 		"no session": func(p *Principal) { p.SessionID = ids.Zero },
 		"bad amr":    func(p *Principal) { p.AMR = "pwd" },
+		"old totp":   func(p *Principal) { p.AMR = "otp+totp" }, // D-264
 	} {
 		p := principal(AppCustomer)
 		mut(&p)
@@ -220,6 +220,7 @@ func TestVerifyRefusesForgeries(t *testing.T) {
 		"bad sub":        func(c *claims) { c.Subject = "42" },
 		"bad sid":        func(c *claims) { c.SessionID = "" },
 		"bad amr":        func(c *claims) { c.AMR = "pwd" },
+		"old totp amr":   func(c *claims) { c.AMR = "otp+totp" }, // D-264: refresh into an otp token
 		"not yet valid":  func(c *claims) { c.NotBefore = jwt.NewNumericDate(t0.Add(time.Hour)) },
 		"customer roles": func(c *claims) { c.Roles = []string{"super_admin"} }, // allowed, but dropped (below)
 	}
@@ -350,10 +351,9 @@ func TestAuthenticator(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []string{"finance"}, p.Roles)
 	require.Equal(t, step, p.StepUpAt)
-	require.Equal(t, AMROTPTOTP, p.AMR)
+	require.Equal(t, AMROTP, p.AMR)
 
-	// An otp+totp token whose sign-in holds no TOTP verification (an admin
-	// whose TOTP was reset) is only an OTP session: the row is the truth.
+	// A sign-in without an SMS step-up has none (D-264).
 	fs.st = SessionState{Active: true, Roles: []string{"finance"}}
 	p, err = a.Authenticate(ctx, rawAdm)
 	require.NoError(t, err)

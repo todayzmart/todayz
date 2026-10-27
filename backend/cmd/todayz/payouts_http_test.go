@@ -13,7 +13,6 @@ import (
 
 	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/credits"
-	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/payouts"
 	"github.com/todayz/backend/internal/platform/authn"
@@ -78,8 +77,7 @@ func (p *payoutShop) post(to credits.Account, n int64) {
 
 // secondDesk signs in a second admin user on approverPhone.
 type secondDesk struct {
-	o      *orderShop
-	secret []byte
+	o *orderShop
 }
 
 func newSecondDesk(o *orderShop, roles ...string) *secondDesk {
@@ -93,26 +91,8 @@ func newSecondDesk(o *orderShop, roles ...string) *secondDesk {
 }
 
 func (d *secondDesk) token() string {
-	t, a := d.o.t, d.o.a
-	t.Helper()
-	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
-		"phone": approverPhone, "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
-	}, nil)
-	require.Equal(t, http.StatusOK, w.code, "otp send: %d", w.code)
-	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
-		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
-	}, map[string]string{"User-Agent": "payouts-test"})
-	require.Equal(t, http.StatusOK, w.code, "otp verify: %d", w.code)
-	tok := w.body["accessToken"].(string)
-	e := a.call(tok, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
-	require.Equal(t, http.StatusOK, e.code, "enrol: %d", e.code)
-	s, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
-	require.NoError(t, err)
-	d.secret = s
-	a.clk.Advance(31 * time.Second)
-	v := a.call(tok, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(d.secret, a.clk.Now()), "purpose": "login"}, nil)
-	require.Equal(t, http.StatusOK, v.code, "totp verify: %d", v.code)
-	return v.body["accessToken"].(string)
+	d.o.t.Helper()
+	return d.o.a.adminToken(approverPhone, "payouts-test")
 }
 
 func items(t *testing.T, r resp) []map[string]any {
@@ -214,9 +194,7 @@ func TestPayoutsHTTP(t *testing.T) {
 		require.Equal(t, "step_up_required", problemCode(r), name)
 	}
 	require.Equal(t, http.StatusOK, get(base).code)
-	a.clk.Advance(31 * time.Second)
-	v := post("/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(desk.secret, a.clk.Now()), "purpose": "step_up"}, nil)
-	require.Equal(t, http.StatusOK, v.code, v.raw)
+	a.stepUp(tok) // D-264: a fresh SMS step-up
 
 	// Hold, then mark paid is refused; unhold puts it back.
 	r = money["hold"]()

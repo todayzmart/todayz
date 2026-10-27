@@ -19,6 +19,7 @@ import (
 	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/httpx"
+	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/jobs/adminapi"
 	"github.com/todayz/backend/internal/platform/notice"
@@ -198,6 +199,10 @@ type phoneAccounts struct{ a *identity.Accounts }
 func (p phoneAccounts) FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (admin.PhoneAccount, error) {
 	acc, err := p.a.FindOrCreateByPhone(ctx, phone, now)
 	return admin.PhoneAccount{UserID: acc.UserID, Status: acc.Status, Created: acc.Created}, err
+}
+
+func (p phoneAccounts) UnlockAdminSignIn(ctx context.Context, userID ids.ID, now time.Time) (*time.Time, error) {
+	return p.a.UnlockAdminSignIn(ctx, userID, now)
 }
 
 // notifyTemplates copies internal/notify's catalogue for A-16, marking which

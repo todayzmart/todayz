@@ -1,20 +1,17 @@
 # Seed admins for local and test only (08 §2 Fixtures, D-64, Q-20; W1-01).
 #
-# TEST VALUES, NOT SECRETS. Read by the backend seed only through
+# TEST PEOPLE, NOT SECRETS. Read by the backend seed only through
 # SEED_ADMINS_FILE (infra/local/local.env), which refuses unless APP_ENV is
-# local or test; staging and prod never run the seed. The journeys
-# (e2e/fixtures/api.ts adminTotpSecret) and admin/e2e/sign-in.stack.spec.ts read
-# the same file and compute the code themselves; the mocks have no TOTP panel.
-# Never copy these into docs or logs.
+# local or test; staging and prod never run the seed. Admins sign in with the
+# SMS OTP alone and confirm a † action with an SMS step-up (D-264): the
+# journeys and admin/e2e read the codes from the mocks server, like any
+# sign-in.
 #
-# One enrolled admin per D-64 role, two each of finance and super_admin (the
-# two-person approval tests), and admin.unenrolled with no totp_secret, so A-01
-# first-login enrolment can be tested. Phones are the reserved test range
+# One admin per D-64 role, two each of finance and super_admin (the
+# two-person approval tests), and admin.unenrolled, a support admin who has
+# never signed in (the first-sign-in tests). Phones are the reserved test range
 # (+91 90000 000xx: OTP 000000 in local and test). An id is a ULID whose 23rd
 # character is N (the seed derives the phone identity id from it).
-#
-# totp_secret is base32 (RFC 6238, SHA-1, 6 digits, 30 s): the first 20 bytes
-# of SHA-256("todayz-seed-admin-totp:" + key), so the file can be rebuilt.
 admins:
   - key: admin.field_agent
     id: 01KE0S1W6W8ZV7T1C3A6M9N021
@@ -22,67 +19,57 @@ admins:
     name: Field Agent Farid
     lang: kn
     roles: [field_agent]
-    totp_secret: IR4M6UZN4X7CXPCIEAUC2BPODI3F5MA4 # gitleaks:allow (test-only value, see the header)
   - key: admin.support
     id: 01KE0S1W6W8ZV7T1C3A6M9N022
     phone: "+919000000022"
     name: Support Sunita
     lang: en
     roles: [support]
-    totp_secret: HAKL3O6KLLXAGYFJDNNZKXZ4G4VXX6VD # gitleaks:allow (test-only value, see the header)
   - key: admin.catalogue
     id: 01KE0S1W6W8ZV7T1C3A6M9N023
     phone: "+919000000023"
     name: Catalogue Kavya
     lang: en
     roles: [catalogue]
-    totp_secret: A77GL5FTGQGMTI2PNOGRF7RH32OAKDVB # gitleaks:allow (test-only value, see the header)
   - key: admin.analyst
     id: 01KE0S1W6W8ZV7T1C3A6M9N024
     phone: "+919000000024"
     name: Analyst Arjun
     lang: en
     roles: [analyst]
-    totp_secret: WJTRUOK6Y3BS7TETFRKRXDUK32IV5CHP # gitleaks:allow (test-only value, see the header)
   - key: admin.admin
     id: 01KE0S1W6W8ZV7T1C3A6M9N025
     phone: "+919000000025"
     name: Admin Anil
     lang: en
     roles: [admin]
-    totp_secret: DCODK5ACR7NW2AHPPF3SKS6RKAIGNJ3Z # gitleaks:allow (test-only value, see the header)
   - key: admin.finance_1
     id: 01KE0S1W6W8ZV7T1C3A6M9N026
     phone: "+919000000026"
     name: Finance Fatima
     lang: en
     roles: [finance]
-    totp_secret: ERFKT5VDGXKHHZCR54PIY56WK46KR25U # gitleaks:allow (test-only value, see the header)
   - key: admin.finance_2
     id: 01KE0S1W6W8ZV7T1C3A6M9N027
     phone: "+919000000027"
     name: Finance Gopal
     lang: hi
     roles: [finance]
-    totp_secret: RFPNDQFYJUHM56GFWCNORMPC7KOKGMQC # gitleaks:allow (test-only value, see the header)
   - key: admin.super_admin_1
     id: 01KE0S1W6W8ZV7T1C3A6M9N028
     phone: "+919000000028"
     name: Super Admin Sara
     lang: en
     roles: [super_admin]
-    totp_secret: MYWFSWQOLZQCUHYTUBGKFC5YY7SSQGYX # gitleaks:allow (test-only value, see the header)
   - key: admin.super_admin_2
     id: 01KE0S1W6W8ZV7T1C3A6M9N029
     phone: "+919000000029"
     name: Super Admin Vikram
     lang: ta
     roles: [super_admin]
-    totp_secret: NNEI2EMJ7SQ5DEK2VXOAXHPSDENT76YW # gitleaks:allow (test-only value, see the header)
   - key: admin.unenrolled
     id: 01KE0S1W6W8ZV7T1C3A6M9N030
     phone: "+919000000030"
     name: New Admin Neha
     lang: en
     roles: [support]
-    totp_secret: "" # not enrolled: A-01 first-login enrolment

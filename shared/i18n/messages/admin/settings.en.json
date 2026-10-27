@@ -1,6 +1,6 @@
 {
   "settings.sub": {
-    "defaultMessage": "Platform rules and limits. Every change needs a reason and your authenticator code.",
+    "defaultMessage": "Platform rules and limits. Every change needs a reason and a fresh SMS code.",
     "description": "Subtitle of the settings screen (A-17)"
   },
   "settings.loadFailed": {
@@ -66,6 +66,10 @@
   "settings.group.customers": {
     "defaultMessage": "Customers",
     "description": "Settings group heading: customers"
+  },
+  "settings.group.access": {
+    "defaultMessage": "Admin sign-in",
+    "description": "Settings group heading: limits on admin sign-in and step-up codes (wrong codes before the lock, lock length, step-up codes an hour)"
   },
   "settings.group.risk": {
     "defaultMessage": "Risk",

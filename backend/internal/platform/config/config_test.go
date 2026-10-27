@@ -189,13 +189,13 @@ func TestMissingKeysFatalOnlyWhenDeployed(t *testing.T) {
 		t.Run(string(e), func(t *testing.T) {
 			env, secrets := fullEnv(t, string(e))
 			delete(env, "PII_HASH_KEY")
-			delete(env, "TOTP_ENC_KEY")
+			delete(env, "DEVICE_SECRET_ENC_KEY")
 			log, buf := captureLog()
 			c, err := Load(get(env), log)
 			if e.IsDeployed() {
 				var ce *Error
 				require.ErrorAs(t, err, &ce)
-				require.Equal(t, []string{"PII_HASH_KEY", "TOTP_ENC_KEY"}, ce.Missing)
+				require.Equal(t, []string{"PII_HASH_KEY", "DEVICE_SECRET_ENC_KEY"}, ce.Missing)
 				requireNoLeak(t, err.Error(), secrets)
 				return
 			}
@@ -393,24 +393,12 @@ func TestSecretHiddenFromReflection(t *testing.T) {
 	require.Equal(t, val, h.Ptr.Reveal())
 }
 
-// D-244: ADMIN_TOTP_OFF works locally and in tests; staging and prod refuse it.
-func TestAdminTOTPOff(t *testing.T) {
-	for _, e := range []string{"local", "test"} {
-		env, _ := fullEnv(t, e)
-		c, err := Load(get(env), nil)
-		require.NoError(t, err, e)
-		require.False(t, c.AdminTOTPOff, "off by default")
-		env["ADMIN_TOTP_OFF"] = "1"
-		c, err = Load(get(env), nil)
-		require.NoError(t, err, e)
-		require.True(t, c.AdminTOTPOff, e)
-	}
-	for _, e := range []string{"staging", "prod"} {
-		env, _ := fullEnv(t, e)
-		env["ADMIN_TOTP_OFF"] = "1"
-		_, err := Load(get(env), nil)
-		var ce *Error
-		require.ErrorAs(t, err, &ce, e)
-		require.Contains(t, ce.Invalid, "ADMIN_TOTP_OFF: must be unset in staging and prod")
-	}
+// D-264: the admin authenticator is gone, and with it TOTP_ENC_KEY. A
+// deployed config no longer needs it.
+func TestNoAdminTOTPKey(t *testing.T) {
+	require.NotContains(t, AppKeyNames, "TOTP_ENC_KEY")
+	env, _ := fullEnv(t, "prod")
+	delete(env, "TOTP_ENC_KEY")
+	_, err := Load(get(env), nil)
+	require.NoError(t, err)
 }

@@ -4,7 +4,7 @@ import type { AdminUserStatus } from '@todayz/api-client/gen/model/adminUserStat
 import { ApiError } from '@todayz/api-client';
 import { Button, DataTable, StatusPill, Tabs, TextField, useToast, type ColumnDef } from '@todayz/ui';
 import { useNavigate } from '@tanstack/react-router';
-import { KeyRound, RotateCcw, ShieldCheck, UserMinus, UserPlus } from 'lucide-react';
+import { LockOpen, RotateCcw, ShieldCheck, UserMinus, UserPlus } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWhen } from '../app/format';
@@ -14,7 +14,8 @@ import { ReasonDialog } from '../app/ReasonDialog';
 import { StepUpDialog } from '../app/StepUpDialog';
 import { AuditPanel } from '../audit/AuditPanel';
 import { ADMIN_ROLES, phoneOk, useAccountError, useRoleLabel } from './labels';
-import { useAccountMove, useAdminUsers, useInvite, type AccountMove } from './queries';
+import type { AdminUserChange } from '@todayz/api-client/gen/model/adminUserChange';
+import { useAccountMove, useAdminUsers, useInvite, useUnlockSignIn } from './queries';
 import type { AdminUsersSearch } from './search';
 import css from '../app/page.module.css';
 
@@ -40,7 +41,7 @@ function useStepUp() {
   return { ask, done: () => setRetry(null), dialog };
 }
 
-/** A-18 Admin users (super_admin): who has admin access, with which roles; invite, change roles, disable, reset the authenticator. */
+/** A-18 Admin users (super_admin): who has admin access, with which roles; invite, change roles, disable, enable. */
 export function AdminUsersPage({ search }: { search: AdminUsersSearch }) {
   const intl = useIntl();
   const navigate = useNavigate();
@@ -100,11 +101,6 @@ function AccountList({ status, search, go }: { status: AdminUserStatus; search: 
       },
       { id: 'roles', header: intl.formatMessage({ id: 'adminUsers.col.roles' }), accessorFn: (a) => roles.list(a.roles) },
       {
-        id: 'totp',
-        header: intl.formatMessage({ id: 'adminUsers.col.totp' }),
-        cell: ({ row }) => <TotpPill enrolled={row.original.totpEnrolled} />,
-      },
-      {
         id: 'active',
         header: intl.formatMessage({ id: status === 'disabled' ? 'adminUsers.col.disabled' : 'adminUsers.col.lastActive' }),
         accessorFn: (a) => {
@@ -154,13 +150,6 @@ function AccountList({ status, search, go }: { status: AdminUserStatus; search: 
         )}
       </div>
     </div>
-  );
-}
-
-function TotpPill({ enrolled }: { enrolled: boolean }) {
-  const intl = useIntl();
-  return (
-    <StatusPill tone={enrolled ? 'completed' : 'pending'}>{intl.formatMessage({ id: enrolled ? 'adminUsers.totp.on' : 'adminUsers.totp.off' })}</StatusPill>
   );
 }
 
@@ -257,9 +246,12 @@ function InviteDialog({ onClose, onDone }: { onClose: () => void; onDone: (id: s
   );
 }
 
-type Asking = 'roles' | 'disable' | 'enable' | 'reset' | null;
+type Asking = 'roles' | 'disable' | 'enable' | 'unlock' | null;
 
-/** The chosen account: its facts, the moves on it (never on your own), and its history. */
+/**
+ * The chosen account: its facts, the moves on it (never on your own), and its history. While its
+ * sign-in is locked after too many wrong codes (D-264), "Unlock sign-in" lifts the lock.
+ */
 function AccountCard({ a, now }: { a: AdminUser; now: string }) {
   const intl = useIntl();
   const when = useWhen();
@@ -268,6 +260,7 @@ function AccountCard({ a, now }: { a: AdminUser; now: string }) {
   const errorText = useAccountError();
   const me = useMe().data;
   const move = useAccountMove(a.id);
+  const unlock = useUnlockSignIn(a.id);
   const step = useStepUp();
   const [asking, setAsking] = useState<Asking>(null);
   const [picked, setPicked] = useState<AdminRole[]>(a.roles);
@@ -277,21 +270,34 @@ function AccountCard({ a, now }: { a: AdminUser; now: string }) {
 
   const open = (k: Exclude<Asking, null>) => {
     move.reset();
+    unlock.reset();
     setPicked(a.roles);
     setAsking(k);
   };
-  const run = (m: AccountMove, done: string) =>
-    move.mutate(m, {
+  const run = (body: AdminUserChange, done: string) =>
+    move.mutate(body, {
       onSuccess: () => {
         step.done();
         setAsking(null);
         toast.show({ message: intl.formatMessage({ id: done }, { name }) });
       },
-      onError: (e) => step.ask(e, () => run(m, done)),
+      onError: (e) => step.ask(e, () => run(body, done)),
     });
-  const change = (body: Omit<Extract<AccountMove, { kind: 'change' }>['body'], 'version'>, done: string) =>
-    run({ kind: 'change', body: { ...body, version: a.version } }, done);
+  const change = (body: Omit<AdminUserChange, 'version'>, done: string) => run({ ...body, version: a.version }, done);
   const error = errorText(move.error, 'change');
+  const lifted = (reason: string) =>
+    unlock.mutate(
+      { reason },
+      {
+        onSuccess: () => {
+          step.done();
+          setAsking(null);
+          toast.show({ message: intl.formatMessage({ id: 'adminUsers.done.unlock' }, { name }) });
+        },
+        onError: (e) => step.ask(e, () => lifted(reason)),
+      },
+    );
+  const locked = a.signInLockedUntil ?? null;
 
   return (
     <>
@@ -310,10 +316,6 @@ function AccountCard({ a, now }: { a: AdminUser; now: string }) {
               {intl.formatMessage({ id: a.status === 'active' ? 'adminUsers.status.active' : 'adminUsers.status.disabled' })}
             </StatusPill>
           </dd>
-          <dt>{intl.formatMessage({ id: 'adminUsers.col.totp' })}</dt>
-          <dd>
-            <TotpPill enrolled={a.totpEnrolled} />
-          </dd>
           <dt>{intl.formatMessage({ id: 'adminUsers.col.lastActive' })}</dt>
           <dd>{a.lastActiveAt ? when(a.lastActiveAt, now) : intl.formatMessage({ id: 'adminUsers.never' })}</dd>
           <dt>{intl.formatMessage({ id: 'adminUsers.detail.invited' })}</dt>
@@ -328,19 +330,28 @@ function AccountCard({ a, now }: { a: AdminUser; now: string }) {
               <dd>{when(a.disabledAt, now)}</dd>
             </>
           )}
+          {locked && (
+            <>
+              <dt>{intl.formatMessage({ id: 'adminUsers.detail.signIn' })}</dt>
+              <dd>
+                <StatusPill tone="cancelled">{intl.formatMessage({ id: 'adminUsers.signInLocked' })}</StatusPill>{' '}
+                {intl.formatMessage({ id: 'adminUsers.signInLockedUntil' }, { when: when(locked, now) })}
+              </dd>
+            </>
+          )}
         </dl>
         {self ? (
           <p className={css.muted}>{intl.formatMessage({ id: 'adminUsers.self' })}</p>
         ) : (
           <div className={css.actions}>
+            {locked && (
+              <Button variant="primary" icon={LockOpen} onClick={() => open('unlock')}>
+                {intl.formatMessage({ id: 'adminUsers.unlock' })}
+              </Button>
+            )}
             {a.status === 'active' && (
               <Button variant="soft" icon={ShieldCheck} onClick={() => open('roles')}>
                 {intl.formatMessage({ id: 'adminUsers.changeRoles' })}
-              </Button>
-            )}
-            {a.totpEnrolled && (
-              <Button variant="soft" icon={KeyRound} onClick={() => open('reset')}>
-                {intl.formatMessage({ id: 'adminUsers.reset' })}
               </Button>
             )}
             {a.status === 'active' ? (
@@ -392,14 +403,13 @@ function AccountCard({ a, now }: { a: AdminUser; now: string }) {
         onClose={() => setAsking(null)}
       />
       <ReasonDialog
-        open={asking === 'reset'}
-        title={intl.formatMessage({ id: 'adminUsers.reset.title' }, { name })}
-        description={intl.formatMessage({ id: 'adminUsers.reset.body' })}
-        confirmLabel={intl.formatMessage({ id: 'adminUsers.reset' })}
-        danger
-        pending={move.isPending}
-        error={error}
-        onConfirm={(reason) => run({ kind: 'reset', reason }, 'adminUsers.done.reset')}
+        open={asking === 'unlock'}
+        title={intl.formatMessage({ id: 'adminUsers.unlock.title' }, { name })}
+        description={intl.formatMessage({ id: 'adminUsers.unlock.body' })}
+        confirmLabel={intl.formatMessage({ id: 'adminUsers.unlock' })}
+        pending={unlock.isPending}
+        error={errorText(unlock.error, 'unlock')}
+        onConfirm={lifted}
         onClose={() => setAsking(null)}
       />
       {step.dialog}

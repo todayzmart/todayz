@@ -3,8 +3,8 @@
 # Same shape as common.yaml. A wrong OTP answers the common `unauthorized` (401)
 # with `extensions.attemptsLeft` (docs/qa/W1-01/REPORT.md, Questions). A wrong
 # code on a signed-in (bearer) route, where a 401 would read as "the access
-# token is bad", is `code_invalid` (422) with `extensions.attemptsLeft`: admin
-# TOTP and recovery codes, and the step-up OTP of DELETE /v1/me (phase B).
+# token is bad", is `code_invalid` (422) with `extensions.attemptsLeft`: the
+# admin SMS step-up (D-264) and the step-up OTP of DELETE /v1/me (phase B).
 domain: auth
 problems:
   - code: otp_locked
@@ -22,8 +22,12 @@ problems:
   - code: step_up_required
     status: 403
     i18n: problems.step_up_required
-    title: Confirm with your authenticator code to continue
+    title: Confirm with the code we send to your phone to continue
   - code: code_invalid
     status: 422
     i18n: problems.code_invalid
     title: That code is not right
+  - code: signin_locked
+    status: 429
+    i18n: problems.signin_locked
+    title: Admin sign-in for this number is locked; try again later or ask another super admin to unlock it

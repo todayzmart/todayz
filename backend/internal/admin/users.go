@@ -23,11 +23,11 @@ import (
 // step-up (authz) and writes an audit row with its reason. An invite gives a
 // phone number admin access: a number with an account keeps it, one that has
 // never signed in gets a users and phone_identities row here (identity never
-// makes an admin at sign-in). Disabling and the authenticator reset end every
-// admin session of the person; identity re-reads admin_users on every refresh
+// makes an admin at sign-in). Disabling ends every admin session of the
+// person; identity re-reads admin_users on every refresh
 // and session check, so a role change holds from the next request.
 //
-// Guards: nobody changes or resets themselves, and no change leaves the
+// Guards: nobody changes themselves, and no change leaves the
 // platform without an active super_admin. Every change takes one advisory
 // lock first, so two super_admins acting on each other at once are ordered
 // and the count stays true; under it the actor is read again (still an
@@ -47,7 +47,7 @@ func (s *Service) adminUserOut(ctx context.Context, r admindb.GetAdminUserRow) a
 	}
 	out := api.AdminUser{
 		Id: idString(r.UserID), Name: r.Name, PhoneMasked: s.maskedPhone(ctx, r.PhoneEnc), Roles: roles,
-		Status: api.Active, TotpEnrolled: r.TotpEnabledAt != nil, CreatedBy: optID(r.CreatedBy),
+		Status: api.Active, CreatedBy: optID(r.CreatedBy),
 		CreatedByName: r.CreatedByName, CreatedAt: r.CreatedAt.UTC(), DisabledAt: utcPtr(r.DisabledAt),
 		Version: int(r.Version),
 	}
@@ -57,6 +57,10 @@ func (s *Service) adminUserOut(ctx context.Context, r admindb.GetAdminUserRow) a
 	if t, ok := r.LastActiveAt.(time.Time); ok {
 		u := t.UTC()
 		out.LastActiveAt = &u
+	}
+	// A lock that has run out is not one (the purge deletes it later).
+	if r.SigninLockedUntil != nil && s.now().Before(*r.SigninLockedUntil) {
+		out.SignInLockedUntil = utcPtr(r.SigninLockedUntil)
 	}
 	return out
 }
@@ -297,6 +301,59 @@ func (s *Service) updateAdminUser(ctx context.Context, actor, id ids.ID, in api.
 	return s.adminUser(ctx, id)
 }
 
+// unlockAdminSignIn lifts the admin sign-in lock of another admin's number
+// (D-264). Lock order: the A-18 advisory lock, then identity's per-number
+// admin sign-in lock; no users row is locked, so it never waits on a sign-in
+// that holds the number's lock and then a users row.
+func (s *Service) unlockAdminSignIn(ctx context.Context, actor, id ids.ID, in api.AdminSignInUnlock) (api.AdminUser, error) {
+	if err := s.writeReady(ctx); err != nil {
+		return api.AdminUser{}, err
+	}
+	if s.accounts == nil {
+		telemetry.Logger(ctx).ErrorContext(ctx, "admin: an unlock needs the identity accounts (PII_ENC_KEY and PII_HASH_KEY)")
+		return api.AdminUser{}, unavailable()
+	}
+	reason, err := cleanReason(in.Reason)
+	if err != nil {
+		return api.AdminUser{}, err
+	}
+	if actor == id {
+		return api.AdminUser{}, invalidTransition("You cannot unlock your own sign-in. Ask another super admin.")
+	}
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		q := s.q(ctx)
+		if err := q.LockAdminUsers(ctx); err != nil {
+			return err
+		}
+		if err := actorStillSuper(ctx, q, actor); err != nil {
+			return err
+		}
+		if _, err := q.GetAdminUser(ctx, ids.UUID(id)); errors.Is(err, pgx.ErrNoRows) {
+			return notFound()
+		} else if err != nil {
+			return err
+		}
+		until, err := s.accounts.UnlockAdminSignIn(ctx, id, s.now())
+		if err != nil {
+			return err
+		}
+		if until == nil {
+			return invalidTransition("This admin's sign-in is not locked.")
+		}
+		_, err = s.audit.Write(ctx, audit.Entry{
+			ActorKind: audit.ActorAdmin, ActorID: actor, Action: "admin_user.unlock_sign_in",
+			SubjectType: "admin_user", SubjectID: id.String(),
+			Before: map[string]any{"signInLockedUntil": until.UTC()},
+			After:  map[string]any{"signInLockedUntil": nil, "reason": reason},
+		})
+		return err
+	})
+	if err != nil {
+		return api.AdminUser{}, err
+	}
+	return s.adminUser(ctx, id)
+}
+
 // keepSuperAdmin refuses a change that takes the last active super_admin
 // away. A target whose account is not active is not counted as one (nor is it
 // by CountActiveSuperAdmins), so taking the role from a blocked account is
@@ -315,60 +372,6 @@ func (s *Service) keepSuperAdmin(ctx context.Context, q *admindb.Queries, active
 		return invalidTransition("This is the last active super admin. Give the role to someone else first.")
 	}
 	return nil
-}
-
-// resetAdminTOTP clears an admin's authenticator and recovery codes and ends
-// their admin sessions; the next sign-in enrols again.
-func (s *Service) resetAdminTOTP(ctx context.Context, actor, id ids.ID, in api.AdminUserTOTPReset) (api.AdminUser, error) {
-	if err := s.writeReady(ctx); err != nil {
-		return api.AdminUser{}, err
-	}
-	reason, err := cleanReason(in.Reason)
-	if err != nil {
-		return api.AdminUser{}, err
-	}
-	if actor == id {
-		return api.AdminUser{}, invalidTransition("You cannot reset your own authenticator. Ask another super admin.")
-	}
-	err = s.db.InTx(ctx, func(ctx context.Context) error {
-		q := s.q(ctx)
-		if err := q.LockAdminUsers(ctx); err != nil {
-			return err
-		}
-		if err := actorStillSuper(ctx, q, actor); err != nil {
-			return err
-		}
-		if _, err := lockTargetUser(ctx, q, id); err != nil {
-			return err
-		}
-		if _, err := q.LockAdminUser(ctx, ids.UUID(id)); errors.Is(err, pgx.ErrNoRows) {
-			return notFound()
-		} else if err != nil {
-			return err
-		}
-		now := s.now()
-		if err := q.ResetAdminTOTP(ctx, admindb.ResetAdminTOTPParams{Now: now, ID: ids.UUID(id)}); err != nil {
-			return err
-		}
-		codes, err := q.DeleteAdminRecoveryCodes(ctx, ids.UUID(id))
-		if err != nil {
-			return err
-		}
-		n, err := q.RevokeAdminSessions(ctx, admindb.RevokeAdminSessionsParams{Now: now, UserID: ids.UUID(id)})
-		if err != nil {
-			return err
-		}
-		_, err = s.audit.Write(ctx, audit.Entry{
-			ActorKind: audit.ActorAdmin, ActorID: actor, Action: "admin_user.totp_reset",
-			SubjectType: "admin_user", SubjectID: id.String(),
-			After: map[string]any{"recoveryCodesCleared": codes, "sessionsRevoked": n, "reason": reason},
-		})
-		return err
-	})
-	if err != nil {
-		return api.AdminUser{}, err
-	}
-	return s.adminUser(ctx, id)
 }
 
 const userActive = "active"
