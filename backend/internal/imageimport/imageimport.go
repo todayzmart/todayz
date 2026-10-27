@@ -74,6 +74,7 @@ type Options struct {
 	UserAgent  string            // required: "TodayZ-ImageImport/<version> (<contact>)"
 	Limit      int               // products to try; at least 1
 	DryRun     bool              // look up, copy and store nothing
+	Newest     bool              // consider recent products first (local demo import)
 	Only       string            // one source code, or "" for all
 	BaseURLs   map[string]string // source code → base URL (tests); default Sources
 	ImageHosts []string          // default ImageHosts
@@ -176,7 +177,21 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 	q := imageimportdb.New(im.d.DB.Q(ctx))
 	var after pgtype.UUID
 	for rep.Tried < im.o.Limit {
-		rows, err := q.ImportCandidates(ctx, imageimportdb.ImportCandidatesParams{After: after, Lim: pageSize})
+		var rows []candidate
+		var err error
+		if im.o.Newest {
+			newRows, queryErr := q.ImportNewestCandidates(ctx, imageimportdb.ImportNewestCandidatesParams{Before: after, Lim: pageSize})
+			err = queryErr
+			for _, r := range newRows {
+				rows = append(rows, candidate{ID: r.ID, Name: r.Name, Barcodes: r.Barcodes, BrandName: r.BrandName, CategorySlug: r.CategorySlug, ParentSlug: r.ParentSlug})
+			}
+		} else {
+			oldRows, queryErr := q.ImportCandidates(ctx, imageimportdb.ImportCandidatesParams{After: after, Lim: pageSize})
+			err = queryErr
+			for _, r := range oldRows {
+				rows = append(rows, candidate{ID: r.ID, Name: r.Name, Barcodes: r.Barcodes, BrandName: r.BrandName, CategorySlug: r.CategorySlug, ParentSlug: r.ParentSlug})
+			}
+		}
 		if err != nil {
 			return rep, fmt.Errorf("imageimport: candidates: %w", err)
 		}
@@ -185,6 +200,13 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 		}
 		for _, r := range rows {
 			after = r.ID
+			// A source-scoped import handles only products assigned to that
+			// database by primary(). This avoids trying a beauty product on OFF
+			// or a food product on OBF, while still counting the requested limit
+			// against actual lookups rather than unrelated catalogue rows.
+			if im.o.Only != "" && primary(r.CategorySlug, r.ParentSlug) != im.o.Only {
+				continue
+			}
 			if rep.Tried >= im.o.Limit {
 				break
 			}
@@ -198,7 +220,15 @@ func (im *Importer) Run(ctx context.Context) (Report, error) {
 }
 
 // one handles a product; only a stopping error (cancelled, rate limited) is returned.
-func (im *Importer) one(ctx context.Context, r imageimportdb.ImportCandidatesRow, rep *Report) error {
+type candidate struct {
+	ID                       pgtype.UUID
+	Name                     string
+	Barcodes                 []string
+	BrandName                *string
+	CategorySlug, ParentSlug string
+}
+
+func (im *Importer) one(ctx context.Context, r candidate, rep *Report) error {
 	pid, _ := ids.FromUUID(r.ID)
 	line := Line{ProductID: pid.String(), Name: r.Name}
 	if skipped(r.CategorySlug, r.ParentSlug) {

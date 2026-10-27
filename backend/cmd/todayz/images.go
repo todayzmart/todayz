@@ -37,11 +37,12 @@ func runImages(ctx context.Context, args []string, getenv func(string) string, o
 	fs.SetOutput(io.Discard)
 	dry := fs.Bool("dry-run", false, "look up only; copy and store nothing")
 	limit := fs.Int("limit", 20, "products to try")
+	newest := fs.Bool("newest", false, "try recently added products first (local demo)")
 	source := fs.String("source", "", "only this database: off, obf or opf")
 	contact := fs.String("contact", "https://todayz.in", "contact in the User-Agent")
 	report := fs.String("report", "", "write a Markdown report to this file")
 	if err := fs.Parse(args[1:]); err != nil || fs.NArg() > 0 {
-		return usageError{msg: "images import takes [--dry-run] [--limit N] [--source off|obf|opf] [--contact URL] [--report FILE]"}
+		return usageError{msg: "images import takes [--dry-run] [--limit N] [--source off|obf|opf] [--newest] [--contact URL] [--report FILE]"}
 	}
 	if *limit < 1 || *limit > maxImportLimit {
 		return usageError{msg: "--limit must be between 1 and 20000"}
@@ -77,7 +78,7 @@ func runImages(ctx context.Context, args []string, getenv func(string) string, o
 	}
 	im, err := imageimport.New(deps, imageimport.Options{
 		UserAgent: imageimport.UserAgent(buildinfo.Get().Version, *contact),
-		Limit:     *limit, DryRun: *dry, Only: *source,
+		Limit:     *limit, DryRun: *dry, Only: *source, Newest: *newest,
 	})
 	if err != nil {
 		return err

@@ -2,7 +2,7 @@
 
 TodayZ is hyperlocal retail for India. Neighbourhood shops put their stock online. Customers search what is in stock near them, book it, and either pick it up or have it delivered. Shops run their counter (POS, which works offline), stock, offers, cashback credits and customers from one business app.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
+> As built on main at c8876a4c (27 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
 
 ## The apps
 
@@ -82,7 +82,7 @@ make reset
 - `make dev` starts Postgres/PostGIS, MinIO, Grafana, the mocks server, Caddy HTTPS and the apps.
 - `make reset` recreates the database, runs migrations and loads the seed data.
 
-Then open https://app.todayz.localhost. Local SMS goes to the mocks server, so no real messages are sent. Full setup, ports, seed users and fixes are in [local-dev.md](docs/guide/local-dev.md).
+Then open https://app.todayz.localhost. Local SMS goes to the mocks server, so no real messages are sent. Full setup, ports, seed users and fixes are in [local-dev.md](docs/guide/local-dev.md). For a local-only Open Facts demo catalogue, see [backend/README.md](backend/README.md#the-binary) for `todayz demo catalogue` and the existing image review steps.
 
 | Command | What it does |
 |---|---|

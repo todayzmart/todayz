@@ -1,0 +1,9 @@
+{"count":7,"products":[
+{"code":"8901234567890","product_name":"Demo Atta","brands":"Demo","quantity":"5 kg","categories_tags":["en:flours","en:wheat-flour"],"image_front_url":"https://images.openfoodfacts.org/images/products/890/123/456/7890/front_en.3.400.jpg","url":"https://world.openfoodfacts.org/product/8901234567890/demo-atta","creator":"demo","contributors":["demo"]},
+{"code":"8901234567891","product_name":"Demo Milk","brands":"Demo Dairy","quantity":"500 ml","categories_tags":["en:dairy-products","en:milk"],"image_front_url":"https://images.openfoodfacts.org/images/products/890/123/456/7891/front_en.3.400.jpg","url":"https://world.openfoodfacts.org/product/8901234567891/demo-milk"},
+{"code":"8901234567892","product_name":"Demo Biscuits","brands":"Demo","quantity":"100 g","categories_tags":["en:biscuits","en:snacks"],"image_front_url":"https://images.openfoodfacts.org/images/products/890/123/456/7892/front_en.3.400.jpg","url":"https://world.openfoodfacts.org/product/8901234567892/demo-biscuits"},
+{"code":"8901234567893","product_name":"Demo Cleaner","brands":"Demo","quantity":"1 l","categories_tags":["en:cleaning-products"],"image_front_url":"https://images.openfoodfacts.org/images/products/890/123/456/7893/front_en.3.400.jpg","url":"https://world.openfoodfacts.org/product/8901234567893/demo-cleaner"},
+{"code":"8901234567894","product_name":"Demo Baby Food","brands":"Demo","quantity":"200 g","categories_tags":["en:baby-foods"],"image_front_url":"https://images.openfoodfacts.org/images/products/890/123/456/7894/front_en.3.400.jpg","url":"https://world.openfoodfacts.org/product/8901234567894/demo-baby-food"},
+{"code":"8901234567895","product_name":"No front photo","brands":"Demo","categories_tags":["en:flours"],"url":"https://world.openfoodfacts.org/product/8901234567895/no-photo"},
+{"code":"not-ean","product_name":"Invalid code","image_front_url":"https://example.invalid/photo.jpg","categories_tags":["en:flours"]}
+]}

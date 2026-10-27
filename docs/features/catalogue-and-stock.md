@@ -2,7 +2,7 @@
 
 How products, shop prices and stock quantities are stored, changed and photographed.
 
-> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at c8876a4c (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -38,11 +38,15 @@ flowchart LR
 
 Each movement writes in the same transaction as the quantity change. Allocation across batches is in `alloc.go`. Product photos have three sources in order: the shop's photo, an admin upload, a stock photo of that kind of item (D-252, D-253). An admin picks each kind's photo from Commons candidates in A-08 (`todayz images types` finds them). The founder's picks are saved in `backend/internal/imageimport/data/approved-type-photos.csv`; `todayz images types --picks builtin` applies them to a new or reset database, with the same steps as A-08 and the system as the audited actor. It leaves alone a kind that already has a photo and a file that was turned down (D-265).
 
+## Demo catalogue
+
+`todayz demo catalogue [--source off|obf|opf] [--category-tag TAG | --search-terms WORDS] [--limit N] [--dry-run] [--from DIR]` reads India-filtered Open Food Facts, Open Beauty Facts or Open Products Facts search JSON. Raw pages are cached under `.cache/<source>-demo/` (or a supplied directory). It maps supported source categories to existing TodayZ categories, keys products by EAN, and skips unmapped entries. Products are listed at up to three live demo stores, with inventory added through `catalogue.Writer` restock movements. Images use the D-252 path: run `todayz images import --source <source> --newest --limit N`, then approve pending images through the admin review API as a local admin. Image rows retain source references and their applicable licence and attribution. The command refuses non-local/test environments and `TODAYZ_NO_EGRESS`. This sample data is for local demos, not production.
+
 ## Code
 
 | Part | Where |
 |---|---|
-| Backend | `backend/internal/catalogue` ([folder](../../backend/internal/catalogue/)): `items.go`, `movements.go`, `batches.go`, `alloc.go`, `price.go`, `photos.go`, `field.go`. Image import: `backend/internal/imageimport` ([folder](../../backend/internal/imageimport/)). |
+| Backend | `backend/internal/catalogue` ([folder](../../backend/internal/catalogue/)): `items.go`, `movements.go`, `batches.go`, `alloc.go`, `price.go`, `photos.go`, `field.go`. Image import: `backend/internal/imageimport` ([folder](../../backend/internal/imageimport/)). Local demo catalogue (D-271): `backend/internal/democatalogue` ([folder](../../backend/internal/democatalogue/)), `backend/internal/catalogue/demo.go`, `backend/cmd/todayz/demo_catalogue.go`. |
 | API paths | [catalogue.yaml](../../backend/api/paths/catalogue.yaml), [admin-catalogue.yaml](../../backend/api/paths/admin-catalogue.yaml), [discover.yaml](../../backend/api/paths/discover.yaml) (substitutes) |
 | Tables | `categories`, `brands`, `products`, `store_items`, `stock_batches`, `stock_movements`, `stock_movement_batches`, `catalogue_changes`, `product_images`, `type_photos`, `substitutes` |
 | Frontend | folders above |
@@ -57,4 +61,4 @@ Live in code. The AI scan flows are drafts only (see [ai-features](ai-features.m
 
 ## Decisions
 
-D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252, D-253 and D-265 product images. D-270 no stock below zero. D-35 and D-79 foreign-key ordering.
+D-01 stock math. D-33 stock sources. D-99 batches. D-245 any price. D-252, D-253 and D-265 product images. D-271 local demo catalogue. D-270 no stock below zero. D-35 and D-79 foreign-key ordering.

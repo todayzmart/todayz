@@ -33,8 +33,10 @@ commands:
   rollup --from D [--to D]  recompute the analytics rollups for IST days D (DATABASE_URL)
   rollup demo [--for 10m]   synthetic traffic against the local API for make demo (APP_ENV local)
   ai eval <feature|all> [--live]  run AI evals on recorded replies; --live calls the model (own key, make ai-eval)
-  images import [--dry-run] [--limit N] [--source off|obf|opf] [--report FILE]
+  images import [--dry-run] [--limit N] [--source off|obf|opf] [--newest] [--report FILE]
                             draft product images from Open Food/Beauty/Products Facts (D-252)
+  demo catalogue [--source off|obf|opf] [--limit N] [--dry-run] [--from DIR]
+                            load local demo products from Open Food/Beauty/Products Facts (D-271)
   admin unlock-sign-in --phone-file FILE|- --reason TEXT
   admin unlock-sign-in --phone-env NAME --reason TEXT
                             lift an admin's sign-in lock when no super admin can (D-264);
@@ -95,6 +97,8 @@ func run(ctx context.Context, args []string, getenv config.Getenv, stdout, stder
 		err = runAI(ctx, rest, getenv, stdout)
 	case "images":
 		err = runImages(ctx, rest, getenv, stdout)
+	case "demo":
+		err = runDemo(ctx, rest, getenv, stdout)
 	case "admin":
 		err = runAdmin(ctx, rest, getenv, os.Stdin, stdout)
 	case "help", "-h", "--help":

@@ -2,7 +2,7 @@
 
 The TodayZ Go API and background worker: one module, one binary called `todayz`.
 
-> As built on main at 713c1cae (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at c8876a4c (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Stack: Go, chi (router), pgx v5 and sqlc (database), goose (migrations), River (jobs, stored in Postgres), PostGIS (maps and search), oapi-codegen and kin-openapi (contract). The folder's rules for contributors are in [CLAUDE.md](CLAUDE.md). The system as a whole is in [docs/guide/architecture.md](../docs/guide/architecture.md).
 
@@ -57,7 +57,8 @@ The complete list, with required and optional markers, is in `backend/internal/p
 | `rollup --from D [--to D]` | Recomputes the analytics rollups for IST days |
 | `rollup demo [--for 10m]` | Synthetic traffic against the local API, used by `make demo` |
 | `ai eval <feature\|all> [--live]` | Runs AI evals on recorded replies; `--live` calls the model with your own key (`make ai-eval`) |
-| `images import [--dry-run] [--limit N] [--source off\|obf\|opf] [--report FILE]` | Drafts product images from Open Food, Beauty and Products Facts |
+| `images import [--dry-run] [--limit N] [--source off\|obf\|opf] [--newest] [--report FILE]` | Drafts product images from Open Food, Beauty and Products Facts; `--newest` tries recent products first for the local demo |
+| `demo catalogue [--source off|obf|opf] [--category-tag TAG | --search-terms WORDS] [--limit N] [--dry-run] [--from DIR]` | Imports mapped Open Facts products into local demo shops; local/test only and refused with `TODAYZ_NO_EGRESS` |
 | `images types [--dry-run] [--again] [--limit N] [--contact URL] [--report FILE]` | Finds item-type photo candidates on Wikimedia Commons for A-08 (D-253) |
 | `images types --picks FILE\|builtin [--dry-run] [--report FILE]` | Applies saved picks (`internal/imageimport/data/approved-type-photos.csv` is `builtin`) as A-08 would, audited as the system (D-265) |
 | `admin unlock-sign-in --phone-file FILE\|- --reason TEXT` (or `--phone-env NAME`) | Break glass (D-264): lifts an admin's sign-in lock and clears its wrong-code count when no super admin can, as `todayz_app`; audited with the system actor; the number is read from a file, stdin or a variable and never printed. Prod: deploy RUNBOOK §8 |

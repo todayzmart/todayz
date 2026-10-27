@@ -23,6 +23,23 @@ WHERE p.status IN ('active', 'pending_review')
 ORDER BY p.id
 LIMIT @lim;
 
+-- name: ImportNewestCandidates :many
+-- Optional newest-first pass for the local demo catalogue, whose ULIDs sort
+-- after the fixed seed catalogue. It still applies every D-252 skip rule.
+SELECT p.id, p.name, p.barcodes, br.name AS brand_name, c.slug AS category_slug,
+  coalesce(pc.slug, '')::text AS parent_slug
+FROM products p
+JOIN categories c ON c.id = p.category_id
+LEFT JOIN categories pc ON pc.id = c.parent_id
+LEFT JOIN brands br ON br.id = p.brand_id
+WHERE p.status IN ('active', 'pending_review')
+  AND NOT EXISTS (SELECT 1 FROM product_images own WHERE own.id = p.image_id AND own.source <> 'type')
+  AND NOT EXISTS (SELECT 1 FROM product_images pi WHERE pi.product_id = p.id
+    AND (pi.status IN ('uploading', 'pending') OR pi.source IN ('off', 'obf', 'opf')))
+  AND (sqlc.narg(before)::uuid IS NULL OR p.id < sqlc.narg(before)::uuid)
+ORDER BY p.id DESC
+LIMIT @lim;
+
 -- name: InsertImportedImage :execrows
 -- A pending imported image, unless the product gained an image or a waiting
 -- photo since it was listed (0 rows then).
