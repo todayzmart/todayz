@@ -134,3 +134,48 @@ StepUpVerifyResponse:
   properties:
     validUntil:
       $ref: ./common.yaml#/Timestamp
+AuthConfigResponse:
+  type: object
+  description: Which service sends the sign-in code (D-275). `firebase` is present when `otpProvider` is `firebase`.
+  required: [otpProvider]
+  properties:
+    otpProvider:
+      type: string
+      description: "`sms`: TodayZ sends the code (`otp/send`). `firebase`: Firebase Auth sends and checks it in the page."
+      enum: [sms, firebase]
+    firebase:
+      $ref: "#/FirebaseWebConfig"
+FirebaseWebConfig:
+  type: object
+  description: The Firebase web app config. Public values (they ship in every page that signs in), never a secret.
+  required: [apiKey, authDomain, projectId, appId]
+  properties:
+    apiKey:
+      type: string
+      description: The Firebase web API key, restricted to the TodayZ origins in Google Cloud.
+    authDomain:
+      type: string
+    projectId:
+      type: string
+    appId:
+      type: string
+    emulatorUrl:
+      type: string
+      description: Local and test only. The Firebase Auth emulator (the mocks server) the page talks to instead of Google.
+FirebaseVerifyRequest:
+  type: object
+  additionalProperties: false
+  required: [idToken, app, deviceId]
+  properties:
+    idToken:
+      type: string
+      description: The Firebase ID token of the phone sign-in. Never logged or stored.
+      minLength: 1
+      maxLength: 8192
+    app:
+      $ref: "#/AuthApp"
+    deviceId:
+      type: string
+      description: A ULID the app makes once per install and keeps; it names this device's session.
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      maxLength: 26

@@ -35,10 +35,12 @@ type PurgeResult struct {
 	Sessions            int64
 	AdminSigninFailures int64
 	AdminSigninLocks    int64
+	FirebaseSignins     int64
 }
 
-// Purge deletes OTP requests, sessions and the admin sign-in failures and
-// locks (D-264) past their retention. It is
+// Purge deletes OTP requests, sessions, the admin sign-in failures and
+// locks (D-264) and the used Firebase verifications (D-275) past their
+// retention. It is
 // idempotent: a retried job deletes nothing it should not.
 func Purge(ctx context.Context, d *db.DB, now time.Time) (PurgeResult, error) {
 	q := identitydb.New(d.Q(ctx))
@@ -63,5 +65,10 @@ func Purge(ctx context.Context, d *db.DB, now time.Time) (PurgeResult, error) {
 		return out, fmt.Errorf("identity: purge admin_signin_locks: %w", err)
 	}
 	out.AdminSigninLocks = n
+	n, err = q.PurgeFirebaseSignins(ctx, now)
+	if err != nil {
+		return out, fmt.Errorf("identity: purge firebase_sign_ins: %w", err)
+	}
+	out.FirebaseSignins = n
 	return out, nil
 }

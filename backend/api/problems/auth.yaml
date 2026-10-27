@@ -31,3 +31,7 @@ problems:
     status: 429
     i18n: problems.signin_locked
     title: Admin sign-in for this number is locked; try again later or ask another super admin to unlock it
+  - code: sign_in_method_changed
+    status: 409
+    i18n: problems.sign_in_method_changed
+    title: The sign-in method changed; read GET /v1/auth/config and start again

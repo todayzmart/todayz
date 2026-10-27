@@ -132,7 +132,38 @@ type Providers struct {
 	MockLLM              bool
 	GeocoderProvider     string
 	GeocoderAPIKey       Secret
+	// OTPProvider names who sends and checks the sign-in code (D-275):
+	// "sms" (our code through AWS SMS, the default) or "firebase" (Firebase
+	// Auth phone sign-in in the browser; the API checks the ID token). The
+	// admin step-up and the field owner code are SMS either way.
+	OTPProvider string
+	// Firebase is the public web config the apps get from GET
+	// /v1/auth/config, and what the ID token check expects.
+	Firebase Firebase
 }
+
+// Firebase is the Firebase Auth project used for the sign-in code (D-275).
+// None of it is secret: the web config ships in every browser, and checking
+// an ID token needs only Google's public keys.
+type Firebase struct {
+	ProjectID  string // FIREBASE_PROJECT_ID: the token's aud, and iss https://securetoken.google.com/<id>
+	WebAPIKey  string // FIREBASE_WEB_API_KEY: the browser key (referrer-restricted in the console)
+	AuthDomain string // FIREBASE_AUTH_DOMAIN
+	AppID      string // FIREBASE_APP_ID
+	// JWKSAPIURL overrides Google's public-key URL in local and test (the
+	// mocks server); staging and prod refuse it, so only Google's keys are
+	// ever trusted there.
+	JWKSAPIURL string
+	// AuthEmulatorURL points the browser SDK at an Auth emulator (the mocks
+	// server) in local and test; staging and prod refuse it.
+	AuthEmulatorURL string
+}
+
+// OTP providers (D-275).
+const (
+	OTPProviderSMS      = "sms"
+	OTPProviderFirebase = "firebase"
+)
 
 // Storage holds R2 (MinIO locally) settings.
 type Storage struct {
@@ -305,6 +336,25 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		MockLLM:              r.boolDefault("MOCK_LLM", true),
 		GeocoderProvider:     r.str("GEOCODER_PROVIDER"),
 		GeocoderAPIKey:       r.secret("GEOCODER_API_KEY"),
+		OTPProvider:          r.otpProvider("OTP_PROVIDER"),
+		Firebase: Firebase{
+			ProjectID:       r.str("FIREBASE_PROJECT_ID"),
+			WebAPIKey:       r.str("FIREBASE_WEB_API_KEY"),
+			AuthDomain:      r.str("FIREBASE_AUTH_DOMAIN"),
+			AppID:           r.str("FIREBASE_APP_ID"),
+			JWKSAPIURL:      r.url("FIREBASE_JWKS_API_URL"),
+			AuthEmulatorURL: r.url("FIREBASE_AUTH_EMULATOR_URL"),
+		},
+	}
+	if env.IsDeployed() {
+		// D-275: deployed, only Google's keys sign a trusted ID token and the
+		// browser talks to Firebase itself, never to an emulator.
+		if c.Providers.Firebase.JWKSAPIURL != "" {
+			r.bad("FIREBASE_JWKS_API_URL", "must be unset in staging and prod")
+		}
+		if c.Providers.Firebase.AuthEmulatorURL != "" {
+			r.bad("FIREBASE_AUTH_EMULATOR_URL", "must be unset in staging and prod")
+		}
 	}
 	if env.IsDeployed() && c.Providers.SMSAPIURL != "" {
 		// D-212: staging and prod send to the regional AWS endpoint, signed by
@@ -442,6 +492,19 @@ func (r *reader) url(name string) string {
 		return ""
 	}
 	return strings.TrimRight(v, "/")
+}
+
+// otpProvider reads OTP_PROVIDER: sms (the default when unset) or firebase.
+func (r *reader) otpProvider(name string) string {
+	v := strings.ToLower(strings.TrimSpace(r.get(name))) // optional: unset means sms
+	switch v {
+	case "", OTPProviderSMS:
+		return OTPProviderSMS
+	case OTPProviderFirebase:
+		return OTPProviderFirebase
+	}
+	r.bad(name, "must be sms or firebase")
+	return OTPProviderSMS
 }
 
 func (r *reader) addr(name string) string {
