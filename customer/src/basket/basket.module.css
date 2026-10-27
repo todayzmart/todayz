@@ -68,9 +68,18 @@
 
 .row {
   display: flex;
+  flex-flow: row wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+/* On a phone the actions drop under the name, left-aligned (tz-card is a column; founder, 27 Oct). */
+@media (width < 480px) {
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .rowText {

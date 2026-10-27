@@ -144,11 +144,6 @@
     "review": "reviewed",
     "enHash": "a4b03af4"
   },
-  "home.map.show": {
-    "message": "வரைபடத்தைப் பார்க்கத் தட்டவும்",
-    "review": "reviewed",
-    "enHash": "8e01ffa5"
-  },
   "home.map.pinOpen": {
     "message": "{name}, திறந்துள்ளது",
     "review": "reviewed",

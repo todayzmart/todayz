@@ -17,6 +17,7 @@ import { deliveryProblemOf, type DeliveryProblem } from '../cart/deliveryRules';
 import { clearFulfilment, useFulfilment } from '../cart/fulfilment';
 import { quoteKey, todaysHours, useCartPricing } from '../cart/quote';
 import { AddressPicker } from '../address/AddressPicker';
+import { LineThumb } from '../cart/LineThumb';
 import styles from '../cart/tx.module.css';
 import { LimitBanner } from '../orders/LimitBanner';
 import { suspendedUntil, useSuspendedText } from '../orders/limit';
@@ -307,6 +308,7 @@ export function CheckoutPage() {
         <ul className={styles.list}>
           {(q ? q.lines : []).map((l) => (
             <li key={l.storeItemId} className={styles.line}>
+              <LineThumb name={l.name} imageKey={l.imageKey} tintKey={l.productId} />
               <div>
                 <p className={styles.name}>
                   {l.name} × {l.quantity}

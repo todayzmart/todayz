@@ -41,6 +41,32 @@
   border-bottom: 0;
 }
 
+/* A line with the item's photo first (LineThumb). */
+.line:has(> .thumb) {
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+}
+
+.thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--t-bg, var(--media));
+  color: var(--t-ink, var(--ink-2));
+  font: 800 15px/1 var(--font-display);
+}
+
+.thumb > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .name {
   margin: 0;
   font: var(--type-label);
@@ -90,6 +116,12 @@
   color: var(--ink);
   padding-top: var(--space-2);
   border-top: 1px solid var(--line);
+}
+
+/* With no rows above it, Total needs no rule over it (founder, 27 Oct). */
+.grand:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .sticky {
@@ -266,4 +298,42 @@
   gap: var(--space-1);
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Pickup or delivery: full width, equal halves, like the Home switch (founder, 27 Oct). */
+.mode {
+  display: flex;
+  width: 100%;
+}
+
+.mode button {
+  flex: 1;
+  height: 36px;
+}
+
+/* Orders: the link to your asks reads as a row, not a bare grey bar (founder, 27 Oct). */
+.asksRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 15px/1.3 var(--font-sans);
+  text-decoration: none;
+}
+
+.asksRow > span {
+  flex: 1;
+}
+
+.asksRow > :first-child {
+  color: var(--brand);
+}
+
+.asksRow > :last-child {
+  color: var(--ink-3);
 }

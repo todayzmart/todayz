@@ -21,6 +21,7 @@ import {
 import { Check, Clock, MapPin, Phone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
+import { LineThumb } from '../cart/LineThumb';
 import styles from '../cart/tx.module.css';
 import { NextFromSplit } from '../basket/NextFromSplit';
 import { PartialConfirm } from './PartialConfirm';
@@ -317,6 +318,7 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
         <ul className={styles.list}>
           {lines.map((l) => (
             <li key={l.id} className={styles.line}>
+              <LineThumb name={l.name} imageKey={l.imageKey} tintKey={l.storeItemId} />
               <div>
                 <p className={styles.name}>
                   {l.name} × {l.quantityAccepted ?? l.quantityRequested}

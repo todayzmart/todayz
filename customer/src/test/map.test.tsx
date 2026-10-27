@@ -1,10 +1,23 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearCart } from '../cart/cart';
 import { tilesUrlFor } from '../home/tiles';
 import { CATEGORIES, NOW, SHOP_A, SHOP_B, STORE_B_ID, atBengaluru, card, page, pageOf, renderDiscover } from './discover-fixtures';
 
-beforeEach(() => clearCart());
+// The test env's IntersectionObserver never fires, so this one says "on screen" at once.
+class SeenAtOnce {
+  constructor(private readonly cb: IntersectionObserverCallback) {}
+  observe(target: Element) { this.cb([{ isIntersecting: true, target } as IntersectionObserverEntry], this as unknown as IntersectionObserver); }
+  unobserve() {}
+  disconnect() {}
+  takeRecords() { return []; }
+}
+
+beforeEach(() => {
+  clearCart();
+  vi.stubGlobal('IntersectionObserver', SeenAtOnce);
+});
+afterEach(() => vi.unstubAllGlobals());
 
 // Far enough apart that the map does not cluster them at the radius it opens with.
 const PINS = [
@@ -25,22 +38,18 @@ function routes(over: Record<string, () => unknown> = {}) {
 }
 
 /**
- * MapLibre waits for a tap on the Home card (D-251 B1), and stays shown for the rest of the visit, so an
- * earlier test in this file may have shown it already. The lazy chunk took over the default 1 s under a
- * parallel load run.
+ * The Home map shows without a tap once its section is near the screen (stubbed above to be at once). The lazy chunk took over the default 1 s under a parallel load run.
  */
 async function showHomeMap() {
-  const first = await screen.findByRole('button', { name: /^Tap to see the map|^Sri Lakshmi Stores, open$/ }, { timeout: 4000 });
-  if (first.textContent?.startsWith('Tap to see the map')) fireEvent.click(first);
   await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' }, { timeout: 4000 });
 }
 
 describe('C-03 map card', () => {
-  it('shows a summary, not the map, until a tap', async () => {
+  it('shows the map without a tap', async () => {
     renderDiscover('/', routes());
     atBengaluru();
-    expect(await screen.findByRole('button', { name: /Tap to see the map.*2 shops within/ })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Sri Lakshmi Stores, open' })).not.toBeInTheDocument();
+    await showHomeMap();
+    expect(screen.queryByRole('button', { name: /Tap to see the map/ })).not.toBeInTheDocument();
   });
 
   it('draws the summary pins with their shop names and opens the full map', async () => {

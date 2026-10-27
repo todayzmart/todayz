@@ -2,7 +2,7 @@
 
 How a customer finds nearby shops and items: search, ranking, saved baskets, ratings and reviews, and the plain-language helpers.
 
-> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d22219d7 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -58,8 +58,8 @@ Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e
 - Live in code. The refine-chip parser is built; a stale package comment in `search/search.go` still says it is not.
 - The "ready soonest" ask badge is not shown on search results ([go-live gaps](../qa/go-live-gaps/LIST.md)).
 - Home rails are built in the browser from the nearest shops' item lists (D-269). There is no "items near you", popular-items, per-category item or ETA endpoint, items carry no category or colour (a tile's tint is a hash of the product id), and subcategories have no photos of their own (they repeat the parent's). See [customer-redesign](../qa/customer-redesign/REPORT.md).
-- The home map is a "tap to see the map" card (D-251 B1).
+- The home map shows without a tap once its section nears the screen (D-272, which supersedes D-251 B1); `/map` is unchanged.
 
 ## Decisions
 
-D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch).
+D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch). D-272 phone fixes (map always shown, photos fill their tiles, initials skip digits).

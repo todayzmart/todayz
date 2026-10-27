@@ -7,10 +7,9 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { Button, Chip, EmptyState, SearchField, Segmented, Skeleton, StoreCard } from '@todayz/ui';
 import { BadgePercent, Bike, Clock, MapPin, ShoppingBag, Store as StoreIcon } from 'lucide-react';
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { LimitBanner } from '../orders/LimitBanner';
-import { Icon } from '../shell/Icon';
 import { VoiceSearchSlot } from '../search/slots';
 import { ChipSelect } from '../shell/ChipSelect';
 import { CartBarLink } from '../store/CartBarLink';
@@ -30,10 +29,39 @@ import styles from './home.module.css';
 // MapLibre stays out of the first load: the card is its own chunk.
 const StoreMapCard = lazy(() => import('./StoreMapCard'));
 
-// MapLibre's JS and WebGL setup cost the phone home its Lighthouse score even when they waited for the
-// card to scroll near (W4-04): the card is a plain summary until a tap (D-251 B1). Once shown, it stays
-// shown for the rest of the visit.
+// The map always shows (founder, 27 Oct; replaces D-251 B1's tap): MapLibre loads when the section
+// comes within a screen of view, so the first paint does not wait for it. Once loaded it stays for the visit.
+// It starts watching only once the shop list has settled: until then the rails above it are empty and the
+// map sits near the top, so it would load with the page (Lighthouse phone Home 58 against 81 without it).
 let mapShown = false;
+
+/** True once the element has come within a screen of the viewport, watched from `ready` (at once without IntersectionObserver). */
+function useNear(ready: boolean): [(el: Element | null) => void, boolean] {
+  const [near, setNear] = useState(mapShown);
+  const ref = useCallback(
+    (el: Element | null) => {
+      if (!el || near || !ready) return;
+      if (typeof IntersectionObserver === 'undefined') {
+        mapShown = true;
+        setNear(true);
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            mapShown = true;
+            setNear(true);
+          }
+        },
+        { rootMargin: '100% 0px' },
+      );
+      io.observe(el);
+    },
+    [near, ready],
+  );
+  return [ref, near];
+}
 
 /**
  * Which shops Home lists (D-269): every shop, or only those that take pickup or delivery orders. A
@@ -146,7 +174,6 @@ const FILTERS: readonly { key: Filter; label: string; icon: typeof Clock }[] = [
 function Nearby({ coords, category, mode }: { coords: Coords; category: string | undefined; mode: Mode }) {
   const intl = useIntl();
   const router = useRouter();
-  const [showMap, setShowMap] = useState(mapShown);
   const km = useRadiusKm();
   const cardProps = useFeatureCardProps();
   const [filters, setFilters] = useState<ReadonlySet<Filter>>(new Set());
@@ -177,6 +204,7 @@ function Nearby({ coords, category, mode }: { coords: Coords; category: string |
         ...(pageParam ? { cursor: pageParam } : {}),
       }),
   });
+  const [mapRef, showMap] = useNear(!stores.isPending);
 
   const items = useMemo(() => stores.data?.pages.flatMap((p) => p.items) ?? [], [stores.data]);
   const railShops = useRailShops(items);
@@ -264,7 +292,7 @@ function Nearby({ coords, category, mode }: { coords: Coords; category: string |
         </div>
       </dl>
 
-      <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
+      <section ref={mapRef} className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
         {showMap ? (
           <Suspense fallback={<Skeleton shape="block" height="220px" />}>
             <StoreMapCard
@@ -278,25 +306,7 @@ function Nearby({ coords, category, mode }: { coords: Coords; category: string |
             />
           </Suspense>
         ) : (
-          <button
-            type="button"
-            className={`tz-card ${styles.mapEntry}`}
-            onClick={() => {
-              mapShown = true;
-              setShowMap(true);
-            }}
-          >
-            <Icon icon={MapPin} />
-            <span className={styles.basketText}>
-              <span className="tz-card-title">{intl.formatMessage({ id: 'home.map.show' })}</span>
-              <span className="tz-meta">
-                {intl.formatMessage(
-                  { id: 'home.map.mapLabel' },
-                  { shops: num(summary.data?.storesNearby ?? 0), km: String(km), open: num(summary.data?.openNow ?? 0) },
-                )}
-              </span>
-            </span>
-          </button>
+          <Skeleton shape="block" height="220px" />
         )}
       </section>
 

@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl';
 import { PathLink } from '../orders/ShopLink';
 import { cartCount, clearCart, setQty, useCart, type CartLine } from './cart';
 import { CreditsControl } from './CreditsControl';
+import { LineThumb } from './LineThumb';
 import { suspendedUntil, useSuspendedText } from '../orders/limit';
 import { useCartPricing } from './quote';
 import { DeliveryProblemBanner, FulfilmentSwitch } from './Delivery';
@@ -193,6 +194,7 @@ function CartRow({ shopSlug, line, quoted }: { shopSlug: string; line: CartLine;
   const pack = line.packLabel ?? (quoted ? [quoted.variant, `${quoted.packSize} ${quoted.unit}`].filter(Boolean).join(' · ') : undefined);
   return (
     <li className={styles.line}>
+      <LineThumb name={line.productName} imageKey={quoted?.imageKey} src={line.imageUrl} tintKey={quoted?.productId ?? line.storeItemId} />
       <div>
         <p className={styles.name}>{line.productName}</p>
         {pack && <p className={styles.meta}>{pack}</p>}

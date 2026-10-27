@@ -180,6 +180,13 @@ select.tz-input:disabled {
   cursor: not-allowed;
 }
 
+.tz-seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* an icon sits apart from its word (founder, 27 Oct) */
+}
+
 /* Segmented is a radio group; the design draws its chosen state on aria-pressed. */
 .tz-seg button[aria-checked='true'] {
   background: var(--surface);

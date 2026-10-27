@@ -5,7 +5,8 @@ import { formatMoney } from '@todayz/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Button, EmptyState, Skeleton, StatusPill, Tabs, orderStatusTone } from '@todayz/ui';
-import { Receipt } from 'lucide-react';
+import { ChevronRight, MessageCircleQuestion, ReceiptIndianRupee } from 'lucide-react';
+import { Icon } from '../shell/Icon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import styles from '../cart/tx.module.css';
@@ -25,7 +26,7 @@ export function OrdersPage() {
       <div className={styles.page}>
         <h1 className="tz-page-title">{intl.formatMessage({ id: 'orders.title' })}</h1>
         <EmptyState
-          icon={Receipt}
+          icon={ReceiptIndianRupee}
           title={intl.formatMessage({ id: 'orders.signedOut.title' })}
           description={intl.formatMessage({ id: 'orders.signedOut.body' })}
           action={
@@ -52,8 +53,10 @@ export function OrdersPage() {
     <div className={styles.page}>
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'orders.title' })}</h1>
       {/* C-26: the asks list is also reached from Orders (W3-16). */}
-      <PathLink to="/asks" className="tz-btn tz-btn-soft tz-btn-sm">
-        {intl.formatMessage({ id: 'asks.ordersLink' })}
+      <PathLink to="/asks" className={styles.asksRow}>
+        <Icon icon={MessageCircleQuestion} />
+        <span>{intl.formatMessage({ id: 'asks.ordersLink' })}</span>
+        <Icon icon={ChevronRight} />
       </PathLink>
       <Tabs
         label={intl.formatMessage({ id: 'orders.tabs.label' })}
@@ -67,7 +70,7 @@ export function OrdersPage() {
             // TODO(lead): the In store tab (POS bills linked to the customer) is not in this slice.
             panel: (
               <EmptyState
-                icon={Receipt}
+                icon={ReceiptIndianRupee}
                 title={intl.formatMessage({ id: 'orders.store.title' })}
                 description={intl.formatMessage({ id: 'orders.store.body' })}
               />
@@ -112,7 +115,7 @@ function Online() {
   if (now.length === 0 && before.length === 0) {
     return (
       <EmptyState
-        icon={Receipt}
+        icon={ReceiptIndianRupee}
         title={intl.formatMessage({ id: 'orders.empty.title' })}
         description={intl.formatMessage({ id: 'orders.empty.body' })}
         action={

@@ -18,7 +18,10 @@ export function asTint(t: string | null | undefined): Tint | undefined {
 
 /** Two letters for the avatar. */
 export function initials(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
+  // Words that start with a letter, so "100% Pure coconut oil" reads PC, not 1P.
+  const all = name.trim().split(/\s+/).filter(Boolean);
+  const lettered = all.filter((w) => /^\p{L}/u.test(w));
+  const words = lettered.length > 0 ? lettered : all;
   const first = words[0] ?? '';
   const second = words[1] ?? '';
   const out = words.length > 1 ? `${[...first][0] ?? ''}${[...second][0] ?? ''}` : [...first].slice(0, 2).join('');

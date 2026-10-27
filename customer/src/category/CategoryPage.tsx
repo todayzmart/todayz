@@ -58,7 +58,7 @@ export function CategoryPage({ slug }: { slug: string }) {
         <EmptyState icon={StoreIcon} title={intl.formatMessage({ id: 'category.notFound.title' })} description={intl.formatMessage({ id: 'category.notFound.body' })} />
       ) : (
         <>
-          <h1 className={homeStyles.sectionTitle}>
+          <h1 className="tz-page-title">
             {category ? intl.formatMessage({ id: 'category.shops' }, { name: category.name }) : <Skeleton width="60%" />}
           </h1>
           <RadiusChips

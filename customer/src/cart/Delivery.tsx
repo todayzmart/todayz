@@ -93,7 +93,7 @@ export function FulfilmentSwitch({
   const gap = freeDeliveryGap(store, quote);
   return (
     <div className={styles.stack}>
-      <Segmented label={intl.formatMessage({ id: 'delivery.mode.label' })} options={options} value={mode} onChange={onChange} />
+      <Segmented className={styles.mode} label={intl.formatMessage({ id: 'delivery.mode.label' })} options={options} value={mode} onChange={onChange} />
       {mode === 'pickup' ? (
         <p className={styles.meta}>{intl.formatMessage({ id: 'cart.pickupOnly' })}</p>
       ) : (

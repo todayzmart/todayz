@@ -5,6 +5,7 @@ import type { DiscoverSearchItem } from '@todayz/api-client/gen/model/discoverSe
 import { Button, Sheet } from '@todayz/ui';
 import { useState, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
+import { imageUrl } from '../home/present';
 import { addToCart, replaceCart, setQty, useCart, type CartLine, type CartStore } from '../cart/cart';
 
 export interface ShopRef {
@@ -32,6 +33,8 @@ export function lineOf(item: DiscoverSearchItem, pack: string): Omit<CartLine, '
     packLabel: pack,
     pricePaise: item.pricePaise,
   };
+  const img = imageUrl(item.imageKey);
+  if (img) line.imageUrl = img;
   if (item.mrpPaise !== null && item.mrpPaise > item.pricePaise) line.mrpPaise = item.mrpPaise;
   return line;
 }

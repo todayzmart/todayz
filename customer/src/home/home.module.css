@@ -337,17 +337,6 @@
 }
 
 /* The Home map before a tap (D-251 B1): a summary card, no MapLibre. */
-.mapEntry {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 72px;
-  font: inherit;
-  text-align: start;
-  color: var(--ink);
-  cursor: pointer;
-}
 
 /* D-269: phone-first, and on a wide screen the discover pages use a wider column. */
 .page {
