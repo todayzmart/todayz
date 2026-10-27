@@ -2,7 +2,7 @@
 
 The five languages, the shared design tokens and components, and the "bright" skin used by the customer and shop apps.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -22,6 +22,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md); design source is the
 - Machine drafts and stale translations never ship to prod. Only reviewed translations compile into the prod catalogue ([translation workflow](../../shared/i18n/docs/translation-workflow.md)).
 - Light theme only: white page, mint wash, pastel tints, Lucide icons, Anek and Figtree fonts.
 - The bright, Zomato-style look moved from a trial into the customer app as a skin (D-249) and into the shop app (D-261). The site follows the same look (D-262).
+- Customer discovery screens use quick-commerce patterns on TodayZ tokens (D-269): pastel photo tiles, product tiles with a square photo on a tint, the price first and ADD on the photo's corner (it becomes the − n + stepper), sideways rails and a floating cart bar. Patterns only: no other app's images, icons or words. Photos are CC0 or public domain, each in a `SOURCES.md`.
 
 ## How it works
 
@@ -48,7 +49,7 @@ flowchart LR
 
 ## Tests
 
-Pseudo-locale checks, the `check-i18n-messages` lint, visual baselines in [e2e/visual](../../e2e/visual/), accessibility checks in [e2e/a11y](../../e2e/a11y/). Journey `08-e2e-15-language`. Reports: [W4-04](../qa/W4-04/REPORT.md), [W4-05](../qa/W4-05/REPORT.md), [W4-05-hindi-customer](../qa/W4-05-hindi-customer/), [D-261](../qa/D-261/).
+Pseudo-locale checks, the `check-i18n-messages` lint, visual baselines in [e2e/visual](../../e2e/visual/), accessibility checks in [e2e/a11y](../../e2e/a11y/). Journey `08-e2e-15-language`. Reports: [W4-04](../qa/W4-04/REPORT.md), [W4-05](../qa/W4-05/REPORT.md), [W4-05-hindi-customer](../qa/W4-05-hindi-customer/), [D-261](../qa/D-261/), [customer-redesign](../qa/customer-redesign/REPORT.md).
 
 ## Status and known gaps
 
@@ -57,4 +58,4 @@ Pseudo-locale checks, the `check-i18n-messages` lint, visual baselines in [e2e/v
 
 ## Decisions
 
-D-58, D-87, D-103, D-247, D-248, D-249, D-250, D-260, D-261, D-262.
+D-58, D-87, D-103, D-247, D-248, D-249, D-250, D-260, D-261, D-262, D-269.

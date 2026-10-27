@@ -326,5 +326,33 @@
   "home.card.footer.none": {
     "defaultMessage": "No cashback at this shop",
     "description": "Footer of a Home shop card without cashback"
+  },
+  "home.mode.label": {
+    "defaultMessage": "Show shops for",
+    "description": "Accessible name of the All / Pickup / Delivery switch on Home"
+  },
+  "home.mode.all": {
+    "defaultMessage": "All",
+    "description": "Switch option on Home: every shop, however it takes orders"
+  },
+  "home.rail.from": {
+    "defaultMessage": "From {shop}",
+    "description": "Heading of a Home rail with one nearby shop's items; shop is its name"
+  },
+  "home.rail.deals": {
+    "defaultMessage": "Deals near you",
+    "description": "Heading of the Home rail of items with an offer"
+  },
+  "home.rail.under": {
+    "defaultMessage": "Under {price}",
+    "description": "Heading of the Home rail of low-priced items; price is pre-formatted, e.g. ₹99"
+  },
+  "home.rail.seeAll": {
+    "defaultMessage": "See all",
+    "description": "Link at the end of a Home rail heading to the shop page"
+  },
+  "home.rail.seeAllAt": {
+    "defaultMessage": "See all items at {shop}",
+    "description": "Accessible name of the See all link"
   }
 }

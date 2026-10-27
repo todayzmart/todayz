@@ -1,10 +1,11 @@
-// C-03 Home (D-249): where you are, the wallet, search with the mic, filters, offers near you, the
-// categories with photos, the counts, the map and the shops near you as photo cards.
+// C-03 Home (D-249, D-269): where you are, the wallet, a sticky search with the mic and the pickup or
+// delivery switch, filters, offers near you, the categories as pastel photo tiles, product rails from the
+// nearest shops, each category's subcategories, the counts, the map and the shops near you as photo cards.
 import { listCategories } from '@todayz/api-client/gen/catalogue/catalogue';
 import { getDiscoverSummary, listDiscoverStores } from '@todayz/api-client/gen/discover/discover';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
-import { Button, CategoryRow, Chip, EmptyState, SearchField, Skeleton, StoreCard } from '@todayz/ui';
+import { Button, Chip, EmptyState, SearchField, Segmented, Skeleton, StoreCard } from '@todayz/ui';
 import { BadgePercent, Bike, Clock, MapPin, ShoppingBag, Store as StoreIcon } from 'lucide-react';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -14,13 +15,14 @@ import { VoiceSearchSlot } from '../search/slots';
 import { ChipSelect } from '../shell/ChipSelect';
 import { CartBarLink } from '../store/CartBarLink';
 import { useVoiceOutcome } from '../voice-search/session';
-import { categoryIcon } from './categories';
+import { CategoryTiles, SubcategoryGrids } from './CategoryTiles';
 import { useCoords, type Coords } from './coords';
 import { useFeatureCardProps } from './feature';
 import { Header } from './Header';
 import { Offers } from './Offers';
-import { categoryPhoto } from './photos';
-import { asTint, radiusM, storeHref } from './present';
+import { radiusM, storeHref } from './present';
+import { Rails } from './Rails';
+import { useRailShops } from './railShops';
 import { RouterLink } from './RouterLink';
 import { RADIUS_OPTIONS_KM, setRadiusKm, useRadiusKm } from './radius';
 import styles from './home.module.css';
@@ -33,6 +35,13 @@ const StoreMapCard = lazy(() => import('./StoreMapCard'));
 // shown for the rest of the visit.
 let mapShown = false;
 
+/**
+ * Which shops Home lists (D-269): every shop, or only those that take pickup or delivery orders. A
+ * discovery filter only: the cart still asks pickup or delivery per order (C-09). Kept for the visit.
+ */
+type Mode = 'all' | 'pickup' | 'delivery';
+let lastMode: Mode = 'all';
+
 export function Home({ category }: { category?: string | undefined }) {
   const intl = useIntl();
   const router = useRouter();
@@ -40,9 +49,14 @@ export function Home({ category }: { category?: string | undefined }) {
   const [q, setQ] = useState('');
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
   const voice = useVoiceOutcome();
+  const [mode, setModeState] = useState<Mode>(lastMode);
+  const setMode = (m: Mode) => {
+    lastMode = m;
+    setModeState(m);
+  };
 
   return (
-    <>
+    <div className={styles.page}>
       <Header coords={coords} />
       {/* Sticky under the header, as the big delivery apps do: search stays one tap away while the list scrolls. */}
       <div className={styles.searchBar}>
@@ -81,6 +95,17 @@ export function Home({ category }: { category?: string | undefined }) {
             </p>
           )}
         </form>
+        <Segmented
+          className={styles.mode}
+          label={intl.formatMessage({ id: 'home.mode.label' })}
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'all', label: intl.formatMessage({ id: 'home.mode.all' }), icon: StoreIcon },
+            { value: 'pickup', label: intl.formatMessage({ id: 'home.filter.pickup' }), icon: ShoppingBag },
+            { value: 'delivery', label: intl.formatMessage({ id: 'home.filter.delivery' }), icon: Bike },
+          ]}
+        />
       </div>
       <div className={styles.body}>
         <LimitBanner />
@@ -105,22 +130,20 @@ export function Home({ category }: { category?: string | undefined }) {
             action={<Button onClick={coords.retry}>{intl.formatMessage({ id: 'home.retry' })}</Button>}
           />
         )}
-        {coords.status === 'ready' && <Nearby coords={coords.coords} category={category} />}
+        {coords.status === 'ready' && <Nearby coords={coords.coords} category={category} mode={mode} />}
       </div>
       <CartBarLink />
-    </>
+    </div>
   );
 }
 
-type Filter = 'openNow' | 'pickup' | 'delivery' | 'hasOffer';
+type Filter = 'openNow' | 'hasOffer';
 const FILTERS: readonly { key: Filter; label: string; icon: typeof Clock }[] = [
   { key: 'openNow', label: 'home.filter.openNow', icon: Clock },
-  { key: 'pickup', label: 'home.filter.pickup', icon: ShoppingBag },
-  { key: 'delivery', label: 'home.filter.delivery', icon: Bike },
   { key: 'hasOffer', label: 'home.filter.offers', icon: BadgePercent },
 ];
 
-function Nearby({ coords, category }: { coords: Coords; category: string | undefined }) {
+function Nearby({ coords, category, mode }: { coords: Coords; category: string | undefined; mode: Mode }) {
   const intl = useIntl();
   const router = useRouter();
   const [showMap, setShowMap] = useState(mapShown);
@@ -139,7 +162,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
     queryFn: () => listCategories(),
   });
   const stores = useInfiniteQuery({
-    queryKey: ['discover', 'stores', lat, lng, km, category ?? null, [...filters].sort()],
+    queryKey: ['discover', 'stores', lat, lng, km, category ?? null, mode, [...filters].sort()],
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
@@ -149,16 +172,15 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
         radius: radiusM(km),
         ...(category ? { category } : {}),
         ...Object.fromEntries([...filters].map((f) => [f, true])),
+        ...(mode === 'pickup' ? { pickup: true } : mode === 'delivery' ? { delivery: true } : {}),
         limit: 20,
         ...(pageParam ? { cursor: pageParam } : {}),
       }),
   });
 
-  const items = stores.data?.pages.flatMap((p) => p.items) ?? [];
-  const names = useMemo(
-    () => new Map((stores.data?.pages.flatMap((p) => p.items) ?? []).map((s) => [s.storeSlug, s.name] as const)),
-    [stores.data],
-  );
+  const items = useMemo(() => stores.data?.pages.flatMap((p) => p.items) ?? [], [stores.data]);
+  const railShops = useRailShops(items);
+  const names = useMemo(() => new Map(items.map((s) => [s.storeSlug, s.name] as const)), [items]);
   const nextKm = RADIUS_OPTIONS_KM.find((k) => k > km);
   const num = (n: number) => n.toLocaleString('en-IN');
 
@@ -192,24 +214,19 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
 
       <Offers coords={coords} km={km} />
 
+      {categories.isPending && (
+        <div className={styles.catGrid} aria-hidden="true">
+          {[0, 1, 2, 3, 4, 5].map((k) => (
+            <Skeleton key={k} shape="block" height="112px" />
+          ))}
+        </div>
+      )}
       {categories.data && categories.data.items.length > 0 && (
         <section className={styles.section} aria-labelledby="home-cats">
-          <h2 id="home-cats" className="tz-label-rule">
+          <h2 id="home-cats" className={styles.railTitle}>
             {intl.formatMessage({ id: 'home.categories.title' })}
           </h2>
-          <CategoryRow
-            label={intl.formatMessage({ id: 'home.categories.label' })}
-            layout="grid"
-            LinkComponent={RouterLink}
-            categories={categories.data.items.map((c) => ({
-              key: c.slug,
-              label: c.name,
-              icon: categoryIcon(c.icon),
-              tint: asTint(c.tint) ?? 'green',
-              imageUrl: categoryPhoto(c.slug),
-              href: category === c.slug ? '/' : `/?category=${encodeURIComponent(c.slug)}`,
-            }))}
-          />
+          <CategoryTiles categories={categories.data.items} active={category} />
           {category && (
             <div className={styles.filterNote}>
               <span className="tz-tag">
@@ -225,6 +242,12 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
           )}
         </section>
       )}
+
+      <Rails shops={railShops} part="top" />
+
+      {categories.data && !category && <SubcategoryGrids categories={categories.data.items} />}
+
+      <Rails shops={railShops} part="bottom" />
 
       <dl className={styles.stats} aria-busy={summary.isPending}>
         <div className={styles.stat}>
@@ -278,7 +301,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
       </section>
 
       <section className={styles.section} aria-labelledby="home-shops">
-        <h2 id="home-shops" className="tz-label-rule">
+        <h2 id="home-shops" className={styles.railTitle}>
           {intl.formatMessage({ id: 'home.shops.title' })}
         </h2>
         <div aria-busy={stores.isPending} className={styles.list}>

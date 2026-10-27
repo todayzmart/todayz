@@ -408,5 +408,40 @@
     "message": "లొకేషన్ మార్చండి",
     "review": "machine",
     "enHash": "04410a88"
+  },
+  "home.mode.label": {
+    "message": "దేని కోసం దుకాణాలు చూపాలి",
+    "review": "machine",
+    "enHash": "07de4fb5"
+  },
+  "home.mode.all": {
+    "message": "అన్నీ",
+    "review": "machine",
+    "enHash": "6a720856"
+  },
+  "home.rail.from": {
+    "message": "{shop} నుండి",
+    "review": "machine",
+    "enHash": "bb11572a"
+  },
+  "home.rail.deals": {
+    "message": "మీ దగ్గర ఆఫర్లు",
+    "review": "machine",
+    "enHash": "018ddbfb"
+  },
+  "home.rail.under": {
+    "message": "{price} లోపు",
+    "review": "machine",
+    "enHash": "8344ca3d"
+  },
+  "home.rail.seeAll": {
+    "message": "అన్నీ చూడండి",
+    "review": "machine",
+    "enHash": "2941c5ce"
+  },
+  "home.rail.seeAllAt": {
+    "message": "{shop} లోని అన్ని వస్తువులు చూడండి",
+    "review": "machine",
+    "enHash": "fb6d20da"
   }
 }

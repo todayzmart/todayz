@@ -2536,57 +2536,6 @@
   color: var(--ink-2);
 }
 
-/* ============ TYPES ============ */
-
-.lp .types {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lp .types li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  gap: 4px 16px;
-  align-items: center;
-  padding: 22px;
-  border-radius: 20px;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-
-.lp .types li:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-pop);
-}
-
-.lp .t-photo {
-  grid-row: span 2;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 3px solid var(--surface);
-  box-shadow: var(--shadow-card);
-  object-fit: cover;
-}
-
-.lp .types b {
-  font: 600 18px/24px var(--font-sans);
-  align-self: end;
-}
-
-.lp .types p {
-  margin: 0;
-  font: 400 14px/20px var(--font-sans);
-  color: var(--ink-2);
-  align-self: start;
-}
-
 /* ============ FAQ ============ */
 
 .lp .faq-grid {
@@ -3021,10 +2970,6 @@
   .lp .steps3 {
     grid-template-columns: 1fr;
     gap: 40px;
-  }
-
-  .lp .types {
-    grid-template-columns: 1fr;
   }
 
   .lp .cta-card {

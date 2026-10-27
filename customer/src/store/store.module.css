@@ -1,8 +1,17 @@
-/* C-07 Shop page (D-249 bright): a photo cover, a white card over it, a sticky search band with
-   category chips, and the item grid. Tokens only. */
+/* C-07 Shop page (D-249 bright, D-269): a short photo cover, a white card over it, a sticky search band
+   with category chips, and a dense grid of item tiles (two across on a phone, five on a wide screen).
+   Tokens only. */
 
 .page {
+  --column: 560px;
+
   padding-bottom: calc(var(--space-12) + var(--space-6));
+}
+
+@media (width >= 1024px) {
+  .page {
+    --column: 1120px;
+  }
 }
 
 .head {
@@ -11,7 +20,7 @@
 }
 
 .cover {
-  height: 184px;
+  height: 136px;
   background: var(--surface-sunken);
   overflow: hidden;
 }
@@ -194,10 +203,35 @@
   padding: var(--space-4);
 }
 
+/* The row gap leaves room for Add, which hangs over the bottom of each photo. */
 .items {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
+  gap: var(--space-4) var(--space-3);
+}
+
+@media (width >= 640px) {
+  .items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1024px) {
+  .items {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-4);
+  }
+}
+
+.skelTile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skelTile > :first-child {
+  display: block;
+  aspect-ratio: 1;
 }
 
 /* Above the bottom nav, inside the content column. */
@@ -206,6 +240,6 @@
   inset-inline: var(--space-4);
   inset-block-end: calc(var(--bottom-nav) + env(safe-area-inset-bottom) + var(--space-3));
   z-index: var(--z-sticky);
-  max-width: calc(var(--column, 560px) - 2 * var(--space-4));
+  max-width: calc(min(var(--column, 560px), 560px) - 2 * var(--space-4));
   margin-inline: auto;
 }

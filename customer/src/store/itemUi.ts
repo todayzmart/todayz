@@ -15,3 +15,12 @@ export function useStepperLabels(): QuantityStepperLabels {
 export function itemHref(shopSlug: string, storeItemId: string): string {
   return `/s/${encodeURIComponent(shopSlug)}/i/${encodeURIComponent(storeItemId)}`;
 }
+
+const TINTS = ['green', 'sky', 'amber', 'lilac', 'peach', 'rose'] as const;
+
+/** A pastel per product that stays the same wherever the product shows. */
+export function tintOf(id: string): (typeof TINTS)[number] {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return TINTS[h % TINTS.length] ?? 'green';
+}

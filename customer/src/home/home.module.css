@@ -9,13 +9,18 @@
   background: var(--surface);
 }
 
-/* White band under the header; it sticks to the top once the header scrolls away. */
+/* White band under the header with search and the pickup or delivery switch (D-269); it sticks to the
+   top once the header scrolls away. */
 .searchBar {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
   padding: var(--space-2) var(--space-4) var(--space-3);
   padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
@@ -227,7 +232,7 @@
   position: relative;
   display: flex;
   height: 100%;
-  min-height: 168px;
+  min-height: 140px;
   overflow: hidden;
   border-radius: var(--radius-xl);
   background: var(--tone);
@@ -342,4 +347,241 @@
   text-align: start;
   color: var(--ink);
   cursor: pointer;
+}
+
+/* D-269: phone-first, and on a wide screen the discover pages use a wider column. */
+.page {
+  --column: 560px;
+}
+
+@media (width >= 1024px) {
+  .page {
+    --column: 1120px;
+  }
+}
+
+/* Search and the pickup or delivery switch share the sticky band; the switch wraps under on a phone. */
+.searchBar > form {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+/* All / Pickup / Delivery: the three share the row on a phone; icon and word sit apart. */
+.mode {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.mode button {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+}
+
+@media (width >= 640px) {
+  .mode {
+    flex: none;
+  }
+}
+
+.railTitle {
+  margin: 0;
+  font: 800 19px/1.2 var(--font-display);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* Top-level categories: pastel tiles, three across on a phone and six on a wide screen. */
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 1024px) {
+  .catGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+.catTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  height: 100%;
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--t-bg);
+  color: var(--ink);
+  text-align: center;
+  text-decoration: none;
+}
+
+.catTile[aria-current] {
+  border-color: var(--brand);
+}
+
+.catPhoto {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+/* The photos are products on white (photos/SOURCES.md); multiply sets them on the tile's tint. */
+.catPhoto > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.catName {
+  font: 700 13px/16px var(--font-sans);
+}
+
+/* Subcategories: four small tiles across on a phone, eight on a wide screen. */
+.subGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 1024px) {
+  .subGrid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+.subTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  text-align: center;
+  text-decoration: none;
+}
+
+.subPhoto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--t-bg);
+}
+
+.subPhoto > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.subName {
+  display: -webkit-box;
+  overflow: hidden;
+  font: 600 12px/15px var(--font-sans);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Product rails: one row of tiles that scrolls sideways, the next tile peeking in. */
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.railHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.seeAll {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--tap-min);
+  color: var(--brand-strong);
+  font: 700 13px/1 var(--font-sans);
+  text-decoration: none;
+}
+
+.railList {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: 0 var(--space-4) var(--space-1);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--space-4);
+  scrollbar-width: none;
+}
+
+.railItem {
+  flex: 0 0 142px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  scroll-snap-align: start;
+}
+
+@media (width >= 1024px) {
+  .railItem {
+    flex-basis: 168px;
+  }
+}
+
+/* Shops near you: two or three cards across on a wide screen. */
+@media (width >= 768px) {
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1024px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* On a wide screen two or three offer banners show at once. */
+@media (width >= 768px) {
+  .bannerItem {
+    flex-basis: 48%;
+  }
+}
+
+@media (width >= 1024px) {
+  .bannerItem {
+    flex-basis: 32%;
+  }
+}
+
+.catTile:focus-visible,
+.subTile:focus-visible,
+.seeAll:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }

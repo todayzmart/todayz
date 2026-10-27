@@ -18,7 +18,7 @@ import { ShareButton } from '../share/ShareButton';
 import { Icon } from '../shell/Icon';
 import { Substitutes } from '../substitutes/Substitutes';
 import { CartBarLink } from '../store/CartBarLink';
-import { itemHref, useStepperLabels } from '../store/itemUi';
+import { itemHref, tintOf, useStepperLabels } from '../store/itemUi';
 import { findItem, itemKey, seedItems, type CachedItem } from '../store/itemCache';
 import { useCartActions } from '../store/useCartActions';
 import styles from './product.module.css';
@@ -115,81 +115,87 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
         {intl.formatMessage({ id: 'product.back' }, { shop: shopName })}
       </RouterLink>
 
-      <div className={styles.media} aria-hidden="true">
-        {imageUrl(item.imageKey) ? <img className={styles.mediaImg} src={imageUrl(item.imageKey)} alt="" decoding="async" /> : initials(item.name)}
-      </div>
-      {imageUrl(item.imageKey) && item.imageCredit && (
-        // An open-database photo is CC BY-SA: name the authors, link the source and the licence (D-252).
-        <p className={styles.credit}>
-          {intl.formatMessage(
-            { id: 'product.photoCredit' },
-            {
-              author: (
-                <a href={item.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
-                  {item.imageCredit.author}
-                </a>
-              ),
-              licence: (
-                <a href={item.imageCredit.licenceUrl} target="_blank" rel="noopener noreferrer license">
-                  {item.imageCredit.licence}
-                </a>
-              ),
-            },
+      <div className={styles.layout}>
+        <div className={styles.gallery}>
+          <div className={styles.media} data-tint={tintOf(item.productId)} aria-hidden="true">
+            {imageUrl(item.imageKey) ? <img className={styles.mediaImg} src={imageUrl(item.imageKey)} alt="" decoding="async" /> : initials(item.name)}
+          </div>
+          {imageUrl(item.imageKey) && item.imageCredit && (
+            // An open-database photo is CC BY-SA: name the authors, link the source and the licence (D-252).
+            <p className={styles.credit}>
+              {intl.formatMessage(
+                { id: 'product.photoCredit' },
+                {
+                  author: (
+                    <a href={item.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                      {item.imageCredit.author}
+                    </a>
+                  ),
+                  licence: (
+                    <a href={item.imageCredit.licenceUrl} target="_blank" rel="noopener noreferrer license">
+                      {item.imageCredit.licence}
+                    </a>
+                  ),
+                },
+              )}
+            </p>
           )}
-        </p>
-      )}
-
-      <div className={styles.titleBlock}>
-        <h1 className={styles.name}>{item.name}</h1>
-        <p className={styles.pack}>{packLine(item)}</p>
-        {item.brand && <p className={styles.pack}>{item.brand}</p>}
-      </div>
-
-      <div className={styles.priceRow}>
-        <span className="tz-price">{money(item.pricePaise)}</span>
-        {pct !== null && item.mrpPaise !== null && (
-          <>
-            <span className="tz-mrp">{money(item.mrpPaise)}</span>
-            <span className="tz-off">{intl.formatMessage({ id: 'product.off' }, { pct: String(pct) })}</span>
-          </>
-        )}
-      </div>
-      <StockTag {...stock} />
-
-      <section className={styles.shop} aria-label={intl.formatMessage({ id: 'product.sold.by' })}>
-        <RouterLink href={`/s/${encodeURIComponent(slug)}`} className="tz-ui-plainlink">
-          <b>{shopName}</b>
-        </RouterLink>
-        <div className="tz-meta">
-          {typeof shop.data?.distanceM === 'number' && <span>{formatDistance(shop.data.distanceM)}</span>}
-          {shop.data?.locality && <span>{shop.data.locality}</span>}
         </div>
-      </section>
 
-      {canAdd ? (
-        <div className={styles.buy}>
-          <QuantityStepper
-            quantity={qty}
-            onChange={(n) => setQty(Math.max(1, n))}
-            alwaysStepper
-            labels={stepperLabels}
-            itemName={item.name}
-          />
-          <Button variant="primary" onClick={add} block>
-            {intl.formatMessage({ id: 'product.addToCart' })}
-          </Button>
+        <div className={styles.details}>
+          <div className={styles.titleBlock}>
+            <h1 className={styles.name}>{item.name}</h1>
+            <p className={styles.pack}>{packLine(item)}</p>
+            {item.brand && <p className={styles.pack}>{item.brand}</p>}
+          </div>
+
+          <div className={styles.priceRow}>
+            <span className={styles.price}>{money(item.pricePaise)}</span>
+            {pct !== null && item.mrpPaise !== null && (
+              <>
+                <span className="tz-mrp">{money(item.mrpPaise)}</span>
+                <span className={styles.off}>{intl.formatMessage({ id: 'product.off' }, { pct: String(pct) })}</span>
+              </>
+            )}
+          </div>
+          <StockTag {...stock} />
+
+          <section className={styles.shop} aria-label={intl.formatMessage({ id: 'product.sold.by' })}>
+            <RouterLink href={`/s/${encodeURIComponent(slug)}`} className="tz-ui-plainlink">
+              <b>{shopName}</b>
+            </RouterLink>
+            <div className="tz-meta">
+              {typeof shop.data?.distanceM === 'number' && <span>{formatDistance(shop.data.distanceM)}</span>}
+              {shop.data?.locality && <span>{shop.data.locality}</span>}
+            </div>
+          </section>
+
+          {canAdd ? (
+            <div className={styles.buy}>
+              <QuantityStepper
+                quantity={qty}
+                onChange={(n) => setQty(Math.max(1, n))}
+                alwaysStepper
+                labels={stepperLabels}
+                itemName={item.name}
+              />
+              <Button variant="primary" onClick={add} block>
+                {intl.formatMessage({ id: 'product.addToCart' })}
+              </Button>
+            </div>
+          ) : !bookable && shop.data ? (
+            <a className="tz-btn tz-btn-soft" href={directionsUrl(shop.data.lat, shop.data.lng)} target="_blank" rel="noopener noreferrer">
+              <Icon icon={MapPin} />
+              {intl.formatMessage({ id: 'store.directions' })}
+            </a>
+          ) : null}
+          {!item.inStock && <Substitutes shopSlug={slug} storeItemId={item.storeItemId} name={item.name} size="md" />}
+
+          <div className={styles.actions}>
+            <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} />
+            <ShareButton storeItemId={item.storeItemId} />
+          </div>
         </div>
-      ) : !bookable && shop.data ? (
-        <a className="tz-btn tz-btn-soft" href={directionsUrl(shop.data.lat, shop.data.lng)} target="_blank" rel="noopener noreferrer">
-          <Icon icon={MapPin} />
-          {intl.formatMessage({ id: 'store.directions' })}
-        </a>
-      ) : null}
-      {!item.inStock && <Substitutes shopSlug={slug} storeItemId={item.storeItemId} name={item.name} size="md" />}
-
-      <div className={styles.actions}>
-        <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} />
-        <ShareButton storeItemId={item.storeItemId} />
       </div>
 
       {others.data && others.data.length > 0 && (

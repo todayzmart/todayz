@@ -1,5 +1,6 @@
 ---
-// Who it is for: the six shop types with a round photo and a line each.
+// Who it is for: the six shop types as pastel tiles, each with a product photo on its tint and a line
+// (D-269). The tiles are bright-page styles (`.bp .b-types` in bright.css) inside the .lp section.
 import type { MessageKey, Translate } from '../../i18n/index.ts';
 import { SHOP_TYPES } from './data.ts';
 
@@ -24,16 +25,20 @@ const types = SHOP_TYPES.map((type, i) => ({
       </div>
       <p class="sec-intro">{t('home.types.intro')}</p>
     </div>
-    <ul class="types">
-      {
-        types.map((type) => (
-          <li data-tint={type.tint}>
-            <img class="t-photo" src={type.photo.src} width="64" height="64" alt="" loading="lazy" decoding="async" />
-            <b>{type.name}</b>
-            <p>{type.desc}</p>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="bp">
+      <ul class="b-types">
+        {
+          types.map((type) => (
+            <li data-tint={type.tint}>
+              <span class="b-type-photo">
+                <img src={type.photo.src} width="240" height="240" alt="" loading="lazy" decoding="async" />
+              </span>
+              <b>{type.name}</b>
+              <p>{type.desc}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </section>
