@@ -3,7 +3,7 @@
 // in lighthouserc.json so the run never touches the network. Scores must be >= 95 in every category,
 // on mobile (Lighthouse's default emulation, as configured in lighthouserc.json) and on desktop
 // (the same URLs with the desktop preset). One documented exception (D-102, site/CLAUDE.md): mobile
-// performance on /hi/ and /te/ is gated at 85 until the Indic fonts are subset; desktop has none.
+// performance on /hi/, /kn/ and /te/ is gated at 85 until the Indic fonts are subset; desktop has none.
 // The machine-draft locales are noindex in this (e2e) build by design, so on /hi/, /kn/, /te/ and
 // /ta/ the SEO category is replaced by its other audits, each required to pass; production builds
 // do not contain draft locales at all. Reports land in .lighthouseci/{mobile,desktop}/.

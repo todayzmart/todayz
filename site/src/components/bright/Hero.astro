@@ -1,14 +1,12 @@
 ---
-// Bright hero (D-262): a photo of a neighbourhood shop under a dark scrim (Unsplash licence,
-// assets/landing/CREDITS.md; an 800px copy for phones), the badge, the big two-part title and the lead. The page passes its own
-// actions and stats in the default slot.
-import type { ImageMetadata } from 'astro';
+// Bright hero (D-262): a photo of a neighbourhood shop under a dark scrim (heroPhotos.ts: a portrait
+// crop for phones, AVIF with a WebP fallback), the badge, the big two-part title and the lead. The page
+// passes its own actions and stats in the default slot.
 import { splitEm } from '../home/data.ts';
+import { PHONE_MAX, srcset, type HeroPhoto } from './heroPhotos.ts';
 
 interface Props {
-  photo: ImageMetadata;
-  /** The same photo 800px wide, so a phone does not download the full one. */
-  small: ImageMetadata;
+  photo: HeroPhoto;
   alt: string;
   badge: string;
   /** Title formatted with the EM argument (home/data.ts), and the emphasised part. */
@@ -17,22 +15,27 @@ interface Props {
   body: string;
 }
 
-const { photo, small, alt, badge, title, titleEm, body } = Astro.props;
+const { photo, alt, badge, title, titleEm, body } = Astro.props;
 const [before, after] = splitEm(title);
+const img = photo.fallback[photo.fallback.length - 1]!;
 ---
 
 <section class="b-hero">
-  <img
-    class="b-hero-photo"
-    src={photo.src}
-    srcset={`${small.src} ${small.width}w, ${photo.src} ${photo.width}w`}
-    sizes="100vw"
-    width={photo.width}
-    height={photo.height}
-    alt={alt}
-    fetchpriority="high"
-    decoding="async"
-  />
+  <picture>
+    <source media={PHONE_MAX} type="image/avif" srcset={srcset(photo.phone)} sizes="100vw" />
+    <source type="image/avif" srcset={srcset(photo.wide)} sizes="100vw" />
+    <img
+      class="b-hero-photo"
+      src={img.src}
+      srcset={srcset(photo.fallback)}
+      sizes="100vw"
+      width={img.width}
+      height={img.height}
+      alt={alt}
+      fetchpriority="high"
+      decoding="async"
+    />
+  </picture>
   <div class="b-w b-hero-in">
     <p class="b-badge"><i class="b-dot" aria-hidden="true"></i>{badge}</p>
     <h1>{before}<span class="b-acc">{titleEm}</span>{after}</h1>

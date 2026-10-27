@@ -4,12 +4,12 @@ Photos on the bright landing (D-262). Product and shop names in them are the mak
 
 ## Hero photos (Unsplash licence)
 
-Free for commercial use, no credit required ([unsplash.com/license](https://unsplash.com/license)). Downloaded at 1800 px and saved as 1600 px WebP, with an 800 px copy (`-800.webp`) that phones load through `srcset`. They replace the trial's street and tea-stall photos (founder, 26 Oct: "the background image is not good").
+Free for commercial use, no credit required ([unsplash.com/license](https://unsplash.com/license)). They replace the trial's street and tea-stall photos (founder, 26 Oct: "the background image is not good"). Encoded from the full-resolution originals (founder, 27 Oct: the 800 px phone copy looked soft): landscape AVIF at 1200, 1920 and 2560 px (SVT-AV1, CRF 34), a portrait crop around the shopkeeper for phones (`-phone-750.avif`, `-phone-1170.avif`), and WebP at 1200 and 1920 px (q75) for browsers without AVIF. `components/bright/heroPhotos.ts` wires them into the hero's `<picture>`.
 
 | File | Page | Photo | Photographer |
 |---|---|---|---|
-| `hero-kirana.webp` | Home | https://unsplash.com/photos/a-man-stands-in-a-small-convenience-store-gakuij2BVdg | Rohit Dey |
-| `hero-shopkeeper.webp` | For retailers | https://unsplash.com/photos/a-man-smiles-in-a-packed-open-front-store-g3IR5Y3C730 (Kochi) | Wietse Jongsma |
+| `hero-kirana-*` | Home | https://unsplash.com/photos/a-man-stands-in-a-small-convenience-store-gakuij2BVdg | Rohit Dey |
+| `hero-shopkeeper-*` | For retailers | https://unsplash.com/photos/a-man-smiles-in-a-packed-open-front-store-g3IR5Y3C730 (Kochi) | Wietse Jongsma |
 
 ## Product photos (CC BY 2.0, trial photos)
 
