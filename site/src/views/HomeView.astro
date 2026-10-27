@@ -20,8 +20,7 @@ import { company, links } from '../lib/company.ts';
 import { faqJsonLd, organizationJsonLd, websiteJsonLd } from '../lib/jsonld.ts';
 import { pageById } from '../lib/pages.ts';
 import Base from '../layouts/Base.astro';
-import kirana from '../assets/landing/hero-kirana.webp';
-import kiranaSmall from '../assets/landing/hero-kirana-800.webp';
+import { kiranaPhoto } from '../components/bright/heroPhotos.ts';
 import '../styles/landing.css';
 import '../styles/bright.css';
 
@@ -39,8 +38,7 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
 <Base page={page} locale={locale} jsonLd={[organizationJsonLd(company), websiteJsonLd(locale), faqJsonLd(faq)]}>
   <div class="bp">
     <Hero
-      photo={kirana}
-      small={kiranaSmall}
+      photo={kiranaPhoto}
       alt={t('home.lede.photo')}
       badge={t('home.lede.badge')}
       title={t('home.lede.title', EM)}

@@ -24,7 +24,7 @@
     "assert": {
       "assertMatrix": [
         {
-          "matchingUrlPattern": "/(hi|te)/(index\\.html)?$",
+          "matchingUrlPattern": "/(hi|kn|te)/(index\\.html)?$",
           "assertions": {
             "categories:performance": [
               "error",
@@ -95,7 +95,7 @@
           }
         },
         {
-          "matchingUrlPattern": "/(kn|ta)/(index\\.html)?$",
+          "matchingUrlPattern": "/ta/(index\\.html)?$",
           "assertions": {
             "categories:performance": [
               "error",
