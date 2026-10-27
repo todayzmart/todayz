@@ -19,6 +19,7 @@ import (
 
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/storage"
 	"github.com/todayz/backend/internal/platform/storage/storagetest"
@@ -174,7 +175,7 @@ func (w *world) product(name, brand, category string, barcodes ...string) ids.ID
 func (w *world) importer(o Options) *Importer {
 	w.t.Helper()
 	im, err := New(Deps{
-		DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: &http.Client{Timeout: 5 * time.Second},
+		DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true, Timeout: 5 * time.Second}),
 		Clock: w.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil)),
 		Sleep: func(_ context.Context, d time.Duration) error {
 			w.slept = append(w.slept, d)
@@ -275,7 +276,7 @@ func TestImportDryRunAndLimit(t *testing.T) {
 	w.product("Onion", "", catStaples)
 	o := w.facts.options(1)
 	o.DryRun = true
-	im, err := New(Deps{DB: db.New(w.tdb.Pool), Client: &http.Client{}, Clock: w.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil))}, o)
+	im, err := New(Deps{DB: db.New(w.tdb.Pool), Client: httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true}), Clock: w.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil))}, o)
 	require.NoError(t, err, "a dry run needs no storage")
 	rep, err := im.Run(context.Background())
 	require.NoError(t, err)
@@ -305,7 +306,7 @@ func TestImportStopsWhenRateLimited(t *testing.T) {
 }
 
 func TestNewRefuses(t *testing.T) {
-	d := Deps{DB: &db.DB{}, Client: &http.Client{}, Clock: clock.NewFake(t0), Log: slog.New(slog.NewTextHandler(io.Discard, nil))}
+	d := Deps{DB: &db.DB{}, Client: httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true}), Clock: clock.NewFake(t0), Log: slog.New(slog.NewTextHandler(io.Discard, nil))}
 	_, err := New(d, Options{UserAgent: "x", Limit: 1})
 	require.ErrorContains(t, err, "storage")
 	_, err = New(d, Options{Limit: 1, DryRun: true})

@@ -119,13 +119,15 @@ env-check: $(ENVTOOL)
 	@$(ENVTOOL) check -env "$(ROOT)/.env.cloud.local" -example "$(ROOT)/.env.cloud.example" | \
 	  awk 'NR == FNR { if (match($$0, /^[A-Z][A-Z0-9_]*=/)) app[substr($$0, 1, RLENGTH - 1)] = 1; next } !($$1 in app)' "$(ROOT)/.env.example" -
 
-# A clean reset, then every suite; the report lists each step's result (no values).
+# A clean reset, then every suite; the report lists each step's result (no values). The load
+# step resets again and builds its own data (make load-data), because e2e leaves its rows behind.
 release-candidate:
 	@out="$(ROOT)/docs/qa/rc-$$(date +%Y-%m-%d)"; mkdir -p "$$out"; \
 	status=0; : >"$$out/summary.md"; \
 	echo "# Release candidate $$(date +%Y-%m-%d) @ $$(git -C "$(ROOT)" rev-parse --short HEAD 2>/dev/null || echo no-git)" >>"$$out/summary.md"; \
-	for t in reset check e2e load security; do \
-	  if $(MAKE) $$t >"$$out/$$t.log" 2>&1; then r=pass; else r=FAIL; status=1; fi; \
+	for t in reset check e2e "reset load-data load" security; do \
+	  n="$${t##* }"; \
+	  if $(MAKE) $$t >"$$out/$$n.log" 2>&1; then r=pass; else r=FAIL; status=1; fi; \
 	  echo "- make $$t: $$r" | tee -a "$$out/summary.md"; \
 	done; \
 	$(ENVTOOL) leakscan -env "$(ENV_FILE)" "$$out"/*.log || status=1; \

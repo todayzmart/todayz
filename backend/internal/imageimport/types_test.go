@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/storage"
 )
@@ -180,7 +181,7 @@ func TestTypesSearchAgain(t *testing.T) {
 	u, err := url.Parse(commons.files.URL)
 	require.NoError(t, err)
 	ti, err := NewTypes(Deps{
-		DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: &http.Client{Timeout: 5 * time.Second},
+		DB: db.New(w.tdb.Pool), Store: storage.New(w.fake.Config(), w.fake.Client()), Client: httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true, Timeout: 5 * time.Second}),
 		Clock: w.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil)),
 		Sleep: func(_ context.Context, d time.Duration) error { w.clk.Advance(d); return nil },
 	}, TypeOptions{UserAgent: UserAgent("test", "https://todayz.in"), Limit: 10, Again: true, APIURL: commons.api.URL, FileHosts: []string{u.Host}})

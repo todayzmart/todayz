@@ -2,7 +2,7 @@
 
 How TodayZ is built, released and rolled back, and what is live today.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## Environments
 
@@ -101,7 +101,7 @@ Database changes are new migration files only. They run as a Fargate ops task (`
 
 ## Release candidate
 
-`make release-candidate` runs reset, check, e2e, load and security on a clean database and writes `docs/qa/rc-<date>/` with `summary.md` and one log per step, then scans the folder for leaked secrets. The latest is [rc-2026-10-26](../qa/rc-2026-10-26/summary.md). The release checklist is [docs/ops/release-checklist.md](../ops/release-checklist.md).
+`make release-candidate` runs reset, check, e2e, load and security on a clean database (the load step resets again and builds its own data with `make load-data`, because e2e leaves its rows behind) and writes `docs/qa/rc-<date>/` with `summary.md` and one log per step, then scans the folder for leaked secrets. The latest is [rc-2026-10-26](../qa/rc-2026-10-26/summary.md). The release checklist is [docs/ops/release-checklist.md](../ops/release-checklist.md).
 
 ## Rollback
 
