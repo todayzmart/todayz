@@ -45,7 +45,7 @@ The inner states are `check_status`. A store goes `draft` to `live` when its bus
 
 Field onboarding: the agent asks the owner for a code, enters the shop details, and the owner's code puts the business and the agent's complete stores live (D-241, D-274).
 
-The B-02 page (`business/src/onboarding/`) sits outside the app shell (the gate renders it bare). `steps.ts` holds the step order and which step to open; each step saves on its own, so the owner can leave and come back. On a phone the rail is a dark header with the steps as a scrolling row of chips; from 1024px it is a column on the left. The rail's "Go to dashboard" link shows only once the shop is live: a new signup has no shop to go to. Colours are the `rail` tokens (D-274).
+The B-02 page (`business/src/onboarding/`) sits outside the app shell (the gate renders it bare). `steps.ts` holds the step order and which step to open; each step saves on its own, so the owner can leave and come back. On a phone the rail is a dark header with the steps as a scrolling row of chips; from 1024px it is a column on the left. The rail's "Go to dashboard" link shows only once the shop is live: a new signup has no shop to go to. The rail counts all seven steps ("3 of 7 steps done"), optional ones included, so it matches "Step n of 7". Colours are the `rail` tokens (D-274).
 
 The check queue (`GET /v1/admin/shop-checks`, `shop_checks.go`) reads live unchecked businesses newest first, then each page's stores and photos in two queries; photo previews are presigned links to the private bucket. Check and reject lock the business row, refuse anything not unchecked, and write the audit row in the same transaction; reject also calls `orders.CancelShopOrders` there.
 

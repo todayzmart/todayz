@@ -218,7 +218,7 @@ describe('B-02 the flow', () => {
   it('with everything in, it opens Go live and lists the recommended photos still to add', async () => {
     renderAt('/onboarding', { messages, handlers: [shops('owner'), ready()] });
     expect(await screen.findByRole('heading', { name: 'Go live' })).toBeInTheDocument();
-    expect(screen.getByText('4 of 6 steps done')).toBeInTheDocument();
+    expect(screen.getByText('4 of 7 steps done')).toBeInTheDocument();
     const todo = screen.getByRole('button', { name: /Shop photos · Recommended/ });
     fireEvent.click(todo);
     expect(await screen.findByRole('heading', { name: 'Shop photos' })).toBeInTheDocument();

@@ -101,8 +101,9 @@ function Frame(props: { steps: StepState[] | null; active: StepId | null; onPick
   const { steps, active, onPick, home = false, children } = props;
   const intl = useIntl();
   const at = active ? STEPS.indexOf(active) : -1;
-  const done = steps?.filter((s) => s.done && !OPTIONAL.has(s.id)).length ?? 0;
-  const needed = STEPS.length - OPTIONAL.size;
+  // The rail counts all seven steps, optional ones included, so it agrees with "Step n of 7".
+  const done = steps?.filter((s) => s.done).length ?? 0;
+  const total = STEPS.length;
   return (
     <div className={styles.onb} data-skin="bright">
       <a className={styles.skip} href="#main">
@@ -122,9 +123,9 @@ function Frame(props: { steps: StepState[] | null; active: StepId | null; onPick
         </div>
         {steps && (
           <>
-            <p className={styles.progressText}>{intl.formatMessage({ id: 'onboarding.progress' }, { done, total: needed })}</p>
+            <p className={styles.progressText}>{intl.formatMessage({ id: 'onboarding.progress' }, { done, total })}</p>
             <div className={styles.bar} aria-hidden="true">
-              <i style={{ width: `${Math.round((done / needed) * 100)}%` }} />
+              <i style={{ width: `${Math.round((done / total) * 100)}%` }} />
             </div>
             <nav aria-label={intl.formatMessage({ id: 'onboarding.steps.label' })}>
               <ol className={styles.steps}>
