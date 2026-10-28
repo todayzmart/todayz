@@ -1,6 +1,1722 @@
 ==> gen: gen-backend
-/bin/bash: sqlc: command not found
-make[3]: *** [gen-backend] Error 127
-make gen: step gen-backend failed (exit 2)
-make[2]: *** [gen] Error 2
-make[1]: *** [e2e] Error 2
+problemgen: 75 codes -> gen/problems
+==> gen: gen-contract
+apigen root: 325 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 185ms.
+apigen check: 322 method+path pairs under /v1 (admin 132, auth 8, biz 104, discover 13, health 3, me 53, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 325 operations -> src/gen (10 prefixes), 75 problem codes, src/mocks/handlers.gen.ts
+==> gen: gen-events
+==> gen: gen-frontend
+
+> @todayz/tokens@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/tokens
+> node scripts/gen.mjs
+
+tokens: 115 vars, 10 font families, icons -> shared/tokens/generated
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5109 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+Scope: 3 of 15 workspace projects
+customer gen$ tsr generate
+admin gen$ tsr generate
+business gen$ tsr generate
+business gen: (node:18734) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+business gen: (Use `node --trace-warnings ...` to show where the warning was created)
+admin gen: (node:18721) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+admin gen: (Use `node --trace-warnings ...` to show where the warning was created)
+customer gen: (node:18708) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+customer gen: (Use `node --trace-warnings ...` to show where the warning was created)
+customer gen: Done
+business gen: Done
+admin gen: Done
+
+> @todayz/site@0.0.0 gen /Users/sairahul/Documents/projects/todayz/site
+> ASTRO_TELEMETRY_DISABLED=1 astro sync
+
+07:00:43 [types] Generated 58ms
+==> e2e: e2e-stack
+ok: make dev (run 1)
+ok: make dev (run 2)
+ok: second make dev reloaded Caddy instead of starting another
+ok: health.sh
+ok: https://todayz.localhost/_health serves the health page
+ok: /_health serves only the page and its CSS (no other .cache/dev file, no ..)
+ok: https://todayz.localhost answers (200)
+ok: https://app.todayz.localhost answers (200)
+ok: https://business.todayz.localhost answers (200)
+ok: https://admin.todayz.localhost answers (200)
+ok: https://api.todayz.localhost answers (404)
+ok: https://mocks.todayz.localhost answers (200)
+ok: https://grafana.todayz.localhost answers (200)
+ok: https://s3.todayz.localhost answers (403)
+ok: https://img.todayz.localhost answers (404)
+ok: https://tiles.todayz.localhost answers (404)
+ok: grafana through Caddy
+ok: http redirects to https
+ok: a client on the LAN address (192.168.29.40) is refused on all 10 HTTPS hosts and on :80
+ok: Grafana redirects other Host names to grafana.todayz.localhost (301)
+ok: anonymous Grafana user is not Admin (settings, datasource create, org users refused)
+ok: cross-origin POST to Grafana is refused (CSRF, 403)
+ok: same-origin Editor request works (folder created)
+ok: todayz_app can read and write todayz_owner's table (sequence included)
+ok: todayz_app cannot CREATE TABLE
+ok: todayz_app cannot DROP TABLE
+ok: todayz_app is not a superuser
+ok: PUT through https://s3.todayz.localhost (SigV4 over Caddy)
+ok: image reads back through https://img.todayz.localhost
+ok: img. 200 is cacheable
+ok: img. errors are not marked cacheable
+ok: img. refuses writes (405)
+ok: img. and tiles. do not list their buckets
+ok: anonymous policy allows GetObject only (no ListBucket)
+ok: private bucket refuses anonymous reads
+ok: img./tiles. refuse 9 path tricks with 400
+ok: a plain object still reads after the trick filters
+ok: ranged GET on bengaluru.pmtiles -> 206, 127 bytes, PMTiles header
+ok: CORS preflight for the customer app
+ok: foreign origin: 206 without CORS headers, Vary: Origin set
+ok: CORS exposes Content-Range; one Vary header
+ok: SC-PL-03 on the captured logs
+ok: no .env.local value in make dev output or process logs
+ok: make stop (stack stopped)
+
+dev-smoke: all checks pass (logs in .cache/dev/smoke/)
+==> e2e: e2e-journeys
+==> dev: dev-stack
+ Container todayz-lgtm-1 Starting 
+ Container todayz-postgres-1 Starting 
+ Container todayz-minio-1 Starting 
+ Container todayz-lgtm-1 Started 
+ Container todayz-postgres-1 Started 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Started 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Starting 
+ Container todayz-postgres-exporter-1 Started 
+ Container todayz-minio-1 Waiting 
+ Container todayz-lgtm-1 Waiting 
+ Container todayz-postgres-exporter-1 Waiting 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Healthy 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Healthy 
+ Container todayz-lgtm-1 Healthy 
+stack: containers healthy (postgres minio lgtm postgres-exporter)
+==> dev: dev-buckets
+buckets ok: images and tiles (anonymous GetObject, no listing), private (no anonymous access)
+tiles: bengaluru.pmtiles already in bucket
+tiles: chennai.pmtiles already in bucket
+tiles: hyderabad.pmtiles already in bucket
+==> dev: dev-caddy
+stack: caddy started on :443 and :80 (*.todayz.localhost)
+==> dev: dev-backend
+problemgen: 75 codes -> gen/problems
+apigen root: 325 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 151ms.
+apigen check: 322 method+path pairs under /v1 (admin 132, auth 8, biz 104, discover 13, health 3, me 53, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 325 operations -> src/gen (10 prefixes), 75 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-26T01:32:15.237Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-26T01:32:15.265Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":0,"head":39901}
+proc: started api (pid 21711, port 8180); log .cache/dev/api.log
+proc: api healthy (http://127.0.0.1:8180/healthz)
+proc: started worker (pid 21785, port 8181); log .cache/dev/worker.log
+proc: worker healthy (http://127.0.0.1:8181/healthz)
+==> dev: dev-mocks
+proc: started mocks (pid 21876, port 4010); log .cache/dev/mocks.log
+proc: mocks healthy (http://127.0.0.1:4010/healthz)
+==> dev: dev-i18n
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5109 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+==> dev: dev-frontend
+proc: started customer (pid 21975, port 5301); log .cache/dev/customer.log
+proc: customer healthy (http://127.0.0.1:5301/)
+proc: started business (pid 22069, port 5302); log .cache/dev/business.log
+proc: business healthy (http://127.0.0.1:5302/)
+proc: started admin (pid 22180, port 5303); log .cache/dev/admin.log
+proc: admin healthy (http://127.0.0.1:5303/)
+proc: started site (pid 22275, port 5304); log .cache/dev/site.log
+proc: site healthy (http://127.0.0.1:5304/)
+==> dev: dev-health
+GROUP      CHECK                              STATE DETAIL
+postgres   postgres :5433                     ok    accepting connections
+postgres   databases                          ok    todayz, todayz_test (owner todayz_owner)
+postgres   extensions                         ok    PostGIS 3.4.3, pg_trgm, unaccent, pgcrypto, pg_stat_statements
+postgres   pg_stat_statements                 ok    preloaded and collecting
+postgres   roles                              ok    todayz_owner, todayz_app, grafana_ro, todayz_exporter (none superuser)
+minio      minio :9100                        ok    live
+minio      minio console :9101                ok    HTTP 200
+minio      bucket images                      ok    exists, anonymous read, no listing
+minio      bucket tiles                       ok    exists, anonymous read, no listing
+minio      bucket private                     ok    exists, no anonymous access
+minio      tiles uploaded                     ok    3 archive(s) in the tiles bucket
+lgtm       grafana :3300                      ok    api/health ok, version 13.2.3
+lgtm       grafana postgres datasource        ok    grafana_ro connects (read-only)
+lgtm       otlp http :4318                    ok    accepts traces
+lgtm       otlp grpc :4317                    ok    listening
+lgtm       postgres_exporter :9187            ok    pg_up 1
+lgtm       prometheus :9390                   ok    scrapes postgres-exporter
+caddy      caddy                              ok    running, local CA present
+caddy      http :80                           ok    redirects to https
+caddy      https://grafana.todayz.localhost   ok    /api/health -> 200
+caddy      https://s3.todayz.localhost        ok    /minio/health/live -> 200
+caddy      https://img.todayz.localhost       ok    /_health/probe.txt -> 200
+caddy      https://tiles.todayz.localhost     ok    /_health/probe.txt -> 206
+caddy      https://todayz.localhost           ok    /_health/bundle.css -> 200
+caddy      https://api.todayz.localhost       ok    -> api :8180 (404)
+caddy      https://app.todayz.localhost       ok    -> customer app :5301 (200)
+caddy      https://business.todayz.localhost  ok    -> business app :5302 (200)
+caddy      https://admin.todayz.localhost     ok    -> admin app :5303 (200)
+caddy      https://todayz.localhost           ok    -> site :5304 (200)
+caddy      https://mocks.todayz.localhost     ok    -> mocks :4010 (200)
+procs      api                                ok    http://127.0.0.1:8180/healthz -> 200
+procs      worker                             ok    http://127.0.0.1:8181/healthz -> 200
+procs      mocks                              ok    http://127.0.0.1:4010/healthz -> 200
+procs      customer                           ok    http://127.0.0.1:5301/ -> 200
+procs      business                           ok    http://127.0.0.1:5302/ -> 200
+procs      admin                              ok    http://127.0.0.1:5303/ -> 200
+procs      site                               ok    http://127.0.0.1:5304/ -> 200
+
+health: all required checks pass (page: https://todayz.localhost/_health)
+
+> @todayz/e2e-journeys@ journeys /Users/sairahul/Documents/projects/todayz/e2e/journeys
+> playwright test
+
+
+Running 30 tests using 1 worker
+
+(node:22621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 specs/01-e2e-02-referral-credits.spec.ts:8:1 › E2E-02 referral credits, ₹300 order using 30, cashback 13, wallet 83, credit account +30 −13 (1.9s)
+  ✓   2 specs/02-e2e-03-partial.spec.ts:7:1 › E2E-03 partial accept → customer confirms the new total → collected (1.0s)
+  ✓   3 specs/02-e2e-03-partial.spec.ts:48:1 › E2E-03 shop side in the business app: Accept part → Send to customer (1.2s)
+  ✓   4 specs/03-e2e-06-bill-qr.spec.ts:8:1 › E2E-06 POS walk-in with bill QR credits (131ms)
+  ✓   5 specs/05-e2e-10-review-hide.spec.ts:26:1 › E2E-10 admin hides a review → the public rating drops; restore brings it back (admin API) (170ms)
+  ✓   6 specs/05-e2e-10-review-hide.spec.ts:59:1 › E2E-10 the customer shop page (C-07) shows the rating (454ms)
+  ✓   7 specs/06-e2e-12-credit-cap.spec.ts:11:1 › E2E-12 before the change: 30 credits are used, 40 are refused with credit_max_exceeded (90ms)
+  ✓   8 specs/06-e2e-12-credit-cap.spec.ts:55:1 › E2E-12 super admin sets credit_max_per_order to 40 with step-up; checkout allows 40; audit entry visible (27.8s)
+  ✓   9 specs/06-e2e-12-credit-cap.spec.ts:122:1 › E2E-12 through A-17: the super admin changes the cap on the settings screen; the history panel shows it (1.1s)
+  ✓  10 specs/07-e2e-13-baskets.spec.ts:16:1 › E2E-13 a basket one shop has in full → Fill cart → order → pickup; a split basket → two orders (2.3s)
+  ✓  11 specs/07-e2e-13-baskets.spec.ts:70:1 › E2E-13 build a basket from search results (C-05 → Add to basket) (987ms)
+  ✓  12 specs/07-e2e-13-baskets.spec.ts:85:3 › E2E-13 build a basket from a shop page (C-07) (899ms)
+  ✓  13 specs/07-e2e-13-baskets.spec.ts:85:3 › E2E-13 build a basket from a product page (C-08) (854ms)
+  ✓  14 specs/08-e2e-15-language.spec.ts:50:1 › E2E-15 language switch mid-journey keeps the cart and finishes the order (1.7s)
+  ✓  15 specs/08-e2e-15-language.spec.ts:103:1 › E2E-15 the screens read in Hindi after the switch (1.3s)
+  ✓  16 specs/08-e2e-15-language.spec.ts:149:1 › E2E-15 Home reads in Telugu after the switch (706ms)
+  ✓  17 specs/09-e2e-16-offline.spec.ts:5:1 › E2E-16 offline customer sees the offline banner and keeps the page; it clears when back online (369ms)
+  ✓  18 specs/10-e2e-17-owner.spec.ts:5:1 › E2E-17 multi-store owner sees both shops and can open each one’s orders (428ms)
+  ✓  19 specs/11-e2e-18-cashier.spec.ts:6:1 › E2E-18 cashier permissions: hand over yes; cancel, settings and the other shop no (158ms)
+  ✓  20 specs/12-e2e-19-blocked.spec.ts:20:1 › E2E-19 blocked customer cannot sign in or order; unblock restores them (1.0m)
+  ✓  21 specs/13-e2e-20-suspended.spec.ts:8:1 › E2E-20 suspended shop: not in discover, no shop page, orders refused (76ms)
+  ✓  22 specs/14-e2e-05-delivery.spec.ts:11:3 › E2E-05 delivery › customer books delivery to a saved address (968ms)
+  ✓  23 specs/14-e2e-05-delivery.spec.ts:52:3 › E2E-05 delivery › shop accepts, dispatches with a rider, and the order is delivered (1.3s)
+  ✓  24 specs/14-e2e-05-delivery.spec.ts:104:3 › E2E-05 delivery › the full phone shows to the shop only while out for delivery (92ms)
+  ✓  25 specs/20-e2e-04-no-show.spec.ts:7:1 › E2E-04 three no-shows → strikes → the open-order limit and its banner (12.9s)
+  ✓  26 specs/21-e2e-07-offline-code.spec.ts:52:1 › E2E-07 offline counter code → synced within 12 h → linked, cashback posted (108ms)
+  ✓  27 specs/21-e2e-07-offline-code.spec.ts:67:1 › E2E-07 variant: the same code used again → sale kept, link failed, no credits (3.0s)
+  ✓  28 specs/21-e2e-07-offline-code.spec.ts:78:1 › E2E-07 variant: device clock off by more than 2 min at its last check → link failed, no credits (3.1s)
+  ✓  29 specs/21-e2e-07-offline-code.spec.ts:90:1 › E2E-07 variant: synced after 12 h → link failed, no credits (3.1s)
+  ✓  30 specs/21-e2e-07-offline-code.spec.ts:103:1 › E2E-07 the shop sees "Customer link failed" on the sale in the business app (791ms)
+
+  30 passed (2.2m)
+==> e2e: e2e-contract
+==> dev: dev-stack
+ Container todayz-postgres-exporter-1 Running 
+ Container todayz-postgres-1 Running 
+ Container todayz-minio-1 Running 
+ Container todayz-lgtm-1 Running 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Waiting 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Waiting 
+ Container todayz-lgtm-1 Waiting 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Healthy 
+ Container todayz-minio-1 Healthy 
+ Container todayz-lgtm-1 Healthy 
+stack: containers healthy (postgres minio lgtm postgres-exporter)
+==> dev: dev-buckets
+buckets ok: images and tiles (anonymous GetObject, no listing), private (no anonymous access)
+tiles: bengaluru.pmtiles already in bucket
+tiles: chennai.pmtiles already in bucket
+tiles: hyderabad.pmtiles already in bucket
+==> dev: dev-caddy
+stack: caddy reloaded
+==> dev: dev-backend
+problemgen: 75 codes -> gen/problems
+apigen root: 325 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 190ms.
+apigen check: 322 method+path pairs under /v1 (admin 132, auth 8, biz 104, discover 13, health 3, me 53, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 325 operations -> src/gen (10 prefixes), 75 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-26T01:34:58.367Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-26T01:34:58.406Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":0,"head":39901}
+proc: api already running (pid 21711)
+proc: worker already running (pid 21785)
+==> dev: dev-mocks
+proc: mocks already running (pid 21876)
+==> dev: dev-i18n
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5109 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+==> dev: dev-frontend
+proc: customer already running (pid 21975)
+proc: business already running (pid 22069)
+proc: admin already running (pid 22180)
+proc: site already running (pid 22275)
+==> dev: dev-health
+GROUP      CHECK                              STATE DETAIL
+postgres   postgres :5433                     ok    accepting connections
+postgres   databases                          ok    todayz, todayz_test (owner todayz_owner)
+postgres   extensions                         ok    PostGIS 3.4.3, pg_trgm, unaccent, pgcrypto, pg_stat_statements
+postgres   pg_stat_statements                 ok    preloaded and collecting
+postgres   roles                              ok    todayz_owner, todayz_app, grafana_ro, todayz_exporter (none superuser)
+minio      minio :9100                        ok    live
+minio      minio console :9101                ok    HTTP 200
+minio      bucket images                      ok    exists, anonymous read, no listing
+minio      bucket tiles                       ok    exists, anonymous read, no listing
+minio      bucket private                     ok    exists, no anonymous access
+minio      tiles uploaded                     ok    3 archive(s) in the tiles bucket
+lgtm       grafana :3300                      ok    api/health ok, version 13.2.3
+lgtm       grafana postgres datasource        ok    grafana_ro connects (read-only)
+lgtm       otlp http :4318                    ok    accepts traces
+lgtm       otlp grpc :4317                    ok    listening
+lgtm       postgres_exporter :9187            ok    pg_up 1
+lgtm       prometheus :9390                   ok    scrapes postgres-exporter
+caddy      caddy                              ok    running, local CA present
+caddy      http :80                           ok    redirects to https
+caddy      https://grafana.todayz.localhost   ok    /api/health -> 200
+caddy      https://s3.todayz.localhost        ok    /minio/health/live -> 200
+caddy      https://img.todayz.localhost       ok    /_health/probe.txt -> 200
+caddy      https://tiles.todayz.localhost     ok    /_health/probe.txt -> 206
+caddy      https://todayz.localhost           ok    /_health/bundle.css -> 200
+caddy      https://api.todayz.localhost       ok    -> api :8180 (404)
+caddy      https://app.todayz.localhost       ok    -> customer app :5301 (200)
+caddy      https://business.todayz.localhost  ok    -> business app :5302 (200)
+caddy      https://admin.todayz.localhost     ok    -> admin app :5303 (200)
+caddy      https://todayz.localhost           ok    -> site :5304 (200)
+caddy      https://mocks.todayz.localhost     ok    -> mocks :4010 (200)
+procs      api                                ok    http://127.0.0.1:8180/healthz -> 200
+procs      worker                             ok    http://127.0.0.1:8181/healthz -> 200
+procs      mocks                              ok    http://127.0.0.1:4010/healthz -> 200
+procs      customer                           ok    http://127.0.0.1:5301/ -> 200
+procs      business                           ok    http://127.0.0.1:5302/ -> 200
+procs      admin                              ok    http://127.0.0.1:5303/ -> 200
+procs      site                               ok    http://127.0.0.1:5304/ -> 200
+
+health: all required checks pass (page: https://todayz.localhost/_health)
+todayz hooks: todayz_problem check on, 75 problem codes registered
+Schemathesis v4.29.1
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from                                                  
+ /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml (in 0.82s)  
+
+     Base URL:         https://api.todayz.localhost                             
+     Specification:    Open API 3.1.0                                           
+     Operations:       322 selected / 325 total                                 
+     Configuration:    /Users/sairahul/Documents/projects/todayz/e2e/contra     
+                       ct/schemathesis.toml                                     
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+
+ ✅  Examples (in 2.02s)                                                        
+                                                                                
+     ✅ 271 passed  ⏭   51 skipped                                              
+
+ ✅  Coverage (in 18.40s)                                                       
+                                                                                
+     ✅ 322 passed                                                              
+
+ ✅  Fuzzing (in 50.70s)                                                        
+                                                                                
+     ✅ 322 passed                                                              
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 322/325
+  Tested: 322
+
+Test Phases:
+  ✅ Examples
+  ✅ Coverage
+  ✅ Fuzzing
+  ⏭  Stateful (disabled)
+
+Test cases:
+  27544 generated, 27544 passed
+
+Reports:
+  - JUNIT: /Users/sairahul/Documents/projects/todayz/e2e/contract/out/junit-20261026T070500Z.xml
+
+Seed: 210187173187174005690839261310414494014
+
+========================== No issues found in 71.19s ===========================
+==> e2e: e2e-frontend-smoke
+Scope: 3 of 15 workspace projects
+customer build:e2e$ tsr generate && vite build --mode e2e && node node_modules/@todayz/auth/scripts/precache-check.mjs && node node_modules/@todayz/config/dist-check.mjs dist
+business build:e2e$ tsr generate && vite build --mode e2e && node node_modules/@todayz/auth/scripts/precache-check.mjs && node node_modules/@todayz/config/dist-check.mjs dist
+admin build:e2e$ tsr generate && vite build --mode e2e && node node_modules/@todayz/auth/scripts/precache-check.mjs && node node_modules/@todayz/config/dist-check.mjs dist
+customer build:e2e: (node:24251) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+customer build:e2e: (Use `node --trace-warnings ...` to show where the warning was created)
+admin build:e2e: (node:24253) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+admin build:e2e: (Use `node --trace-warnings ...` to show where the warning was created)
+business build:e2e: (node:24252) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+business build:e2e: (Use `node --trace-warnings ...` to show where the warning was created)
+customer build:e2e: (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+customer build:e2e:   - import "./functions/x/[code]" without a file extension (vite.config.ts:8:31). Add the file extension
+customer build:e2e: Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+business build:e2e: vite v8.3.3 building client environment for e2e...
+customer build:e2e: vite v8.3.3 building client environment for e2e...
+customer build:e2e: transforming...
+business build:e2e: transforming...
+admin build:e2e: vite v8.3.3 building client environment for e2e...
+admin build:e2e: transforming...
+business build:e2e: ✓ 2421 modules transformed.
+admin build:e2e: ✓ 2385 modules transformed.
+customer build:e2e: ✓ 2309 modules transformed.
+admin build:e2e: rendering chunks...
+business build:e2e: rendering chunks...
+customer build:e2e: rendering chunks...
+business build:e2e: dist/manifest.webmanifest                                                 0.54 kB
+business build:e2e: dist/icons/favicon-32.png                                                 1.67 kB
+business build:e2e: dist/icons/favicon-48.png                                                 2.40 kB
+business build:e2e: dist/index.html                                                           2.47 kB
+business build:e2e: dist/icons/mark-96.png                                                    5.59 kB
+business build:e2e: dist/assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2                 10.28 kB
+business build:e2e: dist/icons/apple-touch-icon.png                                          10.48 kB
+business build:e2e: dist/icons/icon-192.png                                                  13.11 kB
+business build:e2e: dist/assets/figtree-latin-wght-normal-D_ZTVpCC.woff2                     20.15 kB
+business build:e2e: dist/assets/anek-latin-latin-ext-wght-normal-CzxqaSOW.woff2              36.49 kB
+business build:e2e: dist/icons/maskable-512.png                                              39.39 kB
+business build:e2e: dist/assets/anek-latin-latin-wght-normal-DZcssQ26.woff2                  44.79 kB
+business build:e2e: dist/assets/noto-sans-tamil-tamil-wght-normal-iihgzMBi.woff2             50.46 kB
+business build:e2e: dist/assets/anek-tamil-tamil-wght-normal-DiCu5Pqm.woff2                  50.90 kB
+business build:e2e: dist/icons/icon-512.png                                                  60.34 kB
+business build:e2e: dist/assets/noto-sans-kannada-kannada-wght-normal-DuwB-P8d.woff2         90.79 kB
+business build:e2e: dist/assets/anek-kannada-kannada-wght-normal-ppMNNKfK.woff2             113.63 kB
+business build:e2e: dist/assets/noto-sans-devanagari-devanagari-wght-normal-DWI_L5Cu.woff2  121.19 kB
+business build:e2e: dist/assets/noto-sans-telugu-telugu-wght-normal-DoLU0sI2.woff2          123.97 kB
+business build:e2e: dist/assets/anek-telugu-telugu-wght-normal-WkcxfUQX.woff2               140.13 kB
+business build:e2e: dist/assets/anek-devanagari-devanagari-wght-normal-B8fb2BTn.woff2       257.65 kB
+business build:e2e: dist/assets/customers-BeTywxCg.css                                        0.37 kB
+business build:e2e: dist/assets/CoachCardRow-CAdwBVWh.css                                     0.61 kB
+business build:e2e: dist/assets/standee-DoJ1XzXF.css                                          1.36 kB
+business build:e2e: dist/assets/orders-C9BOeTya.css                                           1.54 kB
+business build:e2e: dist/assets/ai-DASG34rD.css                                               1.82 kB
+business build:e2e: dist/assets/stores-DNVAwkkK.css                                           2.25 kB
+business build:e2e: dist/assets/ReasonSheet-9Js0RNDM.css                                      2.35 kB
+business build:e2e: dist/assets/reviews-BhLv_2W3.css                                          2.80 kB
+business build:e2e: dist/assets/stock-PYVE81ky.css                                            2.81 kB
+business build:e2e: dist/assets/permissions-CtkV6YUZ.css                                      2.89 kB
+business build:e2e: dist/assets/credits-DIOUKLXI.css                                          3.14 kB
+business build:e2e: dist/assets/offers-B-v5wUuG.css                                           3.31 kB
+business build:e2e: dist/assets/analytics-BlNuh2rg.css                                        3.37 kB
+business build:e2e: dist/assets/overview-D9iishhD.css                                         3.57 kB
+business build:e2e: dist/assets/voice-zlScbZT2.css                                            3.71 kB
+business build:e2e: dist/assets/sell-Bz-luHIS.css                                             5.10 kB
+business build:e2e: dist/assets/index-7xrykm8o.css                                           52.72 kB
+business build:e2e: dist/assets/labels-B78O68Rb.js                                            0.09 kB │ map:     0.58 kB
+business build:e2e: dist/assets/check-BEFLCRMd.js                                             0.15 kB │ map:     0.94 kB
+business build:e2e: dist/assets/plus-DF6b7JcN.js                                              0.18 kB │ map:     1.04 kB
+business build:e2e: dist/assets/x-BSWDLXj3.js                                                 0.18 kB │ map:     1.02 kB
+business build:e2e: dist/assets/arrow-left-DV7erxHf.js                                        0.19 kB │ map:     1.08 kB
+business build:e2e: dist/assets/clock-CynuPmFI.js                                             0.20 kB │ map:     1.09 kB
+business build:e2e: dist/assets/search-BJatjipY.js                                            0.20 kB │ map:     1.10 kB
+business build:e2e: dist/assets/context-CKP2SsDI.js                                           0.23 kB │ map:     1.54 kB
+business build:e2e: dist/assets/Dialog-Dscs4rGH.js                                            0.23 kB │ map:     0.82 kB
+business build:e2e: dist/assets/lock-iUWx25IB.js                                              0.24 kB │ map:     1.16 kB
+business build:e2e: dist/assets/undo-2-CQsOdZcL.js                                            0.24 kB │ map:     1.10 kB
+business build:e2e: dist/assets/modalStack-BNJH0WeY.js                                        0.24 kB │ map:     1.75 kB
+business build:e2e: dist/assets/message-square-LypQUNgy.js                                    0.26 kB │ map:     1.16 kB
+business build:e2e: dist/assets/ActionError-tmm-qJf9.js                                       0.27 kB │ map:     0.84 kB
+business build:e2e: dist/assets/eye-CbnWsqNR.js                                               0.29 kB │ map:     1.21 kB
+business build:e2e: dist/assets/pencil-tCvqhf4X.js                                            0.31 kB │ map:     1.22 kB
+business build:e2e: dist/assets/StatusPill-BgYlOrtr.js                                        0.31 kB │ map:     1.35 kB
+business build:e2e: dist/assets/RouterLink-s_slMz5F.js                                        0.32 kB │ map:     1.34 kB
+business build:e2e: dist/assets/clipboard-check-BjhEgexS.js                                   0.33 kB │ map:     1.43 kB
+business build:e2e: dist/assets/useNavigate-D8kdtT8d.js                                       0.34 kB │ map:     3.29 kB
+business build:e2e: dist/assets/phone--rG0nmbO.js                                             0.35 kB │ map:     1.19 kB
+business build:e2e: dist/assets/scan-line-IZV1YZqK.js                                         0.36 kB │ map:     1.44 kB
+business build:e2e: dist/assets/ai.module-BN_16ds_.js                                         0.36 kB │ map:     2.43 kB
+business build:e2e: dist/assets/trash-FjA8GLNY.js                                             0.38 kB │ map:     1.46 kB
+business build:e2e: dist/assets/file-text-t4xgVVLZ.js                                         0.41 kB │ map:     1.54 kB
+business build:e2e: dist/assets/money-BqXAa59z.js                                             0.46 kB │ map:     2.98 kB
+business build:e2e: dist/assets/package-x-BCuSCEPL.js                                         0.48 kB │ map:     1.67 kB
+business build:e2e: dist/assets/locales-Bd82IxCv.js                                           0.48 kB │ map:     2.90 kB
+business build:e2e: dist/assets/device-B2N3vhdr.js                                            0.52 kB │ map:     2.57 kB
+business build:e2e: dist/assets/store-H7lwi_Fh.js                                             0.53 kB │ map:     1.50 kB
+business build:e2e: dist/assets/sparkles-D6nUvF21.js                                          0.54 kB │ map:     1.65 kB
+business build:e2e: dist/assets/next-DfUHA0_x.js                                              0.59 kB │ map:     3.73 kB
+business build:e2e: dist/assets/store-paNPeEfJ.js                                             0.64 kB │ map:     3.01 kB
+business build:e2e: dist/assets/format-ZEWqTwm_.js                                            0.75 kB │ map:     3.77 kB
+business build:e2e: dist/assets/Segmented-pzAFqauD.js                                         0.87 kB │ map:     3.89 kB
+business build:e2e: dist/assets/EmptyState-KRf3dX0b.js                                        0.89 kB │ map:     3.49 kB
+business build:e2e: dist/assets/stores.module-wblTBEsj.js                                     0.92 kB │ map:     3.90 kB
+business build:e2e: dist/assets/TextField-CdAOUkuN.js                                         0.93 kB │ map:     3.52 kB
+business build:e2e: dist/assets/Banner-DMA5mZtS.js                                            1.01 kB │ map:     4.79 kB
+business build:e2e: dist/assets/format-mm9HYMrB.js                                            1.10 kB │ map:     4.17 kB
+business build:e2e: dist/assets/useInfiniteQuery-BovvSHky.js                                  1.11 kB │ map:     6.84 kB
+business build:e2e: dist/assets/virtual_pwa-register-D788vf4G.js                              1.13 kB │ map:     4.79 kB
+business build:e2e: dist/assets/labels-Cp9pzQEN.js                                            1.18 kB │ map:     4.54 kB
+business build:e2e: dist/assets/Chip-BK6mkwFu.js                                              1.19 kB │ map:     5.97 kB
+business build:e2e: dist/assets/SearchField-sF8RZm9f.js                                       1.25 kB │ map:     5.30 kB
+business build:e2e: dist/assets/Tabs-083Dw2MX.js                                              1.25 kB │ map:     4.81 kB
+business build:e2e: dist/assets/refresh-cw-_K4fTeE9.js                                        1.27 kB │ map:     4.88 kB
+business build:e2e: dist/assets/preload-helper-DjzSQ1t3.js                                    1.38 kB
+business build:e2e: dist/assets/queries-sw1AFRFX.js                                           1.38 kB │ map:    14.80 kB
+business build:e2e: dist/assets/QuantityStepper-BDgE5Wz5.js                                   1.52 kB │ map:     7.48 kB
+business build:e2e: dist/assets/StoreGate-C3LGIBkk.js                                         1.60 kB │ map:     4.46 kB
+business build:e2e: dist/assets/time-BZdCOYGw.js                                              1.74 kB │ map:     8.56 kB
+business build:e2e: dist/assets/_section-BiEtr7fM.js                                          1.82 kB │ map:     6.36 kB
+business build:e2e: dist/assets/choose-shop-B1S9JCap.js                                       2.00 kB │ map:     6.99 kB
+business build:e2e: dist/assets/coach-Bqi9PwDR.js                                             2.10 kB │ map:     6.44 kB
+business build:e2e: dist/assets/Sheet-BjyULZss.js                                             2.45 kB │ map:    11.45 kB
+business build:e2e: dist/assets/queries-DmKO9AKN.js                                           2.50 kB │ map:    10.76 kB
+business build:e2e: dist/assets/OtpInput-CDkOhq2Y.js                                          2.77 kB │ map:    12.74 kB
+business build:e2e: dist/assets/_token-BxmgFfDQ.js                                            2.97 kB │ map:     9.45 kB
+business build:e2e: dist/assets/useAttachments-Bu9fW1ZD.js                                    3.00 kB │ map:    10.83 kB
+business build:e2e: dist/assets/ScanFlow-4undw3va.js                                          3.21 kB │ map:    13.15 kB
+business build:e2e: dist/assets/insights-BBDQiO7T.js                                          3.79 kB │ map:    16.97 kB
+business build:e2e: dist/assets/customers-BM55HrOO.js                                         4.04 kB │ map:    13.28 kB
+business build:e2e: dist/assets/catalogue-Bdy9ZJDu.js                                         4.21 kB │ map:    20.65 kB
+business build:e2e: dist/assets/settings-ukDSf8vM.js                                          4.25 kB │ map:    13.41 kB
+business build:e2e: dist/assets/voice.module-DOSnxVGx.js                                      4.25 kB │ map:    23.98 kB
+business build:e2e: dist/assets/Button-OO_T2U_V.js                                            4.30 kB │ map:    21.22 kB
+business build:e2e: dist/assets/lazyRouteComponent-rsQcvWua.js                                4.32 kB │ map:    34.93 kB
+business build:e2e: dist/assets/orders-BI38OOSM.js                                            4.41 kB │ map:    34.59 kB
+business build:e2e: dist/assets/permissions-DQyDeRy5.js                                       4.79 kB │ map:    24.91 kB
+business build:e2e: dist/assets/sign-in-CLBfOI1b.js                                           4.93 kB │ map:    20.67 kB
+business build:e2e: dist/assets/CoachCardRow-1ekYK-Sv.js                                      5.36 kB │ map:    23.08 kB
+business build:e2e: dist/assets/workbox-window.prod.es5-Bd17z0YL.js                           5.65 kB │ map:    13.49 kB
+business build:e2e: dist/assets/help-C1ai5Mld.js                                              5.70 kB │ map:    16.46 kB
+business build:e2e: dist/assets/ReasonSheet-Bg3uvV4b.js                                       5.71 kB │ map:    22.77 kB
+business build:e2e: dist/assets/perm-JpBgDFkA.js                                              5.74 kB │ map:    20.06 kB
+business build:e2e: dist/assets/_ticketId-Df7DINpd.js                                         5.93 kB │ map:    17.12 kB
+business build:e2e: dist/assets/queries-BOP7VXQp.js                                           5.99 kB │ map:    36.36 kB
+business build:e2e: dist/assets/new-DnjdCiN2.js                                               6.34 kB │ map:    18.73 kB
+business build:e2e: dist/assets/onboarding_.shelf-CkmhmkSn.js                                 6.58 kB │ map:    22.40 kB
+business build:e2e: dist/assets/restock-scan-CVtz-j4d.js                                      7.02 kB │ map:    23.22 kB
+business build:e2e: dist/assets/insightRows-JSg0k7b6.js                                       7.41 kB │ map:    22.14 kB
+business build:e2e: dist/assets/queries-CMaQB2w-.js                                           7.61 kB │ map:    58.61 kB
+business build:e2e: dist/assets/web-vitals-viX3FQND.js                                        8.62 kB │ map:    21.04 kB
+business build:e2e: dist/assets/standee-DOQTTzTi.js                                           9.94 kB │ map:    35.08 kB
+business build:e2e: dist/assets/onboarding-f493OUsX.js                                       10.98 kB │ map:    35.14 kB
+business build:e2e: dist/assets/overview.module-D7bM39fF.js                                  11.14 kB │ map:    54.91 kB
+business build:e2e: dist/assets/stores-B27vBc8Z.js                                           14.07 kB │ map:    43.08 kB
+business build:e2e: dist/assets/reviews-DGH1GvH6.js                                          15.27 kB │ map:    66.45 kB
+business build:e2e: dist/assets/_orderId-CFE4HQfO.js                                         16.52 kB │ map:    52.67 kB
+business build:e2e: dist/assets/analytics-B6JIP9xM.js                                        16.59 kB │ map:    54.14 kB
+business build:e2e: dist/assets/credits-Apro21Rt.js                                          16.86 kB │ map:    65.73 kB
+business build:e2e: dist/assets/sections-q7kh-lze.js                                         17.85 kB │ map:    59.86 kB
+business build:e2e: dist/assets/routes-YpzLT98Z.js                                           19.89 kB │ map:    66.22 kB
+business build:e2e: dist/assets/voice-5lXmk-RU.js                                            21.11 kB │ map:    68.37 kB
+business build:e2e: dist/assets/orders-wAUBnPmO.js                                           23.44 kB │ map:    78.83 kB
+business build:e2e: dist/assets/shop-nHYFiawS.js                                             29.25 kB │ map:   155.74 kB
+business build:e2e: dist/assets/stock-DUb9kEVg.js                                            37.80 kB │ map:   130.04 kB
+business build:e2e: dist/assets/offers-DlO7dRtN.js                                           39.76 kB │ map:   146.62 kB
+business build:e2e: dist/assets/react-intl-DHqPtRFx.js                                       45.55 kB │ map:   206.42 kB
+business build:e2e: dist/assets/DataTable-CiCoSmmZ.js                                        49.28 kB │ map:   219.35 kB
+business build:e2e: dist/assets/sell-CTiu9tCS.js                                             76.89 kB │ map:   303.96 kB
+business build:e2e: dist/assets/hi-D5EpKFVy.js                                              231.93 kB │ map:   265.59 kB
+business build:e2e: dist/assets/kn-BuA8bobZ.js                                              250.16 kB │ map:   283.78 kB
+business build:e2e: dist/assets/te-B1VErw1Q.js                                              250.25 kB │ map:   283.87 kB
+business build:e2e: dist/assets/ta-Dr7swemz.js                                              278.85 kB │ map:   312.46 kB
+business build:e2e: dist/assets/en-XA-QsHgXogF.js                                           295.21 kB │ map:   368.54 kB
+business build:e2e: dist/assets/index-BE75_Xut.js                                           494.69 kB │ map: 1,655.06 kB
+business build:e2e: ✓ built in 1.11s
+admin build:e2e: dist/manifest.webmanifest                                                 0.52 kB
+admin build:e2e: dist/icons/favicon-32.png                                                 1.67 kB
+admin build:e2e: dist/icons/favicon-48.png                                                 2.40 kB
+admin build:e2e: dist/index.html                                                           2.49 kB
+admin build:e2e: dist/icons/mark-96.png                                                    5.59 kB
+admin build:e2e: dist/assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2                 10.28 kB
+admin build:e2e: dist/icons/apple-touch-icon.png                                          10.48 kB
+admin build:e2e: dist/icons/icon-192.png                                                  13.11 kB
+admin build:e2e: dist/assets/figtree-latin-wght-normal-D_ZTVpCC.woff2                     20.15 kB
+admin build:e2e: dist/assets/anek-latin-latin-ext-wght-normal-CzxqaSOW.woff2              36.49 kB
+admin build:e2e: dist/icons/maskable-512.png                                              39.39 kB
+admin build:e2e: dist/assets/anek-latin-latin-wght-normal-DZcssQ26.woff2                  44.79 kB
+admin build:e2e: dist/assets/noto-sans-tamil-tamil-wght-normal-iihgzMBi.woff2             50.46 kB
+admin build:e2e: dist/assets/anek-tamil-tamil-wght-normal-DiCu5Pqm.woff2                  50.90 kB
+admin build:e2e: dist/icons/icon-512.png                                                  60.34 kB
+admin build:e2e: dist/assets/noto-sans-kannada-kannada-wght-normal-DuwB-P8d.woff2         90.79 kB
+admin build:e2e: dist/assets/anek-kannada-kannada-wght-normal-ppMNNKfK.woff2             113.63 kB
+admin build:e2e: dist/assets/noto-sans-devanagari-devanagari-wght-normal-DWI_L5Cu.woff2  121.19 kB
+admin build:e2e: dist/assets/noto-sans-telugu-telugu-wght-normal-DoLU0sI2.woff2          123.97 kB
+admin build:e2e: dist/assets/anek-telugu-telugu-wght-normal-WkcxfUQX.woff2               140.13 kB
+admin build:e2e: dist/assets/anek-devanagari-devanagari-wght-normal-B8fb2BTn.woff2       257.65 kB
+admin build:e2e: dist/assets/risk-DfWTft_H.css                                             0.05 kB
+admin build:e2e: dist/assets/system-BQOUbWKM.css                                           0.62 kB
+admin build:e2e: dist/assets/demand-IMhSHjAG.css                                           0.78 kB
+admin build:e2e: dist/assets/jobs-BPXbVyeq.css                                             0.86 kB
+admin build:e2e: dist/assets/audit-OizrSdXA.css                                            0.89 kB
+admin build:e2e: dist/assets/banners-pJL6GJ4m.css                                          0.98 kB
+admin build:e2e: dist/assets/page-BbBY0jA6.css                                             1.11 kB
+admin build:e2e: dist/assets/settings-COAWK_nT.css                                         1.15 kB
+admin build:e2e: dist/assets/AssistCard-j_mHCZ-w.css                                       1.22 kB
+admin build:e2e: dist/assets/_ticketId-RuyP8VxR.css                                        1.30 kB
+admin build:e2e: dist/assets/notifications-BX_YmFUw.css                                    1.49 kB
+admin build:e2e: dist/assets/routes-BTbTnhm1.css                                           1.88 kB
+admin build:e2e: dist/assets/field-Dxsbm1Rz.css                                            3.56 kB
+admin build:e2e: dist/assets/index-DNmI3X4k.css                                           52.96 kB
+admin build:e2e: dist/assets/useQuery-DONI3NEH.js                                          0.09 kB │ map:     0.72 kB
+admin build:e2e: dist/assets/not-found-i5RsCZif.js                                         0.11 kB │ map:     1.33 kB
+admin build:e2e: dist/assets/VisuallyHidden-DO8Ylk3F.js                                    0.15 kB │ map:     0.57 kB
+admin build:e2e: dist/assets/check-DbDN8m6P.js                                             0.15 kB │ map:     0.94 kB
+admin build:e2e: dist/assets/plus-p2JItAdY.js                                              0.18 kB │ map:     1.04 kB
+admin build:e2e: dist/assets/x-Cqk5Xqif.js                                                 0.18 kB │ map:     1.02 kB
+admin build:e2e: dist/assets/arrow-left-Dg9qyCtK.js                                        0.19 kB │ map:     1.08 kB
+admin build:e2e: dist/assets/search-COhcCYkm.js                                            0.20 kB │ map:     1.10 kB
+admin build:e2e: dist/assets/audit.module-D-SseEvd.js                                      0.21 kB │ map:     1.24 kB
+admin build:e2e: dist/assets/ban-Dagb_sbn.js                                               0.21 kB │ map:     1.09 kB
+admin build:e2e: dist/assets/rotate-ccw-BO6hd1ZG.js                                        0.23 kB │ map:     1.12 kB
+admin build:e2e: dist/assets/Dialog-CjdnihzG.js                                            0.23 kB │ map:     0.82 kB
+admin build:e2e: dist/assets/activity-BOymLscp.js                                          0.26 kB │ map:     1.12 kB
+admin build:e2e: dist/assets/banknote-BljWHjL5.js                                          0.27 kB │ map:     1.30 kB
+admin build:e2e: dist/assets/orderStatus-Cfa7Pala.js                                       0.28 kB │ map:     1.41 kB
+admin build:e2e: dist/assets/page.module-jwScjuMW.js                                       0.29 kB │ map:     1.52 kB
+admin build:e2e: dist/assets/StatusPill-lD-97hG5.js                                        0.31 kB │ map:     1.35 kB
+admin build:e2e: dist/assets/user-x-iQT8WHQl.js                                            0.34 kB │ map:     1.44 kB
+admin build:e2e: dist/assets/badge-check-JZvBMegs.js                                       0.37 kB │ map:     1.34 kB
+admin build:e2e: dist/assets/idempotency-DV35ybjy.js                                       0.38 kB │ map:     1.40 kB
+admin build:e2e: dist/assets/useNavigate-hZY7_XWc.js                                       0.38 kB │ map:     3.29 kB
+admin build:e2e: dist/assets/sliders-horizontal-BjLNR3O6.js                                0.45 kB │ map:     1.84 kB
+admin build:e2e: dist/assets/eye-off-BalLEG4b.js                                           0.46 kB │ map:     1.55 kB
+admin build:e2e: dist/assets/search-JF4CeRFK.js                                            0.50 kB │ map:     3.28 kB
+admin build:e2e: dist/assets/device-B2N3vhdr.js                                            0.52 kB │ map:     2.57 kB
+admin build:e2e: dist/assets/sparkles-D3dUTkbV.js                                          0.54 kB │ map:     1.65 kB
+admin build:e2e: dist/assets/search-CEZkiXXt.js                                            0.62 kB │ map:     2.29 kB
+admin build:e2e: dist/assets/problems-BuUeXm7f.js                                          0.62 kB │ map:     1.71 kB
+admin build:e2e: dist/assets/trash-CLs-iCHk.js                                             0.62 kB │ map:     2.56 kB
+admin build:e2e: dist/assets/totp-CsGDln1Q.js                                              0.62 kB │ map:     3.06 kB
+admin build:e2e: dist/assets/Segmented-gSjvSgKg.js                                         0.87 kB │ map:     3.89 kB
+admin build:e2e: dist/assets/TextField-COGbf_Be.js                                         0.93 kB │ map:     3.52 kB
+admin build:e2e: dist/assets/labels-o2zHJ8fr.js                                            0.99 kB │ map:     3.15 kB
+admin build:e2e: dist/assets/labels-DgYWVbE2.js                                            0.99 kB │ map:     3.11 kB
+admin build:e2e: dist/assets/search-BJESfaE9.js                                            1.01 kB │ map:     7.84 kB
+admin build:e2e: dist/assets/virtual_pwa-register-D788vf4G.js                              1.13 kB │ map:     4.79 kB
+admin build:e2e: dist/assets/Tabs-YDnr9pmN.js                                              1.25 kB │ map:     4.81 kB
+admin build:e2e: dist/assets/_section-CN98KWZD.js                                          1.36 kB │ map:     4.83 kB
+admin build:e2e: dist/assets/preload-helper-DjzSQ1t3.js                                    1.38 kB
+admin build:e2e: dist/assets/queries-ZhV7qYn0.js                                           1.56 kB │ map:     8.73 kB
+admin build:e2e: dist/assets/ReasonDialog-BsW7-iVP.js                                      1.58 kB │ map:     5.64 kB
+admin build:e2e: dist/assets/AuditPanel-CZ0NEtWu.js                                        1.61 kB │ map:     4.60 kB
+admin build:e2e: dist/assets/next-hu32b6N9.js                                              1.61 kB │ map:     8.64 kB
+admin build:e2e: dist/assets/StepUpDialog-DENmOG3_.js                                      2.00 kB │ map:     6.54 kB
+admin build:e2e: dist/assets/format-Cg5jbxce.js                                            2.11 kB │ map:    14.09 kB
+admin build:e2e: dist/assets/admin-customers-Cq9sX42a.js                                   2.11 kB │ map:    11.71 kB
+admin build:e2e: dist/assets/queries-B2ZvZCf_.js                                           2.24 kB │ map:    13.42 kB
+admin build:e2e: dist/assets/Modal-4GvmOBzB.js                                             2.35 kB │ map:    10.75 kB
+admin build:e2e: dist/assets/field-woGGqMz1.js                                             2.37 kB │ map:     7.13 kB
+admin build:e2e: dist/assets/useMutation-D-vrAsmH.js                                       2.38 kB │ map:    16.84 kB
+admin build:e2e: dist/assets/labels-DuchdgLV.js                                            2.57 kB │ map:     6.90 kB
+admin build:e2e: dist/assets/OtpInput-lmAPSKR2.js                                          2.77 kB │ map:    12.74 kB
+admin build:e2e: dist/assets/customers-DRpX_xXC.js                                         2.87 kB │ map:     8.23 kB
+admin build:e2e: dist/assets/new-CRr6VKcN.js                                               2.98 kB │ map:     8.62 kB
+admin build:e2e: dist/assets/labels-BPSRI6Ge.js                                            3.60 kB │ map:    10.55 kB
+admin build:e2e: dist/assets/queries-DhE7Shil.js                                           3.70 kB │ map:    18.51 kB
+admin build:e2e: dist/assets/jobs-D0QMwWZ3.js                                              3.83 kB │ map:    11.39 kB
+admin build:e2e: dist/assets/Button-BLyytoy_.js                                            3.92 kB │ map:    19.74 kB
+admin build:e2e: dist/assets/admin-businesses-Dp8EP5w8.js                                  4.13 kB │ map:    21.30 kB
+admin build:e2e: dist/assets/queries-Becmg23t.js                                           4.22 kB │ map:    24.63 kB
+admin build:e2e: dist/assets/support-68BY2nyL.js                                           4.31 kB │ map:    12.57 kB
+admin build:e2e: dist/assets/lazyRouteComponent-CRQGfzjV.js                                4.35 kB │ map:    34.93 kB
+admin build:e2e: dist/assets/audit-csepVhAz.js                                             4.41 kB │ map:    13.28 kB
+admin build:e2e: dist/assets/orders-CJSh-8t1.js                                            4.50 kB │ map:    12.42 kB
+admin build:e2e: dist/assets/stores-B4dPOQ4W.js                                            4.51 kB │ map:    12.87 kB
+admin build:e2e: dist/assets/queries-D07gsP8r.js                                           4.98 kB │ map:    19.20 kB
+admin build:e2e: dist/assets/sign-in-6UpdxETQ.js                                           5.07 kB │ map:    21.29 kB
+admin build:e2e: dist/assets/field-agents-Edj7AtCN.js                                      5.14 kB │ map:    14.40 kB
+admin build:e2e: dist/assets/workbox-window.prod.es5-Bd17z0YL.js                           5.65 kB │ map:    13.49 kB
+admin build:e2e: dist/assets/two-step-BEWjhDVw.js                                          5.67 kB │ map:    18.98 kB
+admin build:e2e: dist/assets/labels-CJfZqpg5.js                                            5.88 kB │ map:    15.01 kB
+admin build:e2e: dist/assets/businesses-BAIYI_YE.js                                        6.04 kB │ map:    18.05 kB
+admin build:e2e: dist/assets/queries-DJgbID_W.js                                           6.27 kB │ map:    30.19 kB
+admin build:e2e: dist/assets/AssistCard-DH2Oay3d.js                                        7.30 kB │ map:    62.40 kB
+admin build:e2e: dist/assets/jobs.module-DJDaBpFD.js                                       7.40 kB │ map:    32.56 kB
+admin build:e2e: dist/assets/removable-DfTtCyIk.js                                         7.54 kB │ map:    50.31 kB
+admin build:e2e: dist/assets/web-vitals-viX3FQND.js                                        8.62 kB │ map:    21.04 kB
+admin build:e2e: dist/assets/_customerId-CBI1guTT.js                                       9.12 kB │ map:    27.01 kB
+admin build:e2e: dist/assets/referrals-D3m9_CM9.js                                         9.83 kB │ map:    33.08 kB
+admin build:e2e: dist/assets/demand-CDeGswsS.js                                           10.00 kB │ map:    35.21 kB
+admin build:e2e: dist/assets/field.module-DashpPCu.js                                     10.02 kB │ map:    64.00 kB
+admin build:e2e: dist/assets/banners-DoDHO8eV.js                                          10.69 kB │ map:    37.12 kB
+admin build:e2e: dist/assets/link-DP1xuhlz.js                                             11.08 kB │ map:    63.48 kB
+admin build:e2e: dist/assets/system-Dv6MRCBS.js                                           11.58 kB │ map:    34.79 kB
+admin build:e2e: dist/assets/notifications-BnE1YoI7.js                                    11.66 kB │ map:    39.90 kB
+admin build:e2e: dist/assets/_orderId-94sjY6jz.js                                         12.20 kB │ map:    36.65 kB
+admin build:e2e: dist/assets/admin-users-Crg5HkOM.js                                      14.28 kB │ map:    50.05 kB
+admin build:e2e: dist/assets/risk-BvtEt2Vw.js                                             14.76 kB │ map:    52.61 kB
+admin build:e2e: dist/assets/_storeId-DVMZQYCL.js                                         14.86 kB │ map:    43.38 kB
+admin build:e2e: dist/assets/_businessId-bAvtATwF.js                                      15.01 kB │ map:    44.00 kB
+admin build:e2e: dist/assets/useBaseQuery-2ojMM1Vm.js                                     15.58 kB │ map:    73.28 kB
+admin build:e2e: dist/assets/settings-Bux6pojx.js                                         15.66 kB │ map:    56.13 kB
+admin build:e2e: dist/assets/_kind-CUpGz27X.js                                            15.86 kB │ map:    49.42 kB
+admin build:e2e: dist/assets/payouts-Bxh1nKZV.js                                          17.56 kB │ map:    52.90 kB
+admin build:e2e: dist/assets/_ticketId-BZiBRdpN.js                                        18.60 kB │ map:    62.26 kB
+admin build:e2e: dist/assets/routes-kcfrahds.js                                           18.88 kB │ map:    66.88 kB
+admin build:e2e: dist/assets/reviews-RKicOuS7.js                                          19.22 kB │ map:    66.40 kB
+admin build:e2e: dist/assets/credits-ZUEYHccI.js                                          20.20 kB │ map:    69.86 kB
+admin build:e2e: dist/assets/_businessId-Nm_HbSz5.js                                      30.43 kB │ map:    96.83 kB
+admin build:e2e: dist/assets/react-intl-DS-vuWDr.js                                       34.40 kB │ map:   143.14 kB
+admin build:e2e: dist/assets/DataTable-_7Y-F4Q-.js                                        49.29 kB │ map:   219.35 kB
+admin build:e2e: dist/assets/catalogue-Cvgt-hvG.js                                        49.60 kB │ map:   172.81 kB
+admin build:e2e: dist/assets/en-XA-EDFtY9HC.js                                           279.79 kB │ map:   352.79 kB
+admin build:e2e: dist/assets/index-xUy8wh5I.js                                           490.45 kB │ map: 1,685.74 kB
+admin build:e2e: ✓ built in 1.12s
+customer build:e2e: dist/manifest.webmanifest                                                   0.56 kB
+customer build:e2e: dist/icons/favicon-32.png                                                   1.67 kB
+customer build:e2e: dist/index.html                                                             2.15 kB
+customer build:e2e: dist/icons/favicon-48.png                                                   2.40 kB
+customer build:e2e: dist/icons/mark-96.png                                                      5.59 kB
+customer build:e2e: dist/assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2                   10.28 kB
+customer build:e2e: dist/icons/apple-touch-icon.png                                            10.48 kB
+customer build:e2e: dist/icons/icon-192.png                                                    13.11 kB
+customer build:e2e: dist/assets/figtree-latin-wght-normal-D_ZTVpCC.woff2                       20.15 kB
+customer build:e2e: dist/assets/anek-latin-latin-ext-wght-normal-CzxqaSOW.woff2                36.49 kB
+customer build:e2e: dist/icons/maskable-512.png                                                39.39 kB
+customer build:e2e: dist/assets/anek-latin-latin-wght-normal-DZcssQ26.woff2                    44.79 kB
+customer build:e2e: dist/assets/noto-sans-tamil-tamil-wght-normal-iihgzMBi.woff2               50.46 kB
+customer build:e2e: dist/assets/anek-tamil-tamil-wght-normal-DiCu5Pqm.woff2                    50.90 kB
+customer build:e2e: dist/icons/icon-512.png                                                    60.34 kB
+customer build:e2e: dist/assets/noto-sans-kannada-kannada-wght-normal-DuwB-P8d.woff2           90.79 kB
+customer build:e2e: dist/assets/anek-kannada-kannada-wght-normal-ppMNNKfK.woff2               113.63 kB
+customer build:e2e: dist/assets/noto-sans-devanagari-devanagari-wght-normal-DWI_L5Cu.woff2    121.19 kB
+customer build:e2e: dist/assets/noto-sans-telugu-telugu-wght-normal-DoLU0sI2.woff2            123.97 kB
+customer build:e2e: dist/assets/anek-telugu-telugu-wght-normal-WkcxfUQX.woff2                 140.13 kB
+customer build:e2e: dist/assets/anek-devanagari-devanagari-wght-normal-B8fb2BTn.woff2         257.65 kB
+customer build:e2e: dist/assets/maplibre-gl-worker-VaXr2Fck.mjs                               508.26 kB
+customer build:e2e: dist/assets/share-Eiactiqr.css                                              0.30 kB
+customer build:e2e: dist/assets/map-7G138B1f.css                                                0.41 kB
+customer build:e2e: dist/assets/Substitutes-DUWeIlwE.css                                        0.50 kB
+customer build:e2e: dist/assets/BasketPage-Bay2oxkR.css                                         0.89 kB
+customer build:e2e: dist/assets/CartBarLink-BIxR2CLf.css                                        1.18 kB
+customer build:e2e: dist/assets/search-Dd286GEx.css                                             1.64 kB
+customer build:e2e: dist/assets/_slug.i-pm6l46mO.css                                            1.67 kB
+customer build:e2e: dist/assets/home-zRtBVj2T.css                                               1.75 kB
+customer build:e2e: dist/assets/asks-DTk7j3Ol.css                                               1.86 kB
+customer build:e2e: dist/assets/SignedInOnly-C85j6cdg.css                                       2.50 kB
+customer build:e2e: dist/assets/tx-DuhbLc64.css                                                 3.90 kB
+customer build:e2e: dist/assets/basket-7t8CVV7E.css                                             4.46 kB
+customer build:e2e: dist/assets/index-2anKUTsO.css                                             52.56 kB
+customer build:e2e: dist/assets/tiles-B8-mEBLf.css                                             82.96 kB
+customer build:e2e: dist/assets/number-tag-BZT-70px.js                                          0.03 kB │ map:     0.53 kB
+customer build:e2e: dist/assets/maplibre-gl-worker-CSI7HoEG.js                                  0.06 kB │ map:     0.34 kB
+customer build:e2e: dist/assets/device-Db7QNfXu.js                                              0.07 kB │ map:     0.48 kB
+customer build:e2e: dist/assets/labels-B78O68Rb.js                                              0.09 kB │ map:     0.58 kB
+customer build:e2e: dist/assets/line-CvWEduZV.js                                                0.10 kB │ map:     0.65 kB
+customer build:e2e: dist/assets/catalogue-BHHVrcC8.js                                           0.12 kB │ map:    15.09 kB
+customer build:e2e: dist/assets/useRouter-DZ-SqEMX.js                                           0.15 kB │ map:     1.73 kB
+customer build:e2e: dist/assets/VisuallyHidden-DO8Ylk3F.js                                      0.15 kB │ map:     0.57 kB
+customer build:e2e: dist/assets/chevron-left-DLZ8JIj2.js                                        0.16 kB │ map:     0.99 kB
+customer build:e2e: dist/assets/plus-p2JItAdY.js                                                0.18 kB │ map:     1.04 kB
+customer build:e2e: dist/assets/x-Cqk5Xqif.js                                                   0.18 kB │ map:     1.02 kB
+customer build:e2e: dist/assets/arrow-left-Dg9qyCtK.js                                          0.19 kB │ map:     1.08 kB
+customer build:e2e: dist/assets/_askId-Ck_hz4ak.js                                              0.22 kB │ map:     0.72 kB
+customer build:e2e: dist/assets/context-BkjglMnS.js                                             0.23 kB │ map:     1.54 kB
+customer build:e2e: dist/assets/_basketId-DlZhtzOi.js                                           0.24 kB │ map:     0.81 kB
+customer build:e2e: dist/assets/ulid-DFi-0qXP.js                                                0.25 kB │ map:     1.08 kB
+customer build:e2e: dist/assets/Icon-DoARBuzN.js                                                0.28 kB │ map:     1.34 kB
+customer build:e2e: dist/assets/search-x-DDVzBEl3.js                                            0.29 kB │ map:     1.32 kB
+customer build:e2e: dist/assets/map-pin-CPkDCH9h.js                                             0.29 kB │ map:     1.23 kB
+customer build:e2e: dist/assets/StatusPill-CGlcTBMt.js                                          0.31 kB │ map:     1.35 kB
+customer build:e2e: dist/assets/ShopLink-DwVN5cCD.js                                            0.34 kB │ map:     1.26 kB
+customer build:e2e: dist/assets/RouterLink-dUvm1ETW.js                                          0.37 kB │ map:     1.29 kB
+customer build:e2e: dist/assets/distance-F5PAM77j.js                                            0.42 kB │ map:     1.78 kB
+customer build:e2e: dist/assets/message-circle-question-mark-apqbuYi7.js                        0.42 kB │ map:     1.56 kB
+customer build:e2e: dist/assets/locate-fixed-C4zb_Vrh.js                                        0.43 kB │ map:     1.81 kB
+customer build:e2e: dist/assets/shopping-basket-BM2Lj-uv.js                                     0.44 kB │ map:     1.68 kB
+customer build:e2e: dist/assets/useSend-Bg83Y3uK.js                                             0.47 kB │ map:     2.08 kB
+customer build:e2e: dist/assets/home.module-CsrL6nVf.js                                         0.48 kB │ map:     2.27 kB
+customer build:e2e: dist/assets/money-Bpc9dipk.js                                               0.48 kB │ map:     2.58 kB
+customer build:e2e: dist/assets/locales-Bd82IxCv.js                                             0.48 kB │ map:     2.90 kB
+customer build:e2e: dist/assets/store-64DpVXL7.js                                               0.53 kB │ map:     1.50 kB
+customer build:e2e: dist/assets/clock-C3dPPrkv.js                                               0.57 kB │ map:     2.76 kB
+customer build:e2e: dist/assets/coords-CFpKy-k6.js                                              0.62 kB │ map:     2.37 kB
+customer build:e2e: dist/assets/pending-CHfUgipR.js                                             0.62 kB │ map:     2.30 kB
+customer build:e2e: dist/assets/useMatch-CHR3Tlzy.js                                            0.63 kB │ map:     4.19 kB
+customer build:e2e: dist/assets/LimitBanner-seTDl03E.js                                         0.65 kB │ map:     2.02 kB
+customer build:e2e: dist/assets/share.module-BxZt6qTW.js                                        0.65 kB │ map:     6.13 kB
+customer build:e2e: dist/assets/stream-CmyG9PE-.js                                              0.70 kB │ map:     3.25 kB
+customer build:e2e: dist/assets/place-CEZyayJV.js                                               0.76 kB │ map:     2.89 kB
+customer build:e2e: dist/assets/CartBar-OZoT7VFS.js                                             0.82 kB │ map:     3.29 kB
+customer build:e2e: dist/assets/detect-DRK1MqKS.js                                              0.82 kB │ map:     5.55 kB
+customer build:e2e: dist/assets/limit-BWQFaUdJ.js                                               0.85 kB │ map:     3.33 kB
+customer build:e2e: dist/assets/Segmented-wPPzCleX.js                                           0.87 kB │ map:     3.89 kB
+customer build:e2e: dist/assets/EmptyState-BFT1qXD7.js                                          0.89 kB │ map:     3.49 kB
+customer build:e2e: dist/assets/tx.module-Dml0TzcW.js                                           0.91 kB │ map:     4.95 kB
+customer build:e2e: dist/assets/StoreCard-BoJzq1_4.js                                           0.92 kB │ map:     3.36 kB
+customer build:e2e: dist/assets/TextField-CYE4WTco.js                                           0.93 kB │ map:     3.52 kB
+customer build:e2e: dist/assets/CartBarLink-DUmUBzQp.js                                         0.95 kB │ map:     3.61 kB
+customer build:e2e: dist/assets/fill-B3rKtzUW.js                                                0.99 kB │ map:     4.52 kB
+customer build:e2e: dist/assets/Banner-Bj8JslmS.js                                              1.01 kB │ map:     4.79 kB
+customer build:e2e: dist/assets/format-CznrzQ_B.js                                              1.12 kB │ map:     4.61 kB
+customer build:e2e: dist/assets/virtual_pwa-register-D788vf4G.js                                1.13 kB │ map:     4.79 kB
+customer build:e2e: dist/assets/useInfiniteQuery-3Uexb-ID.js                                    1.14 kB │ map:     6.84 kB
+customer build:e2e: dist/assets/PinMap-Dw3gnVIE.js                                              1.20 kB │ map:     4.01 kB
+customer build:e2e: dist/assets/SearchField-CvUn0B19.js                                         1.24 kB │ map:     5.30 kB
+customer build:e2e: dist/assets/_section-neXl-S_J.js                                            1.25 kB │ map:     4.65 kB
+customer build:e2e: dist/assets/Tabs-uIW9Xf9i.js                                                1.25 kB │ map:     4.81 kB
+customer build:e2e: dist/assets/basket.module-D3DmOOga.js                                       1.26 kB │ map:     5.62 kB
+customer build:e2e: dist/assets/time-g0mWBc4K.js                                                1.27 kB │ map:     7.74 kB
+customer build:e2e: dist/assets/Chip-C5bHpxz4.js                                                1.36 kB │ map:     6.17 kB
+customer build:e2e: dist/assets/preload-helper-DjzSQ1t3.js                                      1.38 kB
+customer build:e2e: dist/assets/me-DzywOR0g.js                                                  1.54 kB │ map:    11.76 kB
+customer build:e2e: dist/assets/SaveDeviceOffer-DsLDlOWc.js                                     1.64 kB │ map:     5.71 kB
+customer build:e2e: dist/assets/language-gIyc5Vzf.js                                            1.67 kB │ map:     6.27 kB
+customer build:e2e: dist/assets/StoreMapCard-VZZoekUo.js                                        1.74 kB │ map:     5.93 kB
+customer build:e2e: dist/assets/itemUi-C-BYaOdN.js                                              1.85 kB │ map:     8.63 kB
+customer build:e2e: dist/assets/_code-DcdsDVOn.js                                               1.90 kB │ map:    11.79 kB
+customer build:e2e: dist/assets/present-B4nS3DBH.js                                             1.90 kB │ map:     7.28 kB
+customer build:e2e: dist/assets/asks-BXrcKOvQ.js                                                2.05 kB │ map:     5.83 kB
+customer build:e2e: dist/assets/fulfilment-idX2-aVS.js                                          2.11 kB │ map:     9.92 kB
+customer build:e2e: dist/assets/orders-D_aREjrN.js                                              2.35 kB │ map:    32.10 kB
+customer build:e2e: dist/assets/useMutation-CNZ_gv8e.js                                         2.37 kB │ map:    16.84 kB
+customer build:e2e: dist/assets/Sheet-LUVBERrm.js                                               2.43 kB │ map:    11.45 kB
+customer build:e2e: dist/assets/asks.module-TGDQQE7Q.js                                         2.48 kB │ map:    17.82 kB
+customer build:e2e: dist/assets/http-CQUpeqZy.js                                                2.54 kB │ map:    12.52 kB
+customer build:e2e: dist/assets/location-DyhBiTSB.js                                            2.73 kB │ map:     8.34 kB
+customer build:e2e: dist/assets/help-OaaTlh4h.js                                                2.74 kB │ map:     7.65 kB
+customer build:e2e: dist/assets/discover-BsX84htg.js                                            2.84 kB │ map:    19.63 kB
+customer build:e2e: dist/assets/useAttachments-BUQw8dV3.js                                      3.33 kB │ map:    12.18 kB
+customer build:e2e: dist/assets/cart-BnyZQf8u.js                                                3.35 kB │ map:    15.85 kB
+customer build:e2e: dist/assets/device-BKpywXk1.js                                              3.49 kB │ map:    18.06 kB
+customer build:e2e: dist/assets/c._slug-DH1K8QhN.js                                             3.52 kB │ map:    10.63 kB
+customer build:e2e: dist/assets/ItemCard-6S_I2kwQ.js                                            3.58 kB │ map:    12.57 kB
+customer build:e2e: dist/assets/Substitutes-6KXCKSgt.js                                         4.00 kB │ map:    13.67 kB
+customer build:e2e: dist/assets/lazyRouteComponent-Cqx3LY-H.js                                  4.10 kB │ map:    33.76 kB
+customer build:e2e: dist/assets/react-A1V_ZqDE.js                                               4.18 kB │ map:    22.55 kB
+customer build:e2e: dist/assets/orders-Brz8rGvK.js                                              4.39 kB │ map:    12.03 kB
+customer build:e2e: dist/assets/useCartActions-D_oKFKZj.js                                      4.95 kB │ map:    19.11 kB
+customer build:e2e: dist/assets/useSelector-yFzLzLLA.js                                         4.97 kB │ map:    29.14 kB
+customer build:e2e: dist/assets/_ticketId-DSbS35jh.js                                           5.04 kB │ map:    13.83 kB
+customer build:e2e: dist/assets/new-BNY8IuF6.js                                                 5.04 kB │ map:    15.12 kB
+customer build:e2e: dist/assets/AddressForm-BuOs381K.js                                         5.14 kB │ map:    12.77 kB
+customer build:e2e: dist/assets/baskets-DpCLfnE3.js                                             5.27 kB │ map:    15.42 kB
+customer build:e2e: dist/assets/SignedInOnly-BNjFG3kK.js                                        5.40 kB │ map:    25.81 kB
+customer build:e2e: dist/assets/workbox-window.prod.es5-Bd17z0YL.js                             5.65 kB │ map:    13.49 kB
+customer build:e2e: dist/assets/map-CONQWUFs.js                                                 5.99 kB │ map:    13.75 kB
+customer build:e2e: dist/assets/link-C7olAop2.js                                                6.22 kB │ map:    33.12 kB
+customer build:e2e: dist/assets/cart-Cd7aSRxc.js                                                6.89 kB │ map:    19.34 kB
+customer build:e2e: dist/assets/account-Dl0gLcUD.js                                             6.95 kB │ map:    20.85 kB
+customer build:e2e: dist/assets/_slug.index-S9dfHWpR.js                                         7.52 kB │ map:    24.10 kB
+customer build:e2e: dist/assets/Delivery-BQyfh0hB.js                                            7.70 kB │ map:    29.04 kB
+customer build:e2e: dist/assets/AskPage-BeUU2IOO.js                                             8.24 kB │ map:    27.22 kB
+customer build:e2e: dist/assets/useQuery-DYfOxJ5n.js                                            8.27 kB │ map:    44.14 kB
+customer build:e2e: dist/assets/web-vitals-viX3FQND.js                                          8.62 kB │ map:    21.04 kB
+customer build:e2e: dist/assets/_slug.i._itemId-D0eGIL9H.js                                     8.79 kB │ map:    30.23 kB
+customer build:e2e: dist/assets/sign-in-BPu0UMJA.js                                             9.09 kB │ map:    39.69 kB
+customer build:e2e: dist/assets/routes-Bw2UZTlk.js                                             10.38 kB │ map:    28.75 kB
+customer build:e2e: dist/assets/checkout-BE5Y33Sc.js                                           11.53 kB │ map:    36.23 kB
+customer build:e2e: dist/assets/search-DZPGIK_D.js                                             12.30 kB │ map:    42.14 kB
+customer build:e2e: dist/assets/slots-CdYX4_SK.js                                              14.94 kB │ map:    96.08 kB
+customer build:e2e: dist/assets/query-ClOKi-dy.js                                              15.07 kB │ map:    81.38 kB
+customer build:e2e: dist/assets/_orderId-CXpCs47S.js                                           18.86 kB │ map:    59.86 kB
+customer build:e2e: dist/assets/esm-CpNd5vRp.js                                                19.04 kB │ map:   136.70 kB
+customer build:e2e: dist/assets/tiles-DkSopcMr.js                                              22.81 kB │ map:   108.24 kB
+customer build:e2e: dist/assets/BasketPage-DPBjEzMr.js                                         24.04 kB │ map:    80.78 kB
+customer build:e2e: dist/assets/react-intl-DS-vuWDr.js                                         34.40 kB │ map:   143.14 kB
+customer build:e2e: dist/assets/hi-ogoj7Cw4.js                                                 83.65 kB │ map:    96.38 kB
+customer build:e2e: dist/assets/te-C9QN7ruc.js                                                 89.18 kB │ map:   101.88 kB
+customer build:e2e: dist/assets/kn-DuczHKXp.js                                                 90.22 kB │ map:   102.91 kB
+customer build:e2e: dist/assets/ta-BR6S35vb.js                                                 96.92 kB │ map:   109.63 kB
+customer build:e2e: dist/assets/en-XA-BpXZtHHt.js                                             112.39 kB │ map:   140.70 kB
+customer build:e2e: dist/assets/index-DJlyMhrN.js                                             384.04 kB │ map: 1,587.95 kB
+customer build:e2e: dist/assets/maplibre-gl-CLOS0QEu.js                                     1,075.08 kB │ map: 2,201.12 kB
+customer build:e2e: ✓ built in 1.25s
+customer build:e2e: [plugin builtin:vite-reporter] 
+customer build:e2e: (!) Some chunks are larger than 500 kB after minification. Consider:
+customer build:e2e: - Using dynamic import() to code-split the application
+customer build:e2e: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+customer build:e2e: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+customer build:e2e: PWA v2.0.0
+customer build:e2e: mode      generateSW
+customer build:e2e: precache  147 entries (3075.42 KiB)
+customer build:e2e: files generated
+customer build:e2e:   dist/sw.js
+customer build:e2e:   dist/workbox-2ff6bd68.js
+admin build:e2e: PWA v2.0.0
+admin build:e2e: mode      generateSW
+admin build:e2e: precache  127 entries (1571.80 KiB)
+admin build:e2e: files generated
+admin build:e2e:   dist/sw.js
+admin build:e2e:   dist/workbox-2ff6bd68.js
+business build:e2e: PWA v2.0.0
+business build:e2e: mode      generateSW
+business build:e2e: precache  134 entries (2623.25 KiB)
+business build:e2e: files generated
+business build:e2e:   dist/sw.js
+business build:e2e:   dist/workbox-2ff6bd68.js
+customer build:e2e: precache-check: all 137 chunks are in the precache manifest
+admin build:e2e: precache-check: all 118 chunks are in the precache manifest
+business build:e2e: precache-check: all 125 chunks are in the precache manifest
+admin build:e2e: dist-check: dist has no sourceMappingURL comments
+customer build:e2e: dist-check: dist has no sourceMappingURL comments
+admin build:e2e: Done
+customer build:e2e: Done
+business build:e2e: dist-check: dist has no sourceMappingURL comments
+business build:e2e: Done
+
+> @todayz/site@0.0.0 build:e2e /Users/sairahul/Documents/projects/todayz/site
+> ASTRO_TELEMETRY_DISABLED=1 astro build --mode e2e && node scripts/headers.mjs && node scripts/verify-dist.mjs --e2e && node scripts/check-site.mjs
+
+07:06:18 [vite] Re-optimizing dependencies because vite config has changed
+07:06:18 [types] Generated 64ms
+07:06:18 [build] output: "static"
+07:06:18 [build] mode: "static"
+07:06:18 [build] directory: /Users/sairahul/Documents/projects/todayz/site/dist/
+07:06:18 [build] Collecting build info...
+07:06:18 [build] ✓ Completed in 74ms.
+07:06:18 [build] Building static entrypoints...
+07:06:18 [vite] vite v8.3.3 building prerender environment for e2e...
+07:06:18 [vite] ✓ built in 210ms
+07:06:18 [vite] vite v8.3.3 building client environment for e2e...
+07:06:18 [vite] ✓ built in 56ms
+07:06:18 [build] Rearranging server assets...
+
+ generating static routes 
+07:06:18   ├─ /404.html (+8ms) 
+07:06:18   ├─ /robots.txt (+2ms) 
+07:06:18   ├─ /sitemap.xml (+1ms) 
+07:06:18   ├─ /index.html (+5ms) 
+07:06:18   ├─ /hi/index.html (+4ms) 
+07:06:18   ├─ /kn/index.html (+3ms) 
+07:06:18   ├─ /te/index.html (+3ms) 
+07:06:18   ├─ /ta/index.html (+3ms) 
+07:06:18   ├─ /for-retailers/index.html (+2ms) 
+07:06:18   ├─ /hi/for-retailers/index.html (+9ms) 
+07:06:18   ├─ /kn/for-retailers/index.html (+3ms) 
+07:06:18   ├─ /te/for-retailers/index.html (+2ms) 
+07:06:18   ├─ /ta/for-retailers/index.html (+2ms) 
+07:06:18   ├─ /how-it-works/index.html (+1ms) 
+07:06:18   ├─ /pricing/index.html (+1ms) 
+07:06:18   ├─ /about/index.html (+1ms) 
+07:06:18   ├─ /contact/index.html (+1ms) 
+07:06:18   ├─ /legal/privacy/index.html (+1ms) 
+07:06:18   ├─ /legal/terms-for-shoppers/index.html (+1ms) 
+07:06:18   ├─ /legal/terms-for-shops/index.html (+0ms) 
+07:06:18   ├─ /legal/refunds-and-credits/index.html (+1ms) 
+07:06:18 ✓ Completed in 82ms.
+
+07:06:18 [build] ✓ Completed in 368ms.
+07:06:18 [build] 19 page(s) built in 458ms
+07:06:18 [build] Complete!
+site: wrote _headers (connect-src https://api.todayz.localhost)
+site: dist ok (61 files; only own hashed bundles and Turnstile on lead-form pages; no remote assets; no inline handlers; e2e build: test key, local API and draft locales allowed)
+site: links and HTML valid
+Scope: 4 of 15 workspace projects
+
+> @todayz/customer@0.0.0 e2e:smoke /Users/sairahul/Documents/projects/todayz/customer
+> playwright test -c playwright.config.ts
+
+[WebServer] (node:24416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./functions/x/[code]" without a file extension (vite.config.ts:8:31). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 28 tests using 2 workers
+
+(node:24418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › e2e/ai.spec.ts:277:1 › 360: C-23 at the daily cap the mic is disabled with the copy (1.6s)
+  ✓   3 [chromium] › e2e/ai.spec.ts:289:1 › 360: C-05 search assist chips after the results apply only when tapped (376ms)
+  ✓   2 [chromium] › e2e/ai.spec.ts:247:1 › 360: C-23 the transcript fills the box, never searches, then searches with source=voice (2.0s)
+  ✓   5 [chromium] › e2e/ai.spec.ts:341:1 › 360: AI-C3 an out-of-stock item offers similar items; a row opens that item, the cart is untouched (405ms)
+  ✓   6 [chromium] › e2e/ai.spec.ts:365:1 › 360: AI-C3 the shop page shows the button under the out-of-stock card only (195ms)
+  ✓   7 [chromium] › e2e/asks.shots.spec.ts:219:1 › C-25 from a search with no results: the sheet sends once and opens C-26 (714ms)
+  ✓   4 [chromium] › e2e/ai.spec.ts:309:1 › 360: C-22 a pasted list becomes draft lines; only the kept ones join the basket (1.7s)
+  ✓   8 [chromium] › e2e/asks.shots.spec.ts:243:1 › C-25 from C-08 sends the product id (614ms)
+  ✓   9 [chromium] › e2e/asks.shots.spec.ts:253:1 › C-26 replies: soonest badge, prices, in-store only, and Book opens checkout (280ms)
+  ✓  11 [chromium] › e2e/asks.shots.spec.ts:287:1 › C-26 closed with no Yes (176ms)
+  ✓  10 [chromium] › e2e/asks.shots.spec.ts:270:1 › C-26 Book on an expired price: checkout asks at the current price and shows the new total (303ms)
+  ✓  12 [chromium] › e2e/asks.shots.spec.ts:295:1 › C-08 Share offers Copy link without a system share sheet (334ms)
+  ✓  13 [chromium] › e2e/asks.shots.spec.ts:308:1 › share link /x/{code} opens C-08, and a shop that is gone gets a search box (367ms)
+  ✓  15 [chromium] › e2e/help.spec.ts:269:1 › 360: the account entry, the list, a closed ticket and someone else's (C-19, SP-04, SP-08) (412ms)
+  ✓  14 [chromium] › e2e/help.spec.ts:228:1 › 360: from an order to a ticket with a photo, support replies, the customer replies (C-19, SP-01, 03, 04, 07) (625ms)
+  ✓  16 [chromium] › e2e/help.spec.ts:289:1 › 360: signed out, help asks to sign in (161ms)
+  ✓  17 [chromium] › e2e/smoke.spec.ts:29:1 › home renders on a phone with the bottom nav (196ms)
+  ✓  18 [chromium] › e2e/smoke.spec.ts:40:1 › home on desktop (185ms)
+  ✓  19 [chromium] › e2e/smoke.spec.ts:48:1 › bottom nav opens Search (264ms)
+  ✓  20 [chromium] › e2e/smoke.spec.ts:57:1 › pseudo-locale via ?locale=pseudo (232ms)
+  ✓  21 [chromium] › e2e/smoke.spec.ts:68:1 › PWA manifest and icons are served locally (161ms)
+  ✓  22 [chromium] › e2e/transactions.shots.spec.ts:210:1 › cart (193ms)
+  ✓  23 [chromium] › e2e/transactions.shots.spec.ts:219:1 › checkout (211ms)
+  ✓  25 [chromium] › e2e/transactions.shots.spec.ts:242:1 › tracking: the shop declined (169ms)
+  ✓  24 [chromium] › e2e/transactions.shots.spec.ts:227:1 › tracking: waiting for the shop, then the pickup code (333ms)
+  ✓  26 [chromium] › e2e/transactions.shots.spec.ts:249:1 › orders list (167ms)
+  ✓  27 [chromium] › e2e/transactions.shots.spec.ts:258:1 › tracking: the shop can give part of the order (175ms)
+  ✓  28 [chromium] › e2e/transactions.shots.spec.ts:287:1 › checkout: the order limit after missed pickups (190ms)
+
+  28 passed (7.5s)
+
+> @todayz/business@0.0.0 e2e:smoke /Users/sairahul/Documents/projects/todayz/business
+> playwright test -c playwright.config.ts
+
+[WebServer] (node:24504) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 42 tests using 2 workers
+
+(node:24505) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › e2e/asks.spec.ts:138:1 › 360 px: the cards and the reply sheet fit (B-20) (561ms)
+  ✓   2 [chromium] › e2e/asks.spec.ts:105:1 › desktop: the inbox, a Yes at the shop price, then Done (B-20) (737ms)
+  ✓   4 [chromium] › e2e/help.spec.ts:244:1 › desktop: a closed ticket takes no reply and offers a new one (B-15, SP-04) (162ms)
+  ✓   5 [chromium] › e2e/help.spec.ts:254:1 › phone 360: a cashier sees the guide and no tickets (B-15, SP-08) (205ms)
+  ✓   3 [chromium] › e2e/help.spec.ts:198:1 › desktop: the guide, opening a ticket with an order and a photo, support replies, the shop replies (B-15, SP-01, 03, 04, 07) (816ms)
+  ✓   6 [chromium] › e2e/help.spec.ts:265:1 › phone 360: an owner opens a ticket from the list (B-15) (291ms)
+  ✓   8 [chromium] › e2e/insights.spec.ts:86:3 › desktop: Analytics Insights tab, grouped by kind with the not-enough-data group (B-12, W3-03) (267ms)
+  ✓   7 [chromium] › e2e/insights.spec.ts:73:3 › desktop: Overview with the KPIs, new orders, chart and Demand insights (B-03, W3-03) (333ms)
+  ✓   9 [chromium] › e2e/insights.spec.ts:95:3 › desktop: Analytics Sales tab (B-12, W3-03) (250ms)
+  ✓  10 [chromium] › e2e/insights.spec.ts:104:3 › desktop: Customers, Slipping away (B-09, W3-03) (277ms)
+  ✓  12 [chromium] › e2e/insights.spec.ts:86:3 › 360: Analytics Insights tab, grouped by kind with the not-enough-data group (B-12, W3-03) (212ms)
+  ✓  11 [chromium] › e2e/insights.spec.ts:73:3 › 360: Overview with the KPIs, new orders, chart and Demand insights (B-03, W3-03) (298ms)
+  ✓  13 [chromium] › e2e/insights.spec.ts:95:3 › 360: Analytics Sales tab (B-12, W3-03) (202ms)
+  ✓  14 [chromium] › e2e/insights.spec.ts:104:3 › 360: Customers, Slipping away (B-09, W3-03) (196ms)
+  ✓  16 [chromium] › e2e/orders.delivery.shots.spec.ts:154:1 › 360 px: Returns to confirm lists the time since the failure (B-04, BK-26) (343ms)
+  ✓  15 [chromium] › e2e/orders.delivery.shots.spec.ts:144:1 › 360 px: the Out for delivery card shows the full phone to call (B-04, BK-27) (367ms)
+  ✓  18 [chromium] › e2e/orders.delivery.shots.spec.ts:175:1 › 360 px: a manager sees both return answers (B-04, BK-26) (221ms)
+  ✓  17 [chromium] › e2e/orders.delivery.shots.spec.ts:163:1 › 360 px: a cashier confirms the goods came back and is told to ask a manager for damage (B-04, BK-26) (237ms)
+  ✓  19 [chromium] › e2e/orders.delivery.shots.spec.ts:185:1 › 360 px: an order out for delivery: address, call, code and Delivery failed (B-04, BK-24, BK-27) (210ms)
+  ✓  20 [chromium] › e2e/orders.shots.spec.ts:118:1 › desktop: a short order offers Accept part (B-04, BK-08) (295ms)
+  ✓  21 [chromium] › e2e/orders.shots.spec.ts:131:1 › 360 px: Reject, Accept part and Accept fit one row, none clipped or wrapped (B-04, lead review 5) (218ms)
+  ✓  22 [chromium] › e2e/orders.shots.spec.ts:156:1 › phone: the Accept part sheet, prefilled with what the stock covers (B-04, BK-08) (350ms)
+  ✓  23 [chromium] › e2e/sell.spec.ts:181:1 › desktop: counter with a bill, then charge and the receipt (B-05) (579ms)
+  ✓  24 [chromium] › e2e/sell.spec.ts:202:1 › desktop: offline sales queue on the device and show as waiting (B-05) (465ms)
+  ✓  25 [chromium] › e2e/sell.spec.ts:220:1 › phone: counter with the bill bar and the bill sheet (B-05) (366ms)
+  ✓  26 [chromium] › e2e/sell.spec.ts:232:1 › phone 360: store sales with each link status and why a link failed (B-05, W2-16) (341ms)
+  ✓  27 [chromium] › e2e/smoke.spec.ts:109:1 › phone: lands on Overview with bottom tabs, no sidebar (B-03) (209ms)
+  ✓  28 [chromium] › e2e/smoke.spec.ts:124:1 › desktop: sidebar with Overview active, no bottom tabs (230ms)
+  ✓  29 [chromium] › e2e/smoke.spec.ts:136:1 › Back after the /overview redirect leaves the app instead of bouncing (180ms)
+  ✓  30 [chromium] › e2e/smoke.spec.ts:144:1 › the Overview tab goes back to / from another section (278ms)
+  ✓  31 [chromium] › e2e/smoke.spec.ts:152:1 › More tab lists the other sections (337ms)
+  ✓  33 [chromium] › e2e/smoke.spec.ts:173:1 › PWA manifest and icons are served locally (174ms)
+  ✓  32 [chromium] › e2e/smoke.spec.ts:161:1 › pseudo-locale via ?locale=pseudo survives the /overview redirect (402ms)
+  ✓  34 [chromium] › e2e/smoke.spec.ts:182:1 › signed out: any page opens the sign-in screen (B-01), with no sidebar or tabs (159ms)
+  ✓  36 [chromium] › e2e/standee.spec.ts:120:1 › phone 360: standee campaigns fit the screen (B-10, W3-09) (256ms)
+  ✓  35 [chromium] › e2e/standee.spec.ts:96:1 › desktop: standee campaigns with the funnel, a new standee and a reprint (B-10, W3-09) (443ms)
+  ✓  38 [chromium] › e2e/voice.spec.ts:262:1 › phone 360: a cashier reopens a draft confirmed in part: done lines shown, the rest wait for a manager (B-06) (218ms)
+  ✓  39 [chromium] › e2e/voice.spec.ts:279:1 › phone 360: a manager reopens the draft and confirms only the open lines (B-06) (368ms)
+  ✓  40 [chromium] › e2e/voice.spec.ts:299:1 › phone 360: editing a line, a manager sees no ask-manager flags (B-06) (1.4s)
+  ✓  41 [chromium] › e2e/voice.spec.ts:323:1 › phone 360: voice off hides the screen and the Stock link (B-06) (245ms)
+  ✓  42 [chromium] › e2e/voice.spec.ts:341:1 › desktop: the draft beside the sidebar (B-06) (1.1s)
+  ✓  37 [chromium] › e2e/voice.spec.ts:203:1 › phone 360: a cashier speaks, checks the draft, picks an item and confirms (B-06) (3.6s)
+
+  42 passed (10.2s)
+
+> @todayz/admin@0.0.0 e2e:smoke /Users/sairahul/Documents/projects/todayz/admin
+> playwright test -c playwright.config.ts
+
+[WebServer] (node:24624) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 50 tests using 2 workers
+
+(node:24626) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › e2e/ai-assist.spec.ts:122:1 › A-14: triage sets the priority the agent picked and sends the reply they chose (2.4s)
+  ✓   2 [chromium] › e2e/ai-assist.spec.ts:61:1 › A-08: the clean-up draft merges a duplicate only after the reviewer chooses it (2.4s)
+  ✓   4 [chromium] › e2e/areas.spec.ts:41:1 › A-03: an admin verifies a submitted business from the queue (643ms)
+  ✓   5 [chromium] › e2e/areas.spec.ts:88:1 › A-05: an admin closes a live store until a time in IST (396ms)
+  ✓   6 [chromium] › e2e/areas.spec.ts:148:1 › A-12: support hides a reported review and restores it, each with a reason (956ms)
+  ✓   3 [chromium] › e2e/ai-assist.spec.ts:204:1 › A-13: the explanation uses only the flag’s numbers and goes to the audit trail when chosen (2.3s)
+  ✓   7 [chromium] › e2e/areas.spec.ts:204:1 › A-08: the catalogue desk merges a store-made duplicate into the master product (630ms)
+  ✓   9 [chromium] › e2e/areas.spec.ts:317:1 › A-17: on a phone each setting reads as a card, with its value, range and change button in view (222ms)
+  ✓   8 [chromium] › e2e/areas.spec.ts:255:1 › A-20: support clears a held banner, then takes it down with a reason (1.1s)
+  ✓  11 [chromium] › e2e/areas.spec.ts:431:1 › A-02: an analyst reads Pulse, switches to 30 days and sees a store needing attention without a link (349ms)
+  ✓  10 [chromium] › e2e/areas.spec.ts:354:1 › A-18: a super admin invites a desk member, then disables another after a fresh code (1.1s)
+  ✓  12 [chromium] › e2e/areas.spec.ts:535:1 › A-16: an admin reads the channels and a kind in Hindi, then sends a test to their own inbox (513ms)
+  ✓  13 [chromium] › e2e/demand.spec.ts:44:1 › A-23 gaps: every city, then one, never a customer (234ms)
+  ✓  14 [chromium] › e2e/demand.spec.ts:64:1 › A-23 site strip: leave one out, approve, see what the site shows (382ms)
+  ✓  16 [chromium] › e2e/field.spec.ts:316:1 › A-15: a field agent sees only their own numbers (150ms)
+  ✓  17 [chromium] › e2e/field.spec.ts:334:1 › A-15: an admin sees every agent and picks whose weekly trend to show (242ms)
+  ✓  18 [chromium] › e2e/jobs.spec.ts:145:1 › SC-OPS-06: the list shows badges and IST schedules, and the filters narrow it (263ms)
+  ✓  15 [chromium] › e2e/field.spec.ts:196:1 › A-04: a field agent adds a shop on a phone, from the name to the owner confirming (1.3s)
+  ✓  19 [chromium] › e2e/jobs.spec.ts:168:1 › SC-OPS-07: admin runs and pauses an ordinary job and opens a run with Grafana links (381ms)
+  ✓  20 [chromium] › e2e/jobs.spec.ts:191:1 › SC-OPS-07: money jobs are super_admin only; admin sees why (248ms)
+  ✓  21 [chromium] › e2e/jobs.spec.ts:201:1 › SC-OPS-07: super_admin sees the money job buttons (236ms)
+  ✓  22 [chromium] › e2e/jobs.spec.ts:210:1 › SC-OPS-07: an order timer has no buttons, whoever looks (288ms)
+  ✓  23 [chromium] › e2e/jobs.spec.ts:220:3 › SC-OPS-07: support reads jobs with no action buttons (393ms)
+  ✓  24 [chromium] › e2e/jobs.spec.ts:220:3 › SC-OPS-07: analyst reads jobs with no action buttons (383ms)
+  ✓  25 [chromium] › e2e/jobs.spec.ts:220:3 › SC-OPS-07: finance reads jobs with no action buttons (389ms)
+  ✓  27 [chromium] › e2e/risk.spec.ts:138:1 › A-13: support reads the queue with no clear or confirm (227ms)
+  ✓  26 [chromium] › e2e/risk.spec.ts:39:1 › A-13: an admin reads a flag, confirms it, then blocks the customer as a separate step (970ms)
+  ✓  28 [chromium] › e2e/risk.spec.ts:174:1 › A-10: an admin filters to flagged referrals and rejects an unpaid one with a reason (668ms)
+  ✓  29 [chromium] › e2e/roles.spec.ts:101:3 › field_agent: the sidebar lists exactly its screens, none answers 403 (933ms)
+  ✓  30 [chromium] › e2e/roles.spec.ts:101:3 › support: the sidebar lists exactly its screens, none answers 403 (1.1s)
+  ✓  31 [chromium] › e2e/roles.spec.ts:101:3 › catalogue: the sidebar lists exactly its screens, none answers 403 (872ms)
+  ✓  32 [chromium] › e2e/roles.spec.ts:101:3 › analyst: the sidebar lists exactly its screens, none answers 403 (921ms)
+  ✓  33 [chromium] › e2e/roles.spec.ts:101:3 › finance: the sidebar lists exactly its screens, none answers 403 (924ms)
+  ✓  34 [chromium] › e2e/roles.spec.ts:101:3 › admin: the sidebar lists exactly its screens, none answers 403 (1.5s)
+  ✓  35 [chromium] › e2e/roles.spec.ts:101:3 › super_admin: the sidebar lists exactly its screens, none answers 403 (1.5s)
+  ✓  37 [chromium] › e2e/smoke.spec.ts:34:1 › desktop: sidebar with the Admin tag (174ms)
+  ✓  38 [chromium] › e2e/smoke.spec.ts:45:1 › phone: sidebar collapses to 44px icon links with names and tooltips (303ms)
+  ✓  36 [chromium] › e2e/roles.spec.ts:101:3 › catalogue + finance: the sidebar lists exactly its screens, none answers 403 (990ms)
+  ✓  40 [chromium] › e2e/smoke.spec.ts:73:1 › is not indexable (129ms)
+  ✓  39 [chromium] › e2e/smoke.spec.ts:64:1 › pseudo-locale via ?locale=pseudo (266ms)
+  ✓  41 [chromium] › e2e/smoke.spec.ts:78:1 › signed out: any page opens the sign-in screen (A-01) (160ms)
+  ✓  42 [chromium] › e2e/smoke.spec.ts:87:1 › signed in without the authenticator step: held at the two-step check (183ms)
+  ✓  44 [chromium] › e2e/system.spec.ts:24:3 › SC-OPS-01: admin reads system health, with the AWS panels not configured locally (337ms)
+  ✓  45 [chromium] › e2e/system.spec.ts:24:3 › SC-OPS-01: super_admin reads system health, with the AWS panels not configured locally (256ms)
+  ✓  46 [chromium] › e2e/system.spec.ts:44:3 › SC-OPS-03: support has no System health link and a URL visit shows no access (175ms)
+  ✓  47 [chromium] › e2e/system.spec.ts:44:3 › SC-OPS-03: catalogue has no System health link and a URL visit shows no access (139ms)
+  ✓  43 [chromium] › e2e/support.spec.ts:29:1 › A-14: a support agent takes, answers and resolves a business ticket (1.1s)
+  ✓  48 [chromium] › e2e/system.spec.ts:44:3 › SC-OPS-03: analyst has no System health link and a URL visit shows no access (145ms)
+  ✓  49 [chromium] › e2e/system.spec.ts:44:3 › SC-OPS-03: finance has no System health link and a URL visit shows no access (157ms)
+  ✓  50 [chromium] › e2e/system.spec.ts:44:3 › SC-OPS-03: field_agent has no System health link and a URL visit shows no access (150ms)
+
+  50 passed (17.7s)
+
+> @todayz/site@0.0.0 e2e:smoke /Users/sairahul/Documents/projects/todayz/site
+> playwright test -c playwright.config.ts && node scripts/lighthouse.mjs
+
+[WebServer] (node:24759) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 100 tests using 2 workers
+
+(node:24760) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24761) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    2 [chromium] › e2e/csp.spec.ts:56:1 › the CSP from dist/_headers is applied to the pages under test (212ms)
+  ✓    1 [chromium] › e2e/csp.spec.ts:63:3 › / runs under the built CSP without a violation (220ms)
+  ✓    4 [chromium] › e2e/csp.spec.ts:63:3 › /how-it-works/ runs under the built CSP without a violation (85ms)
+  ✓    3 [chromium] › e2e/csp.spec.ts:63:3 › /for-retailers/ runs under the built CSP without a violation (122ms)
+  ✓    5 [chromium] › e2e/csp.spec.ts:63:3 › /pricing/ runs under the built CSP without a violation (84ms)
+  ✓    6 [chromium] › e2e/csp.spec.ts:63:3 › /about/ runs under the built CSP without a violation (73ms)
+  ✓    7 [chromium] › e2e/csp.spec.ts:63:3 › /contact/ runs under the built CSP without a violation (79ms)
+  ✓    8 [chromium] › e2e/csp.spec.ts:63:3 › /legal/privacy/ runs under the built CSP without a violation (75ms)
+  ✓    9 [chromium] › e2e/csp.spec.ts:63:3 › /hi/ runs under the built CSP without a violation (145ms)
+  ✓   10 [chromium] › e2e/csp.spec.ts:63:3 › /te/ runs under the built CSP without a violation (138ms)
+  ✓   11 [chromium] › e2e/csp.spec.ts:63:3 › /no-such-page/ runs under the built CSP without a violation (71ms)
+  -   13 [chromium] › e2e/screens.spec.ts:33:5 › home at phone
+  -   14 [chromium] › e2e/screens.spec.ts:33:5 › home-hi at phone
+  -   15 [chromium] › e2e/screens.spec.ts:33:5 › home-kn at phone
+  -   16 [chromium] › e2e/screens.spec.ts:33:5 › home-te at phone
+  -   17 [chromium] › e2e/screens.spec.ts:33:5 › home-ta at phone
+  -   18 [chromium] › e2e/screens.spec.ts:33:5 › for-retailers at phone
+  -   19 [chromium] › e2e/screens.spec.ts:33:5 › for-retailers-hi at phone
+  -   20 [chromium] › e2e/screens.spec.ts:33:5 › how-it-works at phone
+  -   21 [chromium] › e2e/screens.spec.ts:33:5 › pricing at phone
+  -   22 [chromium] › e2e/screens.spec.ts:33:5 › about at phone
+  -   23 [chromium] › e2e/screens.spec.ts:33:5 › contact at phone
+  -   24 [chromium] › e2e/screens.spec.ts:33:5 › privacy at phone
+  -   25 [chromium] › e2e/screens.spec.ts:33:5 › terms-for-shoppers at phone
+  -   26 [chromium] › e2e/screens.spec.ts:33:5 › terms-for-shops at phone
+  -   27 [chromium] › e2e/screens.spec.ts:33:5 › refunds-and-credits at phone
+  -   28 [chromium] › e2e/screens.spec.ts:33:5 › 404 at phone
+  -   29 [chromium] › e2e/screens.spec.ts:33:5 › home at desktop
+  -   30 [chromium] › e2e/screens.spec.ts:33:5 › home-hi at desktop
+  -   31 [chromium] › e2e/screens.spec.ts:33:5 › home-kn at desktop
+  -   32 [chromium] › e2e/screens.spec.ts:33:5 › home-te at desktop
+  -   33 [chromium] › e2e/screens.spec.ts:33:5 › home-ta at desktop
+  -   34 [chromium] › e2e/screens.spec.ts:33:5 › for-retailers at desktop
+  -   35 [chromium] › e2e/screens.spec.ts:33:5 › for-retailers-hi at desktop
+  -   36 [chromium] › e2e/screens.spec.ts:33:5 › how-it-works at desktop
+  -   37 [chromium] › e2e/screens.spec.ts:33:5 › pricing at desktop
+  -   38 [chromium] › e2e/screens.spec.ts:33:5 › about at desktop
+  -   39 [chromium] › e2e/screens.spec.ts:33:5 › contact at desktop
+  -   40 [chromium] › e2e/screens.spec.ts:33:5 › privacy at desktop
+  -   41 [chromium] › e2e/screens.spec.ts:33:5 › terms-for-shoppers at desktop
+  -   42 [chromium] › e2e/screens.spec.ts:33:5 › terms-for-shops at desktop
+  -   43 [chromium] › e2e/screens.spec.ts:33:5 › refunds-and-credits at desktop
+  -   44 [chromium] › e2e/screens.spec.ts:33:5 › 404 at desktop
+  ✓   12 [chromium] › e2e/csp.spec.ts:73:1 › the lead form loads Turnstile and posts to the API under the built CSP (160ms)
+  ✓   45 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › / has one h1, a canonical, Open Graph and no sideways scroll at 390 px (114ms)
+  ✓   47 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /how-it-works/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (106ms)
+  ✓   46 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /for-retailers/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (134ms)
+  ✓   48 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /pricing/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (80ms)
+  ✓   49 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /about/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (75ms)
+  ✓   51 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /legal/privacy/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (75ms)
+  ✓   50 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /contact/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (88ms)
+  ✓   53 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /legal/terms-for-shops/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (73ms)
+  ✓   52 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /legal/terms-for-shoppers/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (75ms)
+  ✓   54 [chromium] › e2e/site.spec.ts:54:5 › SC-SITE-01 every page is a real, complete document › /legal/refunds-and-credits/ has one h1, a canonical, Open Graph and no sideways scroll at 390 px (79ms)
+  ✓   55 [chromium] › e2e/site.spec.ts:69:5 › SC-SITE-01 every page is a real, complete document › /hi/ has no sideways scroll at 390 px (248ms)
+  ✓   56 [chromium] › e2e/site.spec.ts:69:5 › SC-SITE-01 every page is a real, complete document › /kn/ has no sideways scroll at 390 px (183ms)
+  ✓   58 [chromium] › e2e/site.spec.ts:69:5 › SC-SITE-01 every page is a real, complete document › /ta/ has no sideways scroll at 390 px (217ms)
+  ✓   57 [chromium] › e2e/site.spec.ts:69:5 › SC-SITE-01 every page is a real, complete document › /te/ has no sideways scroll at 390 px (234ms)
+  ✓   59 [chromium] › e2e/site.spec.ts:79:3 › SC-SITE-01 every page is a real, complete document › an unknown path gets the noindex 404 page (103ms)
+  ✓   61 [chromium] › e2e/site.spec.ts:113:3 › SC-SITE-02 lead form: a valid submission › the localised form sends its own source and the header button goes to it (1.7s)
+  ✓   62 [chromium] › e2e/site.spec.ts:133:3 › SC-SITE-02 lead form: a valid submission › Turnstile uses its own strings for en and hi, and the browser language otherwise (437ms)
+  ✓   60 [chromium] › e2e/site.spec.ts:91:3 › SC-SITE-02 lead form: a valid submission › posts the camelCase payload with the phone in E.164 and the Turnstile token, then confirms (2.2s)
+  ✓   64 [chromium] › e2e/site.spec.ts:161:3 › SC-SITE-03 lead form: bad input and server trouble › the button renders disabled and only the script enables it (101ms)
+  ✓   65 [chromium] › e2e/site.spec.ts:171:3 › SC-SITE-03 lead form: bad input and server trouble › shows field errors and sends nothing for an invalid form (113ms)
+  ✓   66 [chromium] › e2e/site.spec.ts:187:3 › SC-SITE-03 lead form: bad input and server trouble › asks for the check and sends nothing while Turnstile has no token (115ms)
+  ✓   67 [chromium] › e2e/site.spec.ts:208:3 › SC-SITE-03 lead form: bad input and server trouble › disables the button while the request is in flight (148ms)
+  ✓   68 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is rate limited (429), and lets the visitor retry (167ms)
+  ✓   69 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is down (503), and lets the visitor retry (169ms)
+  ✓   70 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is unreachable, and lets the visitor retry (170ms)
+  ✓   63 [chromium] › e2e/site.spec.ts:146:3 › SC-SITE-02 lead form: a valid submission › the Turnstile script is requested on the form pages only (1.1s)
+  ✓   71 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is missing (404), and lets the visitor retry (177ms)
+  ✓   72 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is forbidding the origin (403), and lets the visitor retry (181ms)
+  ✓   73 [chromium] › e2e/site.spec.ts:242:5 › SC-SITE-03 lead form: bad input and server trouble › says so plainly when the API is refusing the details (400), and lets the visitor retry (200ms)
+  ✓   75 [chromium] › e2e/site.spec.ts:275:3 › SC-SITE-03 lead form: errors are announced, and the form always recovers › says the security check could not load when the Turnstile script is blocked (114ms)
+  ✓   74 [chromium] › e2e/site.spec.ts:256:3 › SC-SITE-03 lead form: errors are announced, and the form always recovers › an input points at its error only while the error shows (311ms)
+  ✓   76 [chromium] › e2e/site.spec.ts:294:3 › SC-SITE-03 lead form: errors are announced, and the form always recovers › says so when the Turnstile widget reports an error (117ms)
+  ✓   77 [chromium] › e2e/site.spec.ts:316:3 › SC-SITE-03 lead form: errors are announced, and the form always recovers › gives up after 15 s, keeps the details and lets the visitor retry (164ms)
+  ✓   79 [chromium] › e2e/site.spec.ts:372:3 › SC-SITE-06 motion can be stopped (WCAG 2.2.2) › the shop-type strip has a visible pause control that works from the keyboard (116ms)
+  ✓   80 [chromium] › e2e/site.spec.ts:387:3 › SC-SITE-06 motion can be stopped (WCAG 2.2.2) › no other animation repeats forever (124ms)
+  ✓   78 [chromium] › e2e/site.spec.ts:342:3 › SC-SITE-03 lead form: errors are announced, and the form always recovers › sends one Idempotency-Key per set of details: the same on a retry, a new one after a success (389ms)
+  ✓   81 [chromium] › e2e/site.spec.ts:406:5 › SC-SITE-04 languages › /hi/ is a reviewed translation with hreflang and a way back to English (279ms)
+  ✓   82 [chromium] › e2e/site.spec.ts:406:5 › SC-SITE-04 languages › /kn/ is a reviewed translation with hreflang and a way back to English (240ms)
+  ✓   84 [chromium] › e2e/site.spec.ts:406:5 › SC-SITE-04 languages › /ta/ is a reviewed translation with hreflang and a way back to English (239ms)
+  ✓   83 [chromium] › e2e/site.spec.ts:406:5 › SC-SITE-04 languages › /te/ is a reviewed translation with hreflang and a way back to English (252ms)
+  ✓   86 [chromium] › e2e/site.spec.ts:431:3 › SC-SITE-04 languages › pages that exist only in English offer no language switcher (67ms)
+  ✓   85 [chromium] › e2e/site.spec.ts:423:3 › SC-SITE-04 languages › the English pages are not marked as drafts and list the language switcher (114ms)
+  ✓   87 [chromium] › e2e/site.spec.ts:439:3 › SC-SITE-05 search engines › sitemap lists every page with alternates and robots points at it (52ms)
+  ✓   88 [chromium] › e2e/site.spec.ts:448:3 › SC-SITE-05 search engines › home carries Organization, WebSite and FAQPage JSON-LD that parses (118ms)
+  ✓   89 [chromium] › e2e/site.spec.ts:455:3 › SC-SITE-05 search engines › the retailers page carries SoftwareApplication and FAQPage JSON-LD (117ms)
+  ✓   90 [chromium] › e2e/site.spec.ts:463:3 › SC-SITE-05 search engines › the old landing page URL is covered by a 301 in _redirects (41ms)
+  ✓   91 [chromium] › e2e/site.spec.ts:468:3 › SC-SITE-05 search engines › _headers sets the CSP and the other security headers for every path (39ms)
+  ✓   92 [chromium] › e2e/site.spec.ts:481:3 › SC-SITE-06 keyboard, no-JS content and restraint › skip link, mobile menu and FAQ work from the keyboard (169ms)
+  ✓   93 [chromium] › e2e/site.spec.ts:498:3 › SC-SITE-06 keyboard, no-JS content and restraint › all copy renders without JavaScript (185ms)
+  ✓   95 [chromium] › e2e/site.spec.ts:517:3 › SC-SITE-06 keyboard, no-JS content and restraint › the landing pages say their shops and numbers are examples, and claim no commission (172ms)
+  ✓   96 [chromium] › e2e/site.spec.ts:527:3 › SC-SITE-06 keyboard, no-JS content and restraint › the mock screens are hidden from assistive technology (120ms)
+  ✓   94 [chromium] › e2e/site.spec.ts:509:3 › SC-SITE-06 keyboard, no-JS content and restraint › no emoji in the rendered text (392ms)
+  ✓   97 [chromium] › e2e/smoke.spec.ts:23:3 › phone: home renders with self-hosted fonts (392ms)
+  ✓   99 [chromium] › e2e/smoke.spec.ts:33:1 › icons are served locally (40ms)
+  ✓   98 [chromium] › e2e/smoke.spec.ts:23:3 › desktop: home renders with self-hosted fonts (536ms)
+  ✓  100 [chromium] › e2e/smoke.spec.ts:41:1 › the only scripts a page asks for are its own hashed bundle and Turnstile (587ms)
+
+  32 skipped
+  68 passed (9.7s)
+
+Lighthouse (mobile)
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+✅  Chrome installation found
+⚠️   GitHub token not set
+Healthcheck passed!
+
+Started a web server on port 51796...
+Running Lighthouse 1 time(s) on http://localhost:51796/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/hi/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/kn/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/te/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/ta/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/for-retailers/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/pricing/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/contact/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51796/legal/privacy/index.html
+Run #1...done.
+Done running Lighthouse!
+
+Checking assertions against 9 URL(s), 9 total run(s)
+
+All results processed!
+
+Dumping 9 reports to disk at /Users/sairahul/Documents/projects/todayz/site/.lighthouseci/mobile...
+Done writing reports to disk.
+
+Done running autorun.
+
+Lighthouse (desktop)
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+✅  Chrome installation found
+⚠️   GitHub token not set
+Healthcheck passed!
+
+Started a web server on port 51968...
+Running Lighthouse 1 time(s) on http://localhost:51968/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/hi/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/kn/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/te/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/ta/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/for-retailers/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/pricing/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/contact/index.html
+Run #1...done.
+Running Lighthouse 1 time(s) on http://localhost:51968/legal/privacy/index.html
+Run #1...done.
+Done running Lighthouse!
+
+Checking assertions against 9 URL(s), 9 total run(s)
+
+All results processed!
+
+Dumping 9 reports to disk at /Users/sairahul/Documents/projects/todayz/site/.lighthouseci/desktop...
+Done writing reports to disk.
+
+Done running autorun.
+==> e2e: e2e-ui-visual
+
+> @todayz/ui@0.0.0 build-storybook /Users/sairahul/Documents/projects/todayz/shared/ui
+> storybook build --output-dir storybook-static --quiet
+
+
+┌  Building storybook v10.6.1
+│
+◇  Cleaning outputDir: storybook-static
+│
+◇  Loading presets
+│
+◇  Building manager..
+│
+●  Building open services..
+│
+●  Building preview..
+│  Vite vite v8.3.3 building client environment for production...
+transforming...
+✓ 2013 modules transformed.
+rendering chunks...
+computing gzip size...
+│  Vite
+│  storybook-static/assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2
+│  10.28 kB
+│  storybook-static/iframe.html
+│  18.66 kB │ gzip:   5.27 kB
+│  storybook-static/assets/figtree-latin-wght-normal-D_ZTVpCC.woff2
+│  20.15 kB
+│  storybook-static/assets/anek-latin-latin-ext-wght-normal-CzxqaSOW.woff2
+│  36.49 kB
+│  storybook-static/assets/anek-latin-latin-wght-normal-DZcssQ26.woff2
+│  44.79 kB
+│  storybook-static/assets/noto-sans-tamil-tamil-wght-normal-iihgzMBi.woff2
+│  50.46 kB
+│  storybook-static/assets/anek-tamil-tamil-wght-normal-DiCu5Pqm.woff2
+│  50.90 kB
+│  storybook-static/assets/noto-sans-kannada-kannada-wght-normal-DuwB-P8d.woff2
+│  90.79 kB
+│  storybook-static/assets/anek-kannada-kannada-wght-normal-ppMNNKfK.woff2
+│  113.63 kB
+│  storybook-static/assets/noto-sans-devanagari-devanagari-wght-normal-DWI_L5Cu.woff2
+│  121.19 kB
+│  storybook-static/assets/noto-sans-telugu-telugu-wght-normal-DoLU0sI2.woff2
+│  123.97 kB
+│  storybook-static/assets/anek-telugu-telugu-wght-normal-WkcxfUQX.woff2
+│  140.13 kB
+│  storybook-static/assets/anek-devanagari-devanagari-wght-normal-B8fb2BTn.woff2
+│  257.65 kB
+│  storybook-static/assets/maplibre-gl-worker-VaXr2Fck.mjs
+│  508.31 kB
+│  storybook-static/assets/iframe-DC3BKeMn.css
+│  50.68 kB │ gzip:   9.38 kB
+│  storybook-static/assets/StoreMap-B8-mEBLf.css
+│  82.96 kB │ gzip:  10.72 kB
+│  storybook-static/assets/iframe-B3WKoeOA.js
+│  0.04 kB │ gzip:   0.06 kB
+│  storybook-static/assets/maplibre-gl-worker-DTCm3-e8.js
+│  0.18 kB │ gzip:   0.17 kB
+│  storybook-static/assets/VisuallyHidden-Bb4Spqkm.js
+│  0.25 kB │ gzip:   0.19 kB
+│  storybook-static/assets/chevron-right-DL4tZkVq.js
+│  0.26 kB │ gzip:   0.22 kB
+│  storybook-static/assets/plus-CZON0QOv.js
+│  0.28 kB │ gzip:   0.23 kB
+│  storybook-static/assets/x-C7nNrfM6.js
+│  0.28 kB │ gzip:   0.23 kB
+│  storybook-static/assets/search-DIL9Z_5W.js
+│  0.30 kB │ gzip:   0.25 kB
+│  storybook-static/assets/user-aUIc9ALS.js
+│  0.32 kB │ gzip:   0.26 kB
+│  storybook-static/assets/mic-C1i73sAZ.js
+│  0.36 kB │ gzip:   0.29 kB
+│  storybook-static/assets/ellipsis-CSwfSVZ0.js
+│  0.38 kB │ gzip:   0.26 kB
+│  storybook-static/assets/triangle-alert-BJqhSl9L.js
+│  0.42 kB │ gzip:   0.31 kB
+│  storybook-static/assets/tag-DoWh23iQ.js
+│  0.45 kB │ gzip:   0.33 kB
+│  storybook-static/assets/shopping-bag-D_JFcWlO.js
+│  0.47 kB │ gzip:   0.33 kB
+│  storybook-static/assets/Skeleton-Xq0ykMdN.js
+│  0.47 kB │ gzip:   0.32 kB
+│  storybook-static/assets/gift-54AMlQZH.js
+│  0.48 kB │ gzip:   0.34 kB
+│  storybook-static/assets/package-TKstSM75.js
+│  0.50 kB │ gzip:   0.34 kB
+│  storybook-static/assets/jsx-runtime-DxxttciK.js
+│  0.53 kB │ gzip:   0.35 kB
+│  storybook-static/assets/store-XJT0C59H.js
+│  0.63 kB │ gzip:   0.37 kB
+│  storybook-static/assets/receipt-BgmzHGfm.js
+│  0.78 kB │ gzip:   0.37 kB
+│  storybook-static/assets/StockTag-j1pdAM23.js
+│  0.87 kB │ gzip:   0.45 kB
+│  storybook-static/assets/Skeleton.stories-CCqT2pEP.js
+│  0.89 kB │ gzip:   0.50 kB
+│  storybook-static/assets/OtpInput.stories-C-D09IgP.js
+│  1.00 kB │ gzip:   0.61 kB
+│  storybook-static/assets/StoreCard-DjhBaDJU.js
+│  1.08 kB │ gzip:   0.51 kB
+│  storybook-static/assets/scan-line-Ca6bwG76.js
+│  1.09 kB │ gzip:   0.53 kB
+│  storybook-static/assets/StockTag.stories-L5iICFP8.js
+│  1.18 kB │ gzip:   0.58 kB
+│  storybook-static/assets/QuantityStepper.stories-rZ2loc2l.js
+│  1.20 kB │ gzip:   0.63 kB
+│  storybook-static/assets/rolldown-runtime-sJBDdmOt.js
+│  1.20 kB │ gzip:   0.67 kB
+│  storybook-static/assets/StoreCard.stories-D_p8lTna.js
+│  1.35 kB │ gzip:   0.77 kB
+│  storybook-static/assets/Button-DAXE66Mi.js
+│  1.39 kB │ gzip:   0.73 kB
+│  storybook-static/assets/WalletCard.stories-DX5Ltdqy.js
+│  1.40 kB │ gzip:   0.75 kB
+│  storybook-static/assets/Chip-p0TVdRBc.js
+│  1.49 kB │ gzip:   0.77 kB
+│  storybook-static/assets/preload-helper-CuP2NwVC.js
+│  1.50 kB │ gzip:   0.82 kB
+│  storybook-static/assets/LanguagePicker.stories-OTdPpbE5.js
+│  1.53 kB │ gzip:   0.83 kB
+│  storybook-static/assets/Toast.stories-B8CCR29k.js
+│  1.58 kB │ gzip:   0.84 kB
+│  storybook-static/assets/CartBar.stories-B4EDBGie.js
+│  1.72 kB │ gzip:   0.87 kB
+│  storybook-static/assets/QuantityStepper-BpRltLGp.js
+│  1.74 kB │ gzip:   0.87 kB
+│  storybook-static/assets/PickupCode.stories-CHKBf3Tk.js
+│  1.77 kB │ gzip:   0.88 kB
+│  storybook-static/assets/Chip.stories-BwpjflnA.js
+│  2.09 kB │ gzip:   1.02 kB
+│  storybook-static/assets/Tabs.stories-eh-4IgCa.js
+│  2.11 kB │ gzip:   1.00 kB
+│  storybook-static/assets/Segmented.stories-yu2YOrqB.js
+│  2.13 kB │ gzip:   1.12 kB
+│  storybook-static/assets/FilterButton.stories-B3VyzOIq.js
+│  2.18 kB │ gzip:   1.04 kB
+│  storybook-static/assets/Sheet.stories-DPiMmlS_.js
+│  2.23 kB │ gzip:   1.06 kB
+│  storybook-static/assets/StatusPill.stories-BpS34cfN.js
+│  2.38 kB │ gzip:   0.91 kB
+│  storybook-static/assets/Dialog.stories-DLNIyk57.js
+│  2.39 kB │ gzip:   0.99 kB
+│  storybook-static/assets/Banner.stories-Ba2ar-oX.js
+│  2.40 kB │ gzip:   1.15 kB
+│  storybook-static/assets/Modal-DqjRrXJ8.js
+│  2.50 kB │ gzip:   1.06 kB
+│  storybook-static/assets/TextField.stories-BlxIWNUH.js
+│  2.51 kB │ gzip:   1.10 kB
+│  storybook-static/assets/EmptyState.stories-DbUK8fbm.js
+│  2.57 kB │ gzip:   1.29 kB
+│  storybook-static/assets/fixtures-CPQvVgZz.js
+│  2.64 kB │ gzip:   1.41 kB
+│  storybook-static/assets/SearchField.stories-B7NU1oaK.js
+│  2.74 kB │ gzip:   1.32 kB
+│  storybook-static/assets/Toast-BawtuLZp.js
+│  2.80 kB │ gzip:   1.38 kB
+│  storybook-static/assets/OtpInput-DY3-vQyY.js
+│  2.85 kB │ gzip:   1.36 kB
+│  storybook-static/assets/BottomNav.stories-CzyEFtbR.js
+│  2.88 kB │ gzip:   1.29 kB
+│  storybook-static/assets/OrderTimeline.stories-2q8Muvqo.js
+│  2.92 kB │ gzip:   1.23 kB
+│  storybook-static/assets/ProductCard.stories-NO_r2VXX.js
+│  3.18 kB │ gzip:   1.41 kB
+│  storybook-static/assets/Button.stories-D720h0NS.js
+│  3.89 kB │ gzip:   1.30 kB
+│  storybook-static/assets/react-dom-sUYY2Lbl.js
+│  3.90 kB │ gzip:   1.42 kB
+│  storybook-static/assets/Icon-yejUVTmw.js
+│  3.93 kB │ gzip:   1.79 kB
+│  storybook-static/assets/PosCart.stories-Cibq3YfL.js
+│  4.02 kB │ gzip:   1.76 kB
+│  storybook-static/assets/Sidebar.stories-B6G3YWiv.js
+│  4.18 kB │ gzip:   1.80 kB
+│  storybook-static/assets/CategoryTile.stories-P3hgXy8o.js
+│  4.29 kB │ gzip:   1.78 kB
+│  storybook-static/assets/KpiTile.stories-ByPmMAtP.js
+│  4.90 kB │ gzip:   2.01 kB
+│  storybook-static/assets/DemandInsights.stories-4xG_Azgi.js
+│  8.83 kB │ gzip:   3.57 kB
+│  storybook-static/assets/esm-CBsftaVa.js
+│  19.22 kB │ gzip:   7.58 kB
+│  storybook-static/assets/StoreMap.stories-Chwh7oBJ.js
+│  22.16 kB │ gzip:   8.91 kB
+│  storybook-static/vite-inject-mocker-entry.js
+│  27.75 kB │ gzip:   9.66 kB
+│  storybook-static/assets/matchers-JIUQ3HVY-DLBmcvP1.js
+│  28.75 kB │ gzip:   9.66 kB
+│  storybook-static/assets/DataTable.stories-60zO65iD.js
+│  52.45 kB │ gzip:  14.43 kB
+│  storybook-static/assets/react-18-D1vkOZWh.js
+│  207.53 kB │ gzip:  65.14 kB
+│  storybook-static/assets/axe-C4lPdR0t.js
+│  659.30 kB │ gzip: 187.88 kB
+│  storybook-static/assets/maplibre-gl-Dl9OY0Ue.js
+│  1,076.59 kB │ gzip: 291.97 kB
+│  storybook-static/assets/iframe-C9AuSWrH.js
+│  1,136.69 kB │ gzip: 323.17 kB
+
+│
+▲  Vite [plugin builtin:vite-reporter]
+│  (!) Some chunks are larger than 500 kB after minification. Consider:
+│  - Using dynamic import() to code-split the application
+│  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+│  ]8;;https://rolldown.rs/reference/OutputOptions.codeSplittinghttps://rolldown.rs/reference/OutputOptions.codeSplitting]8;;
+│  - Adjust chunk size limit for this warning via
+│  build.chunkSizeWarningLimit.
+│  Vite ✓ built in 639ms
+│
+◇  Output directory:
+│  /Users/sairahul/Documents/projects/todayz/shared/ui/storybook-static
+│
+└  Storybook build completed successfully
+
+
+> @todayz/ui@0.0.0 visual /Users/sairahul/Documents/projects/todayz/shared/ui
+> playwright test -c visual/playwright.config.ts design.spec.ts a11y.spec.ts overlays.spec.ts
+
+[WebServer] (node:26161) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 181 tests using 4 workers
+
+(node:26162) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26165) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26163) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    3 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Banner / Warning (672ms)
+  ✓    4 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Banner / With Action (677ms)
+  ✓    1 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Banner / Info (695ms)
+  ✓    2 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Banner / Live Status (694ms)
+  ✓    5 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Banner / Design Reference (540ms)
+  ✓    6 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/BottomNav / Business (544ms)
+  ✓    7 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/BottomNav / Customer (547ms)
+  ✓    8 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/BottomNav / With Badge (544ms)
+  ✓   12 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Sizes (496ms)
+  ✓   10 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Playground (498ms)
+  ✓   11 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Variants (527ms)
+  ✓    9 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/BottomNav / Design Reference (572ms)
+  ✓   13 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Disabled (480ms)
+  ✓   14 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Loading (508ms)
+  ✓   15 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Block (525ms)
+  ✓   16 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / With Icon (502ms)
+  ✓   17 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Icon Only (490ms)
+  ✓   18 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Button / Design Reference (542ms)
+  ✓   19 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CartBar / Default (496ms)
+  ✓   20 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CartBar / One Item (496ms)
+  ✓   21 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CartBar / Large Cart (513ms)
+  ✓   22 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CartBar / No Shop (495ms)
+  ✓   23 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CartBar / Design Reference (506ms)
+  ✓   24 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CategoryTile / Single (508ms)
+  ✓   25 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CategoryTile / Row (461ms)
+  ✓   28 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / On (487ms)
+  ✓   27 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / Off (508ms)
+  ✓   26 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/CategoryTile / Design Reference (530ms)
+  ✓   29 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / With Icon (498ms)
+  ✓   30 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / Disabled (496ms)
+  ✓   32 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / Multiple Choice (517ms)
+  ✓   31 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / Radius Row (556ms)
+  ✓   33 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Chip / Design Reference (506ms)
+  ✓   34 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / Sortable (538ms)
+  ✓   35 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / Sorted By Stock (544ms)
+  ✓   36 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / Loading (532ms)
+  ✓   37 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / Empty (514ms)
+  ✓   38 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / With Footer (552ms)
+  ✓   39 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DataTable / Design Reference (518ms)
+  ✓   40 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / Default (546ms)
+  ✓   41 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / With Not Useful (556ms)
+  ✓   43 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / Loading (492ms)
+  ✓   42 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / Expired First (542ms)
+  ✓   44 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / Nothing Fired (492ms)
+  ✓   45 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/DemandInsights / Design Reference (506ms)
+  ✓   46 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Dialog / Confirm (481ms)
+  ✓   48 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Dialog / Closed (462ms)
+  ✓   47 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Dialog / With Close Button (511ms)
+  ✓   49 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Dialog / With Toast (465ms)
+  ✓   50 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/EmptyState / Default (480ms)
+  ✓   51 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/EmptyState / With Action (503ms)
+  ✓   52 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/EmptyState / With Checklist (517ms)
+  ✓   53 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/EmptyState / Default Icon (543ms)
+  ✓   54 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/FilterButton / Unset (624ms)
+  ✓   55 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/FilterButton / Set (587ms)
+  ✓   56 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/FilterButton / Row (585ms)
+  ✓   57 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Tile (551ms)
+  ✓   58 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Flat (550ms)
+  ✓   59 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / With Link (564ms)
+  ✓   60 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Loading (598ms)
+  ✓   61 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Strip (560ms)
+  ✓   62 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Strip Loading (600ms)
+  ✓   63 [chromium] › visual/a11y.spec.ts:37:3 › axe: Dashboard/KpiTile / Design Reference (582ms)
+  ✓   64 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/LanguagePicker / English (636ms)
+  ✓   65 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/LanguagePicker / Kannada (589ms)
+  ✓   67 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/OrderTimeline / Ready For Pickup (519ms)
+  ✓   66 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/LanguagePicker / Design Reference (597ms)
+  ✓   68 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/OrderTimeline / Just Placed (533ms)
+  ✓   69 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/OrderTimeline / Completed (549ms)
+  ✓   70 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/OrderTimeline / Rejected (556ms)
+  ✓   71 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/OrderTimeline / Design Reference (576ms)
+  ✓   72 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/OtpInput / Empty (578ms)
+  ✓   73 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/OtpInput / Partly Filled (590ms)
+  ✓   74 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/OtpInput / Wrong Code (592ms)
+  ✓   75 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/OtpInput / Six Digit Login (629ms)
+  ✓   76 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/OtpInput / Disabled (612ms)
+  ✓   77 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PickupCode / Default (624ms)
+  ✓   78 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PickupCode / With Hold Timer (589ms)
+  ✓   79 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PickupCode / No Note (604ms)
+  ✓   80 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PickupCode / Design Reference (661ms)
+  ✓   81 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PosCart / Bill (679ms)
+  ✓   82 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PosCart / Walk In (663ms)
+  ✓   83 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PosCart / Empty (557ms)
+  ✓   84 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PosCart / Charging (627ms)
+  ✓   86 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / In Cart (845ms)
+  ✓   85 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/PosCart / Design Reference (1.0s)
+  ✓   87 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Not In Cart (846ms)
+  ✓   88 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Low Stock At Limit (914ms)
+  ✓   89 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Out Of Stock (535ms)
+  ✓   90 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Stale Stock (540ms)
+  ✓   91 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Long Name (539ms)
+  ✓   92 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/ProductCard / Design Reference (548ms)
+  ✓   93 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Add Pill (531ms)
+  ✓   94 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Counting (543ms)
+  ✓   95 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / At Stock Limit (543ms)
+  ✓   96 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Out Of Stock (521ms)
+  ✓   97 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Small (554ms)
+  ✓   98 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Disabled (554ms)
+  ✓   99 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/QuantityStepper / Design Reference (545ms)
+  ✓  100 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/SearchField / Empty (485ms)
+  ✓  101 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/SearchField / With Query (480ms)
+  ✓  102 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/SearchField / With Voice (507ms)
+  ✓  103 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/SearchField / Debounced Search (503ms)
+  ✓  104 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/SearchField / Design Reference (455ms)
+  ✓  105 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Segmented / Text Only (539ms)
+  ✓  106 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Segmented / Last Selected (521ms)
+  ✓  107 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Segmented / With Icons (552ms)
+  ✓  108 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Sheet / Open (481ms)
+  ✓  109 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Sheet / Closed (483ms)
+  ✓  110 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Sheet / Not Dismissible (507ms)
+  ✓  111 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Sheet / With Toast (482ms)
+  ✓  112 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/Sidebar / Business (530ms)
+  ✓  113 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/Sidebar / Overview Current (535ms)
+  ✓  114 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/Sidebar / With Store Footer (532ms)
+  ✓  115 [chromium] › visual/a11y.spec.ts:37:3 › axe: Navigation/Sidebar / Design Reference (546ms)
+  ✓  116 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Skeleton / Text (494ms)
+  ✓  117 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Skeleton / Block (508ms)
+  ✓  119 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Skeleton / Store Card Loading (465ms)
+  ✓  118 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Skeleton / Circle (538ms)
+  ✓  120 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StatusPill / Playground (522ms)
+  ✓  121 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StatusPill / Every Order Status (549ms)
+  ✓  122 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StatusPill / Design Reference (547ms)
+  ✓  123 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / In Stock (548ms)
+  ✓  124 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / Low (542ms)
+  ✓  125 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / Out (501ms)
+  ✓  126 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / Stale (508ms)
+  ✓  127 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / Stacked (523ms)
+  ✓  128 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / No Freshness (496ms)
+  ✓  129 [chromium] › visual/a11y.spec.ts:37:3 › axe: Status/StockTag / Design Reference (488ms)
+  ✓  130 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / Open (517ms)
+  ✓  131 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / Closed With Offer (502ms)
+  ✓  132 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / Tinted (461ms)
+  ✓  133 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / No Tags (481ms)
+  ✓  134 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / Long Name (483ms)
+  ✓  135 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/StoreCard / Design Reference (493ms)
+  ✓  137 [chromium] › visual/a11y.spec.ts:37:3 › axe: Map/StoreMap / Static Fallback (604ms)
+  ✓  136 [chromium] › visual/a11y.spec.ts:37:3 › axe: Map/StoreMap / Home Card (1.0s)
+  ✓  138 [chromium] › visual/a11y.spec.ts:37:3 › axe: Map/StoreMap / Full Map (921ms)
+  ✓  141 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Tabs / With Counts (475ms)
+  ✓  140 [chromium] › visual/a11y.spec.ts:37:3 › axe: Map/StoreMap / Design Reference (577ms)
+  ✓  139 [chromium] › visual/a11y.spec.ts:37:3 › axe: Map/StoreMap / No Shops (1.4s)
+  ✓  142 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/Tabs / Second Selected (503ms)
+  ✓  143 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / With Help (499ms)
+  ✓  144 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Empty (519ms)
+  ✓  145 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Invalid (545ms)
+  ✓  146 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Phone Prefix (555ms)
+  ✓  147 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Phone Prefix Invalid (546ms)
+  ✓  148 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Disabled (542ms)
+  ✓  149 [chromium] › visual/a11y.spec.ts:37:3 › axe: Inputs and actions/TextField / Design Reference (497ms)
+  ✓  150 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Toast / With Link (467ms)
+  ✓  151 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Toast / Plain (600ms)
+  ✓  152 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Toast / With Button (619ms)
+  ✓  154 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/WalletCard / Default (643ms)
+  ✓  153 [chromium] › visual/a11y.spec.ts:37:3 › axe: Feedback and overlays/Toast / Provider (700ms)
+  ✓  155 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/WalletCard / Zero (572ms)
+  ✓  156 [chromium] › visual/a11y.spec.ts:37:3 › axe: Commerce/WalletCard / Design Reference (583ms)
+  ✓  157 [chromium] › visual/design.spec.ts:23:3 › Banner story matches its design card (450ms)
+  ✓  158 [chromium] › visual/design.spec.ts:23:3 › BottomNav story matches its design card (405ms)
+  ✓  159 [chromium] › visual/design.spec.ts:23:3 › Button story matches its design card (421ms)
+  ✓  160 [chromium] › visual/design.spec.ts:23:3 › CartBar story matches its design card (411ms)
+  ✓  162 [chromium] › visual/design.spec.ts:23:3 › Chip story matches its design card (356ms)
+  ✓  161 [chromium] › visual/design.spec.ts:23:3 › CategoryTile story matches its design card (383ms)
+  ✓  163 [chromium] › visual/design.spec.ts:23:3 › DataTable story matches its design card (379ms)
+  ✓  164 [chromium] › visual/design.spec.ts:23:3 › DemandInsights story matches its design card (405ms)
+  ✓  165 [chromium] › visual/design.spec.ts:23:3 › KpiTile story matches its design card (384ms)
+  ✓  166 [chromium] › visual/design.spec.ts:23:3 › LanguagePicker story matches its design card (382ms)
+  ✓  167 [chromium] › visual/design.spec.ts:23:3 › OrderTimeline story matches its design card (386ms)
+  ✓  168 [chromium] › visual/design.spec.ts:23:3 › PickupCode story matches its design card (348ms)
+  ✓  170 [chromium] › visual/design.spec.ts:23:3 › ProductCard story matches its design card (412ms)
+  ✓  169 [chromium] › visual/design.spec.ts:23:3 › PosCart story matches its design card (468ms)
+  ✓  172 [chromium] › visual/design.spec.ts:23:3 › SearchField story matches its design card (367ms)
+  ✓  171 [chromium] › visual/design.spec.ts:23:3 › QuantityStepper story matches its design card (408ms)
+  ✓  174 [chromium] › visual/design.spec.ts:23:3 › StatusPill story matches its design card (459ms)
+  ✓  173 [chromium] › visual/design.spec.ts:23:3 › Sidebar story matches its design card (529ms)
+  ✓  175 [chromium] › visual/design.spec.ts:23:3 › StockTag story matches its design card (460ms)
+  ✓  176 [chromium] › visual/design.spec.ts:23:3 › StoreCard story matches its design card (466ms)
+  ✓  178 [chromium] › visual/design.spec.ts:23:3 › TextField story matches its design card (377ms)
+  ✓  177 [chromium] › visual/design.spec.ts:23:3 › StoreMap story matches its design card (405ms)
+  ✓  179 [chromium] › visual/design.spec.ts:23:3 › WalletCard story matches its design card (395ms)
+  ✓  180 [chromium] › visual/overlays.spec.ts:28:3 › overlay: feedback-and-overlays-dialog--with-toast (662ms)
+  ✓  181 [chromium] › visual/overlays.spec.ts:28:3 › overlay: feedback-and-overlays-sheet--with-toast (931ms)
+
+  181 passed (26.5s)

@@ -1,0 +1,23 @@
+==> reset: reset-db
+stack: databases todayz and todayz_test recreated (empty; migrations and seed run next)
+==> reset: reset-backend
+problemgen: 76 codes -> gen/problems
+apigen root: 339 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 167ms.
+apigen check: 336 method+path pairs under /v1 (admin 141, auth 7, biz 107, discover 13, health 3, me 56, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 339 operations -> src/gen (10 prefixes), 76 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-27T08:16:06.315Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:16:07.372Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":68,"head":49902}
+{"ts":"2026-10-27T08:16:07.392Z","level":"info","msg":"config: unset variables","service":"seed","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:16:07.417Z","level":"info","msg":"seed identity: admins seeded","service":"seed","env":"local","version":"dev","admins":10}
+{"ts":"2026-10-27T08:16:08.421Z","level":"info","msg":"seeded","service":"seed","env":"local","version":"dev","profile":"dev","domains":25}

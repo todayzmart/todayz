@@ -1,13 +1,23 @@
 ==> reset: reset-db
- Container todayz-postgres-1 Recreate 
- Container todayz-postgres-1 Recreated 
- Container todayz-postgres-1 Starting 
- Container todayz-postgres-1 Started 
- Container todayz-postgres-1 Waiting 
- Container todayz-postgres-1 Healthy 
 stack: databases todayz and todayz_test recreated (empty; migrations and seed run next)
 ==> reset: reset-backend
-/bin/bash: sqlc: command not found
-make[2]: *** [gen-backend] Error 127
-make reset: step reset-backend failed (exit 2)
-make[1]: *** [reset] Error 2
+problemgen: 75 codes -> gen/problems
+apigen root: 325 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 178ms.
+apigen check: 322 method+path pairs under /v1 (admin 132, auth 8, biz 104, discover 13, health 3, me 53, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 325 operations -> src/gen (10 prefixes), 75 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-26T01:22:42.537Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-26T01:22:43.478Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":55,"head":39901}
+{"ts":"2026-10-26T01:22:43.496Z","level":"info","msg":"config: unset variables","service":"seed","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-26T01:22:43.526Z","level":"info","msg":"seed identity: admins seeded","service":"seed","env":"local","version":"dev","admins":10,"enrolled":9}
+{"ts":"2026-10-26T01:22:44.546Z","level":"info","msg":"seeded","service":"seed","env":"local","version":"dev","profile":"dev","domains":25}

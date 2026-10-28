@@ -1,0 +1,285 @@
+==> reset: reset-db
+stack: databases todayz and todayz_test recreated (empty; migrations and seed run next)
+==> reset: reset-backend
+problemgen: 76 codes -> gen/problems
+apigen root: 339 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 174ms.
+apigen check: 336 method+path pairs under /v1 (admin 141, auth 7, biz 107, discover 13, health 3, me 56, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 339 operations -> src/gen (10 prefixes), 76 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-27T08:30:02.025Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:30:02.880Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":68,"head":49902}
+{"ts":"2026-10-27T08:30:02.899Z","level":"info","msg":"config: unset variables","service":"seed","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:30:02.923Z","level":"info","msg":"seed identity: admins seeded","service":"seed","env":"local","version":"dev","admins":10}
+{"ts":"2026-10-27T08:30:03.934Z","level":"info","msg":"seeded","service":"seed","env":"local","version":"dev","profile":"dev","domains":25}
+Time: 0.230 ms
+ setseed 
+---------
+ 
+(1 row)
+
+Time: 0.319 ms
+Time: 0.816 ms
+Time: 0.458 ms
+Time: 0.801 ms
+Time: 0.406 ms
+Time: 5.078 ms
+Time: 12.650 ms
+Time: 26.494 ms
+Time: 5.801 ms
+Time: 822.105 ms
+Time: 2567.415 ms (00:02.567)
+Time: 551.806 ms
+Time: 1414.659 ms (00:01.415)
+Time: 9526.305 ms (00:09.526)
+Time: 8912.202 ms (00:08.912)
+Time: 813.018 ms
+Time: 34.965 ms
+Time: 67.552 ms
+Time: 73.047 ms
+Time: 433.587 ms
+Time: 2.376 ms
+Time: 1.585 ms
+Time: 149.862 ms
+Time: 33.001 ms
+Time: 49.395 ms
+Time: 18.384 ms
+Time: 0.688 ms
+Time: 397.401 ms
+Time: 2137.767 ms (00:02.138)
+Time: 1623.437 ms (00:01.623)
+Time: 2120.027 ms (00:02.120)
+Time: 2235.628 ms (00:02.236)
+Time: 1952.145 ms (00:01.952)
+Time: 1077.539 ms (00:01.078)
+Time: 10514.833 ms (00:10.515)
+Time: 5442.994 ms (00:05.443)
+Time: 17806.681 ms (00:17.807)
+Time: 56.664 ms
+Time: 8.009 ms
+Time: 30.338 ms
+Time: 106.986 ms
+Time: 141.631 ms
+Time: 83.800 ms
+Time: 48.335 ms
+Time: 65.587 ms
+Time: 102.394 ms
+Time: 36.991 ms
+Time: 248.442 ms
+Time: 132.883 ms
+Time: 244.883 ms
+Time: 371.359 ms
+ stores | items  | customers | orders | pos_sales 
+--------+--------+-----------+--------+-----------
+   1000 | 211448 |     50000 |  70000 |    350000
+(1 row)
+
+Time: 178.881 ms
+
+== bootstrap (2026-10-27T08:31:17.220Z)
+  threshold err_all rate==0: PASS
+err_all                                      rate=0.000%  (0 of 210)
+err_read                                     rate=0.000%  (0 of 105)
+err_write                                    rate=0.000%  (0 of 105)
+http_req_duration                            n=         p50=     3.3  p95=     9.6  p99=       -  max=    20.6
+http_req_failed                              rate=0.000%  (0 of 525)
+http_reqs                                    count=525  rate=1949.62/s
+iterations                                   count=105  rate=389.92/s
+lat_read                                     n=         p50=     1.3  p95=     3.0  p99=       -  max=     3.1
+lat_read_me_get                              n=         p50=     1.3  p95=     3.0  p99=       -  max=     3.1
+lat_write                                    n=         p50=     3.3  p95=     7.0  p99=       -  max=     7.3
+lat_write_me_patch                           n=         p50=     3.3  p95=     7.0  p99=       -  max=     7.3
+  role   | count 
+---------+-------
+ manager |  1100
+ owner   |  1000
+(2 rows)
+
+load-data: fixture at /Users/sairahul/Documents/projects/todayz/e2e/load/out/fixture.json
+==> load: load-browse
+
+== browse_peak (2026-10-27T08:42:14.900Z)
+  threshold err_all rate<0.001: PASS
+  threshold lat_read p(95)<200: PASS
+  threshold lat_search p(95)<300: PASS
+err_all                                      rate=0.000%  (0 of 57057)
+err_read                                     rate=0.000%  (0 of 38439)
+err_search                                   rate=0.000%  (0 of 18618)
+http_req_duration                            n=  57057  p50=     5.2  p95=    89.3  p99=  1373.0  max=  6915.3
+http_req_failed                              rate=0.000%  (0 of 57057)
+http_reqs                                    count=57057  rate=88.47/s
+iterations                                   count=6075  rate=9.42/s
+lat_read                                     n=  38439  p50=     3.9  p95=    62.6  p99=  1270.6  max=  4207.8
+lat_read_categories                          n=   1860  p50=     0.9  p95=    11.2  p99=   317.2  max=   750.3
+lat_read_store                               n=   6201  p50=     1.6  p95=    22.7  p99=   342.4  max=  1033.1
+lat_read_store_items                         n=   6201  p50=     4.2  p95=    59.9  p99=  1398.3  max=  2504.6
+lat_read_store_items_q                       n=   3164  p50=     4.0  p95=   117.3  p99=  1613.7  max=  3212.1
+lat_read_stores                              n=   6206  p50=     1.7  p95=    20.8  p99=   368.6  max=  1022.3
+lat_read_stores_category                     n=   2468  p50=     5.0  p95=    72.7  p99=   914.6  max=  1883.5
+lat_read_substitutes                         n=   6133  p50=     7.1  p95=   140.4  p99=  2560.1  max=  4207.8
+lat_read_summary                             n=   6206  p50=     4.8  p95=    95.6  p99=  1266.2  max=  2313.8
+lat_search                                   n=  18618  p50=    10.0  p95=   153.9  p99=  1660.1  max=  6915.3
+lat_search_search                            n=   6206  p50=    19.1  p95=   290.7  p99=  4172.6  max=  6915.3
+lat_search_suggest                           n=  12412  p50=     8.2  p95=    81.1  p99=  1086.4  max=  2197.2
+==> load: load-orders
+
+== order_burst (2026-10-27T08:56:47.410Z)
+  threshold err_all rate<0.001: PASS
+  threshold lat_write p(95)<400: PASS
+err_all                                      rate=0.000%  (0 of 4114)
+err_read                                     rate=0.000%  (0 of 1409)
+err_write                                    rate=0.000%  (0 of 2705)
+http_req_duration                            n=   4366  p50=    10.1  p95=    32.1  p99=    42.1  max=   265.9
+http_req_failed                              rate=0.000%  (0 of 4366)
+http_reqs                                    count=4366  rate=5.01/s
+iterations                                   count=1425  rate=1.64/s
+lat_read                                     n=   1409  p50=     4.9  p95=     8.6  p99=    16.3  max=   120.7
+lat_read_order_get                           n=    535  p50=     5.0  p95=     8.5  p99=    11.0  max=    37.3
+lat_read_shop_orders                         n=    874  p50=     4.8  p95=     8.6  p99=    24.9  max=   120.7
+lat_write                                    n=   2705  p50=    16.6  p95=    34.4  p99=    48.4  max=   265.9
+lat_write_accept                             n=    535  p50=    18.5  p95=    27.6  p99=    44.6  max=    65.7
+lat_write_place                              n=    550  p50=    16.8  p95=    24.0  p99=    43.4  max=    63.7
+lat_write_quote                              n=    550  p50=     6.9  p95=    10.6  p99=    18.4  max=   265.9
+lat_write_ready                              n=    535  p50=    15.1  p95=    23.9  p99=    37.4  max=   104.4
+lat_write_verify_code                        n=    535  p50=    28.9  p95=    41.3  p99=    56.5  max=   107.9
+n_orders_collected                           count=535  rate=0.61/s
+n_orders_left_to_expire                      count=15  rate=0.02/s
+n_orders_placed                              count=550  rate=0.63/s
+  status   | orders 
+-----------+--------
+ collected |    535
+ expired   |     15
+
+CREATE VIEW
+ timers_fired | late_p50_s | late_p99_s | late_max_s | late_min_s 
+--------------+------------+------------+------------+------------
+           15 |       0.51 |       0.96 |       0.96 |       0.02
+
+ timers_missed 
+---------------
+             0
+
+CREATE VIEW
+ unbalanced | negative | lots_vs_balances | holds | held_vs_holds | cache_drift | lot_drift 
+------------+----------+------------------+-------+---------------+-------------+-----------
+          0 |        0 |                0 |     0 |             0 |           0 |         0
+
+ ledger_entries_in_run 
+-----------------------
+                  1000
+
+psql:/Users/sairahul/Documents/projects/todayz/e2e/load/checks/order_burst.sql:95: NOTICE:  order_burst: PASS (timers p99 0.96 s, none missed, reconcile clean)
+DO
+==> load: load-pos
+
+== pos_rush (2026-10-27T09:06:48.494Z)
+  threshold err_all rate<0.001: PASS
+  threshold lat_write p(95)<400: PASS
+  threshold ok_retry_returned_same_sale rate==1: PASS
+err_all                                      rate=0.000%  (0 of 5535)
+err_write                                    rate=0.000%  (0 of 5535)
+http_req_duration                            n=   5559  p50=    22.1  p95=    34.1  p99=    43.4  max=   387.1
+http_req_failed                              rate=0.000%  (0 of 5559)
+http_reqs                                    count=5559  rate=9.26/s
+iterations                                   count=5430  rate=9.05/s
+lat_write                                    n=   5535  p50=    22.1  p95=    34.1  p99=    43.4  max=   387.1
+lat_write_sale                               n=   5400  p50=    22.2  p95=    33.6  p99=    38.7  max=   253.7
+lat_write_sale_retry                         n=    104  p50=     3.2  p95=     4.2  p99=     4.4  max=     5.1
+lat_write_sync                               n=     30  p50=   245.6  p95=   308.3  p99=   365.6  max=   387.1
+lat_write_sync_replay                        n=      1  p50=    21.7  p95=    21.7  p99=    21.7  max=    21.7
+n_sales_unique_sent                          count=6000  rate=10.00/s
+ok_retry_returned_same_sale                  rate=100.000%  (105 of 105)
+CREATE VIEW
+ sales_recorded | via_sync | distinct_client_ids | distinct_sent 
+----------------+----------+---------------------+---------------
+           6000 |      600 |                6000 |          6000
+
+ duplicate_client_ids 
+----------------------
+                    0
+
+ lines_without_movement | lines 
+------------------------+-------
+                      0 | 16885
+
+psql:/Users/sairahul/Documents/projects/todayz/e2e/load/checks/pos_rush.sql:44: NOTICE:  pos_rush: PASS (6000 sales, no duplicates)
+DO
+==> load: load-otp
+
+== otp_abuse (2026-10-27T09:09:48.992Z)
+  threshold n_abuser_sends_accepted count<=20: PASS
+  threshold n_hammered_phone_sends_accepted count<=5: PASS
+  threshold ok_abuser_blocked_after_limit rate==1: PASS
+  threshold ok_code_locked_after_max_attempts rate==1: PASS
+  threshold ok_legit_signin rate==1: PASS
+err_all                                      rate=0.000%  (0 of 453)
+err_write                                    rate=0.000%  (0 of 453)
+http_req_duration                            n=    739  p50=     7.8  p95=    16.1  p99=    20.5  max=    31.7
+http_req_failed                              rate=56.157%  (415 of 739)
+http_reqs                                    count=739  rate=4.10/s
+iterations                                   count=466  rate=2.59/s
+lat_write                                    n=    544  p50=     8.1  p95=    28.8  p99=    32.6  max=    47.0
+lat_write_abuse_send                         n=    314  p50=     8.0  p95=    15.6  p99=    24.6  max=    31.7
+lat_write_guess_verify                       n=     78  p50=     2.2  p95=     4.9  p99=     6.4  max=     7.6
+lat_write_hammer_send                        n=     61  p50=     8.2  p95=    14.5  p99=    22.7  max=    31.6
+lat_write_legit_signin                       n=     91  p50=    26.0  p95=    33.5  p99=    37.1  max=    47.0
+n_abuser_sends_accepted                      count=20  rate=0.11/s
+n_hammered_phone_sends_accepted              count=5  rate=0.03/s
+ok_abuser_blocked_after_limit                rate=100.000%  (281 of 281)
+ok_code_locked_after_max_attempts            rate=100.000%  (13 of 13)
+ok_legit_signin                              rate=100.000%  (91 of 91)
+==> load: load-sse
+signed in 40 owners and 300 customers in 620ms
+streams ready 5000 of 5000 in 1m0.185s (failed opens 0)
+api rss before the streams 83 MB, with them open 204 MB
+t+15s published 300, deliveries 1352, open 5000, reconnects 0, api rss 226 MB
+t+30s published 600, deliveries 2784, open 5000, reconnects 0, api rss 208 MB
+t+45s published 900, deliveries 3936, open 5000, reconnects 0, api rss 243 MB
+t+1m0s published 1200, deliveries 5304, open 5000, reconnects 0, api rss 331 MB
+t+1m15s published 1500, deliveries 6624, open 5000, reconnects 0, api rss 319 MB
+t+1m30s published 1800, deliveries 7928, open 5000, reconnects 0, api rss 228 MB
+t+1m45s published 2100, deliveries 9224, open 5000, reconnects 0, api rss 246 MB
+t+2m0s published 2400, deliveries 10592, open 5000, reconnects 0, api rss 224 MB
+t+2m15s published 2700, deliveries 11896, open 5000, reconnects 0, api rss 197 MB
+t+2m30s published 3000, deliveries 13256, open 5000, reconnects 0, api rss 175 MB
+t+2m45s published 3300, deliveries 14752, open 5000, reconnects 0, api rss 247 MB
+t+3m0s published 3600, deliveries 16016, open 5000, reconnects 0, api rss 321 MB
+t+3m15s published 3900, deliveries 17384, open 5000, reconnects 0, api rss 227 MB
+t+3m30s published 4200, deliveries 18808, open 5000, reconnects 0, api rss 266 MB
+t+3m45s published 4500, deliveries 20048, open 5000, reconnects 0, api rss 262 MB
+t+4m0s published 4800, deliveries 21408, open 5000, reconnects 0, api rss 232 MB
+t+4m15s published 5100, deliveries 22744, open 5000, reconnects 0, api rss 227 MB
+t+4m30s published 5400, deliveries 24096, open 5000, reconnects 0, api rss 196 MB
+t+4m45s published 5700, deliveries 25400, open 5000, reconnects 0, api rss 238 MB
+t+5m0s published 6000, deliveries 26632, open 5000, reconnects 0, api rss 325 MB
+t+5m15s published 6300, deliveries 27832, open 5000, reconnects 0, api rss 294 MB
+t+5m30s published 6600, deliveries 29192, open 5000, reconnects 0, api rss 241 MB
+t+5m45s published 6900, deliveries 30568, open 5000, reconnects 0, api rss 248 MB
+t+6m0s published 7200, deliveries 31832, open 5000, reconnects 0, api rss 260 MB
+t+6m15s published 7500, deliveries 33024, open 5000, reconnects 0, api rss 276 MB
+t+6m30s published 7800, deliveries 34392, open 5000, reconnects 0, api rss 277 MB
+t+6m45s published 8100, deliveries 35712, open 5000, reconnects 0, api rss 282 MB
+t+7m0s published 8400, deliveries 37000, open 5000, reconnects 0, api rss 335 MB
+t+7m15s published 8700, deliveries 38352, open 5000, reconnects 0, api rss 332 MB
+t+7m30s published 9000, deliveries 39584, open 5000, reconnects 0, api rss 314 MB
+t+7m45s published 9300, deliveries 40944, open 5000, reconnects 0, api rss 326 MB
+
+== sse_fanout
+streams 5000 (business 2000, customer 3000), ready 5000, reconnects 0, lost 0
+events 9600 at 20/s, deliveries 42152 of 42152 expected (missing 0)
+delivery ms p50=3.6 p95=6.0 p99=8.4 max=70.5  PASS (p95 < 2000)
+api rss MB before 83, open 204, end 271 (growth 32.7%)  FAIL (growth < 10%, no stream lost)
+sse_fanout: FAIL
+exit status 1
+make[2]: *** [load-sse] Error 1
+make load: step load-sse failed (exit 2)
+make[1]: *** [load] Error 2

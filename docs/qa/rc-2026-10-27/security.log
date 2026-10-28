@@ -1,0 +1,575 @@
+==> security: security-gitleaks
+2:49PM INF 802 commits scanned.
+2:49PM INF scanned ~28072570 bytes (28.07 MB) in 5.05s
+2:49PM INF no leaks found
+ci: gitleaks: history clean
+==> security: security-trivy
+ci: trivy fs: gate on HIGH, CRITICAL with a fix available
+2026-10-27T09:19:07Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-27T09:19:07Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-27T09:19:07Z	INFO	[checks-client] Using existing checks from cache	path="/cache/policy/content"
+2026-10-27T09:19:07Z	INFO	[secret] Secret scanning is enabled
+2026-10-27T09:19:07Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln,misconfig' to disable secret scanning
+2026-10-27T09:19:07Z	INFO	[secret] Please see https://trivy.dev/docs/v0.75/guide/scanner/secret#recommendation for faster secret detection
+2026-10-27T09:19:22Z	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="unable to find path to Python executable"
+2026-10-27T09:19:29Z	INFO	[pnpm] Run "pnpm install" to collect the license information of packages	dir="node_modules"
+2026-10-27T09:19:31Z	INFO	[terraform scanner] Scanning root module	file_path="infra/cloudflare"
+2026-10-27T09:19:31Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="account_id, zone_id"
+2026-10-27T09:19:31Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/account"
+2026-10-27T09:19:31Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="budget_alert_emails"
+2026-10-27T09:19:31Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/prod"
+2026-10-27T09:19:31Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="ecr_repository_arn, ecr_repository_url, github_oidc_provider_arn, initial_image_tag"
+2026-10-27T09:19:31Z	INFO	[terraform scanner] Scanning root module	file_path="infra/terraform/envs/staging"
+2026-10-27T09:19:31Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="ecr_repository_arn, ecr_repository_url"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-ec2-no-public-egress-sgr" range="infra/terraform/modules/stack/main.tf:59"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/stack/deploy.tf:37-44"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/edge/main.tf:138-145"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-sns-topic-encryption-use-cmk" range="infra/terraform/modules/stack/alarms.tf:8"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-sns-topic-encryption-use-cmk" range="infra/terraform/modules/stack/alarms.tf:8"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-ec2-no-public-egress-sgr" range="infra/terraform/modules/stack/main.tf:59"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/stack/deploy.tf:37-44"
+2026-10-27T09:19:31Z	INFO	[terraform executor] Ignore finding	rule="aws-s3-encryption-customer-key" range="infra/terraform/modules/edge/main.tf:138-145"
+2026-10-27T09:19:31Z	INFO	Suppressing dependencies for development and testing. To display them, try the '--include-dev-deps' flag.
+2026-10-27T09:19:31Z	INFO	Number of language-specific files	num=8
+2026-10-27T09:19:31Z	INFO	[gomod] Detecting vulnerabilities...
+2026-10-27T09:19:31Z	INFO	[pip] Detecting vulnerabilities...
+2026-10-27T09:19:31Z	INFO	[pnpm] Detecting vulnerabilities...
+2026-10-27T09:19:31Z	INFO	Detected config files	num=14
+2026-10-27T09:19:31Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.75/guide/scanner/vulnerability#severity-selection for details.
+2026-10-27T09:19:31Z	INFO	Some vulnerabilities have been ignored/suppressed. Use the "--show-suppressed" flag to display them.
+
+Report Summary
+
+┌──────────────────────────────────────────┬────────────┬─────────────────┬─────────┬───────────────────┐
+│                  Target                  │    Type    │ Vulnerabilities │ Secrets │ Misconfigurations │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/go.mod                           │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/tools/go.mod                     │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ e2e/contract/requirements.txt            │    pip     │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ e2e/load/ssefanout/go.mod                │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ e2e/mocks/go.mod                         │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ pnpm-lock.yaml                           │    pnpm    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ scripts/ci/wflint/go.mod                 │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ scripts/envtool/go.mod                   │   gomod    │        0        │    -    │         -         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ backend/Dockerfile                       │ dockerfile │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/cloudflare                         │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/account             │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/prod                │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/envs/staging             │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/database/main.tf │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/ecr/main.tf      │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/edge/main.tf     │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/network/main.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/secrets/main.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/alarms.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/deploy.tf  │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/main.tf    │ terraform  │        -        │    -    │         0         │
+├──────────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ infra/terraform/modules/stack/ops.tf     │ terraform  │        -        │    -    │         0         │
+└──────────────────────────────────────────┴────────────┴─────────────────┴─────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+==> security: security-checkov
+ci: checkov -d infra
+terraform scan results:
+
+Passed checks: 473, Failed checks: 0, Skipped checks: 100
+
+
+==> security: security-zap
+ci: zap baseline: https://api.todayz.localhost
+Using the Automation Framework
+Total of 3 URLs
+PASS: Vulnerable JS Library (Powered by Retire.js) [10003]
+PASS: In Page Banner Information Leak [10009]
+PASS: Cookie No HttpOnly Flag [10010]
+PASS: Cookie Without Secure Flag [10011]
+PASS: Re-examine Cache-control Directives [10015]
+PASS: Cross-Domain JavaScript Source File Inclusion [10017]
+PASS: Content-Type Header Missing [10019]
+PASS: Anti-clickjacking Header [10020]
+PASS: X-Content-Type-Options Header Missing [10021]
+PASS: Information Disclosure - Debug Error Messages [10023]
+PASS: Information Disclosure - Sensitive Information in URL [10024]
+PASS: Information Disclosure - Sensitive Information in HTTP Referrer Header [10025]
+PASS: Information Disclosure - Suspicious Comments [10027]
+PASS: Off-site Redirect [10028]
+PASS: Cookie Poisoning [10029]
+PASS: User Controllable Charset [10030]
+PASS: User Controllable HTML Element Attribute (Potential XSS) [10031]
+PASS: Viewstate [10032]
+PASS: Directory Browsing [10033]
+PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]
+PASS: HTTP Server Response Header [10036]
+PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]
+PASS: Content Security Policy (CSP) Header Not Set [10038]
+PASS: X-Backend-Server Header Information Leak [10039]
+PASS: Secure Pages Include Mixed Content [10040]
+PASS: HTTP to HTTPS Insecure Transition in Form Post [10041]
+PASS: HTTPS to HTTP Insecure Transition in Form Post [10042]
+PASS: User Controllable JavaScript Event (XSS) [10043]
+PASS: Big Redirect Detected (Potential Sensitive Information Leak) [10044]
+PASS: Retrieved from Cache [10050]
+PASS: X-ChromeLogger-Data (XCOLD) Header Information Leak [10052]
+PASS: Cookie without SameSite Attribute [10054]
+PASS: CSP [10055]
+PASS: X-Debug-Token Information Leak [10056]
+PASS: Username Hash Found [10057]
+PASS: X-AspNet-Version Response Header [10061]
+PASS: PII Disclosure [10062]
+PASS: Timestamp Disclosure [10096]
+PASS: Hash Disclosure [10097]
+PASS: Cross-Domain Misconfiguration [10098]
+PASS: Weak Authentication Method [10105]
+PASS: Reverse Tabnabbing [10108]
+PASS: Modern Web Application [10109]
+PASS: Authentication Request Identified [10111]
+PASS: Session Management Response Identified [10112]
+PASS: Verification Request Identified [10113]
+PASS: Script Served From Malicious Domain (polyfill) [10115]
+PASS: ZAP is Out of Date [10116]
+PASS: Absence of Anti-CSRF Tokens [10202]
+PASS: Private IP Disclosure [2]
+PASS: Session ID in URL Rewrite [3]
+PASS: Script Passive Scan Rules [50001]
+PASS: Stats Passive Scan Rule [50003]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Sub Resource Integrity Attribute Missing [90003]
+PASS: Charset Mismatch [90011]
+PASS: Application Error Disclosure [90022]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+WARN-NEW: Strict-Transport-Security Header Not Set [10035] x 1 
+	https://api.todayz.localhost/robots.txt (404 Not Found)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 1	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 60
+Automation plan warnings:
+	Job spider error accessing URL https://api.todayz.localhost status code returned : 404 expected 200
+ci: zap: https://api.todayz.localhost has warnings; see ci-reports/zap/api_todayz_localhost.html
+ci: zap baseline: https://app.todayz.localhost
+Using the Automation Framework
+Total of 11 URLs
+PASS: Vulnerable JS Library (Powered by Retire.js) [10003]
+PASS: In Page Banner Information Leak [10009]
+PASS: Cookie No HttpOnly Flag [10010]
+PASS: Cookie Without Secure Flag [10011]
+PASS: Cross-Domain JavaScript Source File Inclusion [10017]
+PASS: Content-Type Header Missing [10019]
+PASS: Information Disclosure - Debug Error Messages [10023]
+PASS: Information Disclosure - Sensitive Information in URL [10024]
+PASS: Information Disclosure - Sensitive Information in HTTP Referrer Header [10025]
+PASS: Off-site Redirect [10028]
+PASS: Cookie Poisoning [10029]
+PASS: User Controllable Charset [10030]
+PASS: User Controllable HTML Element Attribute (Potential XSS) [10031]
+PASS: Viewstate [10032]
+PASS: Directory Browsing [10033]
+PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]
+PASS: HTTP Server Response Header [10036]
+PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]
+PASS: X-Backend-Server Header Information Leak [10039]
+PASS: Secure Pages Include Mixed Content [10040]
+PASS: HTTP to HTTPS Insecure Transition in Form Post [10041]
+PASS: HTTPS to HTTP Insecure Transition in Form Post [10042]
+PASS: User Controllable JavaScript Event (XSS) [10043]
+PASS: Big Redirect Detected (Potential Sensitive Information Leak) [10044]
+PASS: Retrieved from Cache [10050]
+PASS: X-ChromeLogger-Data (XCOLD) Header Information Leak [10052]
+PASS: Cookie without SameSite Attribute [10054]
+PASS: CSP [10055]
+PASS: X-Debug-Token Information Leak [10056]
+PASS: Username Hash Found [10057]
+PASS: X-AspNet-Version Response Header [10061]
+PASS: PII Disclosure [10062]
+PASS: Timestamp Disclosure [10096]
+PASS: Hash Disclosure [10097]
+PASS: Cross-Domain Misconfiguration [10098]
+PASS: Weak Authentication Method [10105]
+PASS: Reverse Tabnabbing [10108]
+PASS: Authentication Request Identified [10111]
+PASS: Session Management Response Identified [10112]
+PASS: Verification Request Identified [10113]
+PASS: Script Served From Malicious Domain (polyfill) [10115]
+PASS: ZAP is Out of Date [10116]
+PASS: Absence of Anti-CSRF Tokens [10202]
+PASS: Private IP Disclosure [2]
+PASS: Session ID in URL Rewrite [3]
+PASS: Script Passive Scan Rules [50001]
+PASS: Stats Passive Scan Rule [50003]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Sub Resource Integrity Attribute Missing [90003]
+PASS: Charset Mismatch [90011]
+PASS: Application Error Disclosure [90022]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+WARN-NEW: Re-examine Cache-control Directives [10015] x 3 
+	https://app.todayz.localhost (200 OK)
+	https://app.todayz.localhost/robots.txt (200 OK)
+	https://app.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Missing Anti-clickjacking Header [10020] x 1 
+	https://app.todayz.localhost (200 OK)
+WARN-NEW: X-Content-Type-Options Header Missing [10021] x 5 
+	https://app.todayz.localhost (200 OK)
+	https://app.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://app.todayz.localhost/icons/favicon-32.png (200 OK)
+	https://app.todayz.localhost/robots.txt (200 OK)
+	https://app.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Information Disclosure - Suspicious Comments [10027] x 1 
+	https://app.todayz.localhost/@vite/client (200 OK)
+WARN-NEW: Strict-Transport-Security Header Not Set [10035] x 5 
+	https://app.todayz.localhost (200 OK)
+	https://app.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://app.todayz.localhost/icons/favicon-32.png (200 OK)
+	https://app.todayz.localhost/robots.txt (200 OK)
+	https://app.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 3 
+	https://app.todayz.localhost (200 OK)
+	https://app.todayz.localhost/robots.txt (200 OK)
+	https://app.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Modern Web Application [10109] x 3 
+	https://app.todayz.localhost (200 OK)
+	https://app.todayz.localhost/robots.txt (200 OK)
+	https://app.todayz.localhost/sitemap.xml (200 OK)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 7	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 54
+ci: zap: https://app.todayz.localhost has warnings; see ci-reports/zap/app_todayz_localhost.html
+ci: zap baseline: https://business.todayz.localhost
+Using the Automation Framework
+Total of 11 URLs
+PASS: Vulnerable JS Library (Powered by Retire.js) [10003]
+PASS: In Page Banner Information Leak [10009]
+PASS: Cookie No HttpOnly Flag [10010]
+PASS: Cookie Without Secure Flag [10011]
+PASS: Cross-Domain JavaScript Source File Inclusion [10017]
+PASS: Content-Type Header Missing [10019]
+PASS: Information Disclosure - Debug Error Messages [10023]
+PASS: Information Disclosure - Sensitive Information in URL [10024]
+PASS: Information Disclosure - Sensitive Information in HTTP Referrer Header [10025]
+PASS: Off-site Redirect [10028]
+PASS: Cookie Poisoning [10029]
+PASS: User Controllable Charset [10030]
+PASS: User Controllable HTML Element Attribute (Potential XSS) [10031]
+PASS: Viewstate [10032]
+PASS: Directory Browsing [10033]
+PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]
+PASS: HTTP Server Response Header [10036]
+PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]
+PASS: X-Backend-Server Header Information Leak [10039]
+PASS: Secure Pages Include Mixed Content [10040]
+PASS: HTTP to HTTPS Insecure Transition in Form Post [10041]
+PASS: HTTPS to HTTP Insecure Transition in Form Post [10042]
+PASS: User Controllable JavaScript Event (XSS) [10043]
+PASS: Big Redirect Detected (Potential Sensitive Information Leak) [10044]
+PASS: Retrieved from Cache [10050]
+PASS: X-ChromeLogger-Data (XCOLD) Header Information Leak [10052]
+PASS: Cookie without SameSite Attribute [10054]
+PASS: CSP [10055]
+PASS: X-Debug-Token Information Leak [10056]
+PASS: Username Hash Found [10057]
+PASS: X-AspNet-Version Response Header [10061]
+PASS: PII Disclosure [10062]
+PASS: Timestamp Disclosure [10096]
+PASS: Hash Disclosure [10097]
+PASS: Cross-Domain Misconfiguration [10098]
+PASS: Weak Authentication Method [10105]
+PASS: Reverse Tabnabbing [10108]
+PASS: Authentication Request Identified [10111]
+PASS: Session Management Response Identified [10112]
+PASS: Verification Request Identified [10113]
+PASS: Script Served From Malicious Domain (polyfill) [10115]
+PASS: ZAP is Out of Date [10116]
+PASS: Absence of Anti-CSRF Tokens [10202]
+PASS: Private IP Disclosure [2]
+PASS: Session ID in URL Rewrite [3]
+PASS: Script Passive Scan Rules [50001]
+PASS: Stats Passive Scan Rule [50003]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Sub Resource Integrity Attribute Missing [90003]
+PASS: Charset Mismatch [90011]
+PASS: Application Error Disclosure [90022]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+WARN-NEW: Re-examine Cache-control Directives [10015] x 3 
+	https://business.todayz.localhost (200 OK)
+	https://business.todayz.localhost/robots.txt (200 OK)
+	https://business.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Missing Anti-clickjacking Header [10020] x 1 
+	https://business.todayz.localhost (200 OK)
+WARN-NEW: X-Content-Type-Options Header Missing [10021] x 5 
+	https://business.todayz.localhost (200 OK)
+	https://business.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://business.todayz.localhost/icons/favicon-48.png (200 OK)
+	https://business.todayz.localhost/robots.txt (200 OK)
+	https://business.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Information Disclosure - Suspicious Comments [10027] x 2 
+	https://business.todayz.localhost/@vite/client (200 OK)
+	https://business.todayz.localhost/src/main.tsx?t=1793090118120 (200 OK)
+WARN-NEW: Strict-Transport-Security Header Not Set [10035] x 5 
+	https://business.todayz.localhost (200 OK)
+	https://business.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://business.todayz.localhost/icons/favicon-32.png (200 OK)
+	https://business.todayz.localhost/robots.txt (200 OK)
+	https://business.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 3 
+	https://business.todayz.localhost (200 OK)
+	https://business.todayz.localhost/robots.txt (200 OK)
+	https://business.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Modern Web Application [10109] x 3 
+	https://business.todayz.localhost (200 OK)
+	https://business.todayz.localhost/robots.txt (200 OK)
+	https://business.todayz.localhost/sitemap.xml (200 OK)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 7	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 54
+ci: zap: https://business.todayz.localhost has warnings; see ci-reports/zap/business_todayz_localhost.html
+ci: zap baseline: https://admin.todayz.localhost
+Using the Automation Framework
+Total of 11 URLs
+PASS: Vulnerable JS Library (Powered by Retire.js) [10003]
+PASS: In Page Banner Information Leak [10009]
+PASS: Cookie No HttpOnly Flag [10010]
+PASS: Cookie Without Secure Flag [10011]
+PASS: Cross-Domain JavaScript Source File Inclusion [10017]
+PASS: Content-Type Header Missing [10019]
+PASS: Information Disclosure - Debug Error Messages [10023]
+PASS: Information Disclosure - Sensitive Information in URL [10024]
+PASS: Information Disclosure - Sensitive Information in HTTP Referrer Header [10025]
+PASS: Off-site Redirect [10028]
+PASS: Cookie Poisoning [10029]
+PASS: User Controllable Charset [10030]
+PASS: User Controllable HTML Element Attribute (Potential XSS) [10031]
+PASS: Viewstate [10032]
+PASS: Directory Browsing [10033]
+PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]
+PASS: HTTP Server Response Header [10036]
+PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]
+PASS: X-Backend-Server Header Information Leak [10039]
+PASS: Secure Pages Include Mixed Content [10040]
+PASS: HTTP to HTTPS Insecure Transition in Form Post [10041]
+PASS: HTTPS to HTTP Insecure Transition in Form Post [10042]
+PASS: User Controllable JavaScript Event (XSS) [10043]
+PASS: Big Redirect Detected (Potential Sensitive Information Leak) [10044]
+PASS: Retrieved from Cache [10050]
+PASS: X-ChromeLogger-Data (XCOLD) Header Information Leak [10052]
+PASS: Cookie without SameSite Attribute [10054]
+PASS: CSP [10055]
+PASS: X-Debug-Token Information Leak [10056]
+PASS: Username Hash Found [10057]
+PASS: X-AspNet-Version Response Header [10061]
+PASS: PII Disclosure [10062]
+PASS: Timestamp Disclosure [10096]
+PASS: Hash Disclosure [10097]
+PASS: Cross-Domain Misconfiguration [10098]
+PASS: Weak Authentication Method [10105]
+PASS: Reverse Tabnabbing [10108]
+PASS: Authentication Request Identified [10111]
+PASS: Session Management Response Identified [10112]
+PASS: Verification Request Identified [10113]
+PASS: Script Served From Malicious Domain (polyfill) [10115]
+PASS: ZAP is Out of Date [10116]
+PASS: Absence of Anti-CSRF Tokens [10202]
+PASS: Private IP Disclosure [2]
+PASS: Session ID in URL Rewrite [3]
+PASS: Script Passive Scan Rules [50001]
+PASS: Stats Passive Scan Rule [50003]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Sub Resource Integrity Attribute Missing [90003]
+PASS: Charset Mismatch [90011]
+PASS: Application Error Disclosure [90022]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+WARN-NEW: Re-examine Cache-control Directives [10015] x 3 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Missing Anti-clickjacking Header [10020] x 3 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: X-Content-Type-Options Header Missing [10021] x 5 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://admin.todayz.localhost/icons/favicon-48.png (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Information Disclosure - Suspicious Comments [10027] x 1 
+	https://admin.todayz.localhost/@vite/client (200 OK)
+WARN-NEW: Strict-Transport-Security Header Not Set [10035] x 5 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/icons/apple-touch-icon.png (200 OK)
+	https://admin.todayz.localhost/icons/favicon-48.png (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 3 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Modern Web Application [10109] x 3 
+	https://admin.todayz.localhost (200 OK)
+	https://admin.todayz.localhost/robots.txt (200 OK)
+	https://admin.todayz.localhost/sitemap.xml (200 OK)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 7	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 54
+ci: zap: https://admin.todayz.localhost has warnings; see ci-reports/zap/admin_todayz_localhost.html
+ci: zap baseline: https://todayz.localhost
+Using the Automation Framework
+Total of 112 URLs
+PASS: Vulnerable JS Library (Powered by Retire.js) [10003]
+PASS: In Page Banner Information Leak [10009]
+PASS: Cookie No HttpOnly Flag [10010]
+PASS: Cookie Without Secure Flag [10011]
+PASS: Content-Type Header Missing [10019]
+PASS: Information Disclosure - Debug Error Messages [10023]
+PASS: Information Disclosure - Sensitive Information in URL [10024]
+PASS: Information Disclosure - Sensitive Information in HTTP Referrer Header [10025]
+PASS: Off-site Redirect [10028]
+PASS: Cookie Poisoning [10029]
+PASS: User Controllable Charset [10030]
+PASS: User Controllable HTML Element Attribute (Potential XSS) [10031]
+PASS: Viewstate [10032]
+PASS: Directory Browsing [10033]
+PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]
+PASS: HTTP Server Response Header [10036]
+PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]
+PASS: X-Backend-Server Header Information Leak [10039]
+PASS: Secure Pages Include Mixed Content [10040]
+PASS: HTTP to HTTPS Insecure Transition in Form Post [10041]
+PASS: HTTPS to HTTP Insecure Transition in Form Post [10042]
+PASS: User Controllable JavaScript Event (XSS) [10043]
+PASS: Big Redirect Detected (Potential Sensitive Information Leak) [10044]
+PASS: Retrieved from Cache [10050]
+PASS: X-ChromeLogger-Data (XCOLD) Header Information Leak [10052]
+PASS: Cookie without SameSite Attribute [10054]
+PASS: CSP [10055]
+PASS: X-Debug-Token Information Leak [10056]
+PASS: Username Hash Found [10057]
+PASS: X-AspNet-Version Response Header [10061]
+PASS: PII Disclosure [10062]
+PASS: Hash Disclosure [10097]
+PASS: Cross-Domain Misconfiguration [10098]
+PASS: Weak Authentication Method [10105]
+PASS: Reverse Tabnabbing [10108]
+PASS: Authentication Request Identified [10111]
+PASS: Session Management Response Identified [10112]
+PASS: Verification Request Identified [10113]
+PASS: Script Served From Malicious Domain (polyfill) [10115]
+PASS: ZAP is Out of Date [10116]
+PASS: Private IP Disclosure [2]
+PASS: Session ID in URL Rewrite [3]
+PASS: Script Passive Scan Rules [50001]
+PASS: Stats Passive Scan Rule [50003]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Charset Mismatch [90011]
+PASS: Application Error Disclosure [90022]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+WARN-NEW: Re-examine Cache-control Directives [10015] x 4 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/pricing/ (200 OK)
+	https://todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Cross-Domain JavaScript Source File Inclusion [10017] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/for-retailers/ (200 OK)
+	https://todayz.localhost/hi/ (200 OK)
+WARN-NEW: Missing Anti-clickjacking Header [10020] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/how-it-works/ (200 OK)
+	https://todayz.localhost/pricing/ (200 OK)
+WARN-NEW: X-Content-Type-Options Header Missing [10021] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/pricing/ (200 OK)
+	https://todayz.localhost/robots.txt (200 OK)
+	https://todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Information Disclosure - Suspicious Comments [10027] x 1 
+	https://todayz.localhost/@vite/client (200 OK)
+WARN-NEW: Strict-Transport-Security Header Not Set [10035] x 4 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/pricing/ (200 OK)
+	https://todayz.localhost/sitemap.xml (200 OK)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/how-it-works/ (200 OK)
+	https://todayz.localhost/pricing/ (200 OK)
+WARN-NEW: Timestamp Disclosure - Unix [10096] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/hi/ (200 OK)
+	https://todayz.localhost/kn/ (200 OK)
+	https://todayz.localhost/te/ (200 OK)
+WARN-NEW: Modern Web Application [10109] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/for-retailers/ (200 OK)
+	https://todayz.localhost/hi/ (200 OK)
+WARN-NEW: Absence of Anti-CSRF Tokens [10202] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/for-retailers/ (200 OK)
+	https://todayz.localhost/hi/ (200 OK)
+WARN-NEW: Sub Resource Integrity Attribute Missing [90003] x 5 
+	https://todayz.localhost (200 OK)
+	https://todayz.localhost/ (200 OK)
+	https://todayz.localhost/contact/ (200 OK)
+	https://todayz.localhost/for-retailers/ (200 OK)
+	https://todayz.localhost/hi/ (200 OK)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 11	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 50
+ci: zap: https://todayz.localhost has warnings; see ci-reports/zap/todayz_localhost.html
+==> security: security-abuse
+ci: abuse: e2e/security/abuse.stack.test.mjs
+▶ API headers through Caddy
+  ✔ every API answer carries the deny-all CSP, nosniff and no-store (slot 2) (61.177083ms)
+  ✔ a foreign origin gets no CORS grant on a preflight (1.142542ms)
+  ✔ a missing or forged bearer is 401 (1.53375ms)
+✔ API headers through Caddy (64.663625ms)
+▶ refresh CSRF through Caddy (D-37)
+  ✔ foreign origin: 403 and no Set-Cookie (10.260459ms)
+  ✔ another app: 403 and no Set-Cookie (1.004375ms)
+  ✔ no origin: 403 and no Set-Cookie (0.674542ms)
+  ✔ no X-TZ-Client: 403 and no Set-Cookie (0.744917ms)
+  ✔ the right origin with an unknown cookie is 401 (1.2675ms)
+✔ refresh CSRF through Caddy (D-37) (14.152709ms)
+▶ OTP limits on the stack (01 §2)
+  ✔ a second send inside the resend gap is 429 with Retry-After (27.712084ms)
+  ✔ five wrong codes lock the request: the right code is refused after (19.414667ms)
+✔ OTP limits on the stack (01 §2) (47.230583ms)
+ℹ tests 10
+ℹ suites 3
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 203.455792

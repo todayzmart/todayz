@@ -1,0 +1,430 @@
+==> gen: gen-backend
+problemgen: 76 codes -> gen/problems
+==> gen: gen-contract
+apigen root: 339 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 169ms.
+apigen check: 336 method+path pairs under /v1 (admin 141, auth 7, biz 107, discover 13, health 3, me 56, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 339 operations -> src/gen (10 prefixes), 76 problem codes, src/mocks/handlers.gen.ts
+==> gen: gen-events
+==> gen: gen-frontend
+
+> @todayz/tokens@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/tokens
+> node scripts/gen.mjs
+
+tokens: 121 vars, 10 font families, icons -> shared/tokens/generated
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5434 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+Scope: 3 of 17 workspace projects
+admin gen$ tsr generate
+customer gen$ tsr generate
+business gen$ tsr generate
+admin gen: (node:1464) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+admin gen: (Use `node --trace-warnings ...` to show where the warning was created)
+business gen: (node:1490) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+business gen: (Use `node --trace-warnings ...` to show where the warning was created)
+customer gen: (node:1477) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+customer gen: (Use `node --trace-warnings ...` to show where the warning was created)
+admin gen: Done
+customer gen: Done
+business gen: Done
+
+> @todayz/site@0.0.0 gen /Users/sairahul/Documents/projects/todayz/site
+> ASTRO_TELEMETRY_DISABLED=1 astro sync
+
+13:54:35 [types] Generated 42ms
+==> e2e: e2e-stack
+ok: make dev (run 1)
+ok: make dev (run 2)
+ok: second make dev reloaded Caddy instead of starting another
+ok: health.sh
+ok: https://todayz.localhost/_health serves the health page
+ok: /_health serves only the page and its CSS (no other .cache/dev file, no ..)
+ok: https://todayz.localhost answers (200)
+ok: https://app.todayz.localhost answers (200)
+ok: https://business.todayz.localhost answers (200)
+ok: https://admin.todayz.localhost answers (200)
+ok: https://api.todayz.localhost answers (404)
+ok: https://mocks.todayz.localhost answers (200)
+ok: https://grafana.todayz.localhost answers (200)
+ok: https://s3.todayz.localhost answers (403)
+ok: https://img.todayz.localhost answers (404)
+ok: https://tiles.todayz.localhost answers (404)
+ok: grafana through Caddy
+ok: http redirects to https
+ok: a client on the LAN address (192.168.1.2) is refused on all 10 HTTPS hosts and on :80
+ok: Grafana redirects other Host names to grafana.todayz.localhost (301)
+ok: anonymous Grafana user is not Admin (settings, datasource create, org users refused)
+ok: cross-origin POST to Grafana is refused (CSRF, 403)
+ok: same-origin Editor request works (folder created)
+ok: todayz_app can read and write todayz_owner's table (sequence included)
+ok: todayz_app cannot CREATE TABLE
+ok: todayz_app cannot DROP TABLE
+ok: todayz_app is not a superuser
+ok: PUT through https://s3.todayz.localhost (SigV4 over Caddy)
+ok: image reads back through https://img.todayz.localhost
+ok: img. 200 is cacheable
+ok: img. errors are not marked cacheable
+ok: img. refuses writes (405)
+ok: img. and tiles. do not list their buckets
+ok: anonymous policy allows GetObject only (no ListBucket)
+ok: private bucket refuses anonymous reads
+ok: img./tiles. refuse 9 path tricks with 400
+ok: a plain object still reads after the trick filters
+ok: ranged GET on bengaluru.pmtiles -> 206, 127 bytes, PMTiles header
+ok: CORS preflight for the customer app
+ok: foreign origin: 206 without CORS headers, Vary: Origin set
+ok: CORS exposes Content-Range; one Vary header
+ok: SC-PL-03 on the captured logs
+ok: no .env.local value in make dev output or process logs
+ok: make stop (stack stopped)
+
+dev-smoke: all checks pass (logs in .cache/dev/smoke/)
+==> e2e: e2e-journeys
+==> dev: dev-stack
+ Container todayz-lgtm-1 Starting 
+ Container todayz-postgres-1 Starting 
+ Container todayz-minio-1 Starting 
+ Container todayz-lgtm-1 Started 
+ Container todayz-postgres-1 Started 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Started 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Starting 
+ Container todayz-postgres-exporter-1 Started 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Waiting 
+ Container todayz-lgtm-1 Waiting 
+ Container todayz-postgres-exporter-1 Waiting 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-minio-1 Healthy 
+ Container todayz-postgres-exporter-1 Healthy 
+ Container todayz-lgtm-1 Healthy 
+stack: containers healthy (postgres minio lgtm postgres-exporter)
+==> dev: dev-buckets
+buckets ok: images and tiles (anonymous GetObject, no listing), private (no anonymous access)
+tiles: bengaluru.pmtiles already in bucket
+tiles: chennai.pmtiles already in bucket
+tiles: hyderabad.pmtiles already in bucket
+==> dev: dev-caddy
+stack: caddy started on :443 and :80 (*.todayz.localhost)
+==> dev: dev-backend
+problemgen: 76 codes -> gen/problems
+apigen root: 339 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 154ms.
+apigen check: 336 method+path pairs under /v1 (admin 141, auth 7, biz 107, discover 13, health 3, me 56, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 339 operations -> src/gen (10 prefixes), 76 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-27T08:25:59.234Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:25:59.250Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":0,"head":49902}
+proc: started api (pid 4156, port 8180); log .cache/dev/api.log
+proc: api healthy (http://127.0.0.1:8180/healthz)
+proc: started worker (pid 4231, port 8181); log .cache/dev/worker.log
+proc: worker healthy (http://127.0.0.1:8181/healthz)
+==> dev: dev-mocks
+proc: started mocks (pid 4320, port 4010); log .cache/dev/mocks.log
+proc: mocks healthy (http://127.0.0.1:4010/healthz)
+==> dev: dev-i18n
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5434 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+==> dev: dev-frontend
+proc: started customer (pid 4419, port 5301); log .cache/dev/customer.log
+proc: customer healthy (http://127.0.0.1:5301/)
+proc: started business (pid 4514, port 5302); log .cache/dev/business.log
+proc: business healthy (http://127.0.0.1:5302/)
+proc: started admin (pid 4609, port 5303); log .cache/dev/admin.log
+proc: admin healthy (http://127.0.0.1:5303/)
+proc: started site (pid 4704, port 5304); log .cache/dev/site.log
+proc: site healthy (http://127.0.0.1:5304/)
+==> dev: dev-health
+GROUP      CHECK                              STATE DETAIL
+postgres   postgres :5433                     ok    accepting connections
+postgres   databases                          ok    todayz, todayz_test (owner todayz_owner)
+postgres   extensions                         ok    PostGIS 3.4.3, pg_trgm, unaccent, pgcrypto, pg_stat_statements
+postgres   pg_stat_statements                 ok    preloaded and collecting
+postgres   roles                              ok    todayz_owner, todayz_app, grafana_ro, todayz_exporter (none superuser)
+minio      minio :9100                        ok    live
+minio      minio console :9101                ok    HTTP 200
+minio      bucket images                      ok    exists, anonymous read, no listing
+minio      bucket tiles                       ok    exists, anonymous read, no listing
+minio      bucket private                     ok    exists, no anonymous access
+minio      tiles uploaded                     ok    3 archive(s) in the tiles bucket
+lgtm       grafana :3300                      ok    api/health ok, version 13.2.3
+lgtm       grafana postgres datasource        ok    grafana_ro connects (read-only)
+lgtm       otlp http :4318                    ok    accepts traces
+lgtm       otlp grpc :4317                    ok    listening
+lgtm       postgres_exporter :9187            ok    pg_up 1
+lgtm       prometheus :9390                   ok    scrapes postgres-exporter
+caddy      caddy                              ok    running, local CA present
+caddy      http :80                           ok    redirects to https
+caddy      https://grafana.todayz.localhost   ok    /api/health -> 200
+caddy      https://s3.todayz.localhost        ok    /minio/health/live -> 200
+caddy      https://img.todayz.localhost       ok    /_health/probe.txt -> 200
+caddy      https://tiles.todayz.localhost     ok    /_health/probe.txt -> 206
+caddy      https://todayz.localhost           ok    /_health/bundle.css -> 200
+caddy      https://api.todayz.localhost       ok    -> api :8180 (404)
+caddy      https://app.todayz.localhost       ok    -> customer app :5301 (200)
+caddy      https://business.todayz.localhost  ok    -> business app :5302 (200)
+caddy      https://admin.todayz.localhost     ok    -> admin app :5303 (200)
+caddy      https://todayz.localhost           ok    -> site :5304 (200)
+caddy      https://mocks.todayz.localhost     ok    -> mocks :4010 (200)
+procs      api                                ok    http://127.0.0.1:8180/healthz -> 200
+procs      worker                             ok    http://127.0.0.1:8181/healthz -> 200
+procs      mocks                              ok    http://127.0.0.1:4010/healthz -> 200
+procs      customer                           ok    http://127.0.0.1:5301/ -> 200
+procs      business                           ok    http://127.0.0.1:5302/ -> 200
+procs      admin                              ok    http://127.0.0.1:5303/ -> 200
+procs      site                               ok    http://127.0.0.1:5304/ -> 200
+
+health: all required checks pass (page: https://todayz.localhost/_health)
+
+> @todayz/e2e-journeys@ journeys /Users/sairahul/Documents/projects/todayz/e2e/journeys
+> playwright test
+
+
+Running 39 tests using 1 worker
+
+(node:5039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 specs/01-e2e-02-referral-credits.spec.ts:8:1 › E2E-02 referral credits, ₹300 order using 30, cashback 13, wallet 83, credit account +30 −13 (5.8s)
+  ✓   2 specs/02-e2e-03-partial.spec.ts:7:1 › E2E-03 partial accept → customer confirms the new total → collected (995ms)
+  ✓   3 specs/02-e2e-03-partial.spec.ts:48:1 › E2E-03 shop side in the business app: Accept part → Send to customer (1.1s)
+  ✓   4 specs/03-e2e-06-bill-qr.spec.ts:8:1 › E2E-06 POS walk-in with bill QR credits (96ms)
+  ✓   5 specs/04-e2e-01-standee.spec.ts:21:1 › E2E-01 standee scan → search → pickup order → collect → review → store referral +30 (2.2s)
+  ✓   6 specs/05-e2e-10-review-hide.spec.ts:26:1 › E2E-10 admin hides a review → the public rating drops; restore brings it back (admin API) (204ms)
+  ✓   7 specs/05-e2e-10-review-hide.spec.ts:59:1 › E2E-10 the customer shop page (C-07) shows the rating (524ms)
+  ✓   8 specs/05-e2e-10-review-hide.spec.ts:80:1 › E2E-10 through A-12: support hides and restores a review on the Reviews screen; the public rating follows (1.3s)
+  ✓   9 specs/06-e2e-12-credit-cap.spec.ts:11:1 › E2E-12 before the change: 30 credits are used, 40 are refused with credit_max_exceeded (73ms)
+  ✓  10 specs/06-e2e-12-credit-cap.spec.ts:55:1 › E2E-12 super admin sets credit_max_per_order to 40 with step-up; checkout allows 40; audit entry visible (114ms)
+  ✓  11 specs/06-e2e-12-credit-cap.spec.ts:122:1 › E2E-12 through A-17: the super admin changes the cap on the settings screen; the history panel shows it (866ms)
+  ✓  12 specs/07-e2e-13-baskets.spec.ts:16:1 › E2E-13 a basket one shop has in full → Fill cart → order → pickup; a split basket → two orders (2.1s)
+  ✓  13 specs/07-e2e-13-baskets.spec.ts:70:1 › E2E-13 build a basket from search results (C-05 → Add to basket) (880ms)
+  ✓  14 specs/07-e2e-13-baskets.spec.ts:85:3 › E2E-13 build a basket from a shop page (C-07) (873ms)
+  ✓  15 specs/07-e2e-13-baskets.spec.ts:85:3 › E2E-13 build a basket from a product page (C-08) (821ms)
+  ✓  16 specs/08-e2e-15-language.spec.ts:50:1 › E2E-15 language switch mid-journey keeps the cart and finishes the order (1.6s)
+  ✓  17 specs/08-e2e-15-language.spec.ts:103:1 › E2E-15 the screens read in Hindi after the switch (1.2s)
+  ✓  18 specs/08-e2e-15-language.spec.ts:149:1 › E2E-15 Home reads in Telugu after the switch (796ms)
+  ✓  19 specs/09-e2e-16-offline.spec.ts:5:1 › E2E-16 offline customer sees the offline banner and keeps the page; it clears when back online (409ms)
+  ✓  20 specs/10-e2e-17-owner.spec.ts:5:1 › E2E-17 multi-store owner sees both shops and can open each one’s orders (375ms)
+  ✓  21 specs/11-e2e-18-cashier.spec.ts:6:1 › E2E-18 cashier permissions: hand over yes; cancel, settings and the other shop no (162ms)
+  ✓  22 specs/12-e2e-19-blocked.spec.ts:20:1 › E2E-19 blocked customer cannot sign in or order; unblock restores them (1.0m)
+  ✓  23 specs/13-e2e-20-suspended.spec.ts:8:1 › E2E-20 suspended shop: not in discover, no shop page, orders refused (49ms)
+  ✓  24 specs/14-e2e-05-delivery.spec.ts:11:3 › E2E-05 delivery › customer books delivery to a saved address (1.0s)
+  ✓  25 specs/14-e2e-05-delivery.spec.ts:52:3 › E2E-05 delivery › shop accepts, dispatches with a rider, and the order is delivered (2.5s)
+  ✓  26 specs/14-e2e-05-delivery.spec.ts:104:3 › E2E-05 delivery › the full phone shows to the shop only while out for delivery (100ms)
+  ✓  27 specs/15-cr-15-adjustments.spec.ts:18:1 › CR-15 +500 credits posts at once; +600 waits for a second finance admin, who approves it on A-09 (2.1s)
+  ✓  28 specs/16-e2e-08-field-onboarding.spec.ts:20:1 › E2E-08 field agent onboards a shop → owner confirms → admin verifies → live in search → first order (193ms)
+  ✓  29 specs/17-e2e-11-voice-update.spec.ts:23:1 › E2E-11 voice update: draft → edit → confirm → stock changes → customer sees the item confirmed (390ms)
+  ✓  30 specs/18-e2e-13-list-parse.spec.ts:21:1 › E2E-13 AI: a typed list becomes basket lines, confirmed line by line (51ms)
+  ✓  31 specs/19-e2e-14-bill-scan.spec.ts:32:1 › E2E-14 supplier bill scan → stock and batch → going to waste → flash offer → customer sees the offer (76ms)
+  ✓  32 specs/20-e2e-04-no-show.spec.ts:7:1 › E2E-04 three no-shows → strikes → the open-order limit and its banner (16.0s)
+  ✓  33 specs/21-e2e-07-offline-code.spec.ts:52:1 › E2E-07 offline counter code → synced within 12 h → linked, cashback posted (89ms)
+  ✓  34 specs/21-e2e-07-offline-code.spec.ts:67:1 › E2E-07 variant: the same code used again → sale kept, link failed, no credits (3.0s)
+  ✓  35 specs/21-e2e-07-offline-code.spec.ts:78:1 › E2E-07 variant: device clock off by more than 2 min at its last check → link failed, no credits (3.1s)
+  ✓  36 specs/21-e2e-07-offline-code.spec.ts:90:1 › E2E-07 variant: synced after 12 h → link failed, no credits (3.1s)
+  ✓  37 specs/21-e2e-07-offline-code.spec.ts:103:1 › E2E-07 the shop sees "Customer link failed" on the sale in the business app (777ms)
+  ✓  38 specs/22-e2e-21-asks.spec.ts:27:1 › E2E-21 stale result → ask nearby → shops reply → book AP’s Yes at ₹100 → collect with the code (221ms)
+  ✓  39 specs/30-e2e-09-statement-payout.spec.ts:23:1 › E2E-09 month-end statement → finance marks the payout paid → the business sees Paid with the UTR (4.8s)
+
+  39 passed (2.0m)
+==> e2e: e2e-contract
+==> dev: dev-stack
+ Container todayz-minio-1 Running 
+ Container todayz-lgtm-1 Running 
+ Container todayz-postgres-exporter-1 Running 
+ Container todayz-postgres-1 Running 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Waiting 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-minio-1 Waiting 
+ Container todayz-lgtm-1 Waiting 
+ Container todayz-minio-1 Healthy 
+ Container todayz-lgtm-1 Healthy 
+ Container todayz-postgres-1 Healthy 
+ Container todayz-postgres-exporter-1 Healthy 
+stack: containers healthy (postgres minio lgtm postgres-exporter)
+==> dev: dev-buckets
+buckets ok: images and tiles (anonymous GetObject, no listing), private (no anonymous access)
+tiles: bengaluru.pmtiles already in bucket
+tiles: chennai.pmtiles already in bucket
+tiles: hyderabad.pmtiles already in bucket
+==> dev: dev-caddy
+stack: caddy reloaded
+==> dev: dev-backend
+problemgen: 76 codes -> gen/problems
+apigen root: 339 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 150ms.
+apigen check: 336 method+path pairs under /v1 (admin 141, auth 7, biz 107, discover 13, health 3, me 56, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 339 operations -> src/gen (10 prefixes), 76 problem codes, src/mocks/handlers.gen.ts
+{"ts":"2026-10-27T08:28:32.856Z","level":"info","msg":"config: unset variables","service":"migrate","env":"local","version":"dev","names":["ANTHROPIC_API_KEY","APP_VERSION","AWS_REGION","GEOCODER_API_KEY","GEOCODER_PROVIDER","OTEL_EXPORTER_OTLP_HEADERS","R2_ACCOUNT_ID","SARVAM_API_KEY","SENTRY_DSN","SHARE_PREVIEW_KEY","TURNSTILE_SECRET_KEY","TURNSTILE_SITE_KEY","VAPID_PRIVATE_KEY","VAPID_PUBLIC_KEY","WHATSAPP_API_KEY","WHATSAPP_PROVIDER"]}
+{"ts":"2026-10-27T08:28:32.874Z","level":"info","msg":"migrated up","service":"migrate","env":"local","version":"dev","applied":0,"head":49902}
+proc: api already running (pid 4156)
+proc: worker already running (pid 4231)
+==> dev: dev-mocks
+proc: mocks already running (pid 4320)
+==> dev: dev-i18n
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5434 keys, locales en, hi, kn, te, ta + en-XA (with machine drafts) -> shared/i18n/compiled
+==> dev: dev-frontend
+proc: customer already running (pid 4419)
+proc: business already running (pid 4514)
+proc: admin already running (pid 4609)
+proc: site already running (pid 4704)
+==> dev: dev-health
+GROUP      CHECK                              STATE DETAIL
+postgres   postgres :5433                     ok    accepting connections
+postgres   databases                          ok    todayz, todayz_test (owner todayz_owner)
+postgres   extensions                         ok    PostGIS 3.4.3, pg_trgm, unaccent, pgcrypto, pg_stat_statements
+postgres   pg_stat_statements                 ok    preloaded and collecting
+postgres   roles                              ok    todayz_owner, todayz_app, grafana_ro, todayz_exporter (none superuser)
+minio      minio :9100                        ok    live
+minio      minio console :9101                ok    HTTP 200
+minio      bucket images                      ok    exists, anonymous read, no listing
+minio      bucket tiles                       ok    exists, anonymous read, no listing
+minio      bucket private                     ok    exists, no anonymous access
+minio      tiles uploaded                     ok    3 archive(s) in the tiles bucket
+lgtm       grafana :3300                      ok    api/health ok, version 13.2.3
+lgtm       grafana postgres datasource        ok    grafana_ro connects (read-only)
+lgtm       otlp http :4318                    ok    accepts traces
+lgtm       otlp grpc :4317                    ok    listening
+lgtm       postgres_exporter :9187            ok    pg_up 1
+lgtm       prometheus :9390                   ok    scrapes postgres-exporter
+caddy      caddy                              ok    running, local CA present
+caddy      http :80                           ok    redirects to https
+caddy      https://grafana.todayz.localhost   ok    /api/health -> 200
+caddy      https://s3.todayz.localhost        ok    /minio/health/live -> 200
+caddy      https://img.todayz.localhost       ok    /_health/probe.txt -> 200
+caddy      https://tiles.todayz.localhost     ok    /_health/probe.txt -> 206
+caddy      https://todayz.localhost           ok    /_health/bundle.css -> 200
+caddy      https://api.todayz.localhost       ok    -> api :8180 (404)
+caddy      https://app.todayz.localhost       ok    -> customer app :5301 (200)
+caddy      https://business.todayz.localhost  ok    -> business app :5302 (200)
+caddy      https://admin.todayz.localhost     ok    -> admin app :5303 (200)
+caddy      https://todayz.localhost           ok    -> site :5304 (200)
+caddy      https://mocks.todayz.localhost     ok    -> mocks :4010 (200)
+procs      api                                ok    http://127.0.0.1:8180/healthz -> 200
+procs      worker                             ok    http://127.0.0.1:8181/healthz -> 200
+procs      mocks                              ok    http://127.0.0.1:4010/healthz -> 200
+procs      customer                           ok    http://127.0.0.1:5301/ -> 200
+procs      business                           ok    http://127.0.0.1:5302/ -> 200
+procs      admin                              ok    http://127.0.0.1:5303/ -> 200
+procs      site                               ok    http://127.0.0.1:5304/ -> 200
+
+health: all required checks pass (page: https://todayz.localhost/_health)
+todayz hooks: todayz_problem check on, 76 problem codes registered
+Schemathesis v4.29.1
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from                                                  
+ /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml (in 0.77s)  
+
+     Base URL:         https://api.todayz.localhost                             
+     Specification:    Open API 3.1.0                                           
+     Operations:       336 selected / 339 total                                 
+     Configuration:    /Users/sairahul/Documents/projects/todayz/e2e/contra     
+                       ct/schemathesis.toml                                     
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+
+ ✅  Examples (in 1.96s)                                                        
+                                                                                
+     ✅ 283 passed  ⏭   53 skipped                                              
+
+ ✅  Coverage (in 17.46s)                                                       
+                                                                                
+     ✅ 336 passed                                                              
+
+ ❌  Fuzzing (in 48.00s)                                                        
+                                                                                
+     ✅ 335 passed  ❌   1 failed                                               
+
+=================================== FAILURES ===================================
+____________________________ POST /v1/auth/otp/send ____________________________
+1. Test Case ID: Ms7FRG
+
+- API rejected schema-compliant request
+
+    Valid data should have been accepted
+    Expected: 2xx, 401, 403, 404, 409, 429, 5xx
+
+[422] Unprocessable Content:
+
+    `{"type":"https://todayz.in/errors/validation_failed","title":"The request is not valid","status":422,"code":"validation_failed","requestId":"01M5Y7M5RNK6V59QZ0RCC36ZB2","fields":{"body.purpose":"an admin step-up is POST /v1/auth/step-up/send"}}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"app": "admin", "purpose": "step_up", "phone": "+918548266550", "turnstileToken": "\u00dci\u000b\u00ae<\u00ec\u00d2,`O"}' https://api.todayz.localhost/v1/auth/otp/send
+    
+    st replay Ms7FRG
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 336/339
+  Tested: 336
+
+Test Phases:
+  ✅ Examples
+  ✅ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ API rejected schema-compliant request: 1
+
+Test cases:
+  28597 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: /Users/sairahul/Documents/projects/todayz/e2e/contract/out/junit-20261027T135835Z.xml
+
+Seed: 17194723617920123919869430762935554981
+
+============================= 1 failure in 67.50s ==============================
+make[3]: *** [e2e-contract] Error 1
+make e2e: step e2e-contract failed (exit 2)
+make[2]: *** [_e2e] Error 2
+make[1]: *** [e2e] Error 2

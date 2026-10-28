@@ -75,3 +75,6 @@ e2e/mocks/fixtures/llm/_recorded/*
 
 # Module lock files: only the env roots pin providers
 infra/terraform/modules/**/.terraform.lock.hcl
+
+# Playwright CLI scratch output
+.playwright-cli/

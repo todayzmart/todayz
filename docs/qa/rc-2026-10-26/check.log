@@ -1,6 +1,587 @@
 ==> gen: gen-backend
-/bin/bash: sqlc: command not found
-make[3]: *** [gen-backend] Error 127
-make gen: step gen-backend failed (exit 2)
-make[2]: *** [gen] Error 2
+problemgen: 75 codes -> gen/problems
+==> gen: gen-contract
+apigen root: 325 operations in 52 path files -> /Users/sairahul/Documents/projects/todayz/backend/gen/api/root.yaml
+
+> @todayz/api-client@0.0.0 bundle /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs bundle
+
+bundling ../../backend/gen/api/root.yaml...
+📦 Created a bundle for ../../backend/gen/api/root.yaml at /Users/sairahul/Documents/projects/todayz/backend/api/openapi.yaml 158ms.
+apigen check: 322 method+path pairs under /v1 (admin 132, auth 8, biz 104, discover 13, health 3, me 53, public 6, telemetry 2, test 4)
+apigen codegen: 52 domain packages + spec -> /Users/sairahul/Documents/projects/todayz/backend/gen/api
+
+> @todayz/api-client@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/gen.mjs
+
+api-client gen: 325 operations -> src/gen (10 prefixes), 75 problem codes, src/mocks/handlers.gen.ts
+==> gen: gen-events
+==> gen: gen-frontend
+
+> @todayz/tokens@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/tokens
+> node scripts/gen.mjs
+
+tokens: 115 vars, 10 font families, icons -> shared/tokens/generated
+
+> @todayz/i18n@0.0.0 gen /Users/sairahul/Documents/projects/todayz/shared/i18n
+> node scripts/gen.mjs
+
+i18n: 4 apps, 5109 keys, locales en, hi, kn, te, ta + en-XA -> shared/i18n/compiled
+Scope: 3 of 15 workspace projects
+customer gen$ tsr generate
+business gen$ tsr generate
+admin gen$ tsr generate
+customer gen: (node:14068) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+customer gen: (Use `node --trace-warnings ...` to show where the warning was created)
+business gen: (node:14094) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+business gen: (Use `node --trace-warnings ...` to show where the warning was created)
+admin gen: (node:14081) Warning: Accessing non-existent property 'replaceRouteChunk' of module exports inside circular dependency
+admin gen: (Use `node --trace-warnings ...` to show where the warning was created)
+customer gen: Done
+admin gen: Done
+business gen: Done
+
+> @todayz/site@0.0.0 gen /Users/sairahul/Documents/projects/todayz/site
+> ASTRO_TELEMETRY_DISABLED=1 astro sync
+
+06:53:03 [types] Generated 39ms
+==> check: check-repo
+ok  	todayz.local/scripts/envtool	0.598s
+ok: canonical make targets (14)
+ok: make stops at the first failing step
+ok: SC-PL-03 secrets never printed
+ok: SC-PL-04 outbound blocked, local allowed, provider keys unset
+ok: git hooks guard secrets, generated code and pushes
+==> check: check-stack
+ok: docker-compose.yml parses
+ok: compose: 4 services, 8 loopback contract ports, health checks, every image pinned by digest
+ok: compose credentials are literal and match local.env
+ok: Caddyfile validates; 10 hosts, all tls internal, no trust install, every site aborts non-loopback clients first
+ok: shellcheck infra/local
+ok: local.env: names in .env.example, no D-18 app key, no provider secrets
+ok: DATABASE_URL (todayz_app) and DATABASE_MIGRATE_URL (todayz_owner) match init.sql and the compose port
+ok: .claude/launch.json is valid
+ok: no AWS_* variable reaches an app process (env file and shell)
+ok: stop-all drains api and worker first, then the rest, mocks last
+ok: a process that ignores SIGTERM is SIGKILLed after its stop timeout
+==> check: check-backend
+0 issues.
+ok  	github.com/todayz/backend/cmd/todayz	228.208s
+?   	github.com/todayz/backend/db	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-audit	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-banners	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-businesses	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-catalogue	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-credits	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-customers	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-demand	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-field	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-jobs	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-leads	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-notifications	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-orders	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-payouts	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-pulse	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-referrals	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-reviews	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-risk	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-settings	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-stores	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-support	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-system	[no test files]
+?   	github.com/todayz/backend/gen/api/admin-users	[no test files]
+?   	github.com/todayz/backend/gen/api/ai	[no test files]
+?   	github.com/todayz/backend/gen/api/asks	[no test files]
+?   	github.com/todayz/backend/gen/api/auth	[no test files]
+?   	github.com/todayz/backend/gen/api/banners	[no test files]
+?   	github.com/todayz/backend/gen/api/baskets	[no test files]
+?   	github.com/todayz/backend/gen/api/biz-support	[no test files]
+?   	github.com/todayz/backend/gen/api/business	[no test files]
+?   	github.com/todayz/backend/gen/api/business-credits	[no test files]
+?   	github.com/todayz/backend/gen/api/catalogue	[no test files]
+?   	github.com/todayz/backend/gen/api/coach	[no test files]
+?   	github.com/todayz/backend/gen/api/discover	[no test files]
+?   	github.com/todayz/backend/gen/api/insights	[no test files]
+?   	github.com/todayz/backend/gen/api/me	[no test files]
+?   	github.com/todayz/backend/gen/api/notifications	[no test files]
+?   	github.com/todayz/backend/gen/api/offers	[no test files]
+?   	github.com/todayz/backend/gen/api/orders	[no test files]
+?   	github.com/todayz/backend/gen/api/platform	[no test files]
+?   	github.com/todayz/backend/gen/api/pos	[no test files]
+?   	github.com/todayz/backend/gen/api/public	[no test files]
+?   	github.com/todayz/backend/gen/api/realtime	[no test files]
+?   	github.com/todayz/backend/gen/api/receipts	[no test files]
+?   	github.com/todayz/backend/gen/api/referrals	[no test files]
+?   	github.com/todayz/backend/gen/api/reviews	[no test files]
+?   	github.com/todayz/backend/gen/api/share	[no test files]
+?   	github.com/todayz/backend/gen/api/spec	[no test files]
+?   	github.com/todayz/backend/gen/api/standee	[no test files]
+?   	github.com/todayz/backend/gen/api/support	[no test files]
+?   	github.com/todayz/backend/gen/api/sync	[no test files]
+?   	github.com/todayz/backend/gen/api/telemetry	[no test files]
+?   	github.com/todayz/backend/gen/api/voice	[no test files]
+?   	github.com/todayz/backend/gen/api/wallet	[no test files]
+?   	github.com/todayz/backend/gen/events	[no test files]
+?   	github.com/todayz/backend/gen/problems	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/admindb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/aiadmindb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/aiconsumerdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/aidb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/airetaildb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/asksdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/bannersdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/basketsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/businessdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/cataloguedb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/coachdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/creditsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/identitydb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/insightsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/notifydb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/offersdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/ordersdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/payoutsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/platformdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/posdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/referralsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/reviewsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/riskdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/rollupsdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/searchdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/standeedb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/supportdb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/telemetrydb	[no test files]
+?   	github.com/todayz/backend/gen/sqlc/voicedb	[no test files]
+ok  	github.com/todayz/backend/internal/admin	2.134s
+ok  	github.com/todayz/backend/internal/ai/assist	2.636s
+ok  	github.com/todayz/backend/internal/ai/bannercopy	9.241s
+ok  	github.com/todayz/backend/internal/ai/bannercopy/bannereval	3.621s
+ok  	github.com/todayz/backend/internal/ai/billscan	31.258s
+ok  	github.com/todayz/backend/internal/ai/billscan/billeval	5.310s
+ok  	github.com/todayz/backend/internal/ai/catalogue	5.144s
+ok  	github.com/todayz/backend/internal/ai/catalogue/catalogueeval	5.673s
+ok  	github.com/todayz/backend/internal/ai/client	6.127s
+ok  	github.com/todayz/backend/internal/ai/drafts	7.458s
+ok  	github.com/todayz/backend/internal/ai/eval	4.863s
+?   	github.com/todayz/backend/internal/ai/eval/selftest	[no test files]
+ok  	github.com/todayz/backend/internal/ai/guard	7.183s
+?   	github.com/todayz/backend/internal/ai/imagecheck	[no test files]
+ok  	github.com/todayz/backend/internal/ai/imagecheck/imageeval	3.321s
+ok  	github.com/todayz/backend/internal/ai/insighttext	17.833s
+ok  	github.com/todayz/backend/internal/ai/insighttext/insighteval	3.853s
+?   	github.com/todayz/backend/internal/ai/listparse	[no test files]
+ok  	github.com/todayz/backend/internal/ai/listparse/listparseeval	4.323s
+ok  	github.com/todayz/backend/internal/ai/prompts	3.697s
+ok  	github.com/todayz/backend/internal/ai/querynorm	3.135s
+ok  	github.com/todayz/backend/internal/ai/querynorm/querynormeval	3.346s
+ok  	github.com/todayz/backend/internal/ai/replydraft	11.581s
+ok  	github.com/todayz/backend/internal/ai/replydraft/replyeval	2.676s
+ok  	github.com/todayz/backend/internal/ai/retail	2.845s
+?   	github.com/todayz/backend/internal/ai/retail/retailtest	[no test files]
+ok  	github.com/todayz/backend/internal/ai/riskexplain	2.271s
+ok  	github.com/todayz/backend/internal/ai/riskexplain/riskeval	2.762s
+ok  	github.com/todayz/backend/internal/ai/schema	2.969s
+ok  	github.com/todayz/backend/internal/ai/scrub	3.107s
+ok  	github.com/todayz/backend/internal/ai/shelfscan	18.583s
+ok  	github.com/todayz/backend/internal/ai/shelfscan/shelfeval	3.651s
+ok  	github.com/todayz/backend/internal/ai/triage	2.552s
+ok  	github.com/todayz/backend/internal/ai/triage/triageeval	2.712s
+?   	github.com/todayz/backend/internal/ai/voicesearch	[no test files]
+ok  	github.com/todayz/backend/internal/ai/voicesearch/voicesearcheval	2.826s
+ok  	github.com/todayz/backend/internal/asks	10.621s
+ok  	github.com/todayz/backend/internal/banners	7.837s
+ok  	github.com/todayz/backend/internal/baskets	6.948s
+ok  	github.com/todayz/backend/internal/business	6.552s
+ok  	github.com/todayz/backend/internal/business/standee	6.371s
+ok  	github.com/todayz/backend/internal/catalogue	29.932s
+ok  	github.com/todayz/backend/internal/coach	81.379s
+ok  	github.com/todayz/backend/internal/coach/coacheval	1.667s
+ok  	github.com/todayz/backend/internal/coach/detectors	13.383s
+ok  	github.com/todayz/backend/internal/credits	86.670s
+ok  	github.com/todayz/backend/internal/devtools/apigen	14.749s
+ok  	github.com/todayz/backend/internal/devtools/eventgen	2.562s
+?   	github.com/todayz/backend/internal/devtools/problemgen	[no test files]
+ok  	github.com/todayz/backend/internal/devtools/settingslint	3.251s
+ok  	github.com/todayz/backend/internal/devtools/vulngate	1.424s
+ok  	github.com/todayz/backend/internal/identity	29.365s
+ok  	github.com/todayz/backend/internal/insights	25.126s
+?   	github.com/todayz/backend/internal/insights/facts	[no test files]
+ok  	github.com/todayz/backend/internal/jobs	18.698s
+ok  	github.com/todayz/backend/internal/notify	12.685s
+ok  	github.com/todayz/backend/internal/offers	8.166s
+ok  	github.com/todayz/backend/internal/ops	12.594s
+?   	github.com/todayz/backend/internal/orders	[no test files]
+ok  	github.com/todayz/backend/internal/payouts	10.205s
+ok  	github.com/todayz/backend/internal/platform/audit	7.203s
+ok  	github.com/todayz/backend/internal/platform/authn	1.717s
+ok  	github.com/todayz/backend/internal/platform/authz	1.655s
+ok  	github.com/todayz/backend/internal/platform/authz/policy	1.564s
+ok  	github.com/todayz/backend/internal/platform/awssms	8.656s
+?   	github.com/todayz/backend/internal/platform/buildinfo	[no test files]
+ok  	github.com/todayz/backend/internal/platform/clock	1.762s
+ok  	github.com/todayz/backend/internal/platform/config	1.513s
+ok  	github.com/todayz/backend/internal/platform/db	3.799s
+?   	github.com/todayz/backend/internal/platform/dbenv	[no test files]
+ok  	github.com/todayz/backend/internal/platform/egress	1.977s
+ok  	github.com/todayz/backend/internal/platform/eventcat	2.422s
+ok  	github.com/todayz/backend/internal/platform/geo/h3	2.474s
+ok  	github.com/todayz/backend/internal/platform/health	6.285s
+ok  	github.com/todayz/backend/internal/platform/httpx	2.493s
+ok  	github.com/todayz/backend/internal/platform/httpx/ifmatch	2.555s
+ok  	github.com/todayz/backend/internal/platform/httpx/mw	2.750s
+ok  	github.com/todayz/backend/internal/platform/httpx/openapi	2.875s
+ok  	github.com/todayz/backend/internal/platform/httpx/openapi/schemacheck	2.375s
+ok  	github.com/todayz/backend/internal/platform/httpx/problem	3.148s
+ok  	github.com/todayz/backend/internal/platform/httpx/problem/registry	2.377s
+ok  	github.com/todayz/backend/internal/platform/httpx/route	2.316s
+ok  	github.com/todayz/backend/internal/platform/idempotency	5.443s
+ok  	github.com/todayz/backend/internal/platform/ids	2.250s
+ok  	github.com/todayz/backend/internal/platform/jobs	44.726s
+ok  	github.com/todayz/backend/internal/platform/jobs/adminapi	38.765s
+ok  	github.com/todayz/backend/internal/platform/lifecycle	8.790s
+ok  	github.com/todayz/backend/internal/platform/migrate	13.180s
+ok  	github.com/todayz/backend/internal/platform/money	2.901s
+?   	github.com/todayz/backend/internal/platform/notice	[no test files]
+?   	github.com/todayz/backend/internal/platform/pgnotify	[no test files]
+ok  	github.com/todayz/backend/internal/platform/pii	3.377s
+ok  	github.com/todayz/backend/internal/platform/queue	10.565s
+ok  	github.com/todayz/backend/internal/platform/ratelimit	1.889s
+ok  	github.com/todayz/backend/internal/platform/realtime	10.927s
+?   	github.com/todayz/backend/internal/platform/reqctx	[no test files]
+ok  	github.com/todayz/backend/internal/platform/settings	5.463s
+ok  	github.com/todayz/backend/internal/platform/telemetry	1.683s
+ok  	github.com/todayz/backend/internal/platform/testclock	6.006s
+ok  	github.com/todayz/backend/internal/pos	1.769s
+ok  	github.com/todayz/backend/internal/referrals	31.724s
+ok  	github.com/todayz/backend/internal/reviews	15.048s
+ok  	github.com/todayz/backend/internal/risk	13.537s
+ok  	github.com/todayz/backend/internal/rollups	11.827s
+ok  	github.com/todayz/backend/internal/search	29.283s
+ok  	github.com/todayz/backend/internal/seed	29.630s
+ok  	github.com/todayz/backend/internal/share	15.832s
+ok  	github.com/todayz/backend/internal/support	13.788s
+ok  	github.com/todayz/backend/internal/telemetry	6.739s
+ok  	github.com/todayz/backend/internal/testkit	1.876s
+ok  	github.com/todayz/backend/internal/voice	1.692s
+?   	github.com/todayz/backend/internal/voice/voiceeval	[no test files]
+govulncheck: no called vulnerabilities in modules (0 in the standard library)
+==> check: check-journeys
+
+> @todayz/e2e-journeys@ typecheck /Users/sairahul/Documents/projects/todayz/e2e/journeys
+> tsc --noEmit
+
+==> check: check-contract
+
+> @todayz/api-client@0.0.0 lint:spec /Users/sairahul/Documents/projects/todayz/shared/api-client
+> node scripts/bundle.mjs lint
+
+validating ../../backend/api/openapi.yaml...
+[1] ../../backend/api/openapi.yaml:14409:21 at #/paths/~1v1~1discover~1summary/get/responses/200/content/application~1json/example/pins/0/storeId
+
+Example value must conform to the schema: `0` property must NOT have unevaluated properties `storeId`.
+
+14407 | productsInRadius: 412
+14408 | pins:
+14409 |   - storeId: 01KE0S1W6W8ZV7T1C3A6MS0001
+      |     ^^^^^^^
+14410 |     storeSlug: lakshmi-traders-indiranagar
+14411 |     lat: 12.9752
+
+referenced from ../../backend/api/openapi.yaml:14402:15 at #/paths/~1v1~1discover~1summary/get/responses/200/content/application~1json 
+
+Warning was generated by the no-invalid-media-type-examples rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-invalid-media-type-examples
+
+
+[2] ../../backend/api/openapi.yaml:17508:5 at #/components/parameters/Traceparent
+
+Component: "Traceparent" is never used.
+
+17506 |     maximum: 100
+17507 |     default: 20
+17508 | Traceparent:
+      | ^^^^^^^^^^^
+17509 |   name: traceparent
+17510 |   in: header
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[3] ../../backend/api/openapi.yaml:22513:5 at #/components/schemas/AiCapScope
+
+Component: "AiCapScope" is never used.
+
+22511 |       minLength: 1
+22512 |       maxLength: 500
+22513 | AiCapScope:
+      | ^^^^^^^^^^
+22514 |   type: string
+22515 |   description: Which daily cap an ai_daily_cap_reached problem hit (its `scope` extension).
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[4] ../../backend/api/openapi.yaml:22643:5 at #/components/schemas/AiLineDisabled
+
+Component: "AiLineDisabled" is never used.
+
+22641 |     - te
+22642 |     - ta
+22643 | AiLineDisabled:
+      | ^^^^^^^^^^^^^^
+22644 |   type: string
+22645 |   description: Why the caller cannot confirm a line; ask_manager - it needs a manager's permission (D-06, D-65).
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[5] ../../backend/api/openapi.yaml:29042:5 at #/components/schemas/NextDeliveryWindow
+
+Component: "NextDeliveryWindow" is never used.
+
+29040 |   examples:
+29041 |     - eyJpZCI6IjAxSkIifQ
+29042 | NextDeliveryWindow:
+      | ^^^^^^^^^^^^^^^^^^
+29043 |   type: object
+29044 |   description: The next time the shop delivers, in `409 delivery_closed` `extensions.nextDeliveryWindow`.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[6] ../../backend/api/openapi.yaml:31392:5 at #/components/schemas/ReviewTagNegative
+
+Component: "ReviewTagNegative" is never used.
+
+31390 |     - expired_item
+31391 |     - overpriced
+31392 | ReviewTagNegative:
+      | ^^^^^^^^^^^^^^^^^
+31393 |   type: string
+31394 |   description: Negative review tags (D-60).
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[7] ../../backend/api/openapi.yaml:31402:5 at #/components/schemas/ReviewTagPositive
+
+Component: "ReviewTagPositive" is never used.
+
+31400 |     - expired_item
+31401 |     - overpriced
+31402 | ReviewTagPositive:
+      | ^^^^^^^^^^^^^^^^^
+31403 |   type: string
+31404 |   description: Positive review tags (D-60).
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[8] ../../backend/api/openapi.yaml:34353:5 at #/components/schemas/SystemReason
+
+Component: "SystemReason" is never used.
+
+34351 |       type: string
+34352 |       maxLength: 200
+34353 | SystemReason:
+      | ^^^^^^^^^^^^
+34354 |   type: string
+34355 |   description: Reasons the system sets on its own (04 §1.5). They appear only in responses and are never accepted in a request.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[9] ../../backend/api/openapi.yaml:17445:5 at #/components/headers/IdempotentReplayed
+
+Component: "IdempotentReplayed" is never used.
+
+17443 |     type: string
+17444 |     pattern: ^"v[0-9]+"$
+17445 | IdempotentReplayed:
+      | ^^^^^^^^^^^^^^^^^^
+17446 |   description: '`true` when the response was replayed from the stored result of the same `Idempotency-Key` (04 §1.6).'
+17447 |   schema:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[10] ../../backend/api/openapi.yaml:17449:5 at #/components/headers/RateLimitLimit
+
+Component: "RateLimitLimit" is never used.
+
+17447 |   schema:
+17448 |     type: boolean
+17449 | RateLimitLimit:
+      | ^^^^^^^^^^^^^^
+17450 |   description: Requests allowed in the current window.
+17451 |   schema:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[11] ../../backend/api/openapi.yaml:17453:5 at #/components/headers/RateLimitRemaining
+
+Component: "RateLimitRemaining" is never used.
+
+17451 |   schema:
+17452 |     type: integer
+17453 | RateLimitRemaining:
+      | ^^^^^^^^^^^^^^^^^^
+17454 |   description: Requests left in the current window.
+17455 |   schema:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[12] ../../backend/api/openapi.yaml:17457:5 at #/components/headers/RateLimitReset
+
+Component: "RateLimitReset" is never used.
+
+17455 |   schema:
+17456 |     type: integer
+17457 | RateLimitReset:
+      | ^^^^^^^^^^^^^^
+17458 |   description: Seconds until the window resets.
+17459 |   schema:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../../backend/api/openapi.yaml: validated in 585ms
+
+Woohoo! Your API description is valid. 🎉
+You have 12 warnings.
+
+
+> @todayz/api-client@0.0.0 lint /Users/sairahul/Documents/projects/todayz/shared/api-client
+> eslint --max-warnings 0 .
+
+
+> @todayz/api-client@0.0.0 typecheck /Users/sairahul/Documents/projects/todayz/shared/api-client
+> tsc --noEmit -p tsconfig.json
+
+
+> @todayz/api-client@0.0.0 test /Users/sairahul/Documents/projects/todayz/shared/api-client
+> vitest run
+
+
+ RUN  v4.1.11 /Users/sairahul/Documents/projects/todayz/shared/api-client
+
+(node:17953) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ test/msw.test.ts (13 tests) 5ms
+ ✓ test/http.test.ts (21 tests) 9ms
+ ✓ test/generated.test.ts (6 tests) 31ms
+stdout | test/regen.test.ts > regenerating from a changed bundle > drops a removed operation and encodes a path parameter
+🎉 TodayZ API - Your OpenAPI spec has been converted into ready to use orval!
+
+ ✓ test/regen.test.ts (2 tests) 715ms
+     ✓ drops a removed operation and encodes a path parameter  653ms
+
+ Test Files  4 passed (4)
+      Tests  42 passed (42)
+   Start at  06:59:14
+   Duration  910ms (transform 143ms, setup 0ms, import 381ms, tests 760ms, environment 409ms)
+
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.003s
+
+OK
+todayz hooks: todayz_problem check on, 75 problem codes registered
+ok  	github.com/todayz/backend/cmd/todayz	22.821s
+==> check: check-ai-eval
+ai_selftest        recorded 12/12 score 1.00 bar 1.00 ok  cost 12 paise  p95 1ms
+banner_copy        recorded 7/7 score 1.00 bar 1.00 ok  cost 14 paise  p95 0s
+catalogue_cleanup  recorded 15/16 score 0.94 bar 0.90 ok  cost 32 paise  p95 1ms
+  fail wrong_merge_pack_size: duplicate p1, want none
+coach_card         recorded 16/16 score 1.00 bar 1.00 ok  cost 16 paise  p95 0s
+image_check        recorded 9/9 score 1.00 bar 1.00 ok  cost 9 paise  p95 0s
+insight_text       recorded 13/13 score 1.00 bar 1.00 ok  cost 25 paise  p95 0s
+list_parse         recorded 200/200 score 1.00 bar 0.95 ok  cost 290 paise  p95 0s
+review_reply       recorded 9/9 score 1.00 bar 1.00 ok  cost 17 paise  p95 0s
+risk_summary       recorded 11/11 score 1.00 bar 1.00 ok  cost 11 paise  p95 0s
+search_assist      recorded 100/100 score 1.00 bar 0.90 ok  cost 126 paise  p95 0s
+shelf_photo        recorded 33/40 score 0.82 bar 0.80 ok  cost 2480 paise  p95 0s
+  fail shelf_04: found 4 of 6
+  fail shelf_08: found 3 of 6
+  fail shelf_10: found 5 of 8
+  fail shelf_21: found 6 of 8
+  fail shelf_27: found 3 of 4
+  fail shelf_34: found 3 of 4
+  fail shelf_38: found 3 of 4
+supplier_bill      recorded 41/60 score 0.68 bar 0.60 ok  cost 3720 paise  p95 0s
+  fail handwritten_en_05: handwritten: 7 of 10 lines right
+  fail handwritten_en_07: handwritten: 5 of 9 lines right
+  fail handwritten_hi_02: handwritten: 3 of 5 lines right
+  fail handwritten_hi_04: handwritten: 5 of 8 lines right
+  fail handwritten_kn_01: handwritten: 4 of 6 lines right
+  fail handwritten_kn_03: handwritten: 5 of 7 lines right
+  fail handwritten_kn_04: handwritten: 4 of 7 lines right
+  fail handwritten_kn_05: handwritten: 4 of 6 lines right
+  fail handwritten_kn_06: handwritten: 3 of 5 lines right
+  fail handwritten_kn_07: handwritten: 3 of 6 lines right
+  fail printed_en_01: printed: 6 of 7 lines right
+  fail printed_en_07: printed: 5 of 6 lines right
+  fail printed_en_08: printed: 7 of 8 lines right
+  fail printed_en_12: printed: 6 of 7 lines right
+  fail printed_hi_02: printed: 4 of 5 lines right
+  fail printed_hi_10: printed: 6 of 7 lines right
+  fail printed_kn_03: printed: 7 of 8 lines right
+  fail printed_kn_06: printed: 3 of 4 lines right
+  fail printed_kn_07: printed: 6 of 7 lines right
+ticket_triage      recorded 15/16 score 0.94 bar 0.85 ok  cost 48 paise  p95 0s
+  fail wrong_category_credits: category payouts, want credits
+voice_search       recorded 100/100 score 1.00 bar 0.90 ok  cost 0 paise  p95 0s
+voice_stock        recorded 96/100 score 0.96 bar 0.90 ok  cost 200 paise  p95 0s
+  fail hi_chawal_aath_bache: line 1: kind restock, want count
+  fail kn_rice_aidu_chila: line 1: quantity differs
+  fail ta_milk_theernthu: line 1: kind sale, want count
+  fail te_unmatched_pootharekulu: line 1: item c3, want null
+==> check: check-mocks
+ok  	todayz.local/e2e/mocks	1.962s
+?   	todayz.local/e2e/mocks/cmd/gencss	[no test files]
+ok  	todayz.local/e2e/mocks/internal/capture	1.482s
+ok  	todayz.local/e2e/mocks/internal/fixtures	2.405s
+ok  	todayz.local/e2e/mocks/internal/server	4.580s
+ok  	todayz.local/e2e/mocks/internal/ui	3.378s
+?   	todayz.local/e2e/mocks/internal/ui/cssgen	[no test files]
+==> check: check-frontend
+Scope: 8 of 15 workspace projects
+shared/config lint$ eslint --max-warnings 0 .
+shared/config lint: Done
+shared/telemetry lint$ eslint --max-warnings 0 .
+shared/i18n lint$ eslint --max-warnings 0 .
+shared/tokens lint$ eslint --max-warnings 0 .
+shared/telemetry lint: Done
+shared/tokens lint: Done
+shared/i18n lint: Done
+customer lint$ eslint --max-warnings 0 .
+admin lint$ eslint --max-warnings 0 .
+site lint$ eslint --max-warnings 0 .
+business lint$ eslint --max-warnings 0 .
+site lint: Done
 make[1]: *** [check] Error 2
