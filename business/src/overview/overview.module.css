@@ -67,6 +67,83 @@
   text-decoration: underline;
 }
 
+.setupHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* The × is small to the eye but keeps a 32px target (44px in the touch density below 1024px). */
+.setupHide {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+[data-density='touch'] .setupHide {
+  width: 44px;
+  height: 44px;
+  margin: calc(-1 * var(--space-3)) calc(-1 * var(--space-3)) 0 0;
+}
+
+.setupHide:hover {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink);
+}
+
+.setupSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.setupSteps li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--space-6);
+  color: var(--ink);
+}
+
+.setupSteps li > svg {
+  flex: none;
+  color: var(--ink-3);
+}
+
+.setupSteps li[data-done] {
+  color: var(--ink-2);
+}
+
+.setupSteps li[data-done] > svg {
+  color: var(--brand-strong);
+}
+
+/* An open step is a link; in the sidebar it must not take the nav item look (see .setupLink). */
+.setupSteps a,
+:global(.tz-side) .setupSteps a[href] {
+  display: inline;
+  height: auto;
+  padding: 0;
+  background: none;
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Greeting band. */
 .greet {
   flex-wrap: wrap;

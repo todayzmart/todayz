@@ -79,7 +79,7 @@ function Dashboard({ store, data, period, onPeriod }: DashboardProps) {
         </div>
         {narrow && (
           <div className={styles.areaSetup}>
-            <SetupCard setup={data.setup} />
+            <SetupCard setup={data.setup} storeId={store.sid} />
           </div>
         )}
         <div className={styles.areaChart}>

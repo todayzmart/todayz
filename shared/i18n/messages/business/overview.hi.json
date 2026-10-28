@@ -688,5 +688,20 @@
     "message": "ऑर्डर",
     "review": "reviewed",
     "enHash": "cded0933"
+  },
+  "overview.setup.hide": {
+    "message": "दुकान का सेटअप छिपाएँ",
+    "review": "reviewed",
+    "enHash": "e385ea11"
+  },
+  "overview.setup.steps": {
+    "message": "दुकान के सेटअप स्टेप",
+    "review": "reviewed",
+    "enHash": "94160ef6"
+  },
+  "overview.setup.done": {
+    "message": "पूरा हुआ",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
   }
 }

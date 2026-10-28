@@ -550,5 +550,17 @@
   "overview.gate.orders": {
     "defaultMessage": "Orders",
     "description": "Cashier note link to Orders."
+  },
+  "overview.setup.hide": {
+    "defaultMessage": "Hide shop setup",
+    "description": "Accessible name of the × button on the shop setup card; hides the card on this device."
+  },
+  "overview.setup.steps": {
+    "defaultMessage": "Shop setup steps",
+    "description": "Accessible name of the list of setup steps on the shop setup card."
+  },
+  "overview.setup.done": {
+    "defaultMessage": "done",
+    "description": "Read by screen readers after a finished step on the shop setup card, like “Invite staff, done”."
   }
 }

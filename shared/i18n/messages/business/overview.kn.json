@@ -688,5 +688,20 @@
     "message": "ಆರ್ಡರ್‌ಗಳು",
     "review": "reviewed",
     "enHash": "cded0933"
+  },
+  "overview.setup.hide": {
+    "message": "ಅಂಗಡಿ ಸೆಟಪ್ ಮರೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "e385ea11"
+  },
+  "overview.setup.steps": {
+    "message": "ಅಂಗಡಿ ಸೆಟಪ್ ಹಂತಗಳು",
+    "review": "reviewed",
+    "enHash": "94160ef6"
+  },
+  "overview.setup.done": {
+    "message": "ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
   }
 }

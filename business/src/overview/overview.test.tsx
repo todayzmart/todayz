@@ -185,10 +185,46 @@ describe('B-03 Overview', () => {
   ])('hides the setup card when setup is %s', (_, setup) => {
     const { container } = render(
       <IntlProvider locale={FORMAT_LOCALE} messages={messages}>
-        <SetupCard setup={setup} />
+        <SetupCard setup={setup} storeId="s1" />
       </IntlProvider>,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('B-03 shop setup card', () => {
+  const setup: SetupProgress = {
+    percent: 40,
+    next: 'products',
+    steps: { kyc: true, products: false, staff: false, standee: false, openingHours: true },
+  };
+  const renderCard = (storeId = 'store-a') =>
+    render(
+      <IntlProvider locale={FORMAT_LOCALE} messages={messages}>
+        <SetupCard setup={setup} storeId={storeId} />
+      </IntlProvider>,
+    );
+
+  afterEach(() => localStorage.clear());
+
+  it('lists every step: done ones ticked, open ones as links to where they are done', () => {
+    renderCard();
+    const list = screen.getByRole('list', { name: 'Shop setup steps' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+    expect(within(list).getByText(/Add opening hours/)).toHaveTextContent('Add opening hours, done');
+    expect(within(list).queryByRole('link', { name: /Add opening hours/ })).toBeNull();
+    expect(within(list).getByRole('link', { name: 'Add products' })).toHaveAttribute('href', '/stock');
+    expect(within(list).getByRole('link', { name: 'Invite staff' })).toHaveAttribute('href', '/stores');
+    expect(within(list).getByRole('link', { name: 'Print the QR standee' })).toHaveAttribute('href', '/standee');
+  });
+
+  it('the × hides the card for that store on this device', () => {
+    const { container, unmount } = renderCard();
+    fireEvent.click(screen.getByRole('button', { name: 'Hide shop setup' }));
+    expect(container).toBeEmptyDOMElement();
+    unmount();
+    expect(renderCard().container).toBeEmptyDOMElement();
+    expect(renderCard('store-b').container).not.toBeEmptyDOMElement();
   });
 });
 

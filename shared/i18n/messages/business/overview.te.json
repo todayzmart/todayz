@@ -688,5 +688,20 @@
     "message": "ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "cded0933"
+  },
+  "overview.setup.hide": {
+    "message": "దుకాణం సెటప్ దాచండి",
+    "review": "reviewed",
+    "enHash": "e385ea11"
+  },
+  "overview.setup.steps": {
+    "message": "దుకాణం సెటప్ దశలు",
+    "review": "reviewed",
+    "enHash": "94160ef6"
+  },
+  "overview.setup.done": {
+    "message": "పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
   }
 }

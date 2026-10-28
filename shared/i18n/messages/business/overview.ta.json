@@ -688,5 +688,20 @@
     "message": "ஆர்டர்கள்",
     "review": "reviewed",
     "enHash": "cded0933"
+  },
+  "overview.setup.hide": {
+    "message": "கடை அமைப்பை மறை",
+    "review": "reviewed",
+    "enHash": "e385ea11"
+  },
+  "overview.setup.steps": {
+    "message": "கடை அமைப்புப் படிகள்",
+    "review": "reviewed",
+    "enHash": "94160ef6"
+  },
+  "overview.setup.done": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
   }
 }

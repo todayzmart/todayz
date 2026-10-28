@@ -2,7 +2,7 @@
 
 What a shop learns about its customers and sales: the overview, demand insights, analytics, and the daily coach.
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 1488dbce (28 Oct 2026). Update this file in the same change as the code it describes.
 
 CRM means customer relationship management, here a simple list of a shop's own customers and how they buy.
 
@@ -10,7 +10,7 @@ CRM means customer relationship management, here a simple list of a shop's own c
 
 | App | What |
 |---|---|
-| Shop app | Overview of today, insight cards (selling fast, sitting on shelf and more), analytics, customer list, coach cards to mark done or dismiss. Folders: [overview](../../business/src/overview/), [insights](../../business/src/insights/), [analytics](../../business/src/analytics/), [customers](../../business/src/customers/), [coach](../../business/src/coach/). |
+| Shop app | Overview of today, insight cards (selling fast, sitting on shelf and more), analytics, customer list, coach cards to mark done or dismiss. Until setup is done, a shop setup card (sidebar foot on desktop, under the KPIs on a phone) lists all five steps (KYC, 50 products, staff, QR standee, opening hours) with a tick or a link to where each is done; its × hides it for that store on that device (D-277). Folders: [overview](../../business/src/overview/), [insights](../../business/src/insights/), [analytics](../../business/src/analytics/), [customers](../../business/src/customers/), [coach](../../business/src/coach/). |
 | Admin console | Platform pulse (daily numbers), demand view, customer list with block and strike reset. Folders: [pulse](../../admin/src/pulse/), [demand](../../admin/src/demand/), [customers](../../admin/src/customers/). |
 | Backend jobs | `rollup_today`, `rollup_day`, `rollup_demand`, `rollup_cohorts`, `rollup_item_pairs`, `rollup_banners`, `coach_daily`, `coach_weekly`, `coach_realtime_rules`. |
 

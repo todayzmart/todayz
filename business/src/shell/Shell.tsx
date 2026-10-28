@@ -2,6 +2,7 @@ import { Outlet } from '@tanstack/react-router';
 import { Button } from '@todayz/ui';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
+import { useCurrentStore } from '../orders/store';
 import { useTodayOverview } from '../overview/queries';
 import { SetupCard } from '../overview/SetupCard';
 import { NavLink } from './NavLink';
@@ -38,6 +39,7 @@ export function Shell() {
   const narrow = useNarrow();
   const counts = useNavCounts();
   const { data } = useTodayOverview();
+  const current = useCurrentStore();
   return (
     <div className={styles.app} data-skin="bright">
       <a className={styles.skip} href="#main">
@@ -60,7 +62,7 @@ export function Shell() {
             </Fragment>
           );
         })}
-        {!narrow && data && <SetupCard setup={data.setup} />}
+        {!narrow && data && current.status === 'ready' && <SetupCard setup={data.setup} storeId={current.store.sid} />}
         {!narrow && <SignOut />}
       </nav>
       <main id="main" className={styles.main} tabIndex={-1} data-density={narrow ? 'touch' : undefined}>
