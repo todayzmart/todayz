@@ -126,9 +126,12 @@ describe('B-10 gating and states', () => {
     expect(calls.some((c) => c.path.includes('/credit-account') || c.path.includes('/referrals'))).toBe(false);
   });
 
-  it('asks for a shop when there is none', async () => {
-    renderAt('/credits', { messages, handlers: [(c) => (c.path === '/v1/biz/businesses' ? json(200, { items: [], nextCursor: null }) : undefined)] });
-    expect(await screen.findByText('Pick a shop first')).toBeInTheDocument();
+  it('sends a person with no shop to shop setup', async () => {
+    const { history } = renderAt('/credits', {
+      messages,
+      handlers: [(c) => (c.path === '/v1/biz/businesses' ? json(200, { items: [], invitations: [], nextCursor: null }) : undefined)],
+    });
+    await waitFor(() => expect(history.location.pathname).toBe('/onboarding'));
   });
 
   it('shows an error with retry when the shop list fails', async () => {

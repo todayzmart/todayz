@@ -135,9 +135,9 @@ describe('B-01 shop picker', () => {
     await waitFor(() => expect(history.location.pathname).toBe('/'));
   });
 
-  it('explains when no shop is linked to the number', async () => {
-    renderAt('/choose-shop', { handlers: [shops([])] });
-    expect(await screen.findByText(/No shop is linked to this number yet/)).toBeInTheDocument();
+  it('sends a number with no shop and no invitation straight to shop setup', async () => {
+    const { history } = renderAt('/choose-shop', { handlers: [shops([])] });
+    await waitFor(() => expect(history.location.pathname).toBe('/onboarding'));
   });
 });
 

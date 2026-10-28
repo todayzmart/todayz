@@ -209,6 +209,22 @@
   text-decoration: underline;
 }
 
+button.home {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.railFoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+}
+
 .content {
   flex: 1;
   min-width: 0;
@@ -410,7 +426,8 @@
     display: block;
   }
 
-  .home {
+  .railFoot {
+    flex-direction: column;
     margin-top: auto;
     padding-top: var(--space-4);
     border-top: 1px solid var(--rail-line);

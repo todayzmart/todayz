@@ -2,7 +2,7 @@
 
 How a shop owner signs up and goes live at once with their stores (D-274), how the field team checks new shops afterwards, and the shop's staff, standee (the printed QR stand) and field-agent help.
 
-> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at b556e264 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -47,6 +47,8 @@ Field onboarding: the agent asks the owner for a code, enters the shop details, 
 
 The B-02 page (`business/src/onboarding/`) sits outside the app shell (the gate renders it bare). `steps.ts` holds the step order and which step to open; each step saves on its own, so the owner can leave and come back. On a phone the rail is a dark header with the steps as a scrolling row of chips; from 1024px it is a column on the left. The rail's "Go to dashboard" link shows only once the shop is live: a new signup has no shop to go to. The rail counts all seven steps ("3 of 7 steps done"), optional ones included, so it matches "Step n of 7". Colours are the `rail` tokens (D-274).
 
+A signed-in person with no shop and no pending invitation never sees the dashboard: the gate sends any route to `/onboarding` (D-276). `/onboarding`, `/sign-in` and `/invite/…` stay open to them, and the shell shows as before while the shop list loads or cannot be read (an offline counter). Because B-02 has no shell, its rail has its own **Sign out** (a wrong number or a staff phone can leave).
+
 The check queue (`GET /v1/admin/shop-checks`, `shop_checks.go`) reads live unchecked businesses newest first, then each page's stores and photos in two queries; photo previews are presigned links to the private bucket. Check and reject lock the business row, refuse anything not unchecked, and write the audit row in the same transaction; reject also calls `orders.CancelShopOrders` there.
 
 ## Code
@@ -60,7 +62,7 @@ The check queue (`GET /v1/admin/shop-checks`, `shop_checks.go`) reads live unche
 
 ## Tests
 
-`owner_test.go`, `agent_sweep_test.go`, `store_photo_test.go` in the package; `business_http_test.go`, `field_http_test.go` and `shop_check_http_test.go` in `backend/cmd/todayz` (go live on submit, the queue, check, reject and its cascade, the role checks). Frontend: `business/src/onboarding/onboarding.test.tsx`, `business/src/shell/sidebar.test.ts`, `admin/src/shop-checks/shopChecks.test.tsx`. Journeys: `04-e2e-01-standee`, `16-e2e-08-field-onboarding`, `10-e2e-17-owner`. Scenario docs: `e2e/scenarios/OB.md`, `FA.md`. Reports: [seller auto-onboarding](../qa/seller-auto-onboarding/REPORT.md), [W1-04](../qa/W1-04/REPORT.md), [W2-10](../qa/W2-10/REPORT.md), [W3-06](../qa/W3-06/REPORT.md), [W3-09](../qa/W3-09/REPORT.md).
+`owner_test.go`, `agent_sweep_test.go`, `store_photo_test.go` in the package; `business_http_test.go`, `field_http_test.go` and `shop_check_http_test.go` in `backend/cmd/todayz` (go live on submit, the queue, check, reject and its cascade, the role checks). Frontend: `business/src/onboarding/onboarding.test.tsx`, `business/src/shell/sidebar.test.ts`, `business/src/shell/Gate.test.tsx` (the no-shop redirect), `admin/src/shop-checks/shopChecks.test.tsx`. Journeys: `04-e2e-01-standee`, `16-e2e-08-field-onboarding`, `10-e2e-17-owner`. Scenario docs: `e2e/scenarios/OB.md`, `FA.md`. Reports: [seller auto-onboarding](../qa/seller-auto-onboarding/REPORT.md), [no-shop redirect screenshot](../qa/no-shop-redirect/settings-to-onboarding.jpg), [W1-04](../qa/W1-04/REPORT.md), [W2-10](../qa/W2-10/REPORT.md), [W3-06](../qa/W3-06/REPORT.md), [W3-09](../qa/W3-09/REPORT.md).
 
 ## Status and known gaps
 
@@ -68,4 +70,4 @@ Live in code. The customer shop page is a card, not a full map (D-251 B1). An ad
 
 ## Decisions
 
-D-39 field agents. D-40 verification (its admin gate replaced by D-274). D-66 staff. D-107 businesses, stores and staff. D-200 to D-206 onboarding screens. D-223 standee rows. D-232 and D-241 field agents. D-246 storefront photo. D-274 live on signup, the shop check and the green rail.
+D-39 field agents. D-40 verification (its admin gate replaced by D-274). D-66 staff. D-107 businesses, stores and staff. D-200 to D-206 onboarding screens. D-223 standee rows. D-232 and D-241 field agents. D-246 storefront photo. D-274 live on signup, the shop check and the green rail. D-276 no shop goes straight to B-02.

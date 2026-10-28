@@ -1,35 +1,23 @@
-import { useSession } from '@todayz/auth';
-import { useQueryClient } from '@tanstack/react-query';
 import { Outlet } from '@tanstack/react-router';
 import { Button } from '@todayz/ui';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
 import { useTodayOverview } from '../overview/queries';
 import { SetupCard } from '../overview/SetupCard';
-import { clearCachedPosStore } from '../pos/store';
 import { NavLink } from './NavLink';
 import { SIDE, TABS } from './nav';
 import { useNarrow } from './useNarrow';
 import { useNavCounts } from './useNavCounts';
+import { useSignOut } from './useSignOut';
 import styles from './shell.module.css';
 
-/** Ends this device's session and drops everything cached for the person who was signed in. */
+/** The sign-out button at the foot of the sidebar (and of the page below 1024px). */
 function SignOut() {
   const intl = useIntl();
-  const session = useSession();
-  const client = useQueryClient();
+  const signOut = useSignOut();
   return (
     <div className={styles.signOut}>
-      <Button
-        variant="ghost"
-        block
-        onClick={() => {
-          // The counter's cached shop and role go first, even when the network call fails (D-179).
-          // Unsent sales stay in the outbox: they belong to the shop, not to the person.
-          clearCachedPosStore();
-          void session.signOut().then(() => client.clear());
-        }}
-      >
+      <Button variant="ghost" block onClick={signOut}>
         {intl.formatMessage({ id: 'auth.signOut' })}
       </Button>
     </div>

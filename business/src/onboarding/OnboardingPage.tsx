@@ -4,11 +4,12 @@ import { ApiError } from '@todayz/api-client';
 import { Banner, Button, EmptyState, Skeleton, TextField, useToast } from '@todayz/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, Check, Inbox, LayoutDashboard, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Inbox, LayoutDashboard, Lock, LogOut } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import { rememberStore, type BusinessSummary } from '../app/shop';
 import { HoursSection, PayoutSection } from '../settings/sections';
+import { useSignOut } from '../shell/useSignOut';
 import { BizError } from '../stores/BizError';
 import { canOnboard } from '../stores/perm';
 import {
@@ -104,6 +105,7 @@ function Frame(props: { steps: StepState[] | null; active: StepId | null; onPick
   // The rail counts all seven steps, optional ones included, so it agrees with "Step n of 7".
   const done = steps?.filter((s) => s.done).length ?? 0;
   const total = STEPS.length;
+  const signOut = useSignOut();
   return (
     <div className={styles.onb} data-skin="bright">
       <a className={styles.skip} href="#main">
@@ -160,12 +162,19 @@ function Frame(props: { steps: StepState[] | null; active: StepId | null; onPick
             </nav>
           </>
         )}
-        {home && (
-          <Link to="/" className={styles.home}>
-            <LayoutDashboard size={16} aria-hidden="true" />
-            {intl.formatMessage({ id: 'onboarding.toDashboard' })}
-          </Link>
-        )}
+        <div className={styles.railFoot}>
+          {home && (
+            <Link to="/" className={styles.home}>
+              <LayoutDashboard size={16} aria-hidden="true" />
+              {intl.formatMessage({ id: 'onboarding.toDashboard' })}
+            </Link>
+          )}
+          {/* A new signup has no shell, so its only way out (a wrong number, a staff phone) is here. */}
+          <button type="button" className={styles.home} onClick={signOut}>
+            <LogOut size={16} aria-hidden="true" />
+            {intl.formatMessage({ id: 'auth.signOut' })}
+          </button>
+        </div>
       </aside>
       <main id="main" className={styles.content} tabIndex={-1} data-step={at >= 0 ? at + 1 : undefined}>
         {children}

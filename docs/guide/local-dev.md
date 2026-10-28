@@ -2,7 +2,7 @@
 
 How to set up a Mac and run the whole TodayZ stack on it, with no cloud account and no provider keys.
 
-> As built on main at 3f7ebd09 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at b556e264 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 Everything is driven by `make` from the repo root. The targets are fixed (D-56); each package adds its own steps in [mk/](../../mk/), nobody edits the root [Makefile](../../Makefile). The full stack config is explained in [infra/local/README.md](../../infra/local/README.md).
 
@@ -103,7 +103,7 @@ Every seeded phone is in a reserved test block (see the comment in identity.go).
 - **Reserved numbers.** In local and test mode the reserved test numbers also accept a fixed development code; the seed comment names it. Staging and prod never run the seed and never accept it.
 - **Admin console** signs in with the SMS code alone (D-264). A † action (payouts, credits, settings, admin users, `money` jobs) asks for a fresh SMS code: tap "Send code" in the dialog and read it from the mocks server like the sign-in code. The Playwright stack journey reads `TZ_ADMIN_PHONE` for a seeded staff number.
 - **Firebase sign-in (D-275).** Local sign-in uses the SMS path. To try the Firebase path, put `OTP_PROVIDER=firebase` in `.env.local` and restart the API: the app then signs in through the mocks server's Firebase stand-in (`FIREBASE_AUTH_EMULATOR_URL` in `infra/local/local.env`), and the code shows at https://mocks.todayz.localhost as before. No Google host is called and no reCAPTCHA appears. The admin step-up still uses the SMS mock.
-- **Business app** after sign-in asks you to choose a shop; a one-shop account skips that screen.
+- **Business app** after sign-in asks you to choose a shop; a one-shop account skips that screen. A number with no shop and no invitation goes straight to shop setup (B-02, D-276).
 
 Local Turnstile is also a mock (`TURNSTILE_API_URL`), so no captcha appears.
 
