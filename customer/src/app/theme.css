@@ -9,7 +9,7 @@
   --add-strong: var(--brand-strong);
   --add-soft: var(--brand-soft);
   --sale: var(--tint-green-ink);
-  --page: var(--surface-sunken);
+  --page: var(--bg);
   --font-display: figtree, "Noto Sans Devanagari", "Noto Sans Kannada", "Noto Sans Telugu", "Noto Sans Tamil", system-ui, sans-serif;
   --shadow-card: var(--shadow-xs);
 }

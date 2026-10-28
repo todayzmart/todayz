@@ -396,12 +396,12 @@
   color: var(--ink);
 }
 
-/* Top-level categories: a round photo over a two-line label, four across on a phone and
-   eight on a wide screen, as the quick-commerce home screens show them. */
+/* Top-level categories: a product photo on a constant light-grey rounded square, label below,
+   four across on a phone and ten on a wide screen, as the quick-commerce home screens show them. */
 .catGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3) var(--space-1);
+  gap: var(--space-4) var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -409,14 +409,13 @@
 
 @media (width >= 700px) {
   .catGrid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
   }
 }
 
-@media (width >= 1024px) {
+@media (width >= 1200px) {
   .catGrid {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    gap: var(--space-4) var(--space-2);
+    grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 }
 
@@ -424,7 +423,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   height: 100%;
   padding: 0;
   border: 0;
@@ -438,20 +437,15 @@
 .catPhoto {
   display: grid;
   place-items: center;
-  width: 64px;
+  width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 50%;
-  background: var(--t-bg);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
 }
 
-@media (width >= 1024px) {
-  .catPhoto {
-    width: 76px;
-  }
-}
-
-/* The main photos are products on white; multiply sets them on the tint. */
+/* The main photos are products on white; multiply sets them on the grey tile. */
 .catPhoto > img {
   width: 100%;
   height: 100%;
@@ -466,26 +460,32 @@
 
 .catName {
   display: -webkit-box;
-  min-height: 28px;
+  min-height: 32px;
   overflow: hidden;
-  font: 600 11px/14px var(--font-sans);
+  font: 600 12px/16px var(--font-sans);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-/* Subcategories: four round photos across on a phone, eight on a wide screen. */
+/* Subcategories: the same constant grey square, four across on a phone and ten on a wide screen. */
 .subGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3) var(--space-1);
+  gap: var(--space-4) var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-@media (width >= 1024px) {
+@media (width >= 700px) {
   .subGrid {
     grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1200px) {
+  .subGrid {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 }
 
@@ -493,7 +493,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   color: var(--ink);
   text-align: center;
   text-decoration: none;
@@ -502,11 +502,12 @@
 .subPhoto {
   display: grid;
   place-items: center;
-  width: 60px;
+  width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 50%;
-  background: var(--t-bg);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
 }
 
 .subPhoto > img {
@@ -515,12 +516,11 @@
   object-fit: contain;
 }
 
-
 .subName {
   display: -webkit-box;
-  min-height: 28px;
+  min-height: 32px;
   overflow: hidden;
-  font: 600 11px/14px var(--font-sans);
+  font: 600 12px/16px var(--font-sans);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }

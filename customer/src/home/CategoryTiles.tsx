@@ -1,9 +1,8 @@
-// C-03 categories as pastel tiles with a photo: the top-level ones filter the shops on Home
-// (`/?category=`), and each one's subcategories open the category page C-06 (`/c/$slug`).
+// C-03 categories as a product photo on a constant light-grey square: the top-level ones filter
+// the shops on Home (`/?category=`), and each one's subcategories open the category page C-06.
 import type { Category } from '@todayz/api-client/gen/model/category';
 import { useIntl } from 'react-intl';
 import { categoryPhoto } from './photos';
-import { asTint } from './present';
 import { RouterLink } from './RouterLink';
 import styles from './home.module.css';
 
@@ -16,7 +15,6 @@ export function CategoryTiles({ categories, active }: { categories: readonly Cat
           <RouterLink
             href={active === c.slug ? '/' : `/?category=${encodeURIComponent(c.slug)}`}
             className={styles.catTile}
-            data-tint={asTint(c.tint) ?? 'green'}
             aria-current={active === c.slug ? 'true' : undefined}
           >
             <span className={styles.catPhoto}>
@@ -45,7 +43,7 @@ export function SubcategoryGrids({ categories }: { categories: readonly Category
               {c.children.map((k) => (
                 <li key={k.slug}>
                   <RouterLink href={`/c/${encodeURIComponent(k.slug)}`} className={styles.subTile}>
-                    <span className={styles.subPhoto} data-tint={asTint(k.tint) ?? asTint(c.tint) ?? 'green'}>
+                    <span className={styles.subPhoto}>
                       {(categoryPhoto(k.slug) ?? categoryPhoto(c.slug)) && (
                         <img src={categoryPhoto(k.slug) ?? categoryPhoto(c.slug)} alt="" loading="lazy" decoding="async" />
                       )}
