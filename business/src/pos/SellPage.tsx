@@ -22,7 +22,7 @@ export function SellPage() {
           </div>
         }
       >
-        <Counter />
+        <Counter key={store.sid} />
       </PosProvider>
     );
   }

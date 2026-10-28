@@ -11,6 +11,7 @@ import { UpdateContext } from '../app/update-context';
 import { NARROW_QUERY } from '../shell/useNarrow';
 import { memoryStorage } from '../sync/storage';
 import type { PosApi, SaleAck, SyncRequest, SyncResponse } from './api';
+import { clearOpenBills } from './openBill';
 import { Counter } from './Counter';
 import type { PosStoreRef } from './context';
 import { PosProvider } from './runtime';
@@ -101,7 +102,7 @@ async function mount(opts: Options = {}) {
   const router = createRouter({ routeTree: createRootRoute({ component: () => tree }), history: createMemoryHistory({ initialEntries: ['/'] }) });
   const app = <RouterProvider router={router} />;
   const view = render(opts.strict ? <StrictMode>{app}</StrictMode> : app);
-  await screen.findByRole('button', { name: /Rice 1 kg/ });
+  await screen.findAllByRole('button', { name: /Rice 1 kg/ });
   return { server, storage, user, view };
 }
 
@@ -126,12 +127,29 @@ const tile = (name: RegExp) => within(screen.getByRole('region', { name: 'Items'
 const due = () => within(screen.getByRole('complementary')).getByText(/^₹[\d,.]+$/, { selector: '.tz-amt' });
 const charge = () => screen.getByRole('button', { name: 'Charge' });
 
+afterEach(() => sessionStorage.clear());
+
 describe('B-05 counter', () => {
   beforeEach(() => {
     vi.useRealTimers();
   });
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it('keeps the open bill when the counter is left and opened again, and not after sign-out clears it (D-279)', async () => {
+    const first = await mount();
+    await first.user.click(tile(/Rice 1 kg/));
+    await first.user.click(tile(/Rice 1 kg/));
+    first.view.unmount();
+    const again = await mount();
+    expect(within(screen.getByRole('complementary')).getByText('2 items')).toBeInTheDocument();
+    expect(due()).toHaveTextContent('₹100');
+    expect(sessionStorage.getItem('todayz.biz.pos.openBill.s1')).not.toBeNull();
+    clearOpenBills();
+    again.view.unmount();
+    await mount();
+    expect(screen.queryByText('2 items')).not.toBeInTheDocument();
   });
 
   it('shows the quick tiles with stock, and adds an item to the bill with a tap', async () => {

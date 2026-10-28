@@ -15,6 +15,7 @@ import { looksLikeBarcode, useWedgeScanner } from '../scanner/wedge';
 import { useNarrow } from '../shell/useNarrow';
 import { AddProductSheet } from './AddProductSheet';
 import { cartReducer, cartTotals, emptyCart, firstShortLine, type CartAction, type CartLine } from './cart';
+import { loadOpenBill, saveOpenBill } from './openBill';
 import { blockedUnits, findByBarcode, searchItems, sellableUnits, sellPricePaise, topTiles } from './catalogue';
 import { buildSale, creditsFor } from './checkout';
 import { usePos } from './context';
@@ -54,9 +55,10 @@ export function Counter() {
   const { store, engine, items, catalogueLoaded, settings, sync, online, durable, records, reloadRecords, now } = usePos();
   const narrow = useNarrow();
   const updates = useUpdateController();
-  const [cart, dispatch] = useReducer(cartReducer, emptyCart);
+  // The open bill outlives the page: leaving Sell and coming back finds it as it was (D-279).
+  const [cart, dispatch] = useReducer(cartReducer, store.sid, (sid) => loadOpenBill(sid)?.cart ?? emptyCart);
   // One id per bill: the bill QR claim and a verified counter code are tied to it (D-12).
-  const [saleId, setSaleId] = useState(() => newUlid());
+  const [saleId, setSaleId] = useState(() => loadOpenBill(store.sid)?.saleId ?? newUlid());
   const [query, setQuery] = useState('');
   const [phone, setPhone] = useState('');
   const [sub, setSub] = useState<Sub | null>(null);
@@ -78,6 +80,7 @@ export function Counter() {
   const hasBill = cart.lines.length > 0;
 
   useHoldUpdates(updates, hasBill || charging);
+  useEffect(() => saveOpenBill(store.sid, { saleId, cart }), [store.sid, saleId, cart]);
 
   const results = useMemo(() => searchItems(items, query), [items, query]);
   const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);

@@ -2,7 +2,7 @@
 
 How a shop runs its counter: sells in the shop app, keeps working without internet, and links a sale to a customer by QR or code.
 
-> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at e4fef4fa (28 Oct 2026). Update this file in the same change as the code it describes.
 
 POS means point of sale, the counter screen where a cashier rings up a sale.
 
@@ -25,6 +25,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md) sections 6 and 12.
 - No item goes below zero at the counter (D-270): a line stops at available (on hand − units blocked for accepted online orders); an online sale above it is `409 insufficient_stock`; damage and expiry stop at on hand. Only an offline race between devices can still take on hand below 0, and then the item reads 0 with "Count needed".
 - Cashiers have limited powers (D-06, D-176). POS sales use the real credits ledger and referrals (D-132).
 - Receipts live at `/r/{token}` and need no sign-in.
+- The bill being rung up stays when the cashier leaves Sell for another page or reloads (D-279): its lines and bill id are kept per store in the tab's `sessionStorage` (`todayz.biz.pos.openBill.<storeId>`, `business/src/pos/openBill.ts`). Charging or clearing the bill removes it, and so does sign-out. The customer phone is not kept.
 
 ## How it works
 
@@ -83,4 +84,4 @@ Live in code.
 
 ## Decisions
 
-D-06, D-07, D-08, D-12, D-36, D-74, D-130, D-131, D-132, D-170 to D-179, D-221, D-243, D-268, D-270.
+D-06, D-07, D-08, D-12, D-36, D-74, D-130, D-131, D-132, D-170 to D-179, D-221, D-243, D-268, D-270, D-279.
