@@ -553,5 +553,10 @@
     "message": "{label} కు డెలివరీ: {address}",
     "review": "reviewed",
     "enHash": "f4a4eb85"
+  },
+  "orders.reason.shop_rejected": {
+    "message": "ఈ షాప్ ఇకపై TodayZలో ఆర్డర్లు తీసుకోదు. మీరు వాడిన క్రెడిట్లు మీ వాలెట్‌కు తిరిగి వచ్చాయి.",
+    "review": "machine",
+    "enHash": "49fc88e8"
   }
 }

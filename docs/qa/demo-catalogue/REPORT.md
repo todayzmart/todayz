@@ -111,8 +111,8 @@ The demo command refuses non-local/test environments and `TODAYZ_NO_EGRESS`. Sou
 
 The founder changed D-273: no retailer image stays, not even as demo data. The quick-commerce layout, cards and product page stay in TodayZ green; the retailer photo pass is gone.
 
-- **Removed from the repo**: `scripts/demo/retailer-images.py`, the 24 `customer/src/home/photos/sub-*.webp` files, and the retailer paragraph in `photos/SOURCES.md`. The six `cat-*.webp` files and `home/photos.ts` / `CategoryTiles.tsx` are back to main.
-- **Removed from the local demo data**: 346 `product_images` rows (254 Flipkart, 90 Blinkit, 2 old synthetic rows) and their objects. No Blinkit, Flipkart, PharmEasy or Amazon image remains.
+- **Category art (28 Oct)**: the founder asked for distinct subcategory tiles, so the 24 `sub-*.webp` files are back as local-demo category art from Blinkit/BigBasket/Amazon, one per subcategory; the six top-level `cat-*.webp` photos stay the main CC0/owned files. The deleted retailer **product** fetcher was not restored.
+- **Removed from the local demo data**: 346 `product_images` rows (254 Flipkart, 90 Blinkit, 2 old synthetic rows) and their objects. No retailer **product** image remains; the category tiles are the separate local-demo art below.
 - **Effect**: 344 of the 1,130 listed products now have no photo and show the initials placeholder. The other listed products keep their Open Food/Beauty/Products Facts photos, with licence and credit. That is the accepted cost; the fix is to import and approve open or owned photos, not to re-add retailer ones.
 - **Kept**: the quick-commerce theme, `ItemCard` (brand, MRP/saving, tag, green Add), the product page (cover photo, Highlights, About this item, Product details, sticky Add), `scripts/demo/enrich-catalogue.py` (names, packs, prices) and the Open Facts image import search.
 - **Cover is back**: item tiles and the product page use `object-fit: cover` (D-272).

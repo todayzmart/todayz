@@ -158,5 +158,20 @@
     "message": "{amount} పేఅవుట్ తదుపరి స్టేట్‌మెంట్‌కు తీసుకెళ్లబడింది.",
     "review": "reviewed",
     "enHash": "17e54cde"
+  },
+  "statements.status.awaitingCheck": {
+    "message": "దుకాణ తనిఖీ కోసం వేచి ఉంది",
+    "review": "reviewed",
+    "enHash": "c3d22ecf"
+  },
+  "statements.payout.awaitingCheck": {
+    "message": "మా బృందం మీ దుకాణాన్ని తనిఖీ చేసే వరకు {amount} చెల్లింపు నిలిపి ఉంచబడింది.",
+    "review": "reviewed",
+    "enHash": "27cc9403"
+  },
+  "statements.awaitingCheck": {
+    "message": "మా బృందం మీ దుకాణాన్ని తనిఖీ చేసిన తర్వాత చెల్లింపులు మొదలవుతాయి. అప్పటివరకు మీరు అమ్ముతూ క్రెడిట్లు సంపాదిస్తూనే ఉంటారు.",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

@@ -2,7 +2,7 @@
 
 Where everything is in the repo, and how each folder is organised.
 
-> As built on main at c8876a4c (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 748eb5f6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 Use this page to find the file for a change. For how the pieces work together read [architecture.md](architecture.md), and for journeys read [flows.md](flows.md). Rules for each folder are in its own `CLAUDE.md`.
 
@@ -59,7 +59,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 
 | Package | Purpose | Main files |
 |---|---|---|
-| `backend/internal/admin` | The admin console's own domain: customers, businesses, stores, catalogue review, product images, banners, audit views, AI assist | `admin.go`, `handlers.go`, `businesses.go`, `product_images.go` |
+| `backend/internal/admin` | The admin console's own domain: customers, businesses, stores, catalogue review, product images, banners, audit views, AI assist, the D-274 shop check queue | `admin.go`, `handlers.go`, `businesses.go`, `shop_checks.go`, `product_images.go` |
 | `backend/internal/ai` | The AI platform and every AI feature, one subfolder each (see section 4) | `client/`, `guard/`, `drafts/`, `scrub/` |
 | `backend/internal/asks` | "Ask shops nearby": create, pick stores, shop inbox, replies, windows | `asks.go`, `create.go`, `inbox.go`, `handlers.go` |
 | `backend/internal/banners` | Shop banners: upload, review queue, daily stats, tidy job | `banners.go`, `manage.go`, `handlers.go` |
@@ -76,7 +76,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/notify` | Notification inboxes, delivery (SMS, WhatsApp), escalation, preferences | `notify.go`, `deliver.go`, `provider.go` |
 | `backend/internal/offers` | Offers and their pricing engine, feed, redemptions | `offers.go`, `engine.go`, `pricing.go` |
 | `backend/internal/ops` | The admin System screen: Beanstalk, DB and queue health | `ops.go`, `aws.go`, `db.go` |
-| `backend/internal/orders` | Online booking: create, state machine, timers, codes, delivery, returns, strikes | `orders.go`, `machine.go`, `create.go`, `transitions.go`, `timers.go` |
+| `backend/internal/orders` | Online booking: create, state machine, timers, codes, delivery, returns, strikes, the shop-reject cancel (D-274) | `orders.go`, `machine.go`, `create.go`, `transitions.go`, `timers.go`, `shop_reject.go` |
 | `backend/internal/payouts` | Monthly statements and payouts | `payouts.go`, `close.go`, `business.go` |
 | `backend/internal/pos` | The shop counter: sales, sync, bill claims, receipts | `pos.go`, `sale.go`, `sync.go`, `claims.go` |
 | `backend/internal/referrals` | Referral programme: clicks, claims, qualifying, rewards | `referrals.go`, `claim.go`, `qualify.go`, `reward.go` |
@@ -184,7 +184,7 @@ The three apps share one shape: React 19, Vite, TanStack Router (file based) and
 ```
 
 - **Routes are thin.** For example `customer/src/routes/cart.tsx` only calls `createFileRoute('/cart')` and points at `CartPage` in `customer/src/cart`.
-- **Feature folders** hold the screens and their data hooks. Customer examples: `search`, `store`, `product`, `cart`, `checkout`, `orders`, `asks`, `basket`, `account`. Business examples: `pos`, `stock`, `orders`, `credits`, `statements`, `coach`, `ai-drafts`, `onboarding`, `sync`. Admin examples: `businesses`, `catalogue`, `orders`, `payouts`, `risk`, `jobs`, `system`, `settings`.
+- **Feature folders** hold the screens and their data hooks. Customer examples: `search`, `store`, `product`, `cart`, `checkout`, `orders`, `asks`, `basket`, `account`. Business examples: `pos`, `stock`, `orders`, `credits`, `statements`, `coach`, `ai-drafts`, `onboarding`, `sync`. Admin examples: `businesses`, `shop-checks`, `catalogue`, `orders`, `payouts`, `risk`, `jobs`, `system`, `settings`.
 - **`routeTree.gen.ts` is generated and git-ignored.** `make gen` writes it. Never edit it.
 - **Business specifics.** `business/src/sync` is the offline engine (`engine.ts`, `idb.ts`, `storage.ts`) and `business/src/pos` is the counter. Both are described in [flows.md](flows.md#7-pos-sale-offline-then-sync).
 - **Admin specifics.** `admin/src/app` has the SMS step-up dialog (`StepUpDialog.tsx`, D-264) and `ReasonDialog.tsx` for audited actions.

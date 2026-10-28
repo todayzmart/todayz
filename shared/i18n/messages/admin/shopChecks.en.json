@@ -1,0 +1,122 @@
+{
+  "shopChecks.sub": {
+    "defaultMessage": "Shops go live as soon as they finish setup. Check each one: visit or call, look at the photos and the map pin. Payouts start once a shop is checked.",
+    "description": "Shop checks: page subtitle"
+  },
+  "shopChecks.list": {
+    "defaultMessage": "Shops to check",
+    "description": "Accessible name of the list of shops to check"
+  },
+  "shopChecks.empty.title": {
+    "defaultMessage": "Nothing to check",
+    "description": "Shop checks: empty queue title"
+  },
+  "shopChecks.empty.body": {
+    "defaultMessage": "Every live shop has been checked. New shops show up here as they finish setup.",
+    "description": "Shop checks: empty queue body"
+  },
+  "shopChecks.kyc": {
+    "defaultMessage": "Tax and bank: {status}",
+    "description": "Shop card pill: the business's tax and bank details status"
+  },
+  "shopChecks.noCategory": {
+    "defaultMessage": "No category",
+    "description": "Shop card: the business has not picked a category"
+  },
+  "shopChecks.liveAt": {
+    "defaultMessage": "Live {when}",
+    "description": "Shop card: when the shop went live"
+  },
+  "shopChecks.byAgent": {
+    "defaultMessage": "Added by a field agent",
+    "description": "Shop card: a field agent onboarded this shop"
+  },
+  "shopChecks.bySelf": {
+    "defaultMessage": "Signed up by the owner",
+    "description": "Shop card: the owner signed up by themselves"
+  },
+  "shopChecks.stores": {
+    "defaultMessage": "Stores",
+    "description": "Accessible name of a shop card's store list"
+  },
+  "shopChecks.noStores": {
+    "defaultMessage": "No store added yet.",
+    "description": "Shop card: the business has no store"
+  },
+  "shopChecks.map": {
+    "defaultMessage": "Open the map pin for {store}",
+    "description": "Shop card: link that opens the store's map pin in a maps app"
+  },
+  "shopChecks.noPin": {
+    "defaultMessage": "No map pin",
+    "description": "Shop card: the store has no location"
+  },
+  "shopChecks.photos": {
+    "defaultMessage": "Photos",
+    "description": "Accessible name of a shop card's photos"
+  },
+  "shopChecks.noPhotos": {
+    "defaultMessage": "No photos yet. Ask the owner to add a storefront photo, or take one on your visit.",
+    "description": "Shop card: the shop has no photos"
+  },
+  "shopChecks.photo.storefront": {
+    "defaultMessage": "Storefront",
+    "description": "Photo kind: the outside of the shop"
+  },
+  "shopChecks.photo.inside": {
+    "defaultMessage": "Inside the shop",
+    "description": "Photo kind: a photo inside the shop"
+  },
+  "shopChecks.photoAlt": {
+    "defaultMessage": "{kind} photo {n}",
+    "description": "Alt text of a shop photo thumbnail"
+  },
+  "shopChecks.check": {
+    "defaultMessage": "Mark checked",
+    "description": "Button: mark the shop checked"
+  },
+  "shopChecks.reject": {
+    "defaultMessage": "Reject",
+    "description": "Button: reject the shop"
+  },
+  "shopChecks.open": {
+    "defaultMessage": "Open business",
+    "description": "Link to the A-03 business page"
+  },
+  "shopChecks.check.title": {
+    "defaultMessage": "Mark {name} checked?",
+    "description": "Check dialog title"
+  },
+  "shopChecks.check.body": {
+    "defaultMessage": "Nothing changes for the shop's customers. Its payouts can start from the next monthly close. This is recorded with your name.",
+    "description": "Check dialog body"
+  },
+  "shopChecks.check.note": {
+    "defaultMessage": "Note",
+    "description": "Check dialog: the note box label"
+  },
+  "shopChecks.check.noteHelp": {
+    "defaultMessage": "Optional. What you saw, for example \"visited, stock and photos match\".",
+    "description": "Check dialog: the note box help"
+  },
+  "shopChecks.reject.title": {
+    "defaultMessage": "Reject {name}?",
+    "description": "Reject dialog title"
+  },
+  "shopChecks.reject.body": {
+    "defaultMessage": "The shop is hidden from customers at once. Its open online orders are cancelled, credits go back to the customers and each one is told. Counter sales are not touched. This cannot be undone here.",
+    "description": "Reject dialog body"
+  },
+  "shopChecks.reject.help": {
+    "defaultMessage": "Say what was wrong. It is recorded with your name, and support uses it if the owner asks.",
+    "description": "Reject dialog: the reason box help"
+  },
+  "shopChecks.done.check": {
+    "defaultMessage": "{name} is checked.",
+    "description": "Toast after a check"
+  },
+  "shopChecks.done.reject": {
+    "defaultMessage": "{name} is hidden. {orders, plural, =0 {No open orders.} one {# open order cancelled.} other {# open orders cancelled.}}",
+    "description": "Toast after a reject"
+  }
+}

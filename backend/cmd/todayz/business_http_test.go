@@ -246,12 +246,16 @@ func TestBusinessHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	r = a.call(owner, http.MethodPost, B+"/submit", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "submitted", r.body["status"])
+	// D-274: filled in is live. The business is verified at once and its
+	// complete stores go live with it; the shop check comes later.
+	require.Equal(t, "verified", r.body["status"])
+	require.Equal(t, "unchecked", r.body["checkStatus"])
 	r = a.call(owner, http.MethodPost, B+"/submit", nil, nil)
 	require.Equal(t, "invalid_transition", r.body["code"], r.raw)
-	r = a.call(owner, http.MethodPost, S+"/submit", nil, nil)
+	r = a.call(owner, http.MethodGet, S, nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, "pending_review", r.body["status"])
+	require.Equal(t, "live", r.body["status"], "the store went live with the business")
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'store.go_live' AND subject_id = $1`, sid))
 
 	// --- request-info: the owner sees exactly the fields (SC-BZ-04) ---------
 	_, err := a.tdb.OwnerPool.Exec(context.Background(),
@@ -640,8 +644,9 @@ func TestBusinessTenancyHTTP(t *testing.T) {
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM staff WHERE role <> 'owner'`))
 }
 
-// TestStoreReviewHTTP: a change to what review approved sends a live or
-// paused store back to review, and a rejected or suspended business takes no
+// TestStoreReviewHTTP: a change to what the shop check saw keeps a live or
+// paused store as it is (D-274: no review takes it off the map) and the audit
+// row says the profile changed; a rejected or suspended business takes no
 // store or KYC changes (review M4).
 func TestStoreReviewHTTP(t *testing.T) {
 	if testing.Short() {
@@ -682,11 +687,12 @@ func TestStoreReviewHTTP(t *testing.T) {
 		r = patch(profile)
 		require.Equal(t, c.from, r.body["status"], "the same values change nothing: %v", c.body)
 		r = patch(c.body)
-		require.Equal(t, "pending_review", r.body["status"], "%v", c.body)
+		require.Equal(t, c.from, r.body["status"], "%v", c.body)
 		patch(profile)
 	}
-	require.Equal(t, 5, a.count(`SELECT count(*) FROM audit_log WHERE action = 'store.update'
-		AND before->>'status' IN ('live', 'paused') AND after->>'status' = 'pending_review'`))
+	require.Equal(t, 10, a.count(`SELECT count(*) FROM audit_log WHERE action = 'store.update'
+		AND before->>'status' IN ('live', 'paused') AND after->>'status' = before->>'status'
+		AND (after->>'profileChanged')::bool`), "each change and each change back")
 
 	kyc := a.call(owner, http.MethodGet, B+"/kyc", nil, nil)
 	require.Equal(t, http.StatusOK, kyc.code, kyc.raw)

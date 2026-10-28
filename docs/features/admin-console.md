@@ -2,7 +2,7 @@
 
 What TodayZ staff can see and do: pulse, reviews of shops, risk, settings, support tickets, jobs and system health.
 
-> As built on main at 713c1cae (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 The console is at admin.todayz.in. It is English only (the console i18n is partial, see [languages-and-design](languages-and-design.md)).
 
@@ -13,7 +13,8 @@ Each screen is a route in [admin/src](../../admin/src/). Screens are gated by ro
 | Screen | Folder | What |
 |---|---|---|
 | Pulse (home) | [pulse](../../admin/src/pulse/) | Daily platform numbers |
-| Businesses, stores | [businesses](../../admin/src/businesses/), [stores](../../admin/src/stores/) | Verify, ask for info, suspend, review store, force-close ([stores-and-onboarding](stores-and-onboarding.md)) |
+| Shop checks (A-24) | [shop-checks](../../admin/src/shop-checks/) | The daily queue of live, unchecked shops, newest first: mark checked or reject with a reason (field_agent, admin, super_admin; D-274, [stores-and-onboarding](stores-and-onboarding.md)) |
+| Businesses, stores | [businesses](../../admin/src/businesses/), [stores](../../admin/src/stores/) | Suspend, reinstate, force-close; the check pill on A-03; the pre-D-274 verify and store review stay for old rows ([stores-and-onboarding](stores-and-onboarding.md)) |
 | Field agents, leads | [field](../../admin/src/field/) | Onboard shops for owners |
 | Orders | [orders](../../admin/src/orders/) | Search and cancel ([orders-pickup-delivery](orders-pickup-delivery.md)) |
 | Customers | [customers](../../admin/src/customers/) | Block, reset strikes, adjust credits |
@@ -36,6 +37,7 @@ Customers and shops reach support from their own apps: [customer/src/help](../..
 Source: [01-product-rules.md](../plan/01-product-rules.md) sections 13 and 14.
 
 - Every sensitive change writes an audit row, and KYC reveal is audited (D-41).
+- Shop check (D-274): shops go live on submit with nobody approving first. field_agent, admin and super_admin work A-24 and mark a shop `checked` (audited `business.check`) or reject it with a reason (`business.check_reject`). A reject hides the shop at once and cancels its open online orders with `shop_rejected`: no customer strike, held credits back, each customer told. Until checked, the monthly close holds the shop's payout as `shop_unchecked` (A-11 shows the cause). The A-24 list and actions work at phone width for agents in the field.
 - Support SLA keys: `support_sla_<priority>_min`, `support_open_tickets_max`, `support_tickets_per_hour`, `support_uploads_per_hour`, `support_upload_ttl_hours`.
 - Risk rules and thresholds: D-225. Store strikes do not auto-pause (D-67). Keys include `store_strike_risk_threshold`.
 - The permission matrix is D-38. Admin AI drafts apply by the screen's own permissions (D-233).
@@ -68,7 +70,7 @@ Every domain keeps its own admin handlers; `backend/internal/admin` holds the sh
 
 ## Tests
 
-Package tests; journeys `13-e2e-20-suspended`, `12-e2e-19-blocked`, `05-e2e-10-review-hide`. Reports: [W3-02](../qa/W3-02/REPORT.md), [W3-08](../qa/W3-08/REPORT.md), [W3-15](../qa/W3-15/REPORT.md), [W3-16](../qa/W3-16/REPORT.md), [admin-i18n](../qa/admin-i18n/). Runbooks: [risk-store-strikes](../runbooks/risk-store-strikes.md), [jobs-job-failing](../runbooks/jobs-job-failing.md).
+Package tests (`backend/cmd/todayz/shop_check_http_test.go`, `admin/src/shop-checks/shopChecks.test.tsx`); journeys `16-e2e-08-field-onboarding` (the agent checks the shop), `13-e2e-20-suspended`, `12-e2e-19-blocked`, `05-e2e-10-review-hide`. Reports: [W3-02](../qa/W3-02/REPORT.md), [W3-08](../qa/W3-08/REPORT.md), [W3-15](../qa/W3-15/REPORT.md), [W3-16](../qa/W3-16/REPORT.md), [admin-i18n](../qa/admin-i18n/). Runbooks: [risk-store-strikes](../runbooks/risk-store-strikes.md), [jobs-job-failing](../runbooks/jobs-job-failing.md).
 
 ## Status and known gaps
 
@@ -76,4 +78,4 @@ Live in code. Admin and its legal text are English only (B6). A sessions page fo
 
 ## Decisions
 
-D-38, D-41, D-47, D-64, D-95, D-97, D-106, D-224, D-225, D-226, D-227, D-233, D-240, D-244 (superseded by D-264), D-264.
+D-38, D-41, D-47, D-64, D-95, D-97, D-106, D-224, D-225, D-226, D-227, D-233, D-240, D-244 (superseded by D-264), D-264, D-274.

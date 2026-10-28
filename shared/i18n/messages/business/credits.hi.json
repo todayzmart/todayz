@@ -318,5 +318,10 @@
     "message": "{credits, plural, one {# क्रेडिट} other {# क्रेडिट}}",
     "review": "reviewed",
     "enHash": "4854c909"
+  },
+  "credits.payouts.awaitingCheck": {
+    "message": "भुगतान हमारी टीम के आपकी दुकान जाँचने के बाद शुरू होगा। तब तक आप बेचते और क्रेडिट कमाते रहेंगे।",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

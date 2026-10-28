@@ -158,5 +158,20 @@
     "message": "{amount} का पेआउट अगले स्टेटमेंट में जोड़ा गया।",
     "review": "reviewed",
     "enHash": "17e54cde"
+  },
+  "statements.status.awaitingCheck": {
+    "message": "दुकान की जाँच बाकी",
+    "review": "reviewed",
+    "enHash": "c3d22ecf"
+  },
+  "statements.payout.awaitingCheck": {
+    "message": "{amount} का भुगतान हमारी टीम के आपकी दुकान जाँचने तक रुका है।",
+    "review": "reviewed",
+    "enHash": "27cc9403"
+  },
+  "statements.awaitingCheck": {
+    "message": "भुगतान हमारी टीम के आपकी दुकान जाँचने के बाद शुरू होगा। तब तक आप बेचते और क्रेडिट कमाते रहेंगे।",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

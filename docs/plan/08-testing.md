@@ -372,7 +372,7 @@ The Gate column (D-11) says which wave gate runs the journey: W2 (the W2-13 gate
 | E2E-05 | Delivery order end to end with rider; full phone visible to the shop only while out for delivery | W2 |
 | E2E-06 | POS walk-in with bill QR credits | W2 |
 | E2E-07 | POS goes offline after an online clock check → customer reads the counter code → sale recorded with the typed code and device time → POS back online within 12 h → server verifies the code at the recorded time step → sale linked, cashback posted. Variants: sync after 12 h, device clock off by more than 2 min at the last online check, or a reused code → sale kept but unlinked, no ledger entries, shop sees "Customer link failed" (D-12) | W2 |
-| E2E-08 | Field agent onboards shop → owner confirms → admin verifies the business and approves the store (`live`) → shop appears in search → first order | W3 |
+| E2E-08 | Field agent onboards shop → owner confirms and the business and store go live at once (D-274) → shop appears in search → first order → the field agent marks the shop checked from the A-24 queue | W3 |
 | E2E-09 | Month end → statement → finance marks paid → business sees Paid with UTR | W3 |
 | E2E-10 | Admin hides a review → rating changes on the customer shop page (W2 gate: admin API; W3 gate: admin UI, D-83) | W2, again at W3 |
 | E2E-11 | Voice update draft → edit → confirm → stock changes → customer sees updated freshness | W3 |

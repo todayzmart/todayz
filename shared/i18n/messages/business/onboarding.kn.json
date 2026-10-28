@@ -1,8 +1,8 @@
 {
   "onboarding.title": {
-    "message": "ಅಂಗಡಿ ಸೆಟಪ್",
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಸಿದ್ಧಪಡಿಸಿ",
     "review": "reviewed",
-    "enHash": "0857f615"
+    "enHash": "f54cfff6"
   },
   "onboarding.loading": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಸೆಟಪ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
@@ -34,11 +34,6 @@
     "review": "reviewed",
     "enHash": "ed6b1f38"
   },
-  "onboarding.step": {
-    "message": "ಹಂತ {n}: {title}",
-    "review": "reviewed",
-    "enHash": "1133cf5c"
-  },
   "onboarding.done": {
     "message": "ಮುಗಿದಿದೆ",
     "review": "reviewed",
@@ -53,11 +48,6 @@
     "message": "ಉಳಿಸಿ",
     "review": "reviewed",
     "enHash": "efc007a3"
-  },
-  "onboarding.business.title": {
-    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ ಬಗ್ಗೆ",
-    "review": "reviewed",
-    "enHash": "6291f190"
   },
   "onboarding.business.brandName": {
     "message": "ಅಂಗಡಿಯ ಹೆಸರು",
@@ -89,16 +79,6 @@
     "review": "reviewed",
     "enHash": "99f2197d"
   },
-  "onboarding.business.categoryNone": {
-    "message": "ವರ್ಗ ಆರಿಸಿ",
-    "review": "reviewed",
-    "enHash": "b91bf5d4"
-  },
-  "onboarding.store.title": {
-    "message": "ನಿಮ್ಮ ಮೊದಲ ಅಂಗಡಿ",
-    "review": "reviewed",
-    "enHash": "c1b36766"
-  },
   "onboarding.store.have": {
     "message": "ಅಂಗಡಿ ಸೇರಿಸಲಾಗಿದೆ: {name}.",
     "review": "reviewed",
@@ -114,30 +94,10 @@
     "review": "reviewed",
     "enHash": "a0df4ca0"
   },
-  "onboarding.hours.title": {
-    "message": "ತೆರೆಯುವ ಸಮಯ",
-    "review": "reviewed",
-    "enHash": "6117e118"
-  },
-  "onboarding.payout.title": {
-    "message": "ಪಾವತಿ ವಿವರಗಳು",
-    "review": "reviewed",
-    "enHash": "ad5e1a85"
-  },
-  "onboarding.payout.body": {
-    "message": "ನಾವು ನಿಮಗೆ ಎಲ್ಲಿ ಹಣ ಕಳುಹಿಸಬೇಕು. ಇದನ್ನು ಈಗ ಅಥವಾ ನಂತರ ಸೇರಿಸಬಹುದು; ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಲು ಇದು ಬೇಕಿಲ್ಲ.",
-    "review": "reviewed",
-    "enHash": "16c98dff"
-  },
-  "onboarding.docs.title": {
-    "message": "ದಾಖಲೆಗಳು",
-    "review": "reviewed",
-    "enHash": "687c8286"
-  },
   "onboarding.docs.help": {
-    "message": "ಫೋಟೋಗಳು ಅಥವಾ PDF, ಪ್ರತಿಯೊಂದೂ 10 MB ವರೆಗೆ. ದಾಖಲೆಗಳನ್ನು ಖಾಸಗಿಯಾಗಿ ಇಡಲಾಗುತ್ತದೆ, ನಮ್ಮ ಪರಿಶೀಲನಾ ತಂಡ ಮಾತ್ರ ನೋಡುತ್ತದೆ.",
+    "message": "ಫೋಟೋಗಳು ಅಥವಾ PDF, ಪ್ರತಿಯೊಂದೂ 10 MB ವರೆಗೆ. ಇವು ಖಾಸಗಿಯಾಗಿರುತ್ತವೆ: ನೀವು ಮತ್ತು ನಮ್ಮ ತಂಡ ಮಾತ್ರ ನೋಡಬಹುದು.",
     "review": "reviewed",
-    "enHash": "5285e84b"
+    "enHash": "3a2e8447"
   },
   "onboarding.docs.kind.pan": {
     "message": "PAN ಕಾರ್ಡ್",
@@ -175,14 +135,14 @@
     "enHash": "27548c4f"
   },
   "onboarding.docs.status.accepted": {
-    "message": "ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "message": "ಸೇರಿಸಲಾಗಿದೆ",
     "review": "reviewed",
-    "enHash": "61a0572c"
+    "enHash": "b68734c2"
   },
   "onboarding.docs.status.rejected": {
-    "message": "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "message": "ಬದಲಿಸಲು ಕೇಳಲಾಗಿದೆ",
     "review": "reviewed",
-    "enHash": "27eeb7a2"
+    "enHash": "99604f84"
   },
   "onboarding.docs.add": {
     "message": "{name} ಸೇರಿಸಿ",
@@ -214,25 +174,20 @@
     "review": "reviewed",
     "enHash": "dd02b2ad"
   },
-  "onboarding.submit.title": {
-    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಿ",
-    "review": "reviewed",
-    "enHash": "ddc87345"
-  },
   "onboarding.submit.body": {
-    "message": "ನಾವು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತೇವೆ, ಏನಾದರೂ ಬೇಕಿದ್ದರೆ ಕರೆ ಮಾಡುತ್ತೇವೆ. ಪರಿಶೀಲನೆಯ ಸಮಯದಲ್ಲೂ ನೀವು ಆರ್ಡರ್‌ಗಳಿಗೆ TodayZ ಬಳಸಬಹುದು.",
+    "message": "ನಮ್ಮ ತಂಡ ಮುಂದಿನ ಕೆಲವು ದಿನಗಳಲ್ಲಿ ಪ್ರತಿ ಹೊಸ ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ. ನೀವು ತಕ್ಷಣ ಮಾರಬಹುದು; ಪಾವತಿಗಳು ಪರಿಶೀಲನೆಯ ನಂತರ ಶುರುವಾಗುತ್ತವೆ.",
     "review": "reviewed",
-    "enHash": "6dc86397"
+    "enHash": "b54252c8"
   },
   "onboarding.submit.action": {
-    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಿ",
+    "message": "ಲೈವ್ ಮಾಡಿ",
     "review": "reviewed",
-    "enHash": "ddc87345"
+    "enHash": "b8d1bae4"
   },
   "onboarding.submit.sent": {
-    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಲಾಗಿದೆ",
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಲೈವ್ ಆಗಿದೆ",
     "review": "reviewed",
-    "enHash": "ef78972f"
+    "enHash": "448f50bc"
   },
   "onboarding.status.submitted.title": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ",
@@ -255,24 +210,24 @@
     "enHash": "f7322f3e"
   },
   "onboarding.status.verified.title": {
-    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಲೈವ್ ಆಗಿದೆ",
     "review": "reviewed",
-    "enHash": "f69ca01e"
+    "enHash": "448f50bc"
   },
   "onboarding.status.verified.body": {
-    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಲೈವ್ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಬಹುದು.",
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಲೈವ್ ಸ್ಟೋರ್‌ಗಳನ್ನು ಹುಡುಕಬಹುದು. ನಮ್ಮ ತಂಡ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲಿಸಿದ ನಂತರ ಪಾವತಿಗಳು ಶುರುವಾಗುತ್ತವೆ.",
     "review": "reviewed",
-    "enHash": "ca169a4c"
+    "enHash": "3c08f63c"
   },
   "onboarding.status.rejected.title": {
-    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಅನುಮೋದನೆಯಾಗಿಲ್ಲ",
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
     "review": "reviewed",
-    "enHash": "75e8f563"
+    "enHash": "f4a5ef0a"
   },
   "onboarding.status.rejected.body": {
-    "message": "ಇದು ತಪ್ಪು ಎಂದು ನಿಮಗೆ ಅನಿಸಿದರೆ ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+    "message": "ನಮ್ಮ ತಂಡಕ್ಕೆ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ದೃಢೀಕರಿಸಲು ಆಗಲಿಲ್ಲ, ಆದ್ದರಿಂದ ಗ್ರಾಹಕರು ಅದನ್ನು ನೋಡಲಾರರು. ಕಾರಣ ತಿಳಿಯಲು ಸಹಾಯವನ್ನು ಸಂಪರ್ಕಿಸಿ.",
     "review": "reviewed",
-    "enHash": "9e413826"
+    "enHash": "522db36f"
   },
   "onboarding.status.suspended.title": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ತಡೆಹಿಡಿಯಲಾಗಿದೆ",
@@ -353,5 +308,160 @@
     "message": "ಬೇರೆ ಯಾವುದೋ ವಿವರ",
     "review": "reviewed",
     "enHash": "61052ba2"
+  },
+  "onboarding.lede": {
+    "message": "ಕೆಲವು ವಿವರಗಳನ್ನು ತುಂಬಿ, ನಿಮ್ಮ ಅಂಗಡಿ ತಕ್ಷಣ ಲೈವ್ ಆಗುತ್ತದೆ. ಅನುಮೋದನೆಗಾಗಿ ಕಾಯಬೇಕಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "f73cd625"
+  },
+  "onboarding.progress": {
+    "message": "{total} ರಲ್ಲಿ {done} ಹಂತಗಳು ಮುಗಿದಿವೆ",
+    "review": "reviewed",
+    "enHash": "46b052c6"
+  },
+  "onboarding.steps.label": {
+    "message": "ಸಿದ್ಧತೆಯ ಹಂತಗಳು",
+    "review": "reviewed",
+    "enHash": "281a6952"
+  },
+  "onboarding.steps.business": {
+    "message": "ಅಂಗಡಿಯ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.steps.store": {
+    "message": "ವಿಳಾಸ ಮತ್ತು ನಕ್ಷೆ ಪಿನ್",
+    "review": "reviewed",
+    "enHash": "a729fbde"
+  },
+  "onboarding.steps.hours": {
+    "message": "ತೆರೆಯುವ ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.steps.category": {
+    "message": "ನೀವು ಏನು ಮಾರುತ್ತೀರಿ",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.steps.photos": {
+    "message": "ಅಂಗಡಿಯ ಫೋಟೋಗಳು",
+    "review": "reviewed",
+    "enHash": "733b9d17"
+  },
+  "onboarding.steps.payout": {
+    "message": "GST, PAN ಮತ್ತು ಪಾವತಿಗಳು",
+    "review": "reviewed",
+    "enHash": "21cfd6a1"
+  },
+  "onboarding.steps.live": {
+    "message": "ಲೈವ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "b8d1bae4"
+  },
+  "onboarding.optional": {
+    "message": "ಐಚ್ಛಿಕ",
+    "review": "reviewed",
+    "enHash": "0c6c4102"
+  },
+  "onboarding.recommended": {
+    "message": "ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "9ef93755"
+  },
+  "onboarding.toDashboard": {
+    "message": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "e5fa8758"
+  },
+  "onboarding.stepOf": {
+    "message": "ಹಂತ {n} / {total}",
+    "review": "reviewed",
+    "enHash": "78cee4b8"
+  },
+  "onboarding.back": {
+    "message": "ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "onboarding.next": {
+    "message": "ಮುಂದೆ",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "onboarding.skip": {
+    "message": "ಈಗ ಬಿಟ್ಟುಬಿಡಿ",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "onboarding.intro.business": {
+    "message": "ಗ್ರಾಹಕರು ಹತ್ತಿರದಲ್ಲಿ ಹುಡುಕುವಾಗ ನೋಡುವ ಹೆಸರು.",
+    "review": "reviewed",
+    "enHash": "06b8dcbd"
+  },
+  "onboarding.intro.store": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಎಲ್ಲಿದೆ. ಗ್ರಾಹಕರು ಮತ್ತು ಡೆಲಿವರಿ ಮಾಡುವವರು ಹುಡುಕಲು ಪಿನ್ ಅನ್ನು ಅಂಗಡಿಯ ಬಾಗಿಲಿನ ಮೇಲೆ ಇಡಿ.",
+    "review": "reviewed",
+    "enHash": "5c51081b"
+  },
+  "onboarding.intro.hours": {
+    "message": "ನೀವು ಯಾವಾಗ ತೆರೆದಿರುತ್ತೀರಿ. ನೀವು ತೆರೆದಿರುವಾಗ ಮಾತ್ರ ಗ್ರಾಹಕರು ಬುಕ್ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "8d5a9398"
+  },
+  "onboarding.intro.category": {
+    "message": "ನಿಮ್ಮ ಹೆಚ್ಚಿನ ಸಾಮಾನುಗಳಿಗೆ ಹೊಂದುವದನ್ನು ಆರಿಸಿ. ಇದು ಗ್ರಾಹಕರು ನಿಮ್ಮನ್ನು ಹುಡುಕಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "ac72e9e8"
+  },
+  "onboarding.intro.photos": {
+    "message": "ಅಂಗಡಿಯ ಮುಂಭಾಗದ ಒಂದು ಫೋಟೋ ಮತ್ತು ಒಳಗಿನ ಒಂದು. ಗ್ರಾಹಕರು ತಾವು ನೋಡಬಹುದಾದ ಅಂಗಡಿಯನ್ನು ನಂಬುತ್ತಾರೆ, ಮತ್ತು ನಮ್ಮ ತಂಡ ಅಂಗಡಿ ಪರಿಶೀಲನೆಗೆ ಇವುಗಳನ್ನು ಬಳಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "36cd65a6"
+  },
+  "onboarding.intro.payout": {
+    "message": "ನಿಮ್ಮ ಹಣವನ್ನು ನಾವು ಎಲ್ಲಿಗೆ ಕಳುಹಿಸಬೇಕು, ಮತ್ತು ನಿಮ್ಮ ತೆರಿಗೆ ದಾಖಲೆಗಳು. ಇವುಗಳಿಲ್ಲದೆ ಲೈವ್ ಆಗಬಹುದು ಮತ್ತು ನಂತರ ಸೇರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "fcf5563f"
+  },
+  "onboarding.intro.live": {
+    "message": "ನೀವು ಲೈವ್ ಆದ ತಕ್ಷಣ ಹತ್ತಿರದ ಗ್ರಾಹಕರು ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಹುಡುಕಿ ಬುಕ್ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "2178871c"
+  },
+  "onboarding.intro.liveDone": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ ಸ್ಥಿತಿ ಇಲ್ಲಿದೆ.",
+    "review": "reviewed",
+    "enHash": "0006b2db"
+  },
+  "onboarding.live.addProducts": {
+    "message": "ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳನ್ನು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "28822efe"
+  },
+  "onboarding.photos.help": {
+    "message": "JPG, PNG ಅಥವಾ WebP, ಪ್ರತಿಯೊಂದೂ 10 MB ವರೆಗೆ. ಫೋಟೋಗಳು ತಕ್ಷಣ ಸೇರುತ್ತವೆ; ಮೊದಲು ಯಾರೂ ಅನುಮೋದಿಸಬೇಕಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "61f26173"
+  },
+  "onboarding.taxDocs": {
+    "message": "ತೆರಿಗೆ ಮತ್ತು ಪರವಾನಗಿ ದಾಖಲೆಗಳು",
+    "review": "reviewed",
+    "enHash": "de682406"
+  },
+  "onboarding.taxDocs.help": {
+    "message": "ಫೋಟೋಗಳು ಅಥವಾ PDF, ಪ್ರತಿಯೊಂದೂ 10 MB ವರೆಗೆ. ಇವು ಖಾಸಗಿಯಾಗಿರುತ್ತವೆ: ನೀವು ಮತ್ತು ನಮ್ಮ ತಂಡ ಮಾತ್ರ ನೋಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "3a2e8447"
+  },
+  "onboarding.status.verified_checked.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಲೈವ್ ಆಗಿದೆ ಮತ್ತು ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "617485bc"
+  },
+  "onboarding.status.verified_checked.body": {
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಲೈವ್ ಸ್ಟೋರ್‌ಗಳನ್ನು ಹುಡುಕಬಹುದು, ಮತ್ತು ಪಾವತಿಗಳು ಸಾಮಾನ್ಯ ವೇಳಾಪಟ್ಟಿಯಲ್ಲಿ ಬರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "91bc1cac"
   }
 }

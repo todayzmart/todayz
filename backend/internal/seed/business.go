@@ -61,7 +61,10 @@ type seedBusiness struct {
 	Status   string // businesses.status
 	Referral string
 	Verified time.Duration // verified this long before the seed clock (0: not verified)
-	KYC      *seedKYC
+	// Unchecked keeps a live business in the D-274 shop check queue; every
+	// other live or suspended one was checked when it went live.
+	Unchecked bool
+	KYC       *seedKYC
 }
 
 // seedKYC is a business's payout details; every value is made up.
@@ -101,7 +104,7 @@ const day = 24 * time.Hour
 var seedBusinesses = []seedBusiness{
 	{Key: "lakshmi", ID: "01KE0S1W6W8ZV7T1C3A6MB0001", Brand: "Lakshmi Traders", Legal: "Lakshmi Traders LLP", Status: "verified", Referral: "BMKT22", Verified: 120 * day,
 		KYC: &seedKYC{PAN: "AAAFL0001K", UPI: "lakshmitraders.seed@oktz", Bank: "000000001001", IFSC: "TZSB0000001", Legal: "Lakshmi Traders LLP", Status: "verified"}},
-	{Key: "annapurna", ID: "01KE0S1W6W8ZV7T1C3A6MB0002", Brand: "Annapurna Provisions", Status: "verified", Referral: "BANP23", Verified: 10 * day},
+	{Key: "annapurna", ID: "01KE0S1W6W8ZV7T1C3A6MB0002", Brand: "Annapurna Provisions", Status: "verified", Referral: "BANP23", Verified: 10 * day, Unchecked: true},
 	{Key: "nandi", ID: "01KE0S1W6W8ZV7T1C3A6MB0003", Brand: "Nandi Hardware", Status: "verified", Referral: "BNDH24", Verified: 90 * day},
 	{Key: "kaveri", ID: "01KE0S1W6W8ZV7T1C3A6MB0004", Brand: "Kaveri Fresh", Status: "verified", Referral: "BKVF25", Verified: 90 * day},
 	{Key: "automart", ID: "01KE0S1W6W8ZV7T1C3A6MB0005", Brand: "Auto Mart", Status: "verified", Referral: "BATM26", Verified: 90 * day},
@@ -269,11 +272,15 @@ func seedbusiness(ctx context.Context, d Deps, _ Profile) error {
 		if b.Status == "needs_info" {
 			fields, note = []string{"storefrontPhoto"}, opt("A clearer storefront photo, please.")
 		}
+		check, checkedAt := "unchecked", (*time.Time)(nil)
+		if verifiedAt != nil && !b.Unchecked {
+			check, checkedAt = "checked", verifiedAt
+		}
 		if _, err := q.Exec(ctx, `INSERT INTO businesses (id, brand_name, legal_name, status, referral_code,
-				needs_info_fields, needs_info_note, submitted_at, verified_at, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10) ON CONFLICT DO NOTHING`,
+				needs_info_fields, needs_info_note, submitted_at, verified_at, check_status, checked_at, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12) ON CONFLICT DO NOTHING`,
 			ids.UUID(mustID(b.ID)), b.Brand, opt(b.Legal), b.Status, b.Referral, fields, note,
-			submittedAt, verifiedAt, now.Add(-150*day)); err != nil {
+			submittedAt, verifiedAt, check, checkedAt, now.Add(-150*day)); err != nil {
 			return fmt.Errorf("business %s: %w", b.Key, err)
 		}
 		if b.KYC != nil && seal != nil {

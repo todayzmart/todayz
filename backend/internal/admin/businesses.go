@@ -104,7 +104,8 @@ func (s *Service) business(ctx context.Context, id ids.ID) (api.AdminBusiness, e
 	out := api.AdminBusiness{
 		Id: idString(b.ID), BrandName: b.BrandName, LegalName: b.LegalName, Status: api.AdminBusinessStatus(b.Status),
 		NeedsInfoFields: fields, NeedsInfoNote: b.NeedsInfoNote, SubmittedAt: utcPtr(b.SubmittedAt),
-		VerifiedAt: utcPtr(b.VerifiedAt), CreatedAt: b.CreatedAt.UTC(), ServerNow: s.now(),
+		VerifiedAt: utcPtr(b.VerifiedAt), CheckStatus: api.AdminCheckStatus(b.CheckStatus), CheckedAt: utcPtr(b.CheckedAt),
+		CheckNote: b.CheckNote, CreatedAt: b.CreatedAt.UTC(), ServerNow: s.now(),
 		Kyc:    api.AdminKyc{Status: "missing"},
 		Stores: []api.AdminBusinessStore{}, Staff: []api.AdminBusinessStaff{}, Documents: []api.AdminBusinessDocument{},
 	}

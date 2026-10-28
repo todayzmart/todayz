@@ -24,7 +24,7 @@ PayoutStatus:
   enum: [pending, held, paid, cancelled]
 PayoutHoldCause:
   type: string
-  enum: [kyc_incomplete, payout_details_missing, risk_flag, business_suspended, manual]
+  enum: [kyc_incomplete, payout_details_missing, risk_flag, business_suspended, manual, shop_unchecked]
 PayoutKycStatus:
   type: string
   enum: [missing, submitted, verified, rejected]
@@ -177,13 +177,14 @@ AdminPayoutLine:
     amountPaise: {$ref: ./common.yaml#/Paise}
 AdminPayoutCauses:
   type: object
-  required: [businessSuspended, kycVerified, payoutDetailsMissing, openRiskFlag]
+  required: [businessSuspended, shopChecked, payoutDetailsMissing, openRiskFlag]
   description: >-
-    The automatic hold causes as they are now (01 §9). payoutDetailsMissing is a business with neither a
+    The automatic hold causes as they are now (01 §9). shopChecked is a shop a field agent or admin has
+    checked (D-274); until then its payout is held. payoutDetailsMissing is a business with neither a
     UPI id nor a bank account to pay to.
   properties:
     businessSuspended: {type: boolean}
-    kycVerified: {type: boolean}
+    shopChecked: {type: boolean}
     payoutDetailsMissing: {type: boolean}
     openRiskFlag: {type: boolean}
 AdminPayoutPayee:
@@ -245,13 +246,14 @@ BusinessPayoutState:
   required: [status, amountPaise, utr, paidAt]
   description: >-
     The business sees `processing` until finance marks the payout paid, `needs_kyc` while it is held for
-    incomplete KYC or payout details, and `paid` with the UTR after (01 §9). An earlier statement whose
+    incomplete KYC or payout details, `awaiting_check` while it is held until a field agent or admin
+    checks the shop (D-274), and `paid` with the UTR after (01 §9). An earlier statement whose
     payout a later close recomputed (D-09: one open payout per business) is `carried`: its amount went on
     into the next statement's payout, which shows the live state.
   properties:
     status:
       type: string
-      enum: [processing, needs_kyc, paid, carried]
+      enum: [processing, needs_kyc, awaiting_check, paid, carried]
     amountPaise:
       $ref: ./common.yaml#/Paise
       description: What this statement's close computed when `carried`; else the payout's amount.

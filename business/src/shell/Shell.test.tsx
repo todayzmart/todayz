@@ -153,6 +153,13 @@ describe('business shell', () => {
     expect(within(list).getAllByRole('link').map((l) => l.getAttribute('href'))).toEqual(MORE.map((m) => `/${m.section}`));
   });
 
+  it('draws B-02 onboarding without the shell: its own green rail, no sidebar or tabs (D-274)', async () => {
+    renderAt('/onboarding');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Set up your shop' })).toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: 'Business' })).toBeNull();
+    expect(screen.getAllByRole('main')).toHaveLength(1);
+  });
+
   it('shows not found for unknown paths', async () => {
     renderAt('/no-such-page');
     expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeInTheDocument();

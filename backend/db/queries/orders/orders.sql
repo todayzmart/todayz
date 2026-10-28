@@ -14,14 +14,18 @@
 
 -- name: StoreForBooking :one
 -- The store as checkout needs it. A store is bookable while live and its
--- business verified (D-40, the same filter as discovery).
+-- business verified (D-40, the same filter as discovery). The business row
+-- is held FOR SHARE to the end of checkout, so a shop reject (D-274, which
+-- locks it FOR UPDATE) either waits for this order and then cancels it, or
+-- commits first and this checkout sees the shop rejected.
 SELECT s.id, s.business_id, s.slug, s.name, s.address_line1, s.address_line2, s.locality,
        s.status, (b.status = 'verified')::bool AS business_verified,
        s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp, s.auto_accept,
        s.delivery_radius_m, s.delivery_fee_paise, s.delivery_free_above_paise, s.delivery_min_order_paise,
        s.delivery_hours, (s.location IS NOT NULL)::bool AS has_location
 FROM stores s JOIN businesses b ON b.id = s.business_id
-WHERE s.id = @id;
+WHERE s.id = @id
+FOR SHARE OF b;
 
 -- name: AddressForDelivery :one
 -- The customer's saved address, with whether it is inside the store's
@@ -581,3 +585,15 @@ WHERE st.id = x.id
   AND (st.accept_rate_30d IS DISTINCT FROM x.accept_rate
     OR st.unaccepted_expiry_rate_30d IS DISTINCT FROM x.expiry_rate
     OR st.reliability_score IS DISTINCT FROM x.score);
+
+-- name: OpenOrdersOfBusiness :many
+-- The open online orders of every store of a business, for the shop reject
+-- (D-274). Every order row is locked here, in id order, before any of their
+-- stock is touched, so the reject never holds one order's items while it
+-- waits for another order (an accept holds its order, then its items).
+SELECT o.id FROM orders o
+JOIN stores s ON s.id = o.store_id
+WHERE s.business_id = @business_id
+  AND o.status IN ('placed','awaiting_customer','accepted','ready','out_for_delivery')
+ORDER BY o.id
+FOR UPDATE OF o;

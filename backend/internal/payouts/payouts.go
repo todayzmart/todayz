@@ -43,7 +43,8 @@ const (
 	statusCancelled = "cancelled"
 
 	holdSuspended = "business_suspended"
-	holdKYC       = "kyc_incomplete"
+	holdUnchecked = "shop_unchecked"
+	holdKYC       = "kyc_incomplete" // before D-274: payouts waited for verified KYC
 	holdDetails   = "payout_details_missing"
 	holdRisk      = "risk_flag"
 	holdManual    = "manual"
@@ -143,23 +144,24 @@ func (s *Service) newID(now time.Time) ids.ID { return s.ids.New(now) }
 
 // --- small helpers ---------------------------------------------------------------
 
-// causes are the automatic hold causes now (01 §9). DetailsMissing is a
-// business with neither a UPI id nor a bank account to pay to.
+// causes are the automatic hold causes now (01 §9). Checked is a shop a
+// field agent or admin has checked (D-274); DetailsMissing is a business with
+// neither a UPI id nor a bank account to pay to.
 type causes struct {
-	Suspended, KYCVerified, DetailsMissing, RiskFlag bool
+	Suspended, Checked, DetailsMissing, RiskFlag bool
 }
 
-func (c causes) open() bool { return c.Suspended || !c.KYCVerified || c.DetailsMissing || c.RiskFlag }
+func (c causes) open() bool { return c.Suspended || !c.Checked || c.DetailsMissing || c.RiskFlag }
 
 // reason is the hold reason the open causes give, in this order: a suspended
-// business, then KYC, then no payout details, then a risk flag; "" when none
-// is open.
+// business, then a shop not checked yet, then no payout details, then a risk
+// flag; "" when none is open.
 func (c causes) reason() string {
 	switch {
 	case c.Suspended:
 		return holdSuspended
-	case !c.KYCVerified:
-		return holdKYC
+	case !c.Checked:
+		return holdUnchecked
 	case c.DetailsMissing:
 		return holdDetails
 	case c.RiskFlag:
@@ -173,7 +175,7 @@ func (s *Service) causes(ctx context.Context, q *payoutsdb.Queries, business ids
 	if err != nil {
 		return causes{}, fmt.Errorf("payouts: hold causes: %w", err)
 	}
-	return causes{Suspended: r.Suspended, KYCVerified: r.KycVerified, DetailsMissing: r.DetailsMissing, RiskFlag: r.RiskFlag}, nil
+	return causes{Suspended: r.Suspended, Checked: r.Checked, DetailsMissing: r.DetailsMissing, RiskFlag: r.RiskFlag}, nil
 }
 
 func mustID(u pgtype.UUID) ids.ID {

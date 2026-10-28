@@ -1,8 +1,8 @@
 {
   "onboarding.title": {
-    "message": "கடை அமைப்பு",
+    "message": "உங்கள் கடையை அமையுங்கள்",
     "review": "reviewed",
-    "enHash": "0857f615"
+    "enHash": "f54cfff6"
   },
   "onboarding.loading": {
     "message": "உங்கள் கடை அமைப்பு ஏற்றப்படுகிறது",
@@ -34,11 +34,6 @@
     "review": "reviewed",
     "enHash": "ed6b1f38"
   },
-  "onboarding.step": {
-    "message": "படி {n}: {title}",
-    "review": "reviewed",
-    "enHash": "1133cf5c"
-  },
   "onboarding.done": {
     "message": "முடிந்தது",
     "review": "reviewed",
@@ -53,11 +48,6 @@
     "message": "சேமிக்கவும்",
     "review": "reviewed",
     "enHash": "efc007a3"
-  },
-  "onboarding.business.title": {
-    "message": "உங்கள் கடையைப் பற்றி",
-    "review": "reviewed",
-    "enHash": "6291f190"
   },
   "onboarding.business.brandName": {
     "message": "கடையின் பெயர்",
@@ -89,16 +79,6 @@
     "review": "reviewed",
     "enHash": "99f2197d"
   },
-  "onboarding.business.categoryNone": {
-    "message": "வகையைத் தேர்ந்தெடுக்கவும்",
-    "review": "reviewed",
-    "enHash": "b91bf5d4"
-  },
-  "onboarding.store.title": {
-    "message": "உங்கள் முதல் கடை",
-    "review": "reviewed",
-    "enHash": "c1b36766"
-  },
   "onboarding.store.have": {
     "message": "கடை சேர்க்கப்பட்டது: {name}.",
     "review": "reviewed",
@@ -114,30 +94,10 @@
     "review": "reviewed",
     "enHash": "a0df4ca0"
   },
-  "onboarding.hours.title": {
-    "message": "திறந்திருக்கும் நேரம்",
-    "review": "reviewed",
-    "enHash": "6117e118"
-  },
-  "onboarding.payout.title": {
-    "message": "பணம் பெறும் விவரங்கள்",
-    "review": "reviewed",
-    "enHash": "ad5e1a85"
-  },
-  "onboarding.payout.body": {
-    "message": "நாங்கள் உங்களுக்கு எங்கே பணம் அனுப்ப வேண்டும். இதை இப்போதோ பிறகோ சேர்க்கலாம்; கடையை மதிப்பாய்வுக்கு அனுப்ப இது தேவையில்லை.",
-    "review": "reviewed",
-    "enHash": "16c98dff"
-  },
-  "onboarding.docs.title": {
-    "message": "ஆவணங்கள்",
-    "review": "reviewed",
-    "enHash": "687c8286"
-  },
   "onboarding.docs.help": {
-    "message": "புகைப்படங்கள் அல்லது PDF, ஒவ்வொன்றும் 10 MB வரை. ஆவணங்கள் தனிப்பட்டவையாக வைக்கப்படும், எங்கள் மதிப்பாய்வுக் குழு மட்டுமே பார்க்கும்.",
+    "message": "படங்கள் அல்லது PDF, ஒவ்வொன்றும் 10 MB வரை. இவை தனிப்பட்டவை: நீங்களும் எங்கள் குழுவும் மட்டுமே பார்க்க முடியும்.",
     "review": "reviewed",
-    "enHash": "5285e84b"
+    "enHash": "3a2e8447"
   },
   "onboarding.docs.kind.pan": {
     "message": "PAN கார்டு",
@@ -175,14 +135,14 @@
     "enHash": "27548c4f"
   },
   "onboarding.docs.status.accepted": {
-    "message": "ஏற்கப்பட்டது",
+    "message": "சேர்க்கப்பட்டது",
     "review": "reviewed",
-    "enHash": "61a0572c"
+    "enHash": "b68734c2"
   },
   "onboarding.docs.status.rejected": {
-    "message": "நிராகரிக்கப்பட்டது",
+    "message": "மாற்றக் கேட்கப்பட்டது",
     "review": "reviewed",
-    "enHash": "27eeb7a2"
+    "enHash": "99604f84"
   },
   "onboarding.docs.add": {
     "message": "{name} சேர்க்கவும்",
@@ -214,25 +174,20 @@
     "review": "reviewed",
     "enHash": "dd02b2ad"
   },
-  "onboarding.submit.title": {
-    "message": "மதிப்பாய்வுக்கு அனுப்பவும்",
-    "review": "reviewed",
-    "enHash": "ddc87345"
-  },
   "onboarding.submit.body": {
-    "message": "உங்கள் விவரங்களைச் சரிபார்ப்போம், ஏதாவது தேவைப்பட்டால் அழைப்போம். மதிப்பாய்வு நடக்கும்போதும் ஆர்டர்களுக்கு TodayZ ஐப் பயன்படுத்தலாம்.",
+    "message": "எங்கள் குழு அடுத்த சில நாட்களில் ஒவ்வொரு புதிய கடையையும் சரிபார்க்கும். நீங்கள் உடனே விற்கலாம்; சரிபார்ப்புக்குப் பிறகு பணம் அனுப்புவது தொடங்கும்.",
     "review": "reviewed",
-    "enHash": "6dc86397"
+    "enHash": "b54252c8"
   },
   "onboarding.submit.action": {
-    "message": "மதிப்பாய்வுக்கு அனுப்பவும்",
+    "message": "நேரலைக்குக் கொண்டு வாருங்கள்",
     "review": "reviewed",
-    "enHash": "ddc87345"
+    "enHash": "b8d1bae4"
   },
   "onboarding.submit.sent": {
-    "message": "மதிப்பாய்வுக்கு அனுப்பப்பட்டது",
+    "message": "உங்கள் கடை நேரலையில் உள்ளது",
     "review": "reviewed",
-    "enHash": "ef78972f"
+    "enHash": "448f50bc"
   },
   "onboarding.status.submitted.title": {
     "message": "உங்கள் கடை மதிப்பாய்வில் உள்ளது",
@@ -255,24 +210,24 @@
     "enHash": "f7322f3e"
   },
   "onboarding.status.verified.title": {
-    "message": "உங்கள் கடை சரிபார்க்கப்பட்டது",
+    "message": "உங்கள் கடை நேரலையில் உள்ளது",
     "review": "reviewed",
-    "enHash": "f69ca01e"
+    "enHash": "448f50bc"
   },
   "onboarding.status.verified.body": {
-    "message": "வாடிக்கையாளர்கள் உங்கள் நேரலைக் கடைகளைக் கண்டறியலாம்.",
+    "message": "வாடிக்கையாளர்கள் உங்கள் நேரலைக் கடைகளைக் கண்டுபிடிக்கலாம். எங்கள் குழு உங்கள் கடையைச் சரிபார்த்த பிறகு பணம் அனுப்புவது தொடங்கும்.",
     "review": "reviewed",
-    "enHash": "ca169a4c"
+    "enHash": "3c08f63c"
   },
   "onboarding.status.rejected.title": {
-    "message": "உங்கள் கடை அங்கீகரிக்கப்படவில்லை",
+    "message": "உங்கள் கடை நீக்கப்பட்டுள்ளது",
     "review": "reviewed",
-    "enHash": "75e8f563"
+    "enHash": "f4a5ef0a"
   },
   "onboarding.status.rejected.body": {
-    "message": "இது தவறு என்று நினைத்தால் ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "message": "எங்கள் குழுவால் உங்கள் கடையை உறுதிப்படுத்த முடியவில்லை, அதனால் வாடிக்கையாளர்கள் அதைப் பார்க்க முடியாது. காரணம் அறிய உதவியைத் தொடர்புகொள்ளுங்கள்.",
     "review": "reviewed",
-    "enHash": "9e413826"
+    "enHash": "522db36f"
   },
   "onboarding.status.suspended.title": {
     "message": "உங்கள் கடை இடைநிறுத்தப்பட்டுள்ளது",
@@ -353,5 +308,160 @@
     "message": "வேறு ஏதோ விவரம்",
     "review": "reviewed",
     "enHash": "61052ba2"
+  },
+  "onboarding.lede": {
+    "message": "சில விவரங்களை நிரப்புங்கள், உங்கள் கடை உடனே நேரலைக்கு வரும். ஒப்புதலுக்காகக் காத்திருக்க வேண்டாம்.",
+    "review": "reviewed",
+    "enHash": "f73cd625"
+  },
+  "onboarding.progress": {
+    "message": "{total} இல் {done} படிகள் முடிந்தன",
+    "review": "reviewed",
+    "enHash": "46b052c6"
+  },
+  "onboarding.steps.label": {
+    "message": "அமைப்புப் படிகள்",
+    "review": "reviewed",
+    "enHash": "281a6952"
+  },
+  "onboarding.steps.business": {
+    "message": "கடையின் பெயர்",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.steps.store": {
+    "message": "முகவரியும் வரைபடப் பின்னும்",
+    "review": "reviewed",
+    "enHash": "a729fbde"
+  },
+  "onboarding.steps.hours": {
+    "message": "திறந்திருக்கும் நேரம்",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.steps.category": {
+    "message": "நீங்கள் என்ன விற்கிறீர்கள்",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.steps.photos": {
+    "message": "கடையின் படங்கள்",
+    "review": "reviewed",
+    "enHash": "733b9d17"
+  },
+  "onboarding.steps.payout": {
+    "message": "GST, PAN மற்றும் பணம் பெறுதல்",
+    "review": "reviewed",
+    "enHash": "21cfd6a1"
+  },
+  "onboarding.steps.live": {
+    "message": "நேரலைக்குக் கொண்டு வாருங்கள்",
+    "review": "reviewed",
+    "enHash": "b8d1bae4"
+  },
+  "onboarding.optional": {
+    "message": "விருப்பத்தேர்வு",
+    "review": "reviewed",
+    "enHash": "0c6c4102"
+  },
+  "onboarding.recommended": {
+    "message": "பரிந்துரைக்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "9ef93755"
+  },
+  "onboarding.toDashboard": {
+    "message": "டாஷ்போர்டுக்குச் செல்லுங்கள்",
+    "review": "reviewed",
+    "enHash": "e5fa8758"
+  },
+  "onboarding.stepOf": {
+    "message": "படி {n} / {total}",
+    "review": "reviewed",
+    "enHash": "78cee4b8"
+  },
+  "onboarding.back": {
+    "message": "பின்செல்",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "onboarding.next": {
+    "message": "அடுத்து",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "onboarding.skip": {
+    "message": "இப்போது தவிர்",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "onboarding.intro.business": {
+    "message": "வாடிக்கையாளர்கள் அருகில் தேடும்போது பார்க்கும் பெயர்.",
+    "review": "reviewed",
+    "enHash": "06b8dcbd"
+  },
+  "onboarding.intro.store": {
+    "message": "உங்கள் கடை எங்கே உள்ளது. வாடிக்கையாளர்களும் டெலிவரி செய்பவர்களும் கண்டுபிடிக்க, பின்னைக் கடையின் வாசலில் வையுங்கள்.",
+    "review": "reviewed",
+    "enHash": "5c51081b"
+  },
+  "onboarding.intro.hours": {
+    "message": "நீங்கள் எப்போது திறந்திருப்பீர்கள். நீங்கள் திறந்திருக்கும்போது மட்டுமே வாடிக்கையாளர்கள் முன்பதிவு செய்ய முடியும்.",
+    "review": "reviewed",
+    "enHash": "8d5a9398"
+  },
+  "onboarding.intro.category": {
+    "message": "உங்கள் பொருட்களில் பெரும்பாலானவற்றுக்குப் பொருந்துவதைத் தேர்ந்தெடுங்கள். இது வாடிக்கையாளர்கள் உங்களைக் கண்டுபிடிக்க உதவும்.",
+    "review": "reviewed",
+    "enHash": "ac72e9e8"
+  },
+  "onboarding.intro.photos": {
+    "message": "கடையின் முன்பக்கப் படம் ஒன்றும் உள்ளே ஒன்றும். வாடிக்கையாளர்கள் தாங்கள் பார்க்கக்கூடிய கடையை நம்புவார்கள், எங்கள் குழு கடைச் சரிபார்ப்புக்கு இவற்றைப் பயன்படுத்தும்.",
+    "review": "reviewed",
+    "enHash": "36cd65a6"
+  },
+  "onboarding.intro.payout": {
+    "message": "உங்கள் பணத்தை நாங்கள் எங்கே அனுப்ப வேண்டும், உங்கள் வரி ஆவணங்கள். இவை இல்லாமலே நேரலைக்கு வரலாம், பிறகு சேர்க்கலாம்.",
+    "review": "reviewed",
+    "enHash": "fcf5563f"
+  },
+  "onboarding.intro.live": {
+    "message": "நீங்கள் நேரலைக்கு வந்தவுடன் அருகிலுள்ள வாடிக்கையாளர்கள் உங்கள் கடையைக் கண்டுபிடித்து முன்பதிவு செய்யலாம்.",
+    "review": "reviewed",
+    "enHash": "2178871c"
+  },
+  "onboarding.intro.liveDone": {
+    "message": "உங்கள் கடையின் நிலை இதோ.",
+    "review": "reviewed",
+    "enHash": "0006b2db"
+  },
+  "onboarding.live.addProducts": {
+    "message": "உங்கள் பொருட்களைச் சேருங்கள்",
+    "review": "reviewed",
+    "enHash": "28822efe"
+  },
+  "onboarding.photos.help": {
+    "message": "JPG, PNG அல்லது WebP, ஒவ்வொன்றும் 10 MB வரை. படங்கள் உடனே சேரும்; முதலில் யாரும் ஒப்புதல் தர வேண்டியதில்லை.",
+    "review": "reviewed",
+    "enHash": "61f26173"
+  },
+  "onboarding.taxDocs": {
+    "message": "வரி மற்றும் உரிம ஆவணங்கள்",
+    "review": "reviewed",
+    "enHash": "de682406"
+  },
+  "onboarding.taxDocs.help": {
+    "message": "படங்கள் அல்லது PDF, ஒவ்வொன்றும் 10 MB வரை. இவை தனிப்பட்டவை: நீங்களும் எங்கள் குழுவும் மட்டுமே பார்க்க முடியும்.",
+    "review": "reviewed",
+    "enHash": "3a2e8447"
+  },
+  "onboarding.status.verified_checked.title": {
+    "message": "உங்கள் கடை நேரலையில் உள்ளது, சரிபார்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "617485bc"
+  },
+  "onboarding.status.verified_checked.body": {
+    "message": "வாடிக்கையாளர்கள் உங்கள் நேரலைக் கடைகளைக் கண்டுபிடிக்கலாம், பணம் வழக்கமான அட்டவணைப்படி வரும்.",
+    "review": "reviewed",
+    "enHash": "91bc1cac"
   }
 }

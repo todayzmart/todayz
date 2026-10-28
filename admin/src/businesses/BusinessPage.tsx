@@ -16,7 +16,7 @@ import { useProblemText } from '../app/problems';
 import { ReasonDialog } from '../app/ReasonDialog';
 import { AuditPanel } from '../audit/AuditPanel';
 import { storeTone, useStoreLabels } from '../stores/labels';
-import { INFO_FIELDS, docTone, kycTone, statusTone, useBusinessLabels } from './labels';
+import { INFO_FIELDS, checkTone, docTone, kycTone, statusTone, useBusinessLabels } from './labels';
 import { useBusiness, useBusinessMove, useReveal, type BusinessMove } from './queries';
 import css from '../app/page.module.css';
 
@@ -206,10 +206,20 @@ function Detail({ b }: { b: AdminBusiness }) {
           <div className={css.title}>
             <h1 className="tz-page-title">{b.brandName}</h1>
             <StatusPill tone={statusTone(b.status)}>{labels.status(b.status)}</StatusPill>
+            {(b.status === 'verified' || b.checkStatus !== 'unchecked') && (
+              <StatusPill tone={checkTone(b.checkStatus)}>{labels.check(b.checkStatus)}</StatusPill>
+            )}
           </div>
           <p className="tz-page-sub">
             {intl.formatMessage({ id: 'businesses.detail.sub' }, { legal: b.legalName ?? '—', created: when(b.createdAt, now), stores: b.stores.length })}
           </p>
+          {b.checkedAt && (
+            <p className="tz-page-sub">
+              {b.checkNote
+                ? intl.formatMessage({ id: 'businesses.check.atNote' }, { when: when(b.checkedAt, now), note: b.checkNote })
+                : intl.formatMessage({ id: 'businesses.check.at' }, { when: when(b.checkedAt, now) })}
+            </p>
+          )}
         </div>
         {mayAct && (
           <div className={css.actions}>

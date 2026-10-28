@@ -53,6 +53,8 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
   const img = imageUrl(item.imageKey);
   const out = !item.inStock;
   const tag = tagOf(item.productId);
+  // The product name often starts with its brand ("Aashirvaad Atta"); do not print it twice.
+  const brandLine = item.brand && !item.name.toLowerCase().startsWith(item.brand.toLowerCase()) ? item.brand : undefined;
 
   return (
     <article className={styles.tile} data-out={out ? '' : undefined}>
@@ -88,7 +90,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
           <span className={styles.price}>{money(item.pricePaise)}</span>
           {pct !== null && item.mrpPaise !== null && <s className={styles.mrp}>{money(item.mrpPaise)}</s>}
         </div>
-        {item.brand && <span className={styles.brand}>{item.brand}</span>}
+        {brandLine && <span className={styles.brand}>{brandLine}</span>}
         <RouterLink href={href} className={styles.name}>
           {item.name}
         </RouterLink>

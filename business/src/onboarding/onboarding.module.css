@@ -1,0 +1,427 @@
+/*
+ * B-02 Shop setup frame (D-274): a dark green step rail and the step card. Tokens only. On a
+ * phone the rail is a dark header with the steps as a scrolling row; from 1024px it is a
+ * full-height column on the left. Contrast on `rail`: on-rail 12.6:1, on-rail-2 8.3:1,
+ * rail-accent 8.2:1. The focus ring on the rail is rail-accent (the blue `focus` is too dark there).
+ */
+
+.onb {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+  color: var(--ink);
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-3);
+  top: calc(-1 * var(--space-12));
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--inverse);
+  color: var(--on-inverse);
+  text-decoration: none;
+}
+
+.skip:focus {
+  top: var(--space-3);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--rail);
+  color: var(--on-rail);
+}
+
+.rail :where(a, button):focus-visible {
+  outline-color: var(--rail-accent);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.brand b {
+  color: var(--rail-accent);
+}
+
+.mark {
+  width: 24px;
+  height: 24px;
+}
+
+.tag {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--rail-line);
+  border-radius: var(--radius-pill);
+  color: var(--on-rail-2);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.lede {
+  margin: 0;
+  color: var(--on-rail-2);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.progressText {
+  margin: 0;
+  color: var(--on-rail-2);
+  font-size: 13px;
+}
+
+.bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--rail-raised);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--rail-accent);
+}
+
+/* Phone: the steps scroll sideways as chips. */
+.steps {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border: 1px solid var(--rail-line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--on-rail);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.step:disabled {
+  color: var(--on-rail-2);
+  cursor: not-allowed;
+}
+
+.step:hover:not(:disabled),
+.step[aria-current='step'] {
+  background: var(--rail-raised);
+}
+
+.step[aria-current='step'] {
+  border-color: var(--rail-accent);
+  font-weight: 600;
+}
+
+.disc {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rail-line);
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.disc[data-done] {
+  border-color: var(--rail-accent);
+  background: var(--rail-accent);
+  color: var(--rail);
+}
+
+.step[aria-current='step'] .disc:not([data-done]) {
+  border-color: var(--rail-accent);
+  color: var(--rail-accent);
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  text-align: left;
+}
+
+.stepHint {
+  display: none;
+  color: var(--on-rail-2);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.stepHint:empty {
+  display: none;
+}
+
+.home {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--on-rail);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.home:hover {
+  text-decoration: underline;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  outline: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+/* A settings section (hours, payout) inside the step card: no card of its own, no second title. */
+.body :global(.tz-card) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.body :global(.tz-card) > :global(.tz-card-title) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sub {
+  margin: var(--space-2) 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tile:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--wash);
+}
+
+.tile:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tile input {
+  accent-color: var(--brand);
+}
+
+.tileTick {
+  margin-left: auto;
+  color: var(--brand-strong);
+}
+
+.tiles:disabled .tile {
+  cursor: default;
+}
+
+.todo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.todoLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.todoLink:disabled {
+  color: var(--ink-2);
+  text-decoration: none;
+  cursor: default;
+}
+
+.note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+/* Desktop: the rail is a full-height column, the steps a vertical list with their hints. */
+@media (width >= 1024px) {
+  .onb {
+    flex-direction: row;
+  }
+
+  .rail {
+    position: sticky;
+    top: 0;
+    flex: none;
+    width: 300px;
+    height: 100dvh;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-5);
+    overflow-y: auto;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .steps {
+    flex-direction: column;
+    gap: var(--space-1);
+    overflow: visible;
+  }
+
+  .step {
+    width: 100%;
+    min-height: 52px;
+    padding: var(--space-2);
+    border-color: transparent;
+    border-radius: var(--radius-md);
+    white-space: normal;
+  }
+
+  .step[aria-current='step'] {
+    border-color: transparent;
+  }
+
+  .stepHint {
+    display: block;
+  }
+
+  .home {
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rail-line);
+  }
+
+  .content {
+    padding: var(--space-8) var(--space-8) var(--space-10);
+  }
+
+  .content > * {
+    width: 100%;
+    max-width: 760px;
+  }
+}

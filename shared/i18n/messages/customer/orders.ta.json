@@ -553,5 +553,10 @@
     "message": "{label} க்கு டெலிவரி: {address}",
     "review": "reviewed",
     "enHash": "f4a4eb85"
+  },
+  "orders.reason.shop_rejected": {
+    "message": "இந்தக் கடை இனி TodayZ-இல் ஆர்டர்களை ஏற்காது. நீங்கள் பயன்படுத்திய கிரெடிட்கள் உங்கள் வாலெட்டுக்குத் திரும்பி வந்துவிட்டன.",
+    "review": "machine",
+    "enHash": "49fc88e8"
   }
 }

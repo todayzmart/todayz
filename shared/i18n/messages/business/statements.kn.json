@@ -158,5 +158,20 @@
     "message": "{amount} ಪೇಔಟ್ ಮುಂದಿನ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗೆ ಸಾಗಿಸಲಾಗಿದೆ.",
     "review": "reviewed",
     "enHash": "17e54cde"
+  },
+  "statements.status.awaitingCheck": {
+    "message": "ಅಂಗಡಿ ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "c3d22ecf"
+  },
+  "statements.payout.awaitingCheck": {
+    "message": "ನಮ್ಮ ತಂಡ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲಿಸುವವರೆಗೆ {amount} ಪಾವತಿ ತಡೆಹಿಡಿಯಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "27cc9403"
+  },
+  "statements.awaitingCheck": {
+    "message": "ನಮ್ಮ ತಂಡ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲಿಸಿದ ನಂತರ ಪಾವತಿಗಳು ಶುರುವಾಗುತ್ತವೆ. ಅಲ್ಲಿಯವರೆಗೆ ನೀವು ಮಾರುತ್ತಾ ಕ್ರೆಡಿಟ್ ಗಳಿಸುತ್ತಿರುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "354f7769"
   }
 }

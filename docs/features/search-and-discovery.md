@@ -57,7 +57,7 @@ Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e
 
 - Live in code. The refine-chip parser is built; a stale package comment in `search/search.go` still says it is not.
 - The "ready soonest" ask badge is not shown on search results ([go-live gaps](../qa/go-live-gaps/LIST.md)).
-- Home rails are built in the browser from the nearest shops' item lists (D-269, D-273). There is no "items near you", popular-items, per-category item or ETA endpoint, and items carry no category or colour (a tile's tint is a hash of the product id). The six top-level category tiles keep the CC0/owned photos on main; a subcategory repeats its parent's photo or shows none, and no retailer photo is used (D-273).
+- Home rails are built in the browser from the nearest shops' item lists (D-269, D-273). There is no "items near you", popular-items, per-category item or ETA endpoint, and items carry no category or colour (a tile's tint is a hash of the product id). The six top-level category tiles keep the CC0/owned photos on main; each subcategory has its own distinct local-demo category photo from Blinkit/BigBasket/Amazon (D-273). Product photos are still Open Facts/Wikimedia or the initials placeholder, not retailer photos.
 - The home map shows without a tap once its section nears the screen (D-272, which supersedes D-251 B1); `/map` is unchanged.
 - The customer app's discovery screens are the quick-commerce layout in TodayZ green: a green header, a grey search pill, round category photos, flat cards with the brand, a saving and a green Add (D-273). Category pages still list shops rather than a product grid.
 

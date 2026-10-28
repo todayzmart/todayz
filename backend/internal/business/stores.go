@@ -467,7 +467,10 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
 		}
-		params.NeedsReview, err = s.profileChanged(cur, params, newPhone)
+		// No admin review takes a live store off the map any more (D-274):
+		// the store stays as it is, and the audit row says whether what the
+		// shop check saw (name, address, location, phone) changed.
+		reviewed, err := s.profileChanged(cur, params, newPhone)
 		if err != nil {
 			return err
 		}
@@ -478,13 +481,9 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 		if n == 0 {
 			return problem.New(genproblems.PreconditionFailed, "")
 		}
-		after := cur.Status
-		if params.NeedsReview && (cur.Status == storeLive || cur.Status == storePaused) {
-			after = storePendingReview
-		}
 		// Field names only: an address or a phone never goes in the audit log.
 		return s.writeAudit(ctx, p.UserID, "store.update", "store", sid.String(),
-			map[string]any{"status": cur.Status}, map[string]any{"status": after, "fields": changed})
+			map[string]any{"status": cur.Status}, map[string]any{"status": cur.Status, "fields": changed, "profileChanged": reviewed})
 	})
 	if err != nil {
 		return businessapi.Store{}, 0, err
@@ -492,10 +491,10 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 	return s.getStore(ctx, bidStr, sidStr)
 }
 
-// profileChanged reports whether an update really changes what review
-// approved (D-40): the name, the address, the location or the phone. A field
-// sent with its current value is no change, so saving an unchanged form does
-// not take a live store off the map. newPhone is the normalised number sent.
+// profileChanged reports whether an update really changes what the shop
+// check saw (D-40, D-274): the name, the address, the location or the phone.
+// A field sent with its current value is no change. newPhone is the
+// normalised number sent.
 func (s *Service) profileChanged(cur businessdb.GetStoreRow, p businessdb.UpdateStoreProfileParams, newPhone string) (bool, error) {
 	text := func(set bool, next, now *string) bool {
 		return set && !equalText(next, now)
@@ -580,7 +579,21 @@ func (s *Service) submitStore(ctx context.Context, bidStr, sidStr string) (busin
 				return incomplete(gaps)
 			}
 		}
-		n, err := q.SubmitStore(ctx, businessdb.SubmitStoreParams{ID: cur.ID, BusinessID: cur.BusinessID})
+		// A store of a live business goes live at once (D-274); before the
+		// business is submitted it waits, and the business's submit puts it
+		// live.
+		b, err := q.GetBusiness(ctx, cur.BusinessID)
+		if err != nil {
+			return err
+		}
+		to := storePendingReview
+		var n int64
+		if b.Status == businessVerified {
+			to = storeLive
+			n, err = q.GoLiveStore(ctx, businessdb.GoLiveStoreParams{Now: s.clock.Now(), ID: cur.ID, BusinessID: cur.BusinessID})
+		} else {
+			n, err = q.SubmitStore(ctx, businessdb.SubmitStoreParams{ID: cur.ID, BusinessID: cur.BusinessID})
+		}
 		if err != nil {
 			return err
 		}
@@ -588,7 +601,7 @@ func (s *Service) submitStore(ctx context.Context, bidStr, sidStr string) (busin
 			return problem.New(genproblems.InvalidTransition, "")
 		}
 		return s.writeAudit(ctx, p.UserID, "store.submit", "store", sid.String(),
-			map[string]any{"status": cur.Status}, map[string]any{"status": "pending_review"})
+			map[string]any{"status": cur.Status}, map[string]any{"status": to})
 	})
 	if err != nil {
 		return businessapi.Store{}, 0, err

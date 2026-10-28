@@ -50,7 +50,7 @@ function detail(p: AdminPayout): AdminPayoutDetail {
   return {
     payout: p,
     lines: [{ storeId: '01JB0ST1A2B3C4D5E6F7G8H9J0', storeName: 'Lakshmi Indiranagar', amountPaise: p.amountPaise }],
-    causes: { businessSuspended: false, kycVerified: true, payoutDetailsMissing: false, openRiskFlag: false },
+    causes: { businessSuspended: false, shopChecked: true, payoutDetailsMissing: false, openRiskFlag: false },
     payee: { kycStatus: 'verified', upiIdLast4: '@okx', bankAccountLast4: '4321', ifsc: 'HDFC0001234' },
     serverNow: NOW,
   };
@@ -142,7 +142,7 @@ describe('A-11 payouts', () => {
     const panel = await screen.findByRole('complementary', { name: 'Sri Lakshmi Stores' });
     expect(within(panel).getByRole('table', { name: 'Per store' })).toHaveTextContent('Lakshmi Indiranagar');
     expect(within(panel).getByText('•••• 4321')).toBeInTheDocument();
-    expect(within(panel).getByText('KYC not verified')).toBeInTheDocument();
+    expect(within(panel).getByText('Shop not checked yet')).toBeInTheDocument();
     expect(new URLSearchParams(calls.find((c) => c.path === '/v1/admin/statements')?.search).get('period')).toBe('2026-09');
     expect(within(panel).getByRole('button', { name: 'Mark paid' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Export CSV' })).toBeInTheDocument();

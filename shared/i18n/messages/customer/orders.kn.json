@@ -553,5 +553,10 @@
     "message": "{label} ಗೆ ಡೆಲಿವರಿ: {address}",
     "review": "reviewed",
     "enHash": "f4a4eb85"
+  },
+  "orders.reason.shop_rejected": {
+    "message": "ಈ ಅಂಗಡಿ ಇನ್ನು ಮುಂದೆ TodayZ ನಲ್ಲಿ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸುವುದಿಲ್ಲ. ನೀವು ಬಳಸಿದ ಕ್ರೆಡಿಟ್‌ಗಳು ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರಳಿವೆ.",
+    "review": "machine",
+    "enHash": "49fc88e8"
   }
 }

@@ -191,7 +191,7 @@ var errFieldUnavailable = errors.New("business: field routes are not configured"
 // errUploadExpired is a field photo confirmed past its confirm_by: the sweep
 // rejects it and deletes its object, so the agent adds it again.
 func errUploadExpired() error {
-	return problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the photo again")
+	return problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the file again")
 }
 
 // fieldCall is the caller of a field route and the engine's decision.
@@ -865,16 +865,13 @@ func fieldDocument(doc businessdb.BusinessDocument) adminfieldapi.FieldDocument 
 	}
 }
 
-// confirmPhoto marks a shop photo uploaded once the bucket holds it with the
-// declared type and at most the declared size (a signed HEAD, as support's
-// claim does). Until then it is pending: not in the counts, not reviewable.
+// confirmPhoto accepts a shop photo once the bucket holds it with the
+// declared type and at most the declared size (confirmUpload). Until then it
+// is pending: not in the counts, not on the shop.
 func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminfieldapi.FieldDocument, error) {
 	c, err := f.call(ctx)
 	if err != nil {
 		return adminfieldapi.FieldDocument{}, err
-	}
-	if f.s.presign == nil {
-		return adminfieldapi.FieldDocument{}, problem.Wrap(genproblems.ServiceUnavailable, errNoStorage)
 	}
 	bid, err := pathID(bidStr)
 	if err != nil {
@@ -897,54 +894,9 @@ func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminf
 		}
 		return doc, nil
 	}
-	var doc businessdb.BusinessDocument
-	if err := f.s.db.InTx(ctx, func(ctx context.Context) error {
-		doc, err = photo(ctx)
-		return err
-	}); err != nil {
-		return adminfieldapi.FieldDocument{}, asProblem(err)
-	}
-	if doc.Status != "pending" {
-		return fieldDocument(doc), nil
-	}
-	now := f.s.clock.Now()
-	if doc.ConfirmBy != nil && now.After(*doc.ConfirmBy) {
-		return adminfieldapi.FieldDocument{}, errUploadExpired()
-	}
-	// Outside the transaction: no row lock is held over the bucket call.
-	obj, err := f.s.presign.head(ctx, doc.ObjectKey, now)
-	switch {
-	case errors.Is(err, errNoObject):
-		return adminfieldapi.FieldDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the photo is not in storage yet")
-	case err != nil:
-		return adminfieldapi.FieldDocument{}, problem.Wrap(genproblems.ServiceUnavailable, fmt.Errorf("business: head field photo: %w", err))
-	}
-	if obj.size < 1 || obj.size > doc.SizeBytes || obj.contentType != doc.ContentType {
-		return adminfieldapi.FieldDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the stored file is not the declared type and size")
-	}
-	err = f.s.db.InTx(ctx, func(ctx context.Context) error {
-		cur, err := photo(ctx)
-		if err != nil {
-			return err
-		}
-		if cur.Status != "pending" {
-			doc = cur
-			return nil
-		}
-		doc, err = f.s.q(ctx).MarkDocumentUploaded(ctx, businessdb.MarkDocumentUploadedParams{Now: f.s.clock.Now(), ID: cur.ID})
-		if db.IsNoRows(err) {
-			// Past confirm_by since the first read: the sweep may already
-			// have deleted the object.
-			return errUploadExpired()
-		}
-		if err != nil {
-			return fmt.Errorf("business: confirm field photo: %w", err)
-		}
-		return f.s.writeAuditAs(ctx, audit.ActorAdmin, c.p.UserID, "document.uploaded", "business_document", did.String(),
-			map[string]any{"status": cur.Status}, map[string]any{"status": doc.Status, "sizeBytes": obj.size})
-	})
+	doc, err := f.s.confirmUpload(ctx, audit.ActorAdmin, c.p.UserID, photo)
 	if err != nil {
-		return adminfieldapi.FieldDocument{}, asProblem(err)
+		return adminfieldapi.FieldDocument{}, err
 	}
 	return fieldDocument(doc), nil
 }

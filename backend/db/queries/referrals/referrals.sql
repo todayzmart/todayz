@@ -260,7 +260,11 @@ SELECT id FROM referrals WHERE status = 'pending' AND kind = 'any_shop' ORDER BY
 SELECT business_id FROM stores WHERE id = @id;
 
 -- name: BusinessVerified :one
-SELECT (status = 'verified')::bool AS verified FROM businesses WHERE id = @id;
+-- A shop counts as verified for referrals once it is live and a field agent
+-- or admin has checked it (D-274): it goes live on submit, so live alone
+-- would let a fake shop earn the reward. The sweep qualifies it after the
+-- check.
+SELECT (status = 'verified' AND check_status = 'checked')::bool AS verified FROM businesses WHERE id = @id;
 
 -- name: CountShopSale :exec
 INSERT INTO referral_shop_sales (referral_id, ref_type, ref_id, store_id, customer_id, created_at)

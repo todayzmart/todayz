@@ -27,8 +27,9 @@ const (
 
 // Reasons the system records (03 §4.2 SystemReason).
 const (
-	reasonNotAccepted = "not_accepted"
-	reasonNoShow      = "no_show"
+	reasonNotAccepted  = "not_accepted"
+	reasonNoShow       = "no_show"
+	reasonShopRejected = "shop_rejected"
 )
 
 // TimerArgs are a timer's job arguments: the order, for the no-show timer

@@ -24,6 +24,22 @@ var orderCodeRand io.Reader
 // It also registers the orders deletion check (BK-44: no account deletion
 // while an order is open) with identity.
 func mountOrders(r chi.Router, d *deps) {
+	svc, err := orders.New(ordersDeps(d))
+	if err != nil {
+		// A missing clock or a malformed order-code or PII key; boot and
+		// buildSecurity refuse those before the routes mount.
+		panic("orders: " + err.Error())
+	}
+	orders.Register(r, svc, ordersAuthz(d))
+	if d.Identity != nil {
+		d.Identity.AddDeletionCheck(svc)
+	}
+}
+
+// ordersDeps is the orders service with every collaborator a status change
+// writes through. The order routes use it, and so does the admin shop
+// reject, which cancels the shop's open orders (D-274).
+func ordersDeps(d *deps) orders.Deps {
 	od := orders.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 		Notices: newNotifyService(d), Stock: jobs.OrdersStock(d.Clock), Open: business.OpenAt,
@@ -56,20 +72,16 @@ func mountOrders(r chi.Router, d *deps) {
 		jobs.Register(reg, jd)
 		od.Jobs = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
 	}
-	var az authz.Authorizer
-	if d.Authz != nil {
-		az = d.Authz
-	}
 	// A damaged return also needs stock.damage (D-69).
-	od.Authz = az
-	svc, err := orders.New(od)
-	if err != nil {
-		// A missing clock or a malformed order-code or PII key; boot and
-		// buildSecurity refuse those before the routes mount.
-		panic("orders: " + err.Error())
+	od.Authz = ordersAuthz(d)
+	return od
+}
+
+// ordersAuthz is the engine as an interface, nil (not a nil pointer) when
+// there is none.
+func ordersAuthz(d *deps) authz.Authorizer {
+	if d.Authz != nil {
+		return d.Authz
 	}
-	orders.Register(r, svc, az)
-	if d.Identity != nil {
-		d.Identity.AddDeletionCheck(svc)
-	}
+	return nil
 }

@@ -2,7 +2,7 @@
 
 How shops promote themselves (offers, banners) and how new customers and shops are rewarded (referrals).
 
-> As built on main at 2c2f23d6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -20,7 +20,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md) sections 8 and 12.
 - Offer kinds, rounding, caps and what is immutable: D-150. Redemption is counted inside the order transaction (D-151).
 - Banners are held until approved. The cap is `store_banners_max` (D-152). Taps are attributed (D-77).
 - Referral kinds: retailer_customer, customer_customer, any_shop. Keys: `ref_<kind>_referrer_credits`, `ref_<kind>_referee_credits`, `ref_qualifying_min_order_paise`, `ref_shop_qualifying_orders`, `ref_attribution_window_days`.
-- A new shop qualifies on distinct customers (D-168). Same-device referrals do not count (D-13). Self-likes are held before the reward (D-237).
+- A new shop qualifies on distinct customers (D-168), and only once a field agent or admin has checked it (D-274): going live on submit is not enough, and the referral sweep qualifies it after the check. Same-device referrals do not count (D-13). Self-likes are held before the reward (D-237).
 - Rewards post to the credits ledger, per side and idempotently (D-161, D-169).
 
 ## How it works

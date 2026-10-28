@@ -149,7 +149,7 @@ BusinessInfoRequest:
       type: [string, "null"]
 Business:
   type: object
-  required: [id, brandName, legalName, categoryId, status, referralCode, myRole, submittedAt, verifiedAt, infoRequest, createdAt]
+  required: [id, brandName, legalName, categoryId, status, checkStatus, referralCode, myRole, submittedAt, verifiedAt, infoRequest, createdAt]
   properties:
     id:
       $ref: ./common.yaml#/Ulid
@@ -161,6 +161,13 @@ Business:
       type: [string, "null"]
     status:
       $ref: "#/BusinessStatus"
+    checkStatus:
+      type: string
+      description: >-
+        The shop check (D-274). A business sells from the moment it submits; payouts are held while it is
+        `unchecked`, until a field agent or admin checks it. `rejected` means the check failed and the shop
+        is hidden.
+      enum: [unchecked, checked, rejected]
     referralCode:
       type: string
       description: The business's shop-to-shop referral code (D-26), 6 characters.
@@ -249,7 +256,7 @@ DocumentContentType:
   enum: [image/jpeg, image/png, image/webp, application/pdf]
 DocumentStatus:
   type: string
-  description: "`pending` until the upload is confirmed, then `uploaded`; an admin accepts or rejects it."
+  description: "`pending` until the upload is confirmed, then `accepted` at once (D-274); an admin may still reject it. `uploaded` is a legacy state from before D-274."
   enum: [pending, uploaded, accepted, rejected]
 DocumentCreate:
   type: object

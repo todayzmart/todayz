@@ -3,9 +3,10 @@ import { smsCodeSince } from '../../fixtures/principals';
 import { ALL_DAY, QA_POINT } from '../../fixtures/seed';
 
 // E2E-08: a field agent onboards a shop (business, store, first item) → the owner confirms with the
-// code sent to their phone → an admin verifies the business and the store goes live (D-40) → the shop
-// is found in search → the first order is booked, accepted and collected. Admin steps use the admin
-// API (D-83); the owner's confirm code is read from the mock SMS and never printed.
+// code sent to their phone, and the business and store go live at once (D-274: nobody approves first)
+// → the shop is found in search → the first order is booked, accepted and collected → the field agent
+// marks the shop checked from the daily queue (A-24), which releases its payouts. Admin steps use the
+// admin API (D-83); the owner's confirm code is read from the mock SMS and never printed.
 interface Created {
   id: string;
   stores?: { id: string }[];
@@ -17,7 +18,7 @@ interface Search {
   results: { store: { storeId: string }; items: { storeItemId: string }[] }[];
 }
 
-test('E2E-08 field agent onboards a shop → owner confirms → admin verifies → live in search → first order', async ({ who }) => {
+test('E2E-08 field agent onboards a shop → owner confirms → live at once in search → first order → agent checks it', async ({ who }) => {
   const agent = await who('fieldAgent');
   const admin = await who('superAdmin');
   const customer = new Customer(await who('walkIn'));
@@ -86,21 +87,14 @@ test('E2E-08 field agent onboards a shop → owner confirms → admin verifies �
   // The owner signs in only after the confirm: a sign-in code to the number inside the resend gap
   // would make the agent's owner-confirm send 429 (01 §2 counts codes per number).
   const owner = await who('newOwner');
-  await test.step('the confirm sent the new store for review', async () => {
-    // D-241: the owner's code submits the business and its complete draft stores, so the owner
-    // need not open the app to submit.
+  await test.step('the confirm put the business and its store live, unchecked', async () => {
+    // D-241, D-274: the owner's code takes the business and its complete stores live, so the owner
+    // need not open the app, and no admin approves anything first.
     const store = await owner.api.ok<{ status: string }>('owner reads the store', 'GET', `/v1/biz/businesses/${bid}/stores/${sid}`);
-    expect(store.status).toBe('pending_review');
-  });
-
-  await test.step('an admin verifies the business; the store goes live', async () => {
-    await admin.api.ok('admin verifies the business', 'POST', `/v1/admin/businesses/${bid}/verify`, { note: 'E2E-08 gate' });
-    const store = await admin.api.ok<{ status: string }>('admin reads the store', 'GET', `/v1/admin/stores/${sid}`);
-    if (store.status !== 'live') {
-      await admin.api.ok('admin approves the store', 'POST', `/v1/admin/stores/${sid}/review`, { decision: 'approve' });
-    }
-    const after = await admin.api.ok<{ status: string }>('admin re-reads the store', 'GET', `/v1/admin/stores/${sid}`);
-    expect(after.status).toBe('live');
+    expect(store.status).toBe('live');
+    const biz = await admin.api.ok<{ status: string; checkStatus: string }>('admin reads the business', 'GET', `/v1/admin/businesses/${bid}`);
+    expect(biz.status).toBe('verified');
+    expect(biz.checkStatus).toBe('unchecked');
   });
 
   const store = { id: sid, slug: '', name: `${brandName} Store`, no: 0 };
@@ -121,5 +115,13 @@ test('E2E-08 field agent onboards a shop → owner confirms → admin verifies �
     expect(item).toBeTruthy();
     const shop = new Shop(owner, store, bid);
     await placeAndCollect(customer, shop, [{ storeItemId: placed, quantity: 1 }]);
+  });
+
+  await test.step('the field agent finds the shop on the check queue and marks it checked', async () => {
+    const queue = await agent.api.ok<{ items: { id: string }[] }>('agent reads the shop check queue', 'GET', '/v1/admin/shop-checks', undefined, { params: { limit: 100 } });
+    expect(queue.items.map((i) => i.id)).toContain(bid);
+    const checked = await agent.api.ok<{ checkStatus: string; status: string }>('agent marks the shop checked', 'POST', `/v1/admin/businesses/${bid}/check`, { note: 'E2E-08 visit: stock and photos match' });
+    expect(checked.checkStatus).toBe('checked');
+    expect(checked.status).toBe('verified');
   });
 });

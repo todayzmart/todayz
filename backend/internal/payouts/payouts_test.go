@@ -83,12 +83,15 @@ func TestStatementCSVKeepsNumbersRaw(t *testing.T) {
 }
 
 func TestHoldReasonOrder(t *testing.T) {
-	require.Equal(t, "", causes{KYCVerified: true}.reason())
-	require.False(t, causes{KYCVerified: true}.open())
-	require.Equal(t, holdKYC, causes{}.reason())
-	require.Equal(t, holdRisk, causes{KYCVerified: true, RiskFlag: true}.reason())
+	require.Equal(t, "", causes{Checked: true}.reason())
+	require.False(t, causes{Checked: true}.open())
+	// D-274: an unchecked shop is held, whatever its KYC says.
+	require.Equal(t, holdUnchecked, causes{}.reason())
+	require.Equal(t, holdUnchecked, causes{DetailsMissing: true, RiskFlag: true}.reason())
+	require.Equal(t, holdDetails, causes{Checked: true, DetailsMissing: true, RiskFlag: true}.reason())
+	require.Equal(t, holdRisk, causes{Checked: true, RiskFlag: true}.reason())
 	require.Equal(t, holdSuspended, causes{Suspended: true, RiskFlag: true}.reason())
-	require.True(t, causes{KYCVerified: true, RiskFlag: true}.open())
+	require.True(t, causes{Checked: true, RiskFlag: true}.open())
 }
 
 func TestTies(t *testing.T) {

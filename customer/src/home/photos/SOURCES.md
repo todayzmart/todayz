@@ -26,3 +26,7 @@ The `cat-` files are single products on white for the pastel category tiles: fou
 | `cat-stationery.webp` | https://commons.wikimedia.org/wiki/File:Pencils_Standing_On_White_Background_(246574375).jpeg | CC0 |
 | `cat-electronics.webp` | https://commons.wikimedia.org/wiki/File:Action-Max-Stereo-Headphones.jpg (Evan-Amos) | Public domain |
 | `cat-hardware.webp` | https://commons.wikimedia.org/wiki/File:AdjustableWrenchWhiteBackground.jpg (Raysonho) | CC0 |
+
+## Subcategory tiles (D-273, 28 Oct)
+
+The `sub-*.webp` files are **local-demo category art only**, one per subcategory so no two tiles share a photo. They come from Blinkit's category collection CDN and product search (`cdn.grofers.com`: Aashirvaad atta, Amul milk, vegetables, Lay's, Coca-Cola, Fortune oil, Britannia, Dove, Nivea, Parachute, Lakmé, Pampers, Dolo, Horlicks, Philips LED, extension board, wrench, stapler), with Amazon.in for Surf Excel, the claw hammer, the Classmate notebook and Nippon Paint. They are not licensed for production and must be replaced with owned or licensed photography before launch. The six `cat-*.webp` top-level photos stay the CC0/owned files above.

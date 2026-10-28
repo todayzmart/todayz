@@ -1,8 +1,8 @@
 {
   "onboarding.title": {
-    "message": "दुकान का सेटअप",
+    "message": "अपनी दुकान सेट करें",
     "review": "reviewed",
-    "enHash": "0857f615"
+    "enHash": "f54cfff6"
   },
   "onboarding.loading": {
     "message": "आपकी दुकान का सेटअप लोड हो रहा है",
@@ -34,11 +34,6 @@
     "review": "reviewed",
     "enHash": "ed6b1f38"
   },
-  "onboarding.step": {
-    "message": "स्टेप {n}: {title}",
-    "review": "reviewed",
-    "enHash": "1133cf5c"
-  },
   "onboarding.done": {
     "message": "पूरा",
     "review": "reviewed",
@@ -53,11 +48,6 @@
     "message": "सेव करें",
     "review": "reviewed",
     "enHash": "efc007a3"
-  },
-  "onboarding.business.title": {
-    "message": "आपकी दुकान के बारे में",
-    "review": "reviewed",
-    "enHash": "6291f190"
   },
   "onboarding.business.brandName": {
     "message": "दुकान का नाम",
@@ -89,16 +79,6 @@
     "review": "reviewed",
     "enHash": "99f2197d"
   },
-  "onboarding.business.categoryNone": {
-    "message": "कैटेगरी चुनें",
-    "review": "reviewed",
-    "enHash": "b91bf5d4"
-  },
-  "onboarding.store.title": {
-    "message": "आपकी पहली दुकान",
-    "review": "reviewed",
-    "enHash": "c1b36766"
-  },
   "onboarding.store.have": {
     "message": "दुकान जुड़ गई: {name}।",
     "review": "reviewed",
@@ -114,30 +94,10 @@
     "review": "reviewed",
     "enHash": "a0df4ca0"
   },
-  "onboarding.hours.title": {
-    "message": "खुलने का समय",
-    "review": "reviewed",
-    "enHash": "6117e118"
-  },
-  "onboarding.payout.title": {
-    "message": "पेमेंट की जानकारी",
-    "review": "reviewed",
-    "enHash": "ad5e1a85"
-  },
-  "onboarding.payout.body": {
-    "message": "हम आपको पैसे कहाँ भेजें। इसे अभी या बाद में जोड़ सकते हैं; दुकान को जाँच के लिए भेजने में इसकी ज़रूरत नहीं है।",
-    "review": "reviewed",
-    "enHash": "16c98dff"
-  },
-  "onboarding.docs.title": {
-    "message": "दस्तावेज़",
-    "review": "reviewed",
-    "enHash": "687c8286"
-  },
   "onboarding.docs.help": {
-    "message": "फ़ोटो या PDF, हर एक 10 MB तक। दस्तावेज़ निजी रखे जाते हैं और सिर्फ़ हमारी जाँच टीम उन्हें देखती है।",
+    "message": "फ़ोटो या PDF, हर एक 10 MB तक। ये निजी रहते हैं: इन्हें सिर्फ़ आप और हमारी टीम देख सकती है।",
     "review": "reviewed",
-    "enHash": "5285e84b"
+    "enHash": "3a2e8447"
   },
   "onboarding.docs.kind.pan": {
     "message": "PAN कार्ड",
@@ -175,14 +135,14 @@
     "enHash": "27548c4f"
   },
   "onboarding.docs.status.accepted": {
-    "message": "मंज़ूर",
+    "message": "जोड़ा गया",
     "review": "reviewed",
-    "enHash": "61a0572c"
+    "enHash": "b68734c2"
   },
   "onboarding.docs.status.rejected": {
-    "message": "नामंज़ूर",
+    "message": "बदलने को कहा गया",
     "review": "reviewed",
-    "enHash": "27eeb7a2"
+    "enHash": "99604f84"
   },
   "onboarding.docs.add": {
     "message": "{name} जोड़ें",
@@ -214,25 +174,20 @@
     "review": "reviewed",
     "enHash": "dd02b2ad"
   },
-  "onboarding.submit.title": {
-    "message": "जाँच के लिए भेजें",
-    "review": "reviewed",
-    "enHash": "ddc87345"
-  },
   "onboarding.submit.body": {
-    "message": "हम आपकी जानकारी जाँचते हैं और कुछ चाहिए हो तो फ़ोन करते हैं। जाँच के दौरान भी आप ऑर्डर के लिए TodayZ इस्तेमाल कर सकते हैं।",
+    "message": "हमारी टीम अगले कुछ दिनों में हर नई दुकान की जाँच करती है। आप तुरंत बेच सकते हैं; भुगतान जाँच के बाद शुरू होगा।",
     "review": "reviewed",
-    "enHash": "6dc86397"
+    "enHash": "b54252c8"
   },
   "onboarding.submit.action": {
-    "message": "जाँच के लिए भेजें",
+    "message": "दुकान चालू करें",
     "review": "reviewed",
-    "enHash": "ddc87345"
+    "enHash": "b8d1bae4"
   },
   "onboarding.submit.sent": {
-    "message": "जाँच के लिए भेज दिया",
+    "message": "आपकी दुकान चालू है",
     "review": "reviewed",
-    "enHash": "ef78972f"
+    "enHash": "448f50bc"
   },
   "onboarding.status.submitted.title": {
     "message": "आपकी दुकान की जाँच चल रही है",
@@ -255,24 +210,24 @@
     "enHash": "f7322f3e"
   },
   "onboarding.status.verified.title": {
-    "message": "आपकी दुकान वेरिफ़ाई हो गई है",
+    "message": "आपकी दुकान चालू है",
     "review": "reviewed",
-    "enHash": "f69ca01e"
+    "enHash": "448f50bc"
   },
   "onboarding.status.verified.body": {
-    "message": "ग्राहक आपकी लाइव दुकानें ढूँढ सकते हैं।",
+    "message": "ग्राहक आपके चालू स्टोर ढूँढ सकते हैं। भुगतान हमारी टीम के दुकान जाँचने के बाद शुरू होगा।",
     "review": "reviewed",
-    "enHash": "ca169a4c"
+    "enHash": "3c08f63c"
   },
   "onboarding.status.rejected.title": {
-    "message": "आपकी दुकान मंज़ूर नहीं हुई",
+    "message": "आपकी दुकान हटा दी गई है",
     "review": "reviewed",
-    "enHash": "75e8f563"
+    "enHash": "f4a5ef0a"
   },
   "onboarding.status.rejected.body": {
-    "message": "अगर आपको लगता है कि यह ग़लती है तो सपोर्ट से संपर्क करें।",
+    "message": "हमारी टीम आपकी दुकान की पुष्टि नहीं कर सकी, इसलिए ग्राहक उसे नहीं देख सकते। कारण जानने के लिए सहायता से संपर्क करें।",
     "review": "reviewed",
-    "enHash": "9e413826"
+    "enHash": "522db36f"
   },
   "onboarding.status.suspended.title": {
     "message": "आपकी दुकान रोक दी गई है",
@@ -353,5 +308,160 @@
     "message": "कोई और जानकारी",
     "review": "reviewed",
     "enHash": "61052ba2"
+  },
+  "onboarding.lede": {
+    "message": "कुछ जानकारी भरें और आपकी दुकान तुरंत चालू हो जाएगी। मंज़ूरी का इंतज़ार नहीं।",
+    "review": "reviewed",
+    "enHash": "f73cd625"
+  },
+  "onboarding.progress": {
+    "message": "{total} में से {done} चरण पूरे",
+    "review": "reviewed",
+    "enHash": "46b052c6"
+  },
+  "onboarding.steps.label": {
+    "message": "सेटअप के चरण",
+    "review": "reviewed",
+    "enHash": "281a6952"
+  },
+  "onboarding.steps.business": {
+    "message": "दुकान का नाम",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.steps.store": {
+    "message": "पता और मैप पिन",
+    "review": "reviewed",
+    "enHash": "a729fbde"
+  },
+  "onboarding.steps.hours": {
+    "message": "खुलने का समय",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.steps.category": {
+    "message": "आप क्या बेचते हैं",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.steps.photos": {
+    "message": "दुकान की फ़ोटो",
+    "review": "reviewed",
+    "enHash": "733b9d17"
+  },
+  "onboarding.steps.payout": {
+    "message": "GST, PAN और भुगतान",
+    "review": "reviewed",
+    "enHash": "21cfd6a1"
+  },
+  "onboarding.steps.live": {
+    "message": "दुकान चालू करें",
+    "review": "reviewed",
+    "enHash": "b8d1bae4"
+  },
+  "onboarding.optional": {
+    "message": "ज़रूरी नहीं",
+    "review": "reviewed",
+    "enHash": "0c6c4102"
+  },
+  "onboarding.recommended": {
+    "message": "सुझाया गया",
+    "review": "reviewed",
+    "enHash": "9ef93755"
+  },
+  "onboarding.toDashboard": {
+    "message": "डैशबोर्ड पर जाएँ",
+    "review": "reviewed",
+    "enHash": "e5fa8758"
+  },
+  "onboarding.stepOf": {
+    "message": "चरण {n} / {total}",
+    "review": "reviewed",
+    "enHash": "78cee4b8"
+  },
+  "onboarding.back": {
+    "message": "पीछे",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "onboarding.next": {
+    "message": "आगे",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "onboarding.skip": {
+    "message": "अभी छोड़ें",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "onboarding.intro.business": {
+    "message": "वह नाम जो ग्राहक आस-पास खोजते समय देखेंगे।",
+    "review": "reviewed",
+    "enHash": "06b8dcbd"
+  },
+  "onboarding.intro.store": {
+    "message": "आपकी दुकान कहाँ है। पिन दुकान के दरवाज़े पर लगाएँ ताकि ग्राहक और डिलीवरी वाले उसे ढूँढ सकें।",
+    "review": "reviewed",
+    "enHash": "5c51081b"
+  },
+  "onboarding.intro.hours": {
+    "message": "आप कब खुले रहते हैं। ग्राहक तभी बुक कर सकते हैं जब आप खुले हों।",
+    "review": "reviewed",
+    "enHash": "8d5a9398"
+  },
+  "onboarding.intro.category": {
+    "message": "वह चुनें जो आपकी ज़्यादातर चीज़ों से मेल खाता हो। इससे ग्राहक आपको ढूँढ पाते हैं।",
+    "review": "reviewed",
+    "enHash": "ac72e9e8"
+  },
+  "onboarding.intro.photos": {
+    "message": "दुकान के सामने की एक फ़ोटो और अंदर की एक। ग्राहक उस दुकान पर भरोसा करते हैं जिसे वे देख सकें, और हमारी टीम दुकान की जाँच में इनका इस्तेमाल करती है।",
+    "review": "reviewed",
+    "enHash": "36cd65a6"
+  },
+  "onboarding.intro.payout": {
+    "message": "हम आपका पैसा कहाँ भेजें, और आपके टैक्स के कागज़। आप इनके बिना भी दुकान चालू कर सकते हैं और बाद में जोड़ सकते हैं।",
+    "review": "reviewed",
+    "enHash": "fcf5563f"
+  },
+  "onboarding.intro.live": {
+    "message": "दुकान चालू करते ही आस-पास के ग्राहक उसे ढूँढ सकते हैं और उससे बुक कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "2178871c"
+  },
+  "onboarding.intro.liveDone": {
+    "message": "आपकी दुकान की स्थिति यह है।",
+    "review": "reviewed",
+    "enHash": "0006b2db"
+  },
+  "onboarding.live.addProducts": {
+    "message": "अपने सामान जोड़ें",
+    "review": "reviewed",
+    "enHash": "28822efe"
+  },
+  "onboarding.photos.help": {
+    "message": "JPG, PNG या WebP, हर एक 10 MB तक। फ़ोटो तुरंत लग जाती हैं; पहले किसी को मंज़ूरी नहीं देनी होती।",
+    "review": "reviewed",
+    "enHash": "61f26173"
+  },
+  "onboarding.taxDocs": {
+    "message": "टैक्स और लाइसेंस के कागज़",
+    "review": "reviewed",
+    "enHash": "de682406"
+  },
+  "onboarding.taxDocs.help": {
+    "message": "फ़ोटो या PDF, हर एक 10 MB तक। ये निजी रहते हैं: इन्हें सिर्फ़ आप और हमारी टीम देख सकती है।",
+    "review": "reviewed",
+    "enHash": "3a2e8447"
+  },
+  "onboarding.status.verified_checked.title": {
+    "message": "आपकी दुकान चालू है और जाँची जा चुकी है",
+    "review": "reviewed",
+    "enHash": "617485bc"
+  },
+  "onboarding.status.verified_checked.body": {
+    "message": "ग्राहक आपके चालू स्टोर ढूँढ सकते हैं, और भुगतान सामान्य समय पर होता है।",
+    "review": "reviewed",
+    "enHash": "91bc1cac"
   }
 }

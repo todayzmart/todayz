@@ -396,7 +396,7 @@ function PayoutDetail({ d, manage }: { d: AdminPayoutDetail; manage: boolean }) 
 
   const causes = [
     { key: 'suspended', open: d.causes.businessSuspended, label: intl.formatMessage({ id: 'payouts.cause.suspended' }) },
-    { key: 'kyc', open: !d.causes.kycVerified, label: intl.formatMessage({ id: 'payouts.cause.kyc' }) },
+    { key: 'unchecked', open: !d.causes.shopChecked, label: intl.formatMessage({ id: 'payouts.cause.unchecked' }) },
     { key: 'details', open: d.causes.payoutDetailsMissing, label: intl.formatMessage({ id: 'payouts.cause.details' }) },
     { key: 'risk', open: d.causes.openRiskFlag, label: intl.formatMessage({ id: 'payouts.cause.risk' }) },
   ];

@@ -82,6 +82,9 @@ type Deps struct {
 	// Storage holds product images (D-252); without its images bucket the
 	// image approve and upload routes answer 503.
 	Storage *storage.Client
+	// ShopOrders is internal/orders' cancel of a rejected shop's open orders
+	// (D-274). Without it a shop reject answers 503.
+	ShopOrders ShopOrderCanceller
 }
 
 // PhoneAccounts finds or makes the account of an E.164 phone in the caller's
@@ -128,6 +131,7 @@ type Service struct {
 	integrations    []Integration
 	notices         notice.Sender
 	storage         *storage.Client
+	shopOrders      ShopOrderCanceller
 }
 
 // New builds the service.
@@ -136,7 +140,7 @@ func New(d Deps) (*Service, error) {
 		return nil, errors.New("admin: a clock is required")
 	}
 	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts,
-		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices, storage: d.Storage}, nil
+		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices, storage: d.Storage, shopOrders: d.ShopOrders}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

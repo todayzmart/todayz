@@ -29,6 +29,8 @@ export function usePayoutLabels() {
   const hold = useCallback(
     (h: string | null): string => {
       switch (h) {
+        case 'shop_unchecked':
+          return intl.formatMessage({ id: 'payouts.hold.unchecked' });
         case 'kyc_incomplete':
           return intl.formatMessage({ id: 'payouts.hold.kyc' });
         case 'payout_details_missing':

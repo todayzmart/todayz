@@ -77,10 +77,7 @@ func (s *Service) listDocuments(ctx context.Context, bidStr string) (businessapi
 // it. The object key is never shown; the URL is valid for uploadTTL and signs
 // the Content-Type and Content-Length, so the upload must be the declared type
 // and size.
-//
-// TODO(lead): nothing turns 'pending' into 'uploaded' yet. Either a confirm
-// call (HEAD the object, check its size and type) or the admin review (W1-10)
-// must check the object exists before trusting the row.
+// The document stays pending until confirmDocument finds the object stored.
 func (s *Service) createDocument(ctx context.Context, bidStr string, body *businessapi.DocumentCreate) (businessapi.DocumentUpload, error) {
 	if err := s.ready(ctx); err != nil {
 		return businessapi.DocumentUpload{}, err
@@ -181,4 +178,102 @@ func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid
 			map[string]any{"kind": doc.Kind, "contentType": doc.ContentType, "sizeBytes": doc.SizeBytes, "storeId": optIDString(doc.StoreID)})
 	})
 	return doc, key, err
+}
+
+// confirmDocument accepts the owner's document once the bucket holds it with
+// the declared type and at most the declared size (confirmUpload). No one
+// approves it first (D-274); the shop check sees it later.
+func (s *Service) confirmDocument(ctx context.Context, bidStr, docStr string) (businessapi.BusinessDocument, error) {
+	if err := s.ready(ctx); err != nil {
+		return businessapi.BusinessDocument{}, err
+	}
+	p, err := principal(ctx)
+	if err != nil {
+		return businessapi.BusinessDocument{}, err
+	}
+	bid, err := pathID(bidStr)
+	if err != nil {
+		return businessapi.BusinessDocument{}, err
+	}
+	did, err := pathID(docStr)
+	if err != nil {
+		return businessapi.BusinessDocument{}, err
+	}
+	lock := func(ctx context.Context) (businessdb.BusinessDocument, error) {
+		doc, err := s.q(ctx).FieldDocumentForUpdate(ctx, businessdb.FieldDocumentForUpdateParams{ID: ids.UUID(did), BusinessID: ids.UUID(bid)})
+		if db.IsNoRows(err) {
+			return businessdb.BusinessDocument{}, problem.New(genproblems.NotFound, "")
+		}
+		if err != nil {
+			return businessdb.BusinessDocument{}, fmt.Errorf("business: document: %w", err)
+		}
+		return doc, nil
+	}
+	doc, err := s.confirmUpload(ctx, audit.ActorStaff, p.UserID, lock)
+	if err != nil {
+		return businessapi.BusinessDocument{}, err
+	}
+	return toDocument(doc), nil
+}
+
+// confirmUpload accepts a pending document once the bucket holds it with the
+// declared type and at most the declared size (a signed HEAD, as support's
+// claim does), audited as the actor. lock reads the row FOR UPDATE and runs
+// the route's own checks; it runs in a transaction before and after the HEAD,
+// and no row lock is held over the bucket call. A document already past
+// pending is answered unchanged.
+func (s *Service) confirmUpload(ctx context.Context, actorKind string, uid ids.ID, lock func(context.Context) (businessdb.BusinessDocument, error)) (businessdb.BusinessDocument, error) {
+	if s.presign == nil {
+		return businessdb.BusinessDocument{}, problem.Wrap(genproblems.ServiceUnavailable, errNoStorage)
+	}
+	var doc businessdb.BusinessDocument
+	if err := s.db.InTx(ctx, func(ctx context.Context) error {
+		var err error
+		doc, err = lock(ctx)
+		return err
+	}); err != nil {
+		return businessdb.BusinessDocument{}, asProblem(err)
+	}
+	if doc.Status != "pending" {
+		return doc, nil
+	}
+	now := s.clock.Now()
+	if doc.ConfirmBy != nil && now.After(*doc.ConfirmBy) {
+		return businessdb.BusinessDocument{}, errUploadExpired()
+	}
+	obj, err := s.presign.head(ctx, doc.ObjectKey, now)
+	switch {
+	case errors.Is(err, errNoObject):
+		return businessdb.BusinessDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the file is not in storage yet")
+	case err != nil:
+		return businessdb.BusinessDocument{}, problem.Wrap(genproblems.ServiceUnavailable, fmt.Errorf("business: head document: %w", err))
+	}
+	if obj.size < 1 || obj.size > doc.SizeBytes || obj.contentType != doc.ContentType {
+		return businessdb.BusinessDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the stored file is not the declared type and size")
+	}
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		cur, err := lock(ctx)
+		if err != nil {
+			return err
+		}
+		if cur.Status != "pending" {
+			doc = cur
+			return nil
+		}
+		doc, err = s.q(ctx).AcceptUploadedDocument(ctx, businessdb.AcceptUploadedDocumentParams{Now: s.clock.Now(), ID: cur.ID})
+		if db.IsNoRows(err) {
+			// Past confirm_by since the first read: the sweep may already
+			// have deleted the object.
+			return errUploadExpired()
+		}
+		if err != nil {
+			return fmt.Errorf("business: confirm document: %w", err)
+		}
+		return s.writeAuditAs(ctx, actorKind, uid, "document.accepted", "business_document", idString(cur.ID),
+			map[string]any{"status": cur.Status}, map[string]any{"status": doc.Status, "sizeBytes": obj.size})
+	})
+	if err != nil {
+		return businessdb.BusinessDocument{}, asProblem(err)
+	}
+	return doc, nil
 }

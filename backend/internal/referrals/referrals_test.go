@@ -370,7 +370,7 @@ func TestKinds(t *testing.T) {
 				assert.Equal(t, statusPending, res.Status)
 				newStore, _, _ = e.store(biz, "live", testNow)
 				refereeTo = Beneficiary{Kind: BeneficiaryStore, ID: newStore}
-				e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
+				e.exec(`UPDATE businesses SET status = 'verified', check_status = 'checked', checked_at = now() WHERE id = $1`, ids.UUID(biz))
 				for range 2 {
 					buyer, _ := e.newCustomer()
 					e.complete(e.order(buyer, newStore, 500, 0)) // any amount counts for a shop
@@ -914,10 +914,18 @@ func TestShopCounting(t *testing.T) {
 	assert.Equal(t, statusPending, st)
 	assert.Empty(t, e.ledger.posted)
 
-	// Verification comes later: the sweep qualifies and enqueues the
-	// reward, which the job pays.
+	// Live but not checked yet (D-274): the sweep still waits.
 	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
 	out, err := e.svc.Sweep(e.ctx)
+	require.NoError(t, err)
+	assert.Zero(t, out["shops_qualified"])
+	st, _, _ = e.referral(res.ReferralID)
+	assert.Equal(t, statusPending, st, "an unchecked shop does not qualify")
+
+	// The check comes later: the sweep qualifies and enqueues the reward,
+	// which the job pays.
+	e.exec(`UPDATE businesses SET check_status = 'checked', checked_at = now() WHERE id = $1`, ids.UUID(biz))
+	out, err = e.svc.Sweep(e.ctx)
 	require.NoError(t, err)
 	assert.EqualValues(t, 1, out["shops_qualified"])
 	st, _, _ = e.referral(res.ReferralID)
@@ -937,7 +945,7 @@ func TestShopCountingSkipsCustomerReferrer(t *testing.T) {
 	e.exec(`UPDATE businesses SET status = 'draft' WHERE id = $1`, ids.UUID(biz))
 	res, err := e.svc.ClaimBusiness(e.ctx, biz, owner, sess, ClaimInput{Code: code})
 	require.NoError(t, err)
-	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
+	e.exec(`UPDATE businesses SET status = 'verified', check_status = 'checked', checked_at = now() WHERE id = $1`, ids.UUID(biz))
 	store, _, _ := e.store(biz, "live", testNow)
 	e.complete(e.order(referrer, store, 10_000, 0))
 	st, _, _ := e.referral(res.ReferralID)
@@ -957,7 +965,7 @@ func TestShopCountingDistinctCustomers(t *testing.T) {
 	e.exec(`UPDATE businesses SET status = 'draft' WHERE id = $1`, ids.UUID(biz))
 	res, err := e.svc.ClaimBusiness(e.ctx, biz, owner, sess, ClaimInput{Code: refCode})
 	require.NoError(t, err)
-	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
+	e.exec(`UPDATE businesses SET status = 'verified', check_status = 'checked', checked_at = now() WHERE id = $1`, ids.UUID(biz))
 	store, _, _ := e.store(biz, "live", testNow)
 	counted := func() int {
 		t.Helper()

@@ -553,5 +553,10 @@
     "message": "{label} पर डिलीवरी: {address}",
     "review": "reviewed",
     "enHash": "f4a4eb85"
+  },
+  "orders.reason.shop_rejected": {
+    "message": "यह दुकान अब TodayZ पर ऑर्डर नहीं ले सकती। इस्तेमाल किए गए क्रेडिट आपके वॉलेट में वापस आ गए हैं।",
+    "review": "machine",
+    "enHash": "49fc88e8"
   }
 }

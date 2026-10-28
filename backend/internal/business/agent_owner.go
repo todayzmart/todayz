@@ -306,7 +306,9 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 			map[string]any{"status": cur.Status}, map[string]any{"status": b.Status}); err != nil {
 			return err
 		}
-		return f.submitStores(ctx, c, cur)
+		// The agent onboarded the stores, so the owner need not open the app:
+		// every complete store goes live with the business (D-241, D-274).
+		return f.s.goLiveStores(ctx, audit.ActorAdmin, c.p.UserID, cur.ID)
 	})
 	if err != nil {
 		return adminfieldapi.FieldBusiness{}, asProblem(err)
@@ -318,36 +320,6 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		return adminfieldapi.FieldBusiness{}, outcome
 	}
 	return f.view(ctx, c, b)
-}
-
-// submitStores sends the business's complete draft stores for review once the
-// owner has confirmed (D-241): the agent onboarded them, so the owner need not
-// open the app to submit. A store still missing a detail stays draft for the
-// owner or agent to finish; submitReady has already found at least one complete.
-func (f *Field) submitStores(ctx context.Context, c fieldCall, b businessdb.Business) error {
-	q := f.s.q(ctx)
-	stores, err := q.CountSubmitStores(ctx, b.ID)
-	if err != nil {
-		return err
-	}
-	for _, st := range stores {
-		if len(storeGaps("", st)) > 0 {
-			continue
-		}
-		n, err := q.SubmitStore(ctx, businessdb.SubmitStoreParams{ID: st.ID, BusinessID: b.ID})
-		if err != nil {
-			return err
-		}
-		if n == 0 {
-			continue // not draft
-		}
-		sid, _ := ids.FromUUID(st.ID)
-		if err := f.s.writeAuditAs(ctx, audit.ActorAdmin, c.p.UserID, "store.submit", "store", sid.String(),
-			map[string]any{"status": storeDraft}, map[string]any{"status": "pending_review"}); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // ownerCodeExpiredOnce audits the first expired try on a code (lapsed, or
