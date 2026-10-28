@@ -70,10 +70,11 @@ What the console showed that the runbook did not say before (now fixed in runboo
 - Until the SMS region policy allows India, every send fails with `OPERATION_NOT_ALLOWED`.
 - The project wizard asks about Gemini; leave it off.
 
+Browser run with the founder's own number (28 Oct): this branch's customer app and API locally, against `todayz-dev`. The app picked Firebase from `/v1/auth/config`, loaded the SDK, and passed the invisible reCAPTCHA (v2 fallback; no reCAPTCHA Enterprise config, as expected). Google then refused the send with `400 BILLING_NOT_ENABLED`. So real SMS needs billing on the project, as the runbook says; nothing in the code blocks it.
+
 Not checked live:
 
-- the browser SDK flow with a real invisible reCAPTCHA;
-- a real SMS to a real phone, which needs Blaze.
+- a real SMS to a real phone, and the code entry after it, which need billing.
 
 The prod check in runbook section 5 covers both.
 
@@ -84,7 +85,7 @@ Set up as runbook sections 1 to 4, on the founder's instruction, in the founder'
 | Step | Done |
 |---|---|
 | Project `todayz-prod` (the ID has no suffix), Analytics off, Gemini off | yes |
-| Blaze plan and budget alert | **no**: billing is the founder's to add. Until then the project is capped at 10 SMS a day. |
+| Blaze plan and budget alert | **no**: billing is the founder's to add. Until then no real SMS is sent (`BILLING_NOT_ENABLED`). |
 | Phone sign-in enabled. No Identity Platform upgrade wizard appeared | yes |
 | SMS region policy: allow India only | yes |
 | Authorized domains: `app`, `business` and `admin.todayz.in`; `localhost` removed | yes |

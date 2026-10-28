@@ -15,7 +15,7 @@ Who does what (D-210):
    - Google Analytics: **off**. TodayZ does not use it.
    - Gemini in Firebase: **off**. The wizard asks about it at creation; TodayZ does not use it.
 2. Upgrade to **Blaze** (pay as you go): the gear icon, then **Usage and billing**, then **Details and settings**, then **Modify plan**.
-   - Phone sign-in on the free plan stops after a few codes a day. The console says "a sent SMS daily quota of 10/day" for a new project without billing.
+   - Without billing, Google sends no real SMS at all: `sendVerificationCode` answers `400 BILLING_NOT_ENABLED` and the apps show "Something went wrong". The console's "sent SMS daily quota of 10/day" only applies once billing is on. Reserved test numbers still work without billing (section 8).
    - India SMS is billed per message. Check the current price on https://firebase.google.com/pricing.
    - Set a budget alert at the same time: the gear icon, then **Usage and billing**, then **Budget alerts**. Use the `BUDGET_ALERT_EMAIL` address.
 
