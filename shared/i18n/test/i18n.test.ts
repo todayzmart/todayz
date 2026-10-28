@@ -25,11 +25,24 @@ function text(ast: MessageFormatElement[], values: Record<string, string> = {}):
 /** Product and brand names that keep their capitals mid-sentence. */
 const PROPER_NOUNS = new Set([
   'TodayZ', 'WhatsApp', 'Google', 'India', 'Indian', 'English', 'JavaScript', 'Cloudflare', 'Turnstile', 'WebP', 'I',
+  // The litre symbol in pack sizes ("Milk 1 L").
+  'L',
+  'Firebase',
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
   'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
 ]);
-/** Multi-word names (a sample shop in the site's mock, a statutory body in the privacy policy). */
-const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board', 'TodayZ Business', 'TodayZ Admin'];
+/**
+ * Multi-word names (a sample shop in the site's mock, a statutory body in the privacy policy, and the titles of
+ * Google's documents that the reCAPTCHA notice must name, D-275, Firebase in the privacy policy, and the open photo
+ * sources, D-252).
+ */
+const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board', 'TodayZ Business', 'TodayZ Admin', 'Privacy Policy', 'Terms of Service', 'Firebase Authentication', 'Open Food Facts', 'Open Beauty Facts', 'Open Products Facts', 'Wikimedia Commons'];
+
+/** Keys whose copy is not a sentence, so sentence case does not apply. */
+const NOT_SENTENCES = new Set([
+  'home.week.days', // weekday initials, M T W T F S S
+  'home.walk.title', // "Search once. {em} Pick it up.": {em} is a whole sentence of its own (home.walk.title_em)
+]);
 
 /**
  * Words that break sentence case: a capitalised word that is not the first word of a sentence,
@@ -38,9 +51,15 @@ const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board', 'TodayZ
  */
 function titleCaseWords(msg: string): string[] {
   const out: string[] = [];
-  const bare = msg.replace(/\{[^}]*\}/g, 'x').replace(/“[^”]*”/g, 'x');
+  // Innermost placeholders first, so a plural whose branches are sentences ends a sentence itself.
+  let bare = msg.replace(/“[^”]*”/g, 'x');
+  for (let prev = ''; prev !== bare; ) {
+    prev = bare;
+    bare = bare.replace(/\{([^{}]*)\}/g, (_, inner: string) => (/[.?]$/.test(inner.trim()) ? 'x.' : 'x'));
+  }
   const text = PROPER_PHRASES.reduce((m, name) => m.replaceAll(name, 'x'), bare);
-  for (const sentence of text.split(/(?<=[.?:])\s+/)) {
+  // A middle dot separates labels ("01 · Search", "2 km · Open"); each part starts afresh.
+  for (const sentence of text.split(/(?<=[.?:])\s+|\s+·\s+/)) {
     for (const word of sentence.split(/\s+/).slice(1)) {
       const w = word.replace(/^[^\p{L}]+|[^\p{L}\d]+$/gu, '').replace(/['’]s$/u, '');
       if (!/^\p{Lu}/u.test(w) || PROPER_NOUNS.has(w) || /^[\p{Lu}\d]{2,}$/u.test(w)) continue;
@@ -130,7 +149,7 @@ describe('catalogues', () => {
     for (const [key, msg] of Object.entries(messages)) {
       expect(msg, key).not.toMatch(/!/);
       expect(msg, key).not.toMatch(/\p{Emoji_Presentation}/u);
-      expect(titleCaseWords(msg), key).toEqual([]);
+      if (!NOT_SENTENCES.has(key)) expect(titleCaseWords(msg), key).toEqual([]);
     }
   });
 
@@ -138,6 +157,9 @@ describe('catalogues', () => {
     expect(titleCaseWords('Go To Orders')).toEqual(['To', 'Orders']);
     expect(titleCaseWords('Your shop on TodayZ. Pay by UPI or card.')).toEqual([]);
     expect(titleCaseWords('{count} items in {storeName}')).toEqual([]);
+    expect(titleCaseWords('{n, plural, one {# item goes.} other {# items go.}} Pack photos stay.')).toEqual([]);
+    expect(titleCaseWords('{n, plural, one {# item} other {# items}} Pack photos')).toEqual(['Pack']);
+    expect(titleCaseWords('01 · Search')).toEqual([]);
   });
 
   it('generated output exists (run make gen first)', () => {
