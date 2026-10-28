@@ -31,13 +31,13 @@
   gap: var(--space-2);
 }
 
-.frame {
-  width: 100%;
-  aspect-ratio: 148 / 210;
-  max-height: 70vh;
-  border: 1px solid var(--line);
+.preview {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--surface);
+  background: var(--surface-subtle);
 }
 
 /* W3-09 campaigns and their counts. */

@@ -64,35 +64,15 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "standee.preview": {
-    "message": "प्रीव्यू",
-    "review": "reviewed",
-    "enHash": "f1fbb2b4"
-  },
-  "standee.download": {
-    "message": "A5 PDF डाउनलोड करें",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "standee.preparing": {
-    "message": "PDF तैयार हो रहा है",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
-  "standee.pdfError": {
-    "message": "स्टैंडी तैयार नहीं हो सकी। फिर से कोशिश करें।",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
-  },
   "standee.frameTitle": {
     "message": "स्टैंडी का प्रीव्यू",
     "review": "reviewed",
     "enHash": "d22dd779"
   },
   "standee.printTip": {
-    "message": "A5 पर 100% साइज़ में प्रिंट करें, प्रिंटर की तरफ़ से कोई मार्जिन न जोड़ें, ताकि QR कोड साफ़ रहे।",
+    "message": "प्रिंट विंडो में A5, 100% स्केल और बिना मार्जिन चुनें, ताकि QR कोड साफ़ रहे। फ़ाइल रखनी हो तो “Save as PDF” चुनें।",
     "review": "reviewed",
-    "enHash": "079abaf2"
+    "enHash": "8fa92c61"
   },
   "standee.campaigns.title": {
     "message": "कैंपेन",
@@ -243,5 +223,40 @@
     "message": "{campaign} की गिनती",
     "review": "reviewed",
     "enHash": "bdbb16a3"
+  },
+  "standee.print": {
+    "message": "प्रिंट करें या PDF सेव करें",
+    "review": "reviewed",
+    "enHash": "3ed9f194"
+  },
+  "standee.codeError": {
+    "message": "आपका शॉर्ट कोड लोड नहीं हो सका।",
+    "review": "reviewed",
+    "enHash": "a9513e83"
+  },
+  "standee.sheet.lead": {
+    "message": "स्कैन करें और खरीदें",
+    "review": "reviewed",
+    "enHash": "f4567f1d"
+  },
+  "standee.sheet.qr": {
+    "message": "{shop} का QR कोड",
+    "review": "reviewed",
+    "enHash": "50937475"
+  },
+  "standee.sheet.hint": {
+    "message": "देखें क्या स्टॉक में है, बुक करें और कैशबैक पाएँ।",
+    "review": "reviewed",
+    "enHash": "f0f6b2f7"
+  },
+  "standee.sheet.code": {
+    "message": "दुकान कोड",
+    "review": "reviewed",
+    "enHash": "707cf6c1"
+  },
+  "standee.campaigns.printOne": {
+    "message": "प्रिंट करें या PDF सेव करें: {campaign}",
+    "review": "reviewed",
+    "enHash": "90f2a733"
   }
 }

@@ -61,7 +61,7 @@ W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orde
 
 W2-12: B-07 Stock (`src/stock/`), B-08 Offers and banners (`src/offers/`), B-11 Reviews (`src/reviews/`) and B-10 Credits (`src/credits/`), each with its route under `src/routes/<area>/`. Stock, offers and reviews use the generated client; `stock/api.ts` (create product, import) and `credits/api.ts` are adapters marked `TODO(merge)`. Reviews, Credits and Offers still need `nav.ts` entries. Report: `docs/qa/W2-12/REPORT.md`.
 
-W2-10 finish: B-02 onboarding (`src/onboarding/`, `/onboarding`), B-13 stores and staff (`src/stores/`, `/stores`, `/invite/$token`), B-14 settings (`src/settings/`, `/settings`) and the QR standee page (`src/standee/`, `/standee`). All use the generated client except the standee PDF (`credits/api.ts` adapter, `TODO(merge)` until `getQrStandee` is generated). Report: `docs/qa/W2-10-finish/REPORT.md`.
+W2-10 finish: B-02 onboarding (`src/onboarding/`, `/onboarding`), B-13 stores and staff (`src/stores/`, `/stores`, `/invite/$token`), B-14 settings (`src/settings/`, `/settings`) and the QR standee page (`src/standee/`, `/standee`). All use the generated client. The standee sheet is drawn and printed in the browser (`src/standee/StandeeSheet.tsx`, `usePrintSheet.tsx`, D-278); there is no server PDF. Report: `docs/qa/W2-10-finish/REPORT.md`.
 
 - Edits send `If-Match` (read first when the ETag is unknown; a 412 refetches). Create, invite, submit and document calls carry an `Idempotency-Key`. Roles are in `src/stores/perm.ts`; the server is the gate (D-200 to D-205).
 - Documents: the file is checked in the browser, registered, then PUT to the presigned URL with only `Content-Type`. A failed PUT leaves a `pending` document (no confirm route in 04).

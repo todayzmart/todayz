@@ -51,28 +51,12 @@
     "defaultMessage": "Short code",
     "description": "standee short code label"
   },
-  "standee.preview": {
-    "defaultMessage": "Preview",
-    "description": "standee button"
-  },
-  "standee.download": {
-    "defaultMessage": "Download A5 PDF",
-    "description": "standee button"
-  },
-  "standee.preparing": {
-    "defaultMessage": "Preparing the PDF",
-    "description": "standee button busy label"
-  },
-  "standee.pdfError": {
-    "defaultMessage": "Could not prepare the standee. Try again.",
-    "description": "standee banner"
-  },
   "standee.frameTitle": {
     "defaultMessage": "Standee preview",
     "description": "standee preview frame title"
   },
   "standee.printTip": {
-    "defaultMessage": "Print on A5 at 100% size, with no margins added by the printer, so the QR code stays sharp.",
+    "defaultMessage": "In the print dialog pick A5, scale 100% and no margins, so the QR code stays sharp. Choose “Save as PDF” to keep a file.",
     "description": "standee print tip"
   },
   "standee.campaigns.title": {
@@ -194,5 +178,33 @@
   "standee.funnel.one": {
     "defaultMessage": "{campaign} counts",
     "description": "accessible label of a standee funnel"
+  },
+  "standee.print": {
+    "defaultMessage": "Print or save as PDF",
+    "description": "standee button: opens the browser print dialog"
+  },
+  "standee.codeError": {
+    "defaultMessage": "Could not load your short code.",
+    "description": "standee banner when the store short code fails"
+  },
+  "standee.sheet.lead": {
+    "defaultMessage": "Scan to shop at",
+    "description": "printed standee: line above the shop name"
+  },
+  "standee.sheet.qr": {
+    "defaultMessage": "QR code for {shop}",
+    "description": "accessible name of the standee QR"
+  },
+  "standee.sheet.hint": {
+    "defaultMessage": "See what is in stock, book it and earn cashback.",
+    "description": "printed standee: line under the QR"
+  },
+  "standee.sheet.code": {
+    "defaultMessage": "Shop code",
+    "description": "printed standee: label before the short code"
+  },
+  "standee.campaigns.printOne": {
+    "defaultMessage": "Print or save as PDF: {campaign}",
+    "description": "accessible name of a campaign's print button"
   }
 }

@@ -1,17 +1,18 @@
 import { Banner, Button, EmptyState, Skeleton } from '@todayz/ui';
-import { Download, Inbox, Lock, Printer, Store as StoreIcon } from 'lucide-react';
+import { Inbox, Lock, Printer, Store as StoreIcon } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { getStandeePdf } from '../credits/api';
 import { canSeeCredits } from '../credits/permissions';
 import { useShortCode } from '../credits/queries';
 import { useCurrentStore, type CurrentStore } from '../orders/store';
 import { Campaigns } from './campaigns/Campaigns';
 import styles from './standee.module.css';
+import { storeLink } from './link';
+import { StandeeSheet } from './StandeeSheet';
+import { usePrintSheet } from './usePrintSheet';
 
 /**
- * QR standee (06 B-02 step and B-10 link, D-51). W2-10 owns the PDF and the preview; campaigns,
+ * QR standee (06 B-02 step and B-10 link, D-51). W2-10 owns the sheet, drawn and printed in the browser (D-278); campaigns,
  * reorders and scan analytics are W3-09 (`campaigns/`, `analytics/`). Manager and above; the API is the real gate.
  */
 export function StandeePage() {
@@ -58,36 +59,9 @@ export function StandeePage() {
 function Standee({ store }: { store: CurrentStore }) {
   const intl = useIntl();
   const code = useShortCode(store.bid, store.sid);
-  const [pdf, setPdf] = useState<{ url: string } | null>(null);
-  const [busy, setBusy] = useState<'preview' | 'download' | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  // The blob URL lives only as long as the preview; nothing secret is in it.
-  useEffect(() => () => {
-    if (pdf) URL.revokeObjectURL(pdf.url);
-  }, [pdf]);
-
-  const fetchPdf = async (mode: 'preview' | 'download') => {
-    setBusy(mode);
-    setFailed(false);
-    try {
-      const blob = await getStandeePdf(store.bid, store.sid);
-      const url = URL.createObjectURL(blob);
-      if (mode === 'preview') {
-        setPdf({ url });
-      } else {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'todayz-standee-a5.pdf';
-        a.click();
-        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      }
-    } catch {
-      setFailed(true);
-    } finally {
-      setBusy(null);
-    }
-  };
+  const { print, portal } = usePrintSheet();
+  // The store standee's link (D-26): the scan opens the shop and counts as a store referral.
+  const sheet = code.data ? { shop: store.name, link: storeLink(code.data), code: code.data } : null;
 
   return (
     <>
@@ -100,32 +74,33 @@ function Standee({ store }: { store: CurrentStore }) {
         </div>
         <div className={styles.stack}>
           <p className={styles.sub}>{intl.formatMessage({ id: 'standee.card.body' })}</p>
-
           {code.isPending && <Skeleton width="10ch" />}
-          {code.data && (
-            <p>
-              <span className={styles.sub}>{intl.formatMessage({ id: 'standee.shortCode' })} </span>
-              <span className={styles.code}>{code.data}</span>
-            </p>
-          )}
-          {failed && (
-            <Banner tone="warning" action={<Button loading={busy !== null} onClick={() => void fetchPdf(busy ?? 'preview')}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
-              {intl.formatMessage({ id: 'standee.pdfError' })}
+          {code.isError && (
+            <Banner tone="warning" action={<Button loading={code.isFetching} onClick={() => void code.refetch()}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
+              {intl.formatMessage({ id: 'standee.codeError' })}
             </Banner>
           )}
-          <div className={styles.actions}>
-            <Button icon={Printer} loading={busy === 'preview'} loadingLabel={intl.formatMessage({ id: 'standee.preparing' })} onClick={() => void fetchPdf('preview')}>
-              {intl.formatMessage({ id: 'standee.preview' })}
-            </Button>
-            <Button icon={Download} loading={busy === 'download'} loadingLabel={intl.formatMessage({ id: 'standee.preparing' })} onClick={() => void fetchPdf('download')}>
-              {intl.formatMessage({ id: 'standee.download' })}
-            </Button>
-          </div>
-          {pdf && <iframe className={styles.frame} title={intl.formatMessage({ id: 'standee.frameTitle' })} src={pdf.url} />}
+          {sheet && (
+            <>
+              <p>
+                <span className={styles.sub}>{intl.formatMessage({ id: 'standee.shortCode' })} </span>
+                <span className={styles.code}>{sheet.code}</span>
+              </p>
+              <div className={styles.actions}>
+                <Button variant="primary" icon={Printer} onClick={() => print(sheet)}>
+                  {intl.formatMessage({ id: 'standee.print' })}
+                </Button>
+              </div>
+              <figure className={styles.preview} aria-label={intl.formatMessage({ id: 'standee.frameTitle' })}>
+                <StandeeSheet {...sheet} />
+              </figure>
+            </>
+          )}
           <p className={styles.sub}>{intl.formatMessage({ id: 'standee.printTip' })}</p>
         </div>
       </section>
-      <Campaigns store={store} />
+      <Campaigns store={store} shortCode={code.data} onPrint={print} />
+      {portal}
     </>
   );
 }

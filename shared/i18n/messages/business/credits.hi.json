@@ -209,30 +209,10 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "credits.standee.preview": {
-    "message": "PDF देखें",
-    "review": "reviewed",
-    "enHash": "37b66fde"
-  },
-  "credits.standee.download": {
-    "message": "A5 PDF डाउनलोड करें",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "credits.standee.preparing": {
-    "message": "PDF तैयार हो रही है",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
   "credits.standee.open": {
     "message": "स्टैंडी के विकल्प",
     "review": "reviewed",
     "enHash": "62238373"
-  },
-  "credits.standee.error": {
-    "message": "स्टैंडी तैयार नहीं हो सकी। फिर से कोशिश करें।",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
   },
   "credits.referral.title": {
     "message": "किसी दुकान को रेफ़र करें",

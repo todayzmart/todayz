@@ -44,14 +44,3 @@ export function getCreditAccount(bid: string, cursor?: string): Promise<CreditAc
   if (cursor) q.set('cursor', cursor);
   return request<CreditAccount>(`${biz(bid)}/credit-account?${q.toString()}`, { method: 'GET' });
 }
-
-/**
- * `GET {S}/qr-standee.pdf` (manager and above): the printable A5 standee as a Blob. Fetched with the
- * session's bearer token by `request`, so no token ever sits in a URL.
- */
-export function getStandeePdf(bid: string, sid: string): Promise<Blob> {
-  return request<Blob>(`${biz(bid)}/stores/${encodeURIComponent(sid)}/qr-standee.pdf`, {
-    method: 'GET',
-    headers: { Accept: 'application/pdf, application/problem+json' },
-  });
-}

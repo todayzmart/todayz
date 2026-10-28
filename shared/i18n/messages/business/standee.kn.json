@@ -64,35 +64,15 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "standee.preview": {
-    "message": "ಪ್ರಿವ್ಯೂ",
-    "review": "reviewed",
-    "enHash": "f1fbb2b4"
-  },
-  "standee.download": {
-    "message": "A5 PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "standee.preparing": {
-    "message": "PDF ತಯಾರಾಗುತ್ತಿದೆ",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
-  "standee.pdfError": {
-    "message": "ಸ್ಟ್ಯಾಂಡಿ ತಯಾರಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
-  },
   "standee.frameTitle": {
     "message": "ಸ್ಟ್ಯಾಂಡಿ ಪ್ರಿವ್ಯೂ",
     "review": "reviewed",
     "enHash": "d22dd779"
   },
   "standee.printTip": {
-    "message": "QR ಕೋಡ್ ಸ್ಪಷ್ಟವಾಗಿರಲು A5 ನಲ್ಲಿ 100% ಗಾತ್ರದಲ್ಲಿ, ಪ್ರಿಂಟರ್ ಮಾರ್ಜಿನ್ ಸೇರಿಸದೆ ಪ್ರಿಂಟ್ ಮಾಡಿ.",
+    "message": "ಪ್ರಿಂಟ್ ವಿಂಡೋದಲ್ಲಿ A5, 100% ಸ್ಕೇಲ್ ಮತ್ತು ಮಾರ್ಜಿನ್ ಇಲ್ಲದೆ ಆಯ್ಕೆಮಾಡಿ, ಆಗ QR ಕೋಡ್ ಸ್ಪಷ್ಟವಾಗಿರುತ್ತದೆ. ಫೈಲ್ ಬೇಕಿದ್ದರೆ “Save as PDF” ಆಯ್ಕೆಮಾಡಿ.",
     "review": "reviewed",
-    "enHash": "079abaf2"
+    "enHash": "8fa92c61"
   },
   "standee.campaigns.title": {
     "message": "ಅಭಿಯಾನಗಳು",
@@ -243,5 +223,40 @@
     "message": "{campaign} ಎಣಿಕೆಗಳು",
     "review": "reviewed",
     "enHash": "bdbb16a3"
+  },
+  "standee.print": {
+    "message": "ಪ್ರಿಂಟ್ ಮಾಡಿ ಅಥವಾ PDF ಆಗಿ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "3ed9f194"
+  },
+  "standee.codeError": {
+    "message": "ನಿಮ್ಮ ಶಾರ್ಟ್ ಕೋಡ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "a9513e83"
+  },
+  "standee.sheet.lead": {
+    "message": "ಸ್ಕ್ಯಾನ್ ಮಾಡಿ, ಇಲ್ಲಿ ಖರೀದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f4567f1d"
+  },
+  "standee.sheet.qr": {
+    "message": "{shop} ಗಾಗಿ QR ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "50937475"
+  },
+  "standee.sheet.hint": {
+    "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಏನಿದೆ ನೋಡಿ, ಬುಕ್ ಮಾಡಿ ಮತ್ತು ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "f0f6b2f7"
+  },
+  "standee.sheet.code": {
+    "message": "ಅಂಗಡಿ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "707cf6c1"
+  },
+  "standee.campaigns.printOne": {
+    "message": "ಪ್ರಿಂಟ್ ಮಾಡಿ ಅಥವಾ PDF ಆಗಿ ಉಳಿಸಿ: {campaign}",
+    "review": "reviewed",
+    "enHash": "90f2a733"
   }
 }

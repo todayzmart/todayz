@@ -3,12 +3,13 @@ import type { Standee } from '@todayz/api-client/gen/model/standee';
 import { newUlid } from '@todayz/auth';
 import { Banner, Button, EmptyState, Skeleton, StatusPill, TextField, useToast } from '@todayz/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { Plus, QrCode, RefreshCw } from 'lucide-react';
+import { Plus, Printer, QrCode, RefreshCw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import type { CurrentStore } from '../../orders/store';
 import { Funnel } from '../analytics/Funnel';
 import styles from '../standee.module.css';
+import type { SheetContent } from '../StandeeSheet';
 import { addStandee, reorderStandee, standeeErrorKey, useStandees } from './queries';
 
 /** The contract's StandeeCampaign bound (ck_qr_standees_campaign). */
@@ -18,7 +19,7 @@ const CAMPAIGN_MAX = 40;
  * Standee campaigns (B-10, W3-09): one row per printed standee, each with its own QR link
  * (`?s=<standee id>`, D-26), its scans → sign-ups → qualified counts and a reorder request.
  */
-export function Campaigns({ store }: { store: CurrentStore }) {
+export function Campaigns({ store, shortCode, onPrint }: { store: CurrentStore; shortCode: string | undefined; onPrint: (sheet: SheetContent) => void }) {
   const intl = useIntl();
   const list = useStandees(store);
 
@@ -50,7 +51,7 @@ export function Campaigns({ store }: { store: CurrentStore }) {
             ) : (
               <ul className={styles.list}>
                 {list.data.items.map((s) => (
-                  <Row key={s.id} store={store} standee={s} />
+                  <Row key={s.id} store={store} standee={s} onPrint={shortCode ? () => onPrint({ shop: store.name, link: s.link, code: shortCode, campaign: s.campaign }) : undefined} />
                 ))}
               </ul>
             )}
@@ -121,7 +122,7 @@ function NewCampaign({ store, full, limit }: { store: CurrentStore; full: boolea
   );
 }
 
-function Row({ store, standee }: { store: CurrentStore; standee: Standee }) {
+function Row({ store, standee, onPrint }: { store: CurrentStore; standee: Standee; onPrint: (() => void) | undefined }) {
   const intl = useIntl();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
@@ -158,15 +159,19 @@ function Row({ store, standee }: { store: CurrentStore; standee: Standee }) {
       </p>
       <Funnel counts={standee.counts} label={intl.formatMessage({ id: 'standee.funnel.one' }, { campaign: standee.campaign })} />
       {failure !== null && <Banner tone="warning">{intl.formatMessage({ id: `standee.campaigns.error.${standeeErrorKey(failure)}` }, { limit: 0 })}</Banner>}
-      {pending ? (
-        <p className={styles.sub}>{intl.formatMessage({ id: 'standee.campaigns.reorderSince' }, { date: date(standee.reorderRequestedAt ?? standee.createdAt) })}</p>
-      ) : (
-        <div className={styles.actions}>
+      {pending && <p className={styles.sub}>{intl.formatMessage({ id: 'standee.campaigns.reorderSince' }, { date: date(standee.reorderRequestedAt ?? standee.createdAt) })}</p>}
+      <div className={styles.actions}>
+        {onPrint && (
+          <Button size="sm" variant="soft" icon={Printer} aria-label={intl.formatMessage({ id: 'standee.campaigns.printOne' }, { campaign: standee.campaign })} onClick={onPrint}>
+            {intl.formatMessage({ id: 'standee.print' })}
+          </Button>
+        )}
+        {!pending && (
           <Button size="sm" variant="soft" icon={RefreshCw} loading={busy} loadingLabel={intl.formatMessage({ id: 'standee.campaigns.reordering' })} onClick={() => void reorder()}>
             {intl.formatMessage({ id: 'standee.campaigns.reorder' })}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </li>
   );
 }

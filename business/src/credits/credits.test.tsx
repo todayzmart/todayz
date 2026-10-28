@@ -142,35 +142,10 @@ describe('B-10 gating and states', () => {
 });
 
 describe('B-10 standee and referrals', () => {
-  it('shows the store short code and the standee actions, with a plain link to /standee', async () => {
+  it('shows the store short code with a plain link to /standee, where the sheet is printed', async () => {
     renderAt('/credits', { messages, handlers: [shops('owner'), account([]), refs, store] });
     expect(await screen.findByText('K7Q2X9')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Preview PDF' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Download A5 PDF' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Standee options' })).toHaveAttribute('href', '/standee');
-  });
-
-  it('fetches the standee PDF with the session token and no token in the URL', async () => {
-    const createObjectURL = vi.fn(() => 'blob:standee');
-    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
-    Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
-    const open = vi.spyOn(window, 'open').mockReturnValue(null);
-    const { calls } = renderAt('/credits', {
-      messages,
-      handlers: [
-        shops('owner'),
-        account([]),
-        refs,
-        store,
-        (c) => (c.path === `${B}/stores/s1/qr-standee.pdf` ? new Response(new Blob(['%PDF']), { status: 200, headers: { 'content-type': 'application/pdf' } }) : undefined),
-      ],
-    });
-    fireEvent.click(await screen.findByRole('button', { name: 'Preview PDF' }));
-    await waitFor(() => expect(open).toHaveBeenCalledWith('blob:standee', '_blank', 'noopener'));
-    const pdf = calls.find((c) => c.path.endsWith('/qr-standee.pdf'));
-    if (!pdf) throw new Error('no standee request');
-    expect(pdf.headers.get('Authorization')).toBe('Bearer test-token');
-    expect(pdf.search).not.toContain('token');
   });
 
   it('shows the referral code, stats and where rewards go, and copies the code on tap', async () => {

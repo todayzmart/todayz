@@ -354,7 +354,7 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | GET | {B}/statements | manager | W3-01 | monthly statements (D-51) |
 | GET | {B}/statements/{period} | manager | W3-01 | detail; `Accept: text/csv` for CSV |
 | GET | {B}/referrals | manager | W2-03 | business referral code (shop-to-shop), stats (D-26) |
-| GET | {S}/qr-standee.pdf?standeeId= | manager | W2-10 | printable A5 standee; URL carries the store short code and `?s={standeeId}` (D-26, D-52) |
+| ~~GET~~ | ~~{S}/qr-standee.pdf?standeeId=~~ | — | — | dropped (D-278): the business app draws and prints the A5 sheet in the browser from the store short code and each standee's `link` |
 | GET | {S}/standees | manager | W3-09 | `listStandees`: standee rows (no code of their own), newest first, each with its link and `counts {scans, signUps, qualified}`, plus `totals` and `limit` (D-51, D-223) |
 | POST | {S}/standees | manager | W3-09 | `createStandee`, idempotent; `{campaign}` (1–40 chars); audited; `409 standee_limit_reached` at the cap (D-223) |
 | POST | {S}/standees/{standeeId}/reorder | manager | W3-09 | `requestStandeeReorder`, idempotent; asks for a reprint (`reorderRequestedAt`); a request already waiting is answered unchanged; audited (D-223) |

@@ -64,35 +64,15 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "standee.preview": {
-    "message": "முன்னோட்டம்",
-    "review": "reviewed",
-    "enHash": "f1fbb2b4"
-  },
-  "standee.download": {
-    "message": "A5 PDF பதிவிறக்கவும்",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "standee.preparing": {
-    "message": "PDF தயாராகிறது",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
-  "standee.pdfError": {
-    "message": "ஸ்டாண்டியைத் தயாரிக்க முடியவில்லை. மீண்டும் முயலவும்.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
-  },
   "standee.frameTitle": {
     "message": "ஸ்டாண்டி முன்னோட்டம்",
     "review": "reviewed",
     "enHash": "d22dd779"
   },
   "standee.printTip": {
-    "message": "QR கோடு தெளிவாக இருக்க, A5 இல் 100% அளவில், பிரிண்டர் ஓரங்கள் சேர்க்காமல் அச்சிடுங்கள்.",
+    "message": "அச்சு சாளரத்தில் A5, 100% அளவு, ஓரங்கள் இல்லாமல் தேர்வுசெய்யுங்கள்; அப்போது QR குறியீடு தெளிவாக இருக்கும். கோப்பு வேண்டுமெனில் “Save as PDF” தேர்வுசெய்யுங்கள்.",
     "review": "reviewed",
-    "enHash": "079abaf2"
+    "enHash": "8fa92c61"
   },
   "standee.campaigns.title": {
     "message": "பிரச்சாரங்கள்",
@@ -243,5 +223,40 @@
     "message": "{campaign} எண்ணிக்கைகள்",
     "review": "reviewed",
     "enHash": "bdbb16a3"
+  },
+  "standee.print": {
+    "message": "அச்சிடுங்கள் அல்லது PDF ஆகச் சேமியுங்கள்",
+    "review": "reviewed",
+    "enHash": "3ed9f194"
+  },
+  "standee.codeError": {
+    "message": "உங்கள் குறுங்குறியீட்டை ஏற்ற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "a9513e83"
+  },
+  "standee.sheet.lead": {
+    "message": "ஸ்கேன் செய்து இங்கே வாங்குங்கள்",
+    "review": "reviewed",
+    "enHash": "f4567f1d"
+  },
+  "standee.sheet.qr": {
+    "message": "{shop} க்கான QR குறியீடு",
+    "review": "reviewed",
+    "enHash": "50937475"
+  },
+  "standee.sheet.hint": {
+    "message": "கையிருப்பில் என்ன உள்ளது என்று பாருங்கள், முன்பதிவு செய்து கேஷ்பேக் பெறுங்கள்.",
+    "review": "reviewed",
+    "enHash": "f0f6b2f7"
+  },
+  "standee.sheet.code": {
+    "message": "கடைக் குறியீடு",
+    "review": "reviewed",
+    "enHash": "707cf6c1"
+  },
+  "standee.campaigns.printOne": {
+    "message": "அச்சிடுங்கள் அல்லது PDF ஆகச் சேமியுங்கள்: {campaign}",
+    "review": "reviewed",
+    "enHash": "90f2a733"
   }
 }

@@ -209,30 +209,10 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "credits.standee.preview": {
-    "message": "PDF ಮುನ್ನೋಟ",
-    "review": "reviewed",
-    "enHash": "37b66fde"
-  },
-  "credits.standee.download": {
-    "message": "A5 PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "credits.standee.preparing": {
-    "message": "PDF ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
   "credits.standee.open": {
     "message": "ಸ್ಟ್ಯಾಂಡಿ ಆಯ್ಕೆಗಳು",
     "review": "reviewed",
     "enHash": "62238373"
-  },
-  "credits.standee.error": {
-    "message": "ಸ್ಟ್ಯಾಂಡಿ ಸಿದ್ಧಪಡಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
   },
   "credits.referral.title": {
     "message": "ಒಂದು ಅಂಗಡಿಯನ್ನು ರೆಫರ್ ಮಾಡಿ",

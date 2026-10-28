@@ -209,30 +209,10 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "credits.standee.preview": {
-    "message": "PDF முன்னோட்டம்",
-    "review": "reviewed",
-    "enHash": "37b66fde"
-  },
-  "credits.standee.download": {
-    "message": "A5 PDF பதிவிறக்கவும்",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "credits.standee.preparing": {
-    "message": "PDF தயாராகிறது",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
   "credits.standee.open": {
     "message": "ஸ்டாண்டி விருப்பங்கள்",
     "review": "reviewed",
     "enHash": "62238373"
-  },
-  "credits.standee.error": {
-    "message": "ஸ்டாண்டியைத் தயாரிக்க முடியவில்லை. மீண்டும் முயலவும்.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
   },
   "credits.referral.title": {
     "message": "ஒரு கடையைப் பரிந்துரைக்கவும்",

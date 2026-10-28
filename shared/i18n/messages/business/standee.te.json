@@ -64,35 +64,15 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "standee.preview": {
-    "message": "ప్రివ్యూ",
-    "review": "reviewed",
-    "enHash": "f1fbb2b4"
-  },
-  "standee.download": {
-    "message": "A5 PDF డౌన్‌లోడ్ చేయండి",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "standee.preparing": {
-    "message": "PDF సిద్ధమవుతోంది",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
-  "standee.pdfError": {
-    "message": "స్టాండీని సిద్ధం చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
-  },
   "standee.frameTitle": {
     "message": "స్టాండీ ప్రివ్యూ",
     "review": "reviewed",
     "enHash": "d22dd779"
   },
   "standee.printTip": {
-    "message": "QR కోడ్ స్పష్టంగా ఉండేలా A5 మీద 100% సైజులో, ప్రింటర్ మార్జిన్లు జోడించకుండా ప్రింట్ చేయండి.",
+    "message": "ప్రింట్ విండోలో A5, 100% స్కేల్, మార్జిన్లు లేకుండా ఎంచుకోండి, అప్పుడు QR కోడ్ స్పష్టంగా ఉంటుంది. ఫైల్ కావాలంటే “Save as PDF” ఎంచుకోండి.",
     "review": "reviewed",
-    "enHash": "079abaf2"
+    "enHash": "8fa92c61"
   },
   "standee.campaigns.title": {
     "message": "క్యాంపెయిన్‌లు",
@@ -243,5 +223,40 @@
     "message": "{campaign} లెక్కలు",
     "review": "reviewed",
     "enHash": "bdbb16a3"
+  },
+  "standee.print": {
+    "message": "ప్రింట్ చేయండి లేదా PDF గా సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "3ed9f194"
+  },
+  "standee.codeError": {
+    "message": "మీ షార్ట్ కోడ్ లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "a9513e83"
+  },
+  "standee.sheet.lead": {
+    "message": "స్కాన్ చేసి ఇక్కడ కొనండి",
+    "review": "reviewed",
+    "enHash": "f4567f1d"
+  },
+  "standee.sheet.qr": {
+    "message": "{shop} కోసం QR కోడ్",
+    "review": "reviewed",
+    "enHash": "50937475"
+  },
+  "standee.sheet.hint": {
+    "message": "స్టాక్‌లో ఏముందో చూడండి, బుక్ చేయండి, క్యాష్‌బ్యాక్ పొందండి.",
+    "review": "reviewed",
+    "enHash": "f0f6b2f7"
+  },
+  "standee.sheet.code": {
+    "message": "షాప్ కోడ్",
+    "review": "reviewed",
+    "enHash": "707cf6c1"
+  },
+  "standee.campaigns.printOne": {
+    "message": "ప్రింట్ చేయండి లేదా PDF గా సేవ్ చేయండి: {campaign}",
+    "review": "reviewed",
+    "enHash": "90f2a733"
   }
 }

@@ -209,30 +209,10 @@
     "review": "reviewed",
     "enHash": "7545309d"
   },
-  "credits.standee.preview": {
-    "message": "PDF ప్రివ్యూ",
-    "review": "reviewed",
-    "enHash": "37b66fde"
-  },
-  "credits.standee.download": {
-    "message": "A5 PDF డౌన్‌లోడ్ చేయండి",
-    "review": "reviewed",
-    "enHash": "d5f56067"
-  },
-  "credits.standee.preparing": {
-    "message": "PDF సిద్ధమవుతోంది",
-    "review": "reviewed",
-    "enHash": "cc44de09"
-  },
   "credits.standee.open": {
     "message": "స్టాండీ ఆప్షన్లు",
     "review": "reviewed",
     "enHash": "62238373"
-  },
-  "credits.standee.error": {
-    "message": "స్టాండీని సిద్ధం చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
-    "review": "reviewed",
-    "enHash": "9f51d4bd"
   },
   "credits.referral.title": {
     "message": "ఒక దుకాణాన్ని రిఫర్ చేయండి",

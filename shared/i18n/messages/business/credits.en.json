@@ -167,25 +167,9 @@
     "defaultMessage": "Short code",
     "description": "B-10 standee short code label"
   },
-  "credits.standee.preview": {
-    "defaultMessage": "Preview PDF",
-    "description": "B-10 button"
-  },
-  "credits.standee.download": {
-    "defaultMessage": "Download A5 PDF",
-    "description": "B-10 button"
-  },
-  "credits.standee.preparing": {
-    "defaultMessage": "Preparing the PDF",
-    "description": "B-10 button busy label"
-  },
   "credits.standee.open": {
     "defaultMessage": "Standee options",
     "description": "B-10 link to the standee screen"
-  },
-  "credits.standee.error": {
-    "defaultMessage": "Could not prepare the standee. Try again.",
-    "description": "B-10 toast"
   },
   "credits.referral.title": {
     "defaultMessage": "Refer a shop",

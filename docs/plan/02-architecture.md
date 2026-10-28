@@ -325,7 +325,7 @@ Source of truth for every role check. It covers every action used in [04-api.md]
 | asks | `asks.view` | `S/asks` inbox (B-20), `ask.created` on `S/stream` (D-101) | ✓ | ✓ | ✓ |
 | asks | `asks.reply` | `S/asks/{askId}/reply` (Yes or No) and `S/asks/{askId}/report`; changing the prefilled price also needs `item.price.edit`, and "Add it to your stock" needs `item.manage` | ✓ | ✓ | ✓ |
 | asks | `asks.manage` | mute or unmute asks for the store (`asksMuted` on `S/settings`, audited). W1-04 seeds this key in the role matrix and gates `asksMuted` with it; `asks.view`, `asks.reply` and the golden-table rows are enforced in W3-16's own `policy/asks.go`, on the stub the lead adds before Wave 3 (07, D-101) | ✓ | ✓ | – |
-| business | `standee.manage` | `S/qr-standee.pdf`, `S/standees` | ✓ | ✓ | – |
+| business | `standee.manage` | `S/standees` (the A5 sheet is drawn in the browser, D-278) | ✓ | ✓ | – |
 | business | `inbox.view` | business inbox (B-16), mark read | ✓ | ✓ | ✓ |
 | business | `support.tickets` | business support tickets (B-15) | ✓ | ✓ | – |
 | orders | `order.view` | `S/orders`, `S/stream` | ✓ | ✓ | ✓ |

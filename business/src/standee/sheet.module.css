@@ -1,0 +1,119 @@
+/*
+ * The A5 standee sheet (D-278). One markup for the preview and the print: the sheet is a size
+ * container and everything inside is sized in cqw, so it scales from the on-screen preview to 148 mm
+ * on paper. Tokens only; print-color-adjust keeps the mint wash and the brand band on paper.
+ */
+
+.sheet {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 148 / 210;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  overflow: hidden;
+  print-color-adjust: exact;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 7cqw 8cqw 6cqw;
+  border-top: 3cqw solid var(--brand);
+  background: linear-gradient(to bottom, var(--wash), var(--surface) 45%);
+  text-align: center;
+}
+
+:where(.inner p) {
+  margin: 0;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 6cqw;
+  font-weight: 600;
+}
+
+.brand b {
+  color: var(--brand-strong);
+}
+
+.lead {
+  margin-top: 6cqw;
+  color: var(--ink-2);
+  font-size: 4.4cqw;
+}
+
+.shop {
+  margin-top: 1.5cqw;
+  font-family: var(--font-display);
+  font-size: 9cqw;
+  font-weight: 600;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.qr {
+  flex: none;
+  width: 66cqw;
+  height: 66cqw;
+  margin-top: 5cqw;
+}
+
+.hint {
+  margin-top: 3cqw;
+  color: var(--ink-2);
+  font-size: 4cqw;
+  line-height: 1.35;
+}
+
+.code {
+  margin-top: auto;
+  color: var(--ink-2);
+  font-size: 3.8cqw;
+}
+
+.code b {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 5.5cqw;
+  letter-spacing: 0.08em;
+}
+
+.campaign {
+  margin-top: 1.5cqw;
+  color: var(--ink-3);
+  font-size: 3cqw;
+}
+
+/* Off screen until printing; the page's own preview is a separate copy. */
+.printRoot {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: a5 portrait;
+    margin: 0;
+  }
+
+  :global(body) > :not([data-standee-print]) {
+    display: none !important;
+  }
+
+  .printRoot {
+    display: block;
+  }
+
+  .printRoot .sheet {
+    width: 148mm;
+    max-width: none;
+    height: 210mm;
+    border: 0;
+    border-radius: 0;
+  }
+}
