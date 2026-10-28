@@ -2,7 +2,7 @@
 
 How people sign in to TodayZ, what a session is, and what an account can do (profile, photo, addresses, deletion).
 
-> As built on main at 3f7ebd09 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at d8857496 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -105,12 +105,12 @@ The code always goes to the number on the admin's account. `POST /v1/auth/otp/se
 
 ## Tests
 
-Go tests sit beside the code (`identity_test.go`, `refresh_replay_test.go`, `account_race_test.go`, `stepup_test.go`, `signin_limits_test.go`, `firebase_test.go`, `platform/firebaseauth/firebaseauth_test.go`). Frontend: `shared/auth/src/phone-otp.test.tsx` and `firebase.test.ts`. The Firebase stand-in in the mocks server has `e2e/mocks/internal/server/firebase_test.go`. HTTP-level tests live in `backend/cmd/todayz/*_http_test.go` (`admin_signin_lock_http_test.go` for the lock, the unlock and the cookie-free step-up routes; `identity_firebase_http_test.go` for the config route and the swap). Journeys: `e2e/journeys/specs/` has `10-e2e-17-owner`, `11-e2e-18-cashier`, `12-e2e-19-blocked`, `13-e2e-20-suspended`. Reports: [W1-02](../qa/W1-02/REPORT.md), [firebase-otp](../qa/firebase-otp/REPORT.md), [auth-refresh-and-a09](../qa/auth-refresh-and-a09/), [D-259](../qa/D-259/).
+Go tests sit beside the code (`identity_test.go`, `refresh_replay_test.go`, `account_race_test.go`, `stepup_test.go`, `signin_limits_test.go`, `firebase_test.go`, `platform/firebaseauth/firebaseauth_test.go`). Frontend: `shared/auth/src/phone-otp.test.tsx` and `firebase.test.ts`. The Firebase stand-in in the mocks server has `e2e/mocks/internal/server/firebase_test.go`. HTTP-level tests live in `backend/cmd/todayz/*_http_test.go` (`admin_signin_lock_http_test.go` for the lock, the unlock and the cookie-free step-up routes; `identity_firebase_http_test.go` for the config route and the swap; `identity_firebase_live_test.go`, opt-in, for a real Firebase test project, [runbook](../runbooks/firebase-phone-auth.md) section 8). Journeys: `e2e/journeys/specs/` has `10-e2e-17-owner`, `11-e2e-18-cashier`, `12-e2e-19-blocked`, `13-e2e-20-suspended`. Reports: [W1-02](../qa/W1-02/REPORT.md), [firebase-otp](../qa/firebase-otp/REPORT.md), [auth-refresh-and-a09](../qa/auth-refresh-and-a09/), [D-259](../qa/D-259/).
 
 ## Status and known gaps
 
 - Live in code: OTP sign-in (AWS SMS, or Firebase with `OTP_PROVIDER=firebase`), refresh rotation, admin SMS step-up, the admin sign-in lock and unlock, the step-up quota, photo, addresses, deletion.
-- Firebase in prod waits for the founder's Firebase project and the lead's apply ([runbook](../runbooks/firebase-phone-auth.md)); until then prod stays on SMS.
+- Firebase in prod waits for the founder's `todayz-prod` project and the lead's apply ([runbook](../runbooks/firebase-phone-auth.md)); until then prod stays on SMS. The verifier and the swap were checked against a real test project, `todayz-dev`, on 28 Oct 2026 ([report](../qa/firebase-otp/REPORT.md)).
 - Left for a later release (D-264): dropping the unused admin `totp_*` columns, `sessions.totp_verified_at` and `admin_recovery_codes` (49501 already scrubbed them).
 - Not built: a sessions page ("where am I signed in") and a "new sign-in" notice. Both are after launch ([go-live gaps](../qa/go-live-gaps/LIST.md)).
 - Open: a signed device id for referral-farming defence, and key rotation, are listed in the same gap file.

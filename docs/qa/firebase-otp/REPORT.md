@@ -7,8 +7,13 @@ What we built: Firebase Authentication can now send and check the sign-in code f
 - **Branch:** `claude/firebase-sms-otp-761592`, local, not pushed.
 - **Commits:**
   - `3f7ebd09` is the backend.
-  - The next commit has the frontend, the mock, the config and the docs.
-- **Cloud:** no Firebase or Google Cloud project exists yet, and nothing called Google. The setup is in [the runbook](../../runbooks/firebase-phone-auth.md). The founder creates the project, and the lead applies the prod properties after the founder's yes (D-210).
+  - `d8857496` has the frontend, the mock, the config and the docs.
+  - The next commit adds the live check against a real test project.
+- **Cloud:**
+  - The lead's brief said not to create a Firebase project. On 28 Oct 2026 the founder told this session directly to create one for testing.
+  - So a test project, `todayz-dev`, now exists in the founder's Google account. It is on the free Spark plan, with no billing.
+  - The existing InstaHunter project was not touched.
+  - `todayz-dev` is not the prod project. Prod still needs `todayz-prod`: the founder creates it, and the lead applies the prod properties after the founder's yes (D-210). Both are in [the runbook](../../runbooks/firebase-phone-auth.md).
 
 ## What was built
 
@@ -44,7 +49,32 @@ Not run:
 - A run against the live local stack (`make dev` is the main checkout's).
 - Playwright.
 
-Nothing was tried against a real Firebase project.
+## Live check against `todayz-dev` (28 Oct)
+
+`todayz-dev` was set up as runbook sections 1 to 3, with no Blaze plan, `localhost` left in, and one reserved test number (D-15). Its four public values live in a file outside the repo.
+
+| Step | Result |
+|---|---|
+| Identity Toolkit REST: `sendVerificationCode` for the test number | 200, no SMS sent |
+| `signInWithPhoneNumber` with `000000` | 200, a real Google-signed ID token |
+| `TestFirebaseLive`: TodayZ's verifier against Google's real keys (`project`, `iss`, `aud`, `phone`, `auth_time`) | pass, token 2 s old |
+| Same test: `POST /v1/auth/firebase/verify` on a fresh database | 200, TodayZ access token and refresh cookie |
+| Same test: the same token swapped again | 401 `otp_expired` |
+| `TestFirebaseLive` without the variable (as in `make check`) | skipped |
+| `golangci-lint run ./cmd/todayz/` | 0 issues |
+
+What the console showed that the runbook did not say before (now fixed in runbook sections 1 and 2):
+
+- Enabling Phone on a new project first needs the Identity Platform upgrade. It cannot be undone, and without Blaze it is capped at 3,000 daily active users.
+- Until the SMS region policy allows India, every send fails with `OPERATION_NOT_ALLOWED`.
+- The project wizard asks about Gemini; leave it off.
+
+Not checked live:
+
+- the browser SDK flow with a real invisible reCAPTCHA;
+- a real SMS to a real phone, which needs Blaze.
+
+The prod check in runbook section 5 covers both.
 
 ## Findings and follow-ups
 

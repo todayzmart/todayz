@@ -13,6 +13,7 @@ Who does what (D-210):
 1. Go to https://console.firebase.google.com and choose **Create a project**.
    - Name: `todayz-prod`. Note the project ID it shows; it may have a suffix, for example `todayz-prod-1a2b3`.
    - Google Analytics: **off**. TodayZ does not use it.
+   - Gemini in Firebase: **off**. The wizard asks about it at creation; TodayZ does not use it.
 2. Upgrade to **Blaze** (pay as you go): the gear icon, then **Usage and billing**, then **Details and settings**, then **Modify plan**.
    - Phone sign-in on the free plan stops after a few codes a day.
    - India SMS is billed per message. Check the current price on https://firebase.google.com/pricing.
@@ -22,8 +23,10 @@ Who does what (D-210):
 
 1. Open **Build**, then **Authentication**, then **Get started**.
 2. Open **Sign-in method**, choose **Phone**, then **Enable**, then **Save**.
-   - Leave **Phone numbers for testing** empty in this project. Reserved test numbers are a local and test thing only (D-15).
+   - On a new project, **Save** first opens **Upgrade to the new authentication**: Firebase Authentication with Identity Platform. Go through its steps and choose the upgrade. Phone stays **Disabled** until you do. The upgrade cannot be undone. Without Blaze it is capped at 3,000 daily active users, which is enough for a test project but not for prod. Then enable Phone again and save. The console confirms "Phone enabled".
+   - Leave **Phone numbers for testing** empty in this project. Reserved test numbers are a local and test thing only (D-15). A separate test project may have one (section 8).
 3. Open **Settings**, then **SMS region policy**. Choose **Allow**, pick **India** only, and save. A code is then never sent to a number outside India.
+   - This step is required. Until a region is allowed, every send fails with `OPERATION_NOT_ALLOWED` ("SMS unable to be sent until this region enabled by the app developer"), and the apps show the generic "could not send" error.
 4. Open **Settings**, then **Authorized domains**:
    - Add `app.todayz.in`, `business.todayz.in` and `admin.todayz.in`.
    - Remove `localhost`. Local work uses the mock (section 7), not this project.
@@ -129,6 +132,33 @@ To try the Firebase path:
 3. Read the code at https://mocks.todayz.localhost, as for SMS.
 
 No Google host is called, and no reCAPTCHA appears. See [e2e/mocks/README.md](../../e2e/mocks/README.md).
+
+## 8. Live check against a test project
+
+This checks TodayZ's verifier and the swap against a real Firebase project and Google's real keys, without sending any SMS. Use a separate test project, never `todayz-prod`. On 28 Oct 2026, the founder asked for one to be made, `todayz-dev`, on the free Spark plan. It was set up with sections 1 to 3, with these differences:
+
+- no Blaze upgrade;
+- `localhost` left in **Authorized domains**;
+- one test phone number from the reserved range (`+91 90000 000xx`, code `000000`, D-15), added under **Phone numbers for testing**.
+
+Its four values live in a file outside the repo, never in `.env.local` and never in chat.
+
+1. Get an ID token for the test number. Use the Identity Toolkit REST API with the project's web key:
+   - First call `accounts:sendVerificationCode` with the phone number. A test number needs no reCAPTCHA token, and no SMS is sent. It returns a `sessionInfo`.
+   - Then call `accounts:signInWithPhoneNumber` with that `sessionInfo` and code `000000`. It returns the `idToken`.
+   - Write the token to a file with mode 600. Never echo it.
+2. Within 5 minutes of step 1, run:
+
+   ```bash
+   cd backend && TODAYZ_FIREBASE_LIVE_TOKEN_FILE=<token file> FIREBASE_PROJECT_ID=<test project id> go test -run '^TestFirebaseLive$' -v ./cmd/todayz/
+   ```
+
+   It needs Docker for the test database (as `make check` sets it, see `backend/CLAUDE.md`). `TestFirebaseLive` ([identity_firebase_live_test.go](../../backend/cmd/todayz/identity_firebase_live_test.go)) checks three things:
+   - TodayZ's verifier accepts the token against Google's real keys.
+   - `POST /v1/auth/firebase/verify` returns a TodayZ session and refresh cookie. In that part, a loopback server hands on Google's keys, because `APP_ENV=test` refuses egress.
+   - A second swap of the same token answers `401 otp_expired`.
+
+   Without the variable the test skips, so `make check` never calls Google.
 
 ## What TodayZ cannot see on the Firebase path
 
