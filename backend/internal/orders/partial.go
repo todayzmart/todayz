@@ -224,7 +224,7 @@ func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b 
 			}
 			want[i] = *l.QuantityAccepted
 		}
-		if err := s.lockStock(ctx, lines, want); err != nil {
+		if err := s.lockStock(ctx, o.StoreID, lines, want, now); err != nil {
 			return err
 		}
 		if err := s.recapCredits(ctx, o); err != nil {

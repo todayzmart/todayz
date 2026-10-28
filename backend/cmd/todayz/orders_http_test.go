@@ -389,6 +389,12 @@ func (o *orderShop) stock(item string) (onHand, reserved int) {
 	return onHand, reserved
 }
 
+// changeSeq is the item's newest catalogue change, the cursor the POS reads
+// stock by (0 when it has none).
+func (o *orderShop) changeSeq(item string) int {
+	return o.a.count(`SELECT coalesce(max(seq), 0) FROM catalogue_changes WHERE entity = 'store_item' AND entity_id = $1`, uuidOf(o.t, item))
+}
+
 func (o *orderShop) held(id string) int {
 	return o.a.count(`SELECT count(*) FROM stock_reservations WHERE order_id = $1 AND status = 'held'`, uuidOf(o.t, id))
 }
@@ -552,11 +558,14 @@ func TestBK05AcceptAll(t *testing.T) {
 	require.Equal(t, http.StatusCreated, r.code, r.raw)
 	id := r.body["id"].(string)
 
+	butterSeq, saltSeq := o.changeSeq(o.butter), o.changeSeq(o.salt)
 	now := o.a.clk.Now()
 	r = o.staff(o.cashier, id, "accept", map[string]any{})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, "accepted", r.body["status"])
 	noCode(t, r.body, "")
+	require.Greater(t, o.changeSeq(o.butter), butterSeq, "the hold reaches the POS by the change cursor (D-280)")
+	require.Greater(t, o.changeSeq(o.salt), saltSeq)
 	_, hold := o.times(id)
 	require.NotNil(t, hold)
 	require.True(t, hold.Equal(now.Add(30*time.Minute)), "hold_until = accepted_at + pickup_hold_min")
@@ -862,9 +871,11 @@ func TestBK17CustomerCancel(t *testing.T) {
 	require.Equal(t, "cancelled", r.body["status"])
 
 	id = o.accepted()
+	seq := o.changeSeq(o.butter)
 	r = cancel(id)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Zero(t, o.held(id))
+	require.Greater(t, o.changeSeq(o.butter), seq, "the release reaches the POS by the change cursor (D-280)")
 
 	id = o.accepted()
 	r = o.staff(o.cashier, id, "ready", nil)

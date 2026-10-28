@@ -2,7 +2,7 @@
 
 How a customer books items, how the shop accepts and hands over, and what the timers do.
 
-> As built on main at d22219d7 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 3d54bd71 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -18,7 +18,7 @@ How a customer books items, how the shop accepts and hands over, and what the ti
 Source: [01-product-rules.md](../plan/01-product-rules.md) sections 5 and 6.
 
 - Timers are settings: `order_accept_timeout_min`, `pickup_hold_min`, `pickup_extension_min`, `partial_confirm_timeout_min`, `delivery_dispatch_timeout_min`.
-- Stock reserves at accept (D-01). A partial accept waits for the customer (D-28, D-68).
+- Stock reserves at accept (D-01); on hand drops only at hand-over. Every hold and release records a catalogue change per item, so the shop's counter shows the blocked units (D-280). A partial accept waits for the customer (D-28, D-68).
 - No-show applies to pickup only (D-21). Strikes use `noshow_strikes`, `noshow_window_days`, `noshow_limit_days`; stores use `store_strike_risk_threshold` (D-67).
 - Delivery has a kill switch, `feature_delivery_enabled`. Thresholds are inclusive (D-94). Quote and place share one hours check (D-219).
 - A failed delivery sends reminders (`delivery_return_first_reminder_hours`, `delivery_return_second_reminder_hours`, D-218). After a fixed 72 hours the return is auto-confirmed.
@@ -69,4 +69,4 @@ Live in code. No courier integration exists in the code; the shop dispatches and
 
 ## Decisions
 
-D-01, D-04, D-21, D-22, D-28, D-67, D-68, D-69, D-94, D-108 (cancel races, deadlines), D-216, D-218, D-219, D-220, D-222, D-268 (the Counter sales tab), D-272 (line photos in cart, checkout and order; full-width Pickup / Delivery switch).
+D-01, D-04, D-21, D-22, D-28, D-67, D-68, D-69, D-94, D-108 (cancel races, deadlines), D-216, D-218, D-219, D-220, D-222, D-268 (the Counter sales tab), D-272 (line photos in cart, checkout and order; full-width Pickup / Delivery switch), D-280 (held stock reaches the counter).

@@ -143,6 +143,21 @@ UPDATE offers SET redemptions = GREATEST(redemptions - 1, 0) WHERE id = @id;
 -- Scheduling (internal/jobs/offers.go)
 ------------------------------------------------------------------------------
 
+-- name: LockStoresWithDueOffers :exec
+-- The stores rows of every offer Tidy is about to move, in id order, before
+-- it touches an offer: the catalogue writers' lock order (stores row first),
+-- so Tidy cannot wait in a cycle with an order or a POS sale that holds a
+-- store and then redeems or releases an offer (D-280).
+SELECT s.id FROM stores s
+WHERE s.id IN (
+  SELECT o.store_id FROM offers o
+  WHERE (o.status = 'scheduled' AND o.starts_at <= @now AND (o.ends_at IS NULL OR o.ends_at > @now))
+     OR (o.status IN ('scheduled', 'live') AND o.ends_at IS NOT NULL AND o.ends_at <= @now)
+     OR (o.status IN ('scheduled', 'live') AND o.max_redemptions IS NOT NULL AND o.redemptions >= o.max_redemptions)
+)
+ORDER BY s.id
+FOR NO KEY UPDATE;
+
 -- name: StartDueOffers :many
 UPDATE offers SET status = 'live', version = version + 1, updated_at = @now
 WHERE status = 'scheduled' AND starts_at <= @now AND (ends_at IS NULL OR ends_at > @now)

@@ -25,6 +25,10 @@ func Tidy(ctx context.Context, d *db.DB, c clock.Clock) (TidyResult, error) {
 		q := offersdb.New(d.Q(ctx))
 		type change struct{ id, store ids.ID }
 		var changes []change
+		// The stores rows first, as every catalogue writer takes them (D-280).
+		if err := q.LockStoresWithDueOffers(ctx, now); err != nil {
+			return fmt.Errorf("offers: lock stores: %w", err)
+		}
 		started, err := q.StartDueOffers(ctx, now)
 		if err != nil {
 			return fmt.Errorf("offers: start due: %w", err)

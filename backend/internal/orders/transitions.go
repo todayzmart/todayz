@@ -176,8 +176,8 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 				itemIDs = append(itemIDs, r.StoreItemID)
 			}
 		}
-		if _, err := q.LockItems(ctx, itemIDs); err != nil {
-			return fmt.Errorf("orders: lock items: %w", err)
+		if _, err := lockStockItems(ctx, q, o.StoreID, itemIDs, now); err != nil {
+			return err
 		}
 	}
 	if _, err := q.ReleaseReservations(ctx, ordersdb.ReleaseReservationsParams{Reason: &reason, OrderID: o.ID}); err != nil {
@@ -262,7 +262,7 @@ func (s *Service) accept(ctx context.Context, by ids.ID, storeID, orderID ids.ID
 		// Lock the items in id order and check each has the stock, for a
 		// partial accept too (04: 409 when an accepted quantity is more
 		// than available).
-		if err := s.lockStock(ctx, lines, want); err != nil {
+		if err := s.lockStock(ctx, o.StoreID, lines, want, now); err != nil {
 			return err
 		}
 		if partial {
@@ -324,7 +324,7 @@ func (s *Service) holdAndStart(ctx context.Context, o ordersdb.Order, lines []or
 // lockStock locks the items of the lines with a quantity in want, in id
 // order, and answers 409 insufficient_stock naming the first item that
 // does not have it available.
-func (s *Service) lockStock(ctx context.Context, lines []ordersdb.OrderLinesRow, want []int32) error {
+func (s *Service) lockStock(ctx context.Context, storeID pgtype.UUID, lines []ordersdb.OrderLinesRow, want []int32, now time.Time) error {
 	need := map[ids.ID]int32{}
 	var itemIDs []pgtype.UUID
 	for i, l := range lines {
@@ -340,9 +340,9 @@ func (s *Service) lockStock(ctx context.Context, lines []ordersdb.OrderLinesRow,
 	if len(itemIDs) == 0 {
 		return nil
 	}
-	items, err := s.q(ctx).LockItems(ctx, itemIDs)
+	items, err := lockStockItems(ctx, s.q(ctx), storeID, itemIDs, now)
 	if err != nil {
-		return fmt.Errorf("orders: lock items: %w", err)
+		return err
 	}
 	for _, it := range items {
 		id := mustID(it.ID)
@@ -352,6 +352,23 @@ func (s *Service) lockStock(ctx context.Context, lines []ordersdb.OrderLinesRow,
 		}
 	}
 	return nil
+}
+
+// lockStockItems takes the store's catalogue sequence, records a catalogue
+// change for each item and then locks the items in id order. Every path
+// that holds or releases stock calls it before it touches a reservation:
+// the reservation moves reserved through its trigger, and the POS only
+// sees that by the change cursor (D-280). The lock order is the stock
+// writer's: the stores row, then the items.
+func lockStockItems(ctx context.Context, q *ordersdb.Queries, storeID pgtype.UUID, itemIDs []pgtype.UUID, now time.Time) ([]ordersdb.LockItemsRow, error) {
+	if err := q.RecordItemChanges(ctx, ordersdb.RecordItemChangesParams{StoreID: storeID, ItemIds: itemIDs, Now: now}); err != nil {
+		return nil, fmt.Errorf("orders: catalogue change: %w", err)
+	}
+	items, err := q.LockItems(ctx, itemIDs)
+	if err != nil {
+		return nil, fmt.Errorf("orders: lock items: %w", err)
+	}
+	return items, nil
 }
 
 // acceptedQuantities reads an accept's lines, when sent: each a line of the

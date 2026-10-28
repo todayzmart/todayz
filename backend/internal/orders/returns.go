@@ -273,8 +273,8 @@ func (s *Service) settleReturn(ctx context.Context, o ordersdb.Order, outcome st
 				itemIDs = append(itemIDs, r.StoreItemID)
 			}
 		}
-		if _, err := q.LockItems(ctx, itemIDs); err != nil {
-			return fmt.Errorf("orders: lock items: %w", err)
+		if _, err := lockStockItems(ctx, q, o.StoreID, itemIDs, now); err != nil {
+			return err
 		}
 	}
 	reason := "return_" + outcome

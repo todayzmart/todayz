@@ -2,11 +2,12 @@
 -- Only the work package that builds internal/orders edits this folder (D-50).
 --
 -- Times come from the injected clock (@now), never now(). Lock order: the
--- order row (FOR UPDATE) first. Holding or releasing stock then locks the
--- order's store_items by id and never the stores row; collecting goes
--- through the catalogue writer (stores row, then the item), one item at a
--- time in store_item_id order, and never pre-locks items, so no path takes
--- an item before the stores row.
+-- order row (FOR UPDATE) first. Holding or releasing stock then takes the
+-- store's catalogue sequence (RecordItemChanges, the stores row) and locks the
+-- order's store_items by id (D-280); collecting goes through the catalogue
+-- writer (stores row, then the item), one item at a time in store_item_id
+-- order, and never pre-locks items, so no path takes an item before the
+-- stores row.
 
 ------------------------------------------------------------------------------
 -- Placing
@@ -288,6 +289,19 @@ SELECT id, on_hand, reserved FROM store_items
 WHERE id = ANY(@ids::uuid[])
 ORDER BY id
 FOR UPDATE;
+
+-- name: RecordItemChanges :exec
+-- One catalogue change per item (D-36, D-280): a reservation moves reserved,
+-- and the POS reads stock by this cursor. It takes the store's catalogue
+-- sequence, the first lock of every stock write (internal/catalogue/writer.go),
+-- so it runs before LockItems.
+WITH s AS (
+  UPDATE stores SET catalogue_seq = catalogue_seq + cardinality(@item_ids::uuid[])
+  WHERE id = @store_id RETURNING catalogue_seq
+)
+INSERT INTO catalogue_changes (store_id, seq, entity, entity_id, op, created_at)
+SELECT @store_id, s.catalogue_seq - cardinality(@item_ids::uuid[]) + i.ord, 'store_item', i.id, 'upsert', @now
+FROM s, unnest(@item_ids::uuid[]) WITH ORDINALITY AS i(id, ord);
 
 -- name: InsertReservation :exec
 INSERT INTO stock_reservations (id, order_id, order_item_id, store_item_id, quantity, created_at, updated_at)

@@ -107,7 +107,7 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 			// order an accept and a cancel take them in (items, then the
 			// ledger), so the instant accept below cannot deadlock with
 			// them; the price then reads the stock it will hold.
-			if err := lockCartItems(ctx, q, c); err != nil {
+			if err := lockCartItems(ctx, q, storeID, c, now); err != nil {
 				return err
 			}
 		}
@@ -264,9 +264,10 @@ func (s *Service) tellAsk(ctx context.Context, customerID, storeID ids.ID, booke
 	}
 }
 
-// lockCartItems locks the cart's items in id order (LockItems). An id that
-// does not parse is left to the price's field error.
-func lockCartItems(ctx context.Context, q *ordersdb.Queries, c cart) error {
+// lockCartItems locks the cart's items in id order (lockStockItems, so the
+// store's catalogue sequence first, as the instant accept that follows needs).
+// An id that does not parse is left to the price's field error.
+func lockCartItems(ctx context.Context, q *ordersdb.Queries, storeID ids.ID, c cart, now time.Time) error {
 	itemIDs := make([]pgtype.UUID, 0, len(c.items))
 	for _, it := range c.items {
 		if id, err := ids.Parse(it.StoreItemId); err == nil {
@@ -276,10 +277,8 @@ func lockCartItems(ctx context.Context, q *ordersdb.Queries, c cart) error {
 	if len(itemIDs) == 0 {
 		return nil
 	}
-	if _, err := q.LockItems(ctx, itemIDs); err != nil {
-		return fmt.Errorf("orders: lock items: %w", err)
-	}
-	return nil
+	_, err := lockStockItems(ctx, q, ids.UUID(storeID), itemIDs, now)
+	return err
 }
 
 // autoAccept accepts a new order at once for a store with auto-accept on
@@ -306,7 +305,7 @@ func (s *Service) autoAccept(ctx context.Context, orderID ids.ID, hold time.Dura
 	for i, l := range lines {
 		want[i] = l.QuantityRequested
 	}
-	if err := s.lockStock(ctx, lines, want); err != nil {
+	if err := s.lockStock(ctx, o.StoreID, lines, want, now); err != nil {
 		if problem.CodeOf(err) == genproblems.InsufficientStock {
 			return false, nil
 		}
