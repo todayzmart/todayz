@@ -13,7 +13,8 @@ What we built: Firebase Authentication can now send and check the sign-in code f
   - The lead's brief said not to create a Firebase project. On 28 Oct 2026 the founder told this session directly to create one for testing.
   - So a test project, `todayz-dev`, now exists in the founder's Google account. It is on the free Spark plan, with no billing.
   - The existing InstaHunter project was not touched.
-  - `todayz-dev` is not the prod project. Prod still needs `todayz-prod`: the founder creates it, and the lead applies the prod properties after the founder's yes (D-210). Both are in [the runbook](../../runbooks/firebase-phone-auth.md).
+  - `todayz-dev` is not the prod project.
+  - Later on 28 Oct the founder told this session to set up `todayz-prod` too ("lets go live (except AWS)"). See "`todayz-prod` (28 Oct)" below. The AWS switch was explicitly left out: nothing in AWS or Cloudflare Pages was changed.
 
 ## What was built
 
@@ -76,6 +77,28 @@ Not checked live:
 
 The prod check in runbook section 5 covers both.
 
+## `todayz-prod` (28 Oct)
+
+Set up as runbook sections 1 to 4, on the founder's instruction, in the founder's Google account.
+
+| Step | Done |
+|---|---|
+| Project `todayz-prod` (the ID has no suffix), Analytics off, Gemini off | yes |
+| Blaze plan and budget alert | **no**: billing is the founder's to add. Until then the project is capped at 10 SMS a day. |
+| Phone sign-in enabled. No Identity Platform upgrade wizard appeared | yes |
+| SMS region policy: allow India only | yes |
+| Authorized domains: `app`, `business` and `admin.todayz.in`; `localhost` removed | yes |
+| Sign-up left on | yes |
+| Web app `todayz-web`, no Hosting | yes |
+| The four public values in the main checkout's `.env.cloud.local` (names-only check: 4) | yes |
+| Browser key: websites are the three apps plus `todayz-prod.firebaseapp.com`; APIs are Identity Toolkit and Token Service only (Firebase had pre-selected 25) | yes |
+| No test phone numbers | yes |
+
+Not done, on purpose:
+
+- **AWS:** `OTP_PROVIDER` and the four values in prod `extra_properties` (runbook section 5). The founder said not to touch AWS. Prod keeps signing in by AWS SMS until the lead applies it.
+- **Cloudflare Pages:** no deploy from this branch. The apps only use Firebase once the API says so, so a deploy now would change nothing for users. It would also replace main's prod apps with an unmerged branch. The apps ship with the normal merge to main.
+
 ## Findings and follow-ups
 
 1. **The admin sign-in lock sees no wrong codes on the Firebase path.** Wrong codes go from the browser to Google, so D-264's "lock after 10 wrong" counts nothing while the provider is firebase. An existing lock still refuses the swap. The founder accepted this ("accept Firebase's limits"). Firebase's per-IP and per-project limits apply instead.
@@ -90,6 +113,6 @@ The prod check in runbook section 5 covers both.
 
 ## Founder and lead steps to go live
 
-1. Founder: sections 1 to 4 of [the runbook](../../runbooks/firebase-phone-auth.md). That means creating the project on Blaze with India-only SMS and the three app domains, then restricting the browser key. The four values go in `.env.cloud.local`; names are in `.env.cloud.example`.
+1. Founder: sections 1 to 4 of [the runbook](../../runbooks/firebase-phone-auth.md). Done on 28 Oct except **Blaze and the budget alert** (section 1, step 2), which needs the founder's card.
 2. Lead: section 5. Add `OTP_PROVIDER=firebase` and the four values to the prod `extra_properties`, show the plan summary to the founder, and apply on their yes. No app rebuild is needed.
 3. To switch back: section 6, `OTP_PROVIDER=sms`.

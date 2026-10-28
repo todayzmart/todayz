@@ -15,7 +15,7 @@ Who does what (D-210):
    - Google Analytics: **off**. TodayZ does not use it.
    - Gemini in Firebase: **off**. The wizard asks about it at creation; TodayZ does not use it.
 2. Upgrade to **Blaze** (pay as you go): the gear icon, then **Usage and billing**, then **Details and settings**, then **Modify plan**.
-   - Phone sign-in on the free plan stops after a few codes a day.
+   - Phone sign-in on the free plan stops after a few codes a day. The console says "a sent SMS daily quota of 10/day" for a new project without billing.
    - India SMS is billed per message. Check the current price on https://firebase.google.com/pricing.
    - Set a budget alert at the same time: the gear icon, then **Usage and billing**, then **Budget alerts**. Use the `BUDGET_ALERT_EMAIL` address.
 
@@ -23,7 +23,7 @@ Who does what (D-210):
 
 1. Open **Build**, then **Authentication**, then **Get started**.
 2. Open **Sign-in method**, choose **Phone**, then **Enable**, then **Save**.
-   - On a new project, **Save** first opens **Upgrade to the new authentication**: Firebase Authentication with Identity Platform. Go through its steps and choose the upgrade. Phone stays **Disabled** until you do. The upgrade cannot be undone. Without Blaze it is capped at 3,000 daily active users, which is enough for a test project but not for prod. Then enable Phone again and save. The console confirms "Phone enabled".
+   - On some new projects, **Save** first opens **Upgrade to the new authentication**: Firebase Authentication with Identity Platform. Go through its steps and choose the upgrade. Phone stays **Disabled** until you do. The upgrade cannot be undone. Without Blaze it is capped at 3,000 daily active users, which is enough for a test project but not for prod. Then enable Phone again and save. The console confirms "Phone enabled". (`todayz-dev` showed this wizard; `todayz-prod` did not, and Phone saved straight away.)
    - Leave **Phone numbers for testing** empty in this project. Reserved test numbers are a local and test thing only (D-15). A separate test project may have one (section 8).
 3. Open **Settings**, then **SMS region policy**. Choose **Allow**, pick **India** only, and save. A code is then never sent to a number outside India.
    - This step is required. Until a region is allowed, every send fails with `OPERATION_NOT_ALLOWED` ("SMS unable to be sent until this region enabled by the app developer"), and the apps show the generic "could not send" error.
@@ -62,11 +62,14 @@ The web API key works from any site until it is restricted.
    - `https://app.todayz.in/*`
    - `https://business.todayz.in/*`
    - `https://admin.todayz.in/*`
+   - `https://<project>.firebaseapp.com/*`, the auth domain: the SDK's helper frame there calls Identity Toolkit with the same key
 4. Under **API restrictions**, choose **Restrict key** and tick:
    - **Identity Toolkit API**
    - **Token Service API**
    - **reCAPTCHA Enterprise API**, if it is listed
-5. Choose **Save**. A change can take a few minutes to apply.
+
+   Firebase pre-selects about 25 APIs on its auto-created key. Untick all of them except these.
+5. Choose **Save**. A change can take a few minutes to apply. The credentials list then shows the key as "HTTP referrers, 2 APIs".
 
 ## 5. Switch prod to Firebase (lead)
 

@@ -110,7 +110,7 @@ Go tests sit beside the code (`identity_test.go`, `refresh_replay_test.go`, `acc
 ## Status and known gaps
 
 - Live in code: OTP sign-in (AWS SMS, or Firebase with `OTP_PROVIDER=firebase`), refresh rotation, admin SMS step-up, the admin sign-in lock and unlock, the step-up quota, photo, addresses, deletion.
-- Firebase in prod waits for the founder's `todayz-prod` project and the lead's apply ([runbook](../runbooks/firebase-phone-auth.md)); until then prod stays on SMS. The verifier and the swap were checked against a real test project, `todayz-dev`, on 28 Oct 2026 ([report](../qa/firebase-otp/REPORT.md)).
+- Firebase in prod: the `todayz-prod` project is set up (28 Oct 2026). It still needs the founder's Blaze billing and the lead's AWS apply ([runbook](../runbooks/firebase-phone-auth.md) sections 1 and 5). Until then prod stays on SMS. The verifier and the swap were checked against a real test project, `todayz-dev`, on 28 Oct 2026 ([report](../qa/firebase-otp/REPORT.md)).
 - Left for a later release (D-264): dropping the unused admin `totp_*` columns, `sessions.totp_verified_at` and `admin_recovery_codes` (49501 already scrubbed them).
 - Not built: a sessions page ("where am I signed in") and a "new sign-in" notice. Both are after launch ([go-live gaps](../qa/go-live-gaps/LIST.md)).
 - Open: a signed device id for referral-farming defence, and key rotation, are listed in the same gap file.
