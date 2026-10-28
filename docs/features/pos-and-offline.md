@@ -2,7 +2,7 @@
 
 How a shop runs its counter: sells in the shop app, keeps working without internet, and links a sale to a customer by QR or code.
 
-> As built on main at 3d54bd71 (28 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 1716ee20 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 POS means point of sale, the counter screen where a cashier rings up a sale.
 
@@ -54,6 +54,7 @@ Money units on the counter are paise (D-172). Settings are never assumed on the 
 - **Online refusal.** `createPosSale` above available answers `409 insufficient_stock` with `storeItemId` and `available` and writes nothing. The money was already taken, so the device keeps that sale pending for sync (which never refuses for stock), adopts the server's number less its own pending sales, and opens Update stock ("This sale went through…"). A bill QR sale, which needs the server, is refused.
 - **The race.** Two devices that sold the last unit offline both keep their sale; on hand ends below 0 on the server, and every read (items, sync changes) shows 0 with `countNeeded`. The tile says "Count needed" until a count.
 - **Tiles and search results** show "N blocked for online orders" when N > 0. Accepting, ending or returning an online order writes a catalogue change per item, so the held units reach the counter by its next sync (D-280).
+- **Out of stock tiles stay.** Until sales rank any items, Quick items shows every listed item alphabetically, out of stock ones included, dimmed with "Out of stock", so the grid does not shift as stock runs out (D-282).
 
 ### Counter sales (D-268)
 

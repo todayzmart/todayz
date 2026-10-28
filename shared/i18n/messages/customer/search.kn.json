@@ -248,5 +248,20 @@
     "message": "ವರ್ಗದ ಪ್ರಕಾರ ಖರೀದಿಸಿ",
     "review": "machine",
     "enHash": "09ac8bca"
+  },
+  "search.allOut.title": {
+    "message": "ಈಗ ಹತ್ತಿರದ ಯಾವ ಅಂಗಡಿಯಲ್ಲೂ ಇದು ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "0f3ee79d"
+  },
+  "search.allOut.body": {
+    "message": "ಈ ಅಂಗಡಿಗಳು ಇದನ್ನು ಇಡುತ್ತವೆ, ಆದರೆ ಇದು ಖಾಲಿಯಾಗಿದೆ. ದೊಡ್ಡ ಪ್ರದೇಶದಲ್ಲಿ ಹುಡುಕಿ ಅಥವಾ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "2773907b"
+  },
+  "search.allOut.bodyWidest": {
+    "message": "ಈ ಅಂಗಡಿಗಳು ಇದನ್ನು ಇಡುತ್ತವೆ, ಆದರೆ ಇದು ಖಾಲಿಯಾಗಿದೆ. ನೀವು ಈಗಾಗಲೇ ಅತಿ ದೊಡ್ಡ ಪ್ರದೇಶದಲ್ಲಿ ಹುಡುಕುತ್ತಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "54ee5be1"
   }
 }

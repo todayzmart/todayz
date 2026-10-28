@@ -69,13 +69,13 @@ describe('prices and tiles', () => {
     expect(topTiles(items).map((i) => i.id)).toEqual(['3', '1', '2']);
     expect(topTiles(items, 2).map((i) => i.id)).toEqual(['3', '1']);
   });
-  it('falls back to listed items in stock, alphabetically, while nothing is ranked', () => {
+  it('falls back to listed items, alphabetically, out of stock ones included (D-282), while nothing is ranked', () => {
     const plain = [
       item('a', 'Tea'),
       item('b', 'Atta', { available: 0 }),
       item('c', 'Salt'),
       item('d', 'Oil', { isListed: false }),
     ];
-    expect(topTiles(plain).map((i) => i.id)).toEqual(['c', 'a']);
+    expect(topTiles(plain).map((i) => i.id)).toEqual(['b', 'c', 'a']);
   });
 });

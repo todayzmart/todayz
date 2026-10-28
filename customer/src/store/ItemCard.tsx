@@ -68,7 +68,9 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
         )}
         {tag && <span className={styles.tag}>{intl.formatMessage({ id: `store.tags.${tag}` })}</span>}
         {pct !== null && <span className={styles.off}>{intl.formatMessage({ id: 'product.off' }, { pct: String(pct) })}</span>}
-        {bookable && (
+        {/* Out of stock with none in the cart: no Add at all, only the label (D-282). A line already in
+            the cart keeps its stepper so it can be taken out. */}
+        {bookable && !(out && qty === 0) && (
           <div className={styles.add}>
             <QuantityStepper
               quantity={qty}
@@ -76,7 +78,6 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
               max={out ? 0 : undefined}
               labels={stepperLabels}
               itemName={item.name}
-              disabled={out && qty === 0}
               size="sm"
             />
           </div>

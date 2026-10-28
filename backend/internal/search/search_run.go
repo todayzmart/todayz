@@ -198,12 +198,22 @@ func (s *Service) Search(ctx context.Context, p discoverapi.SearchDiscoverParams
 	// request shape, not demand: it is not logged, so it never shows as a
 	// zero-result search (TODO(lead): conservative reading of 01 §11).
 	if offset == 0 && found {
-		results := 0
+		// Only what is in stock counts: a search that found it only out of stock is still a
+		// zero-result search for Wanted nearby and Missed sales (D-282).
+		results, withIt := 0, 0
 		for _, st := range stores {
-			results += len(st.Items)
+			n := 0
+			for _, it := range st.Items {
+				if it.inStock() {
+					n++
+				}
+			}
+			if n > 0 {
+				results, withIt = results+n, withIt+1
+			}
 		}
 		s.record(ctx, q, logEntry{
-			req: req, norm: norm, results: results, stores: len(stores),
+			req: req, norm: norm, results: results, stores: withIt,
 			start: start,
 		})
 	}
@@ -462,7 +472,7 @@ func searchItem(it candItem, now time.Time, staleAfter time.Duration) discoverap
 	out := discoverapi.DiscoverSearchItem{
 		StoreItemId: it.ID.String(), ProductId: it.ProductID.String(), Name: it.Name,
 		Variant: it.Variant, Brand: it.Brand, PackSize: it.PackSize, Unit: discoverapi.DiscoverUnit(it.Unit),
-		PricePaise: int(it.Price), HasOffer: it.Offer, InStock: true, ImageKey: it.ImageKey, ImageCredit: it.Credit,
+		PricePaise: int(it.Price), HasOffer: it.Offer, InStock: it.inStock(), ImageKey: it.ImageKey, ImageCredit: it.Credit,
 		ConfirmedAt: confirmedAt(it.StockUpdatedAt, now, staleAfter),
 	}
 	if it.Mrp != nil {

@@ -2,7 +2,7 @@
 
 How a customer finds nearby shops and items: search, ranking, saved baskets, ratings and reviews, and the plain-language helpers.
 
-> As built on main at d22219d7 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 1716ee20 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -24,6 +24,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md) sections 10, 11, 11.1
 - Baskets: `basket_max_saved`, `basket_max_items`, `basket_results_max`, `basket_split_max_shops` (D-110, D-111).
 - Search logs keep location only as H3 cells (a hex grid) at coarse resolution (D-81, D-59).
 - Only live shops of verified businesses appear (D-40).
+- Out of stock listings show, labelled with no Add, after the in-stock ones (in a store, and stores with nothing in stock last); they count for neither the summary, badges nor the zero-result log, and an all-out result says "No shop nearby has it in stock right now." C-08's other shops list keeps them too, last and labelled (D-282).
 
 ## How it works
 
@@ -63,4 +64,4 @@ Package tests; contract tests in `e2e/contract`; journey `07-e2e-13-baskets`; `e
 
 ## Decisions
 
-D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch). D-272 phone fixes (map always shown, photos fill their tiles, initials skip digits). D-273 quick-commerce UI in TodayZ green, with no retailer images.
+D-40, D-42, D-63 ranking. D-59 and D-81 location. D-92 rating. D-101 proof, voice, plain-language search. D-110 and D-111 baskets. D-140 reviews. D-231 and D-238 refine chips and hint. D-235 substitutes. D-250 baskets tab. D-269 quick-commerce look (Home rails, tiles, mode switch). D-272 phone fixes (map always shown, photos fill their tiles, initials skip digits). D-273 quick-commerce UI in TodayZ green, with no retailer images. D-282 out of stock listings stay, labelled, after in-stock.

@@ -248,5 +248,20 @@
     "message": "श्रेणी के हिसाब से खरीदें",
     "review": "machine",
     "enHash": "09ac8bca"
+  },
+  "search.allOut.title": {
+    "message": "अभी पास की किसी दुकान में यह स्टॉक में नहीं है।",
+    "review": "reviewed",
+    "enHash": "0f3ee79d"
+  },
+  "search.allOut.body": {
+    "message": "ये दुकानें इसे रखती हैं, पर यह खत्म हो गया है। बड़े इलाके में खोजें या पास की दुकानों से पूछें।",
+    "review": "reviewed",
+    "enHash": "2773907b"
+  },
+  "search.allOut.bodyWidest": {
+    "message": "ये दुकानें इसे रखती हैं, पर यह खत्म हो गया है। आप पहले से सबसे बड़े इलाके में खोज रहे हैं।",
+    "review": "reviewed",
+    "enHash": "54ee5be1"
   }
 }

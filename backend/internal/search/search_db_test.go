@@ -112,7 +112,9 @@ func TestSearchSummaryASK09(t *testing.T) {
 	r := f.search("Amul Butter 100 g")
 	require.NotNil(t, r.Summary)
 	assert.Equal(t, discoverapi.DiscoverSearchSummary{StoresChecked: 4, StoresWithIt: 1, MinPricePaise: 5800}, *r.Summary)
-	assert.Equal(t, []string{"near"}, resultSlugs(r), "500 g and out-of-stock rows never show")
+	assert.Equal(t, []string{"near", "instore"}, resultSlugs(r), "500 g never shows; the out-of-stock listing comes last and is not counted (D-282)")
+	assert.False(t, card(t, r, "instore").Items[0].InStock)
+	assert.True(t, card(t, r, "near").Items[0].InStock)
 
 	// 5 km takes in the shop 3 km away.
 	r = f.search("Amul Butter 100 g", radius(discoverapi.SearchDiscoverParamsRadiusN5000))
@@ -163,11 +165,11 @@ func TestHiddenStoresNeverShowSR01(t *testing.T) {
 
 func TestMatching(t *testing.T) {
 	f := newQA(t)
-	assert.Equal(t, []string{"near", "mid"}, resultSlugs(f.search("amull buttr")), "typo")
+	assert.Equal(t, []string{"near", "mid", "instore"}, resultSlugs(f.search("amull buttr")), "typo; instore has it out of stock")
 	assert.Equal(t, []string{"near", "mid", "far"}, resultSlugs(f.search("dahi")), "synonym")
 	assert.Equal(t, []string{"mid", "near", "far"}, resultSlugs(f.search("Nandini Dahi")), "the store's own name is an exact match")
-	assert.Equal(t, []string{"near", "mid"}, resultSlugs(f.search("ಬೆಣ್ಣೆ")), "Kannada synonym")
-	assert.Equal(t, []string{"near"}, resultSlugs(f.search("8901262150019")), "barcode")
+	assert.Equal(t, []string{"near", "mid", "instore"}, resultSlugs(f.search("ಬೆಣ್ಣೆ")), "Kannada synonym")
+	assert.Equal(t, []string{"near", "instore"}, resultSlugs(f.search("8901262150019")), "barcode")
 	assert.ElementsMatch(t, []string{"near", "mid", "far", "instore"}, resultSlugs(f.search("Dairy and eggs")), "category name")
 	assert.Equal(t, []string{"near", "far"}, resultSlugs(f.search("wheat flour")), "multi-word synonym")
 	assert.Empty(t, f.search("'; DROP TABLE stores; --").Results)
@@ -184,8 +186,20 @@ func TestOutOfStockAndInStoreOnlySR02SR05(t *testing.T) {
 	assert.Equal(t, "closest", badgeOf(r, "instore"), "never Lowest price")
 	assert.Nil(t, c.DeliveryFeePaise)
 
+	// D-282: out of stock everywhere still shows the listings, labelled, with no summary line
+	// and no badge, and the search counts as a zero-result search.
 	f.exec(`UPDATE store_items SET on_hand = 0 WHERE id = $1`, f.nearButter)
-	assert.Empty(t, f.search("Amul Butter 100 g").Results)
+	r = f.search("Amul Butter 100 g")
+	assert.Equal(t, []string{"near", "instore"}, resultSlugs(r))
+	assert.Nil(t, r.Summary)
+	for _, c := range r.Results {
+		assert.Nil(t, c.Badge, c.Store.StoreSlug)
+		assert.False(t, c.Items[0].InStock, c.Store.StoreSlug)
+	}
+	logs := f.logRows()
+	last := logs[len(logs)-1]
+	assert.Equal(t, 0, last.results, "found only out of stock: a zero-result search")
+	assert.Equal(t, 0, last.store)
 }
 
 func TestBadgesAndModesASK10(t *testing.T) {
@@ -266,7 +280,7 @@ func TestFilters(t *testing.T) {
 	}{
 		{"same name", "curd", f.curd, []string{"near", "mid", "far"}, 3},
 		{"q about another product", "atta", f.curd, []string{"near", "mid", "far"}, 3},
-		{"one pack size only", "amul butter", f.butter100, []string{"near"}, 1},
+		{"one pack size only", "amul butter", f.butter100, []string{"near", "instore"}, 1},
 		{"no stock anywhere", "ghee", f.atta, []string{"near", "far"}, 2},
 	} {
 		r := f.search(tc.q, func(p *discoverapi.SearchDiscoverParams) { p.ProductId = sp(ulidOf(t, tc.product)) })

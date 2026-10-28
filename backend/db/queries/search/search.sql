@@ -142,8 +142,10 @@ LIMIT @lim OFFSET @off;
 ------------------------------------------------------------------------------
 
 -- name: SearchItems :many
--- Filter first (01 §11): in stock, listed, live store of a verified business,
--- within the radius. An item matches when its search vector matches tsq (the
+-- Filter first (01 §11): listed, live store of a verified business, within the
+-- radius. Out of stock items come too, after the in-stock ones, so the cap never
+-- drops an in-stock row for one; the service ranks them after the in-stock
+-- stores and labels them (D-282). An item matches when its search vector matches tsq (the
 -- normalised words with their synonyms), or its product is one of typo_ids
 -- (trigram on the product name), or its product is in match_category_ids (the
 -- query names a category). brand_id, max_price and category_ids are the
@@ -173,7 +175,7 @@ LEFT JOIN product_images pim ON pim.id = p.image_id
 LEFT JOIN categories c ON c.id = b.category_id
 WHERE s.status = 'live' AND b.status = 'verified'
   AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography, @radius_m::float8)
-  AND si.is_listed AND si.on_hand - si.reserved > 0
+  AND si.is_listed
   AND p.status IN ('active', 'pending_review')
   AND (si.search @@ to_tsquery('simple', @tsq::text)
        OR si.product_id = ANY(@typo_ids::uuid[])
@@ -187,6 +189,7 @@ WHERE s.status = 'live' AND b.status = 'verified'
   AND (sqlc.narg(brand_id)::uuid IS NULL OR p.brand_id = sqlc.narg(brand_id)::uuid)
   AND (sqlc.narg(max_price)::bigint IS NULL OR si.price_paise <= sqlc.narg(max_price)::bigint)
   AND (sqlc.narg(category_ids)::uuid[] IS NULL OR p.category_id = ANY(sqlc.narg(category_ids)::uuid[]))
+ORDER BY (si.on_hand - si.reserved > 0) DESC
 LIMIT @lim;
 
 -- name: TypoProducts :many

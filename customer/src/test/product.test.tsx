@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearCart, getCart } from '../cart/cart';
 import { NOW, SHOP_A, SHOP_B, STORE_B_ID, atBengaluru, card, item, page, pageOf, renderDiscover } from './discover-fixtures';
@@ -6,6 +6,7 @@ import { NOW, SHOP_A, SHOP_B, STORE_B_ID, atBengaluru, card, item, page, pageOf,
 beforeEach(() => clearCart());
 
 const ID = '01KE0S1W6W8ZV7T1C3A6ITEM01';
+const STORE_C_ID = '01KE0S1W6W8ZV7T1C3A6MS0003';
 
 function routes() {
   return {
@@ -16,6 +17,7 @@ function routes() {
       summary: { storesChecked: 5, storesWithIt: 2, minPricePaise: 25000 },
       results: [
         { store: card(), items: [item()], badge: null, deliveryFeePaise: 2000 },
+        { store: card({ storeId: STORE_C_ID, storeSlug: 'ganesh-provisions', name: 'Ganesh Provisions', distanceM: 900 }), items: [item({ storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM08', pricePaise: 24500, inStock: false })], badge: null, deliveryFeePaise: 0 },
         { store: card({ storeId: STORE_B_ID, storeSlug: SHOP_B, name: 'Annapurna Kirana', distanceM: 1200 }), items: [item({ storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM09', pricePaise: 25000 })], badge: null, deliveryFeePaise: 0 },
       ],
       chips: [],
@@ -48,6 +50,16 @@ describe('C-08 Product detail', () => {
     expect(calls.find((c) => c.path === '/v1/discover/search')?.query.get('productId')).toBe('01KE0S1W6W8ZV7T1C3A6PROD01');
     expect(screen.getByText('Annapurna Kirana')).toBeInTheDocument();
     expect(screen.getByText('₹250')).toBeInTheDocument();
+  });
+
+  it('keeps a shop that has run out in the list, after the ones with stock, labelled (D-282)', async () => {
+    renderDiscover(`/s/${SHOP_A}/i/${ID}`, routes());
+    atBengaluru();
+    const list = (await screen.findByText('Other nearby shops')).closest('section') as HTMLElement;
+    const rows = await within(list).findAllByRole('listitem');
+    expect(rows.map((r) => r.querySelector('b')?.textContent)).toEqual(['Annapurna Kirana', 'Ganesh Provisions']);
+    expect(within(rows[1] as HTMLElement).getByText('Out of stock')).toBeInTheDocument();
+    expect(within(rows[0] as HTMLElement).queryByText('Out of stock')).not.toBeInTheDocument();
   });
 
   it('credits an open-database photo with its authors, source and licence; a shop photo has no credit line (D-252)', async () => {

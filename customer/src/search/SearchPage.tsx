@@ -343,10 +343,12 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
   const pages = useMemo(() => search.data?.pages ?? [], [search.data]);
   const first = pages[0];
   const groups = pages.flatMap((p) => p.results.map((r) => ({ r, serverNow: p.serverNow })));
-  // C-05 "none confirmed" (D-190): shops have it listed, but none has confirmed the stock lately
-  // (the server nulls `confirmedAt` past `stock_stale_after_hours`).
+  // C-05 "none confirmed" (D-190): shops have it in stock, but none has confirmed the stock lately
+  // (the server nulls `confirmedAt` past `stock_stale_after_hours`). "All out" (D-282): shops list
+  // it, but every one has run out; the server sends those listings after the in-stock ones.
+  const allOut = groups.length > 0 && !groups.some(({ r }) => r.items.some((i) => i.inStock));
   const noneConfirmed =
-    groups.length > 0 && !groups.some(({ r }) => r.items.some((i) => i.inStock && i.confirmedAt !== null));
+    groups.length > 0 && !allOut && !groups.some(({ r }) => r.items.some((i) => i.inStock && i.confirmedAt !== null));
 
   useEffect(() => {
     for (const p of pages) for (const r of p.results) seedItems(qc, r.store.storeSlug, r.items, p.serverNow);
@@ -474,8 +476,8 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
           <AskNearbySlot query={q} />
         </>
       )}
-      {search.isSuccess && !search.hasNextPage && noneConfirmed && (
-        <NoneConfirmed km={km} query={q} />
+      {search.isSuccess && !search.hasNextPage && (noneConfirmed || allOut) && (
+        <NoneConfirmed km={km} query={q} out={allOut} />
       )}
       <ul className={styles.groups}>
         {groups.map(({ r, serverNow }) => (
@@ -494,11 +496,12 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
 }
 
 /**
- * D-190: say plainly that no shop in range has confirmed the stock, and offer the next radius up. At 20 km
+ * D-190: say plainly that no shop in range has confirmed the stock (or, with `out`, that every shop that
+ * lists it has run out, D-282), and offer the next radius up. At 20 km
  * there is no wider option, so offer to search again later. The shops are never asked again from here:
  * "Ask shops nearby" stays the customer's own action (AskNearbySlot).
  */
-function NoneConfirmed({ km, query }: { km: number; query: string }) {
+function NoneConfirmed({ km, query, out }: { km: number; query: string; out: boolean }) {
   const intl = useIntl();
   const next = RADIUS_OPTIONS_KM.find((k) => k > km);
   const qc = useQueryClient();
@@ -507,9 +510,17 @@ function NoneConfirmed({ km, query }: { km: number; query: string }) {
       <Banner
         tone="warning"
         live="status"
-        title={intl.formatMessage({ id: 'search.noneConfirmed.title' })}
+        title={intl.formatMessage({ id: out ? 'search.allOut.title' : 'search.noneConfirmed.title' })}
       >
-        {intl.formatMessage({ id: next !== undefined ? 'search.noneConfirmed.body' : 'search.noneConfirmed.bodyWidest' })}
+        {intl.formatMessage({
+          id: out
+            ? next !== undefined
+              ? 'search.allOut.body'
+              : 'search.allOut.bodyWidest'
+            : next !== undefined
+              ? 'search.noneConfirmed.body'
+              : 'search.noneConfirmed.bodyWidest',
+        })}
       </Banner>
       {next !== undefined ? (
         <Button variant="soft" block onClick={() => setRadiusKm(next)}>

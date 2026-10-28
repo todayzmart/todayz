@@ -248,5 +248,20 @@
     "message": "వర్గం వారీగా కొనండి",
     "review": "machine",
     "enHash": "09ac8bca"
+  },
+  "search.allOut.title": {
+    "message": "ప్రస్తుతం దగ్గరలోని ఏ దుకాణంలోనూ ఇది స్టాక్‌లో లేదు.",
+    "review": "reviewed",
+    "enHash": "0f3ee79d"
+  },
+  "search.allOut.body": {
+    "message": "ఈ దుకాణాలు దీన్ని ఉంచుతాయి, కానీ ఇది అయిపోయింది. పెద్ద ప్రాంతంలో వెతకండి లేదా దగ్గరలోని దుకాణాలను అడగండి.",
+    "review": "reviewed",
+    "enHash": "2773907b"
+  },
+  "search.allOut.bodyWidest": {
+    "message": "ఈ దుకాణాలు దీన్ని ఉంచుతాయి, కానీ ఇది అయిపోయింది. మీరు ఇప్పటికే అతి పెద్ద ప్రాంతంలో వెతుకుతున్నారు.",
+    "review": "reviewed",
+    "enHash": "54ee5be1"
   }
 }

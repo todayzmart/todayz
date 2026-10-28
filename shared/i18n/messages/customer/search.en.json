@@ -198,5 +198,17 @@
   "search.assist.applied": {
     "defaultMessage": "Added filters",
     "description": "C-05 accessible name of the price and brand filters the customer added"
+  },
+  "search.allOut.title": {
+    "defaultMessage": "No shop nearby has it in stock right now.",
+    "description": "C-05 every result is out of stock (D-282)"
+  },
+  "search.allOut.body": {
+    "defaultMessage": "These shops list it, but it has run out. Try a wider area or ask shops nearby.",
+    "description": "C-05 all out of stock, body"
+  },
+  "search.allOut.bodyWidest": {
+    "defaultMessage": "These shops list it, but it has run out. You are already searching the widest area.",
+    "description": "C-05 all out of stock at 20 km"
   }
 }

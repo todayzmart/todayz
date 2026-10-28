@@ -85,6 +85,21 @@ describe('C-05 Search', () => {
     expect(screen.getByRole('button', { name: 'Search again later' })).toBeInTheDocument();
   });
 
+  it('when every shop has run out, it shows them labelled and says no shop has it in stock (D-282)', async () => {
+    const out = result({
+      summary: null,
+      results: result().results.map((g) => ({ ...g, badge: null, items: g.items.map((it) => ({ ...it, inStock: false })) })),
+    });
+    renderDiscover('/search?q=atta', routes(out));
+    atBengaluru();
+    expect(await screen.findByText('Sri Lakshmi Stores')).toBeInTheDocument();
+    expect(screen.getByText('No shop nearby has it in stock right now.')).toBeInTheDocument();
+    expect(screen.getAllByText('Out of stock').length).toBeGreaterThan(0);
+    expect(document.querySelector('.tz-add')).toBeNull();
+    expect(screen.queryByText('None of the shops has confirmed yet.')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Search within 5 km' })).toBeInTheDocument();
+  });
+
   it('does not show it while some shop has confirmed', async () => {
     renderDiscover('/search?q=atta', routes());
     atBengaluru();

@@ -47,7 +47,7 @@ type weights struct {
 	text, distance, reliability, rating, offer float64
 }
 
-// candItem is one matching in-stock item of a store.
+// candItem is one matching item of a store, in stock or not (D-282).
 type candItem struct {
 	ID             ids.ID
 	ProductID      ids.ID
@@ -66,6 +66,10 @@ type candItem struct {
 	Category       bool                             // matched only because the query names its category
 	Offer          bool
 }
+
+// inStock: the store can sell it now. An item at 0 or below still shows, labelled, after the
+// in-stock ones (D-282).
+func (it candItem) inStock() bool { return it.Available > 0 }
 
 // itemScore orders a store's items (text and offer terms only: the store
 // terms are the same for all of them).
@@ -102,6 +106,17 @@ type candStore struct {
 // bookable: pickup or delivery (D-41); an In-store only store is not.
 func (s *candStore) bookable() bool { return s.Pickup || s.Delivery }
 
+// hasStock: at least one matching item is in stock. Only these stores have it (summary), get
+// badges and rank first (D-282).
+func (s *candStore) hasStock() bool {
+	for _, it := range s.Items {
+		if it.inStock() {
+			return true
+		}
+	}
+	return false
+}
+
 // lead is the store's best item (after rank).
 func (s *candStore) lead() candItem { return s.Items[0] }
 
@@ -131,8 +146,8 @@ func clamp01(v float64) float64 {
 	return v
 }
 
-// rank orders each store's items (score, then cheaper, then id), scores the
-// stores and orders them by the sort: relevance (score, ties to the nearer
+// rank orders each store's items (in stock first, then score, then cheaper, then id), scores
+// the stores and orders them: stores with an item in stock first (D-282), then by the sort: relevance (score, ties to the nearer
 // store), nearest (distance, then score) or cheapest (the lead item's price,
 // then distance). The store id breaks every remaining tie, so the order is
 // stable across pages.
@@ -140,6 +155,9 @@ func rank(stores []*candStore, w weights, sortBy string) {
 	for _, s := range stores {
 		sort.SliceStable(s.Items, func(i, j int) bool {
 			a, b := s.Items[i], s.Items[j]
+			if ia, ib := a.inStock(), b.inStock(); ia != ib {
+				return ia
+			}
 			if sa, sb := a.itemScore(w), b.itemScore(w); sa != sb {
 				return sa > sb
 			}
@@ -158,6 +176,9 @@ func rank(stores []*candStore, w weights, sortBy string) {
 	}
 	sort.SliceStable(stores, func(i, j int) bool {
 		a, b := stores[i], stores[j]
+		if ha, hb := a.hasStock(), b.hasStock(); ha != hb {
+			return ha
+		}
 		switch sortBy {
 		case sortNearest:
 			if less, ok := byDistance(a, b); ok {
@@ -248,8 +269,8 @@ const (
 // lowest total (ties to the nearer store; In-store only stores never), and
 // Closest to the nearest card. A card shows at most one badge, Lowest price
 // first; when one card wins both, Closest goes to no other card. Ready
-// soonest is not shown on search results in v1. It returns the badge per
-// index of page.
+// soonest is not shown on search results in v1. A store with nothing in stock gets neither
+// (D-282). It returns the badge per index of page.
 func badges(page []*candStore, m modes) map[int]string {
 	out := map[int]string{}
 	if len(page) == 0 {
@@ -265,38 +286,42 @@ func badges(page []*candStore, m modes) map[int]string {
 	var cheapStore *candStore
 	for i, s := range page {
 		t, ok := total(s, m)
-		if !ok || !s.bookable() {
+		if !ok || !s.bookable() || !s.hasStock() {
 			continue
 		}
 		if cheapStore == nil || t < best || (t == best && nearer(s, cheapStore)) {
 			cheapest, best, cheapStore = i, t, s
 		}
 	}
-	closest, nearest := 0, page[0]
+	closest := -1
+	var nearest *candStore
 	for i, s := range page {
-		if nearer(s, nearest) {
+		if s.hasStock() && (nearest == nil || nearer(s, nearest)) {
 			closest, nearest = i, s
 		}
 	}
 	if cheapest >= 0 {
 		out[cheapest] = badgeLowestPrice
 	}
-	if closest != cheapest {
+	if closest >= 0 && closest != cheapest {
 		out[closest] = badgeClosest
 	}
 	return out
 }
 
-// summary is the D-101 line: M stores have it, from the lowest item price
-// among all of them (every matching item, not only the listed ones). ok is
-// false when no store has it (the line is hidden).
+// summary is the D-101 line: M stores have it in stock, from the lowest price among their
+// in-stock items. Out of stock listings count for neither (D-282). ok is false when no store
+// has it (the line is hidden).
 func summary(stores []*candStore) (withIt int, minPrice int64, ok bool) {
 	for _, s := range stores {
+		if s.hasStock() {
+			withIt++
+		}
 		for _, it := range s.Items {
-			if !ok || it.Price < minPrice {
+			if it.inStock() && (!ok || it.Price < minPrice) {
 				minPrice, ok = it.Price, true
 			}
 		}
 	}
-	return len(stores), minPrice, ok
+	return withIt, minPrice, ok
 }

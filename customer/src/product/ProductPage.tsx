@@ -53,6 +53,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
   const serverNow = found.data?.serverNow ?? '';
 
   // Other nearby shops: the discover search limited to this master product (`productId`; `q` stays required).
+  // A shop that lists it but has run out stays in the list, after the ones with stock, labelled (D-282).
   const others = useQuery({
     queryKey: ['discover', 'others', item?.productId ?? null, coords?.lat ?? null, coords?.lng ?? null, km],
     enabled: item !== undefined && coords !== null,
@@ -63,8 +64,9 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
       const out = r.results.flatMap((res) =>
         res.store.storeSlug === slug
           ? []
-          : res.items.filter((i) => i.productId === item.productId && i.inStock).map((i) => ({ store: res.store, item: i, serverNow: r.serverNow })),
+          : res.items.filter((i) => i.productId === item.productId).map((i) => ({ store: res.store, item: i, serverNow: r.serverNow })),
       );
+      out.sort((a, b) => Number(b.item.inStock) - Number(a.item.inStock));
       for (const o of out) seedItems(qc, o.store.storeSlug, [o.item], o.serverNow);
       return out;
     },
@@ -262,12 +264,13 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
           </h2>
           <ul className={styles.otherList}>
             {others.data.map((o) => (
-              <li key={o.store.storeSlug}>
+              <li key={o.item.storeItemId}>
                 <RouterLink href={itemHref(o.store.storeSlug, o.item.storeItemId)} className={styles.other}>
                   <span className="tz-ui-minw0">
                     <b>{o.store.name}</b>
                     <span className="tz-meta">
                       <span>{formatDistance(o.store.distanceM)}</span>
+                      {!o.item.inStock && <span>{intl.formatMessage({ id: 'product.stock.out' })}</span>}
                     </span>
                   </span>
                   <span className="tz-price">{money(o.item.pricePaise)}</span>

@@ -160,7 +160,7 @@ func fp(v float64) *float64 { return &v }
 
 func goldenStores() []*candStore {
 	item := func(n byte, text float64, price int64, offer bool) candItem {
-		return candItem{ID: fid(100 + n), ProductID: fid(200 + n), Name: "item", Unit: "g", PackSize: 100, Price: price, Text: text, Offer: offer}
+		return candItem{ID: fid(100 + n), ProductID: fid(200 + n), Name: "item", Unit: "g", PackSize: 100, Price: price, Text: text, Offer: offer, Available: 5}
 	}
 	return []*candStore{
 		// B: near, partial text, top rating, half reliability.
@@ -226,7 +226,7 @@ func TestBadges(t *testing.T) {
 	free := int64(10000)
 	st := func(n byte, dist float64, price int64, pickup, delivery bool, fee int64) *candStore {
 		return &candStore{ID: fid(n), Slug: string('a' + rune(n)), DistanceM: dist, Pickup: pickup, Delivery: delivery,
-			FeePaise: fee, FreeAbove: &free, Items: []candItem{{ID: fid(100 + n), Price: price, Text: 1}}}
+			FeePaise: fee, FreeAbove: &free, Items: []candItem{{ID: fid(100 + n), Price: price, Text: 1, Available: 5}}}
 	}
 	none := modes{}
 
@@ -283,6 +283,31 @@ func TestBadges(t *testing.T) {
 		require.Equal(t, 1, n, b)
 	}
 	require.Empty(t, badges(nil, none))
+}
+
+// D-282: a store that has the item only out of stock ranks after every store that has it in
+// stock, gets no badge and does not count in the summary; inside a store the in-stock item leads.
+func TestOutOfStockRanksLast(t *testing.T) {
+	out := &candStore{ID: fid(7), Slug: "out", DistanceM: 10, Pickup: true, Items: []candItem{{ID: fid(107), Price: 100, Text: 1}}}
+	in := &candStore{ID: fid(6), Slug: "in", DistanceM: 900, Pickup: true, Items: []candItem{
+		{ID: fid(105), Price: 50, Text: 1},
+		{ID: fid(106), Price: 9000, Text: 0.3, Available: 2},
+	}}
+	ss := []*candStore{out, in}
+	for _, sortBy := range []string{sortRelevance, sortNearest, sortCheapest} {
+		ss = []*candStore{out, in}
+		rank(ss, defaultWeights, sortBy)
+		require.Equal(t, []string{"in", "out"}, slugs(ss), sortBy)
+	}
+	require.Equal(t, fid(106), in.lead().ID, "the in-stock item leads its store")
+	require.Equal(t, map[int]string{0: badgeLowestPrice}, badges(ss, modes{}), "the nearer out-of-stock store is not Closest")
+	n, minPrice, ok := summary(ss)
+	require.True(t, ok)
+	require.Equal(t, 1, n)
+	require.Equal(t, int64(9000), minPrice, "out-of-stock prices do not count")
+	_, _, ok = summary([]*candStore{out})
+	require.False(t, ok, "only out of stock: no summary line")
+	require.Empty(t, badges([]*candStore{out}, modes{}))
 }
 
 func TestSummary(t *testing.T) {
