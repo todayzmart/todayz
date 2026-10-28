@@ -94,6 +94,31 @@
               createdAt: "2026-10-25T05:00:00Z"
               version: 1
       default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/standee-sheet/printed:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: markStoreSheetPrinted
+    tags: [standee]
+    summary: Record that the store sheet was printed
+    description: >-
+      Manager and above. The app calls it when Print is pressed on the store's own sheet (D-278,
+      printed in the browser). The first call records the time and ticks the setup step "Print
+      the QR standee" (D-281); later calls change nothing.
+    x-idempotency: none
+    responses:
+      "204":
+        description: Recorded
+      default: *problem
 /v1/biz/businesses/{bid}/stores/{sid}/standees/{standeeId}/reorder:
   parameters:
     - name: bid

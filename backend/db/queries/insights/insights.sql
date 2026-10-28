@@ -315,7 +315,8 @@ ORDER BY store_item_id, created_at DESC, id DESC;
 SELECT b.status::text AS business_status,
        (SELECT count(*) FROM store_items WHERE store_id = s.id AND is_listed)::int AS listed,
        (SELECT count(*) FROM staff st WHERE st.business_id = s.business_id AND st.status = 'active' AND st.role <> 'owner')::int AS staff,
-       EXISTS (SELECT 1 FROM qr_standees q WHERE q.store_id = s.id)::bool AS has_standee,
+       (s.standee_printed_at IS NOT NULL
+        OR EXISTS (SELECT 1 FROM qr_standees q WHERE q.store_id = s.id))::bool AS has_standee,
        (s.hours <> '{}'::jsonb)::bool AS has_hours
 FROM stores s
 JOIN businesses b ON b.id = s.business_id

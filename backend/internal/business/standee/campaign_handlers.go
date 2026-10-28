@@ -21,6 +21,7 @@ var Ops = map[string]string{
 	"ListStandees":          policy.StandeeManage,
 	"CreateStandee":         policy.StandeeManage,
 	"RequestStandeeReorder": policy.StandeeManage,
+	"MarkStoreSheetPrinted": policy.StandeeManage,
 }
 
 // Register mounts the standee routes on r. az is the permission engine; it
@@ -83,6 +84,17 @@ func (h handlers) RequestStandeeReorder(ctx context.Context, req standeeapi.Requ
 		return nil, asProblem(err)
 	}
 	return standeeapi.RequestStandeeReorder200JSONResponse(st), nil
+}
+
+func (h handlers) MarkStoreSheetPrinted(ctx context.Context, req standeeapi.MarkStoreSheetPrintedRequestObject) (standeeapi.MarkStoreSheetPrintedResponseObject, error) {
+	store, err := pathID(req.Sid)
+	if err != nil {
+		return nil, err
+	}
+	if err := h.s.MarkSheetPrinted(ctx, store); err != nil {
+		return nil, asProblem(err)
+	}
+	return standeeapi.MarkStoreSheetPrinted204Response{}, nil
 }
 
 func principal(ctx context.Context) (authn.Principal, error) {

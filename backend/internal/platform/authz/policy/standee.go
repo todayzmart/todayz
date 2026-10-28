@@ -11,6 +11,6 @@ const (
 func init() {
 	ownerManager := map[authz.Role]authz.Grant{authz.Owner: authz.Allow, authz.Manager: authz.Allow}
 	Register(authz.Table{Domain: "standee", Actions: []authz.Action{
-		{Name: StandeeManage, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "{S}/standees (list, create), {S}/standees/{standeeId}/reorder (B-10)"},
+		{Name: StandeeManage, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "{S}/standees (list, create), {S}/standee-sheet/printed, {S}/standees/{standeeId}/reorder (B-10)"},
 	}})
 }

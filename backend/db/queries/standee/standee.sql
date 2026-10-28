@@ -60,3 +60,8 @@ FOR NO KEY UPDATE;
 UPDATE qr_standees
 SET reorder_requested_at = @now::timestamptz, reorder_requested_by = @requested_by, updated_at = @now::timestamptz, version = version + 1
 WHERE id = @id AND store_id = @store_id AND reorder_requested_at IS NULL;
+
+-- name: MarkStoreSheetPrinted :exec
+-- The first Print of the store sheet (D-281); a later one keeps the first time.
+UPDATE stores SET standee_printed_at = @now
+WHERE id = @store_id AND standee_printed_at IS NULL;

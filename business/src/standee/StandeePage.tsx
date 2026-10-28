@@ -1,11 +1,13 @@
 import { Banner, Button, EmptyState, Skeleton } from '@todayz/ui';
 import { Inbox, Lock, Printer, Store as StoreIcon } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import { canSeeCredits } from '../credits/permissions';
 import { useShortCode } from '../credits/queries';
 import { useCurrentStore, type CurrentStore } from '../orders/store';
 import { Campaigns } from './campaigns/Campaigns';
+import { noteSheetPrinted } from './campaigns/queries';
 import styles from './standee.module.css';
 import { storeLink } from './link';
 import { StandeeSheet } from './StandeeSheet';
@@ -59,6 +61,7 @@ export function StandeePage() {
 function Standee({ store }: { store: CurrentStore }) {
   const intl = useIntl();
   const code = useShortCode(store.bid, store.sid);
+  const qc = useQueryClient();
   const { print, portal } = usePrintSheet();
   // The store standee's link (D-26): the scan opens the shop and counts as a store referral.
   const sheet = code.data ? { shop: store.name, link: storeLink(code.data), code: code.data } : null;
@@ -87,7 +90,11 @@ function Standee({ store }: { store: CurrentStore }) {
                 <span className={styles.code}>{sheet.code}</span>
               </p>
               <div className={styles.actions}>
-                <Button variant="primary" icon={Printer} onClick={() => print(sheet)}>
+                <Button variant="primary" icon={Printer} onClick={() => {
+                    print(sheet);
+                    noteSheetPrinted(qc, store);
+                  }}
+                >
                   {intl.formatMessage({ id: 'standee.print' })}
                 </Button>
               </div>

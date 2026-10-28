@@ -1,8 +1,9 @@
 import { ApiError } from '@todayz/api-client';
-import { createStandee, listStandees, requestStandeeReorder } from '@todayz/api-client/gen/standee/standee';
+import { createStandee, listStandees, markStoreSheetPrinted, requestStandeeReorder } from '@todayz/api-client/gen/standee/standee';
 import type { Standee } from '@todayz/api-client/gen/model/standee';
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 import type { CurrentStore } from '../../orders/store';
+import { overviewKey } from '../../overview/queries';
 
 // Keys carry only the store id; a standee's link is data, never part of a key.
 export const standeesKey = (sid: string) => ['standees', sid] as const;
@@ -28,6 +29,17 @@ export async function reorderStandee(qc: QueryClient, s: CurrentStore, id: strin
   } finally {
     void qc.invalidateQueries({ queryKey: standeesKey(s.sid) });
   }
+}
+
+/**
+ * Records that the store sheet was printed, which ticks the setup step "Print the QR standee" (D-281). Fire and forget:
+ * printing never waits on it, and a failure only leaves the step for the next Print.
+ */
+export function noteSheetPrinted(qc: QueryClient, s: CurrentStore): void {
+  markStoreSheetPrinted(s.bid, s.sid).then(
+    () => void qc.invalidateQueries({ queryKey: overviewKey(s.sid) }),
+    () => undefined,
+  );
 }
 
 /** The i18n suffix for an error (`standee.campaigns.error.<key>`). */

@@ -2,7 +2,7 @@
 
 How a shop owner signs up and goes live at once with their stores (D-274), how the field team checks new shops afterwards, and the shop's staff, standee (the printed QR stand) and field-agent help.
 
-> As built on main at d8f2ca2e (28 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at f5a2cec5 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 ## What users can do
 
@@ -24,7 +24,7 @@ Source: [01-product-rules.md](../plan/01-product-rules.md) sections 3 and 14.
 - Shop photos and KYC documents are accepted when the upload is confirmed; nobody reviews them first.
 - Roles are owner, manager, cashier (D-65, D-66). The app has no business delete (D-66).
 - The standee URL is `app.todayz.in/s/{slug}` with referral and standee parameters.
-- The QR standee (`/standee`, owner and manager) is drawn in the browser as an A5 sheet: shop name, QR and shop code. **Print or save as PDF** uses the browser's print dialog. The store sheet's QR is `/v1/public/ref/{shortCode}?k=s`; each campaign standee prints its own sheet with its `?s=<standeeId>` link (D-278).
+- The QR standee (`/standee`, owner and manager) is drawn in the browser as an A5 sheet: shop name, QR and shop code. **Print or save as PDF** uses the browser's print dialog. The store sheet's QR is `/v1/public/ref/{shortCode}?k=s`; each campaign standee prints its own sheet with its `?s=<standeeId>` link (D-278). Printing the store sheet records `stores.standee_printed_at` (`POST {S}/standee-sheet/printed`), which ticks the setup card's standee step (D-281).
 - Field agents edit only items they added, within `field_agent_edit_window_days` (D-232). The owner code is limited by `field_owner_codes_per_agent_hour` (D-241).
 
 ## How it works
@@ -71,4 +71,4 @@ Live in code. The customer shop page is a card, not a full map (D-251 B1). An ad
 
 ## Decisions
 
-D-39 field agents. D-40 verification (its admin gate replaced by D-274). D-66 staff. D-107 businesses, stores and staff. D-200 to D-206 onboarding screens. D-223 standee rows. D-278 standee drawn and printed in the browser. D-232 and D-241 field agents. D-246 storefront photo. D-274 live on signup, the shop check and the green rail. D-276 no shop goes straight to B-02.
+D-39 field agents. D-40 verification (its admin gate replaced by D-274). D-66 staff. D-107 businesses, stores and staff. D-200 to D-206 onboarding screens. D-223 standee rows. D-278 standee drawn and printed in the browser. D-281 printing the store sheet ticks the setup step. D-232 and D-241 field agents. D-246 storefront photo. D-274 live on signup, the shop check and the green rail. D-276 no shop goes straight to B-02.

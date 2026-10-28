@@ -171,6 +171,19 @@ func (s *Service) Create(ctx context.Context, p authn.Principal, store ids.ID, c
 	return out, nil
 }
 
+// MarkSheetPrinted records the first Print of the store's own sheet (D-281),
+// which ticks the setup step; a later Print changes nothing.
+func (s *Service) MarkSheetPrinted(ctx context.Context, store ids.ID) error {
+	if err := s.ready(ctx); err != nil {
+		return err
+	}
+	now := s.clock.Now()
+	if err := s.q(ctx).MarkStoreSheetPrinted(ctx, standeedb.MarkStoreSheetPrintedParams{StoreID: ids.UUID(store), Now: &now}); err != nil {
+		return fmt.Errorf("standee: sheet printed: %w", err)
+	}
+	return nil
+}
+
 // RequestReorder marks the standee as waiting for a reprint. A request
 // already waiting is answered unchanged and writes nothing.
 // TODO(lead): admin fulfilment (who prints and clears it) is not built (D-223).

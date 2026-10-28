@@ -55,11 +55,13 @@ describe('standee page (D-278: drawn and printed in the browser)', () => {
     expect(calls.some((c) => c.path.endsWith('.pdf'))).toBe(false);
   });
 
-  it('"Print or save as PDF" opens the browser print dialog with only the sheet', async () => {
+  it('"Print or save as PDF" opens the browser print dialog with only the sheet and ticks the setup step (D-281)', async () => {
     const print = stubPrint();
-    renderAt('/standee', { messages, handlers: [shops('owner'), store, standees] });
+    const printed: Handler = (c) => (c.method === 'POST' && c.path === `${B}/stores/s1/standee-sheet/printed` ? new Response(null, { status: 204 }) : undefined);
+    const { calls } = renderAt('/standee', { messages, handlers: [shops('owner'), store, standees, printed] });
     fireEvent.click(await screen.findByRole('button', { name: 'Print or save as PDF' }));
     await waitFor(() => expect(print).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST' && c.path === `${B}/stores/s1/standee-sheet/printed`)).toBe(true));
     const sheet = document.body.querySelector('[data-standee-print]');
     expect(sheet).not.toBeNull();
     expect(sheet?.textContent).toContain('K7Q2X9');

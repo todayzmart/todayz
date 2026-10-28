@@ -280,6 +280,29 @@ func TestReorder(t *testing.T) {
 	require.Equal(t, genproblems.NotFound, problemCode(err))
 }
 
+// D-281: printing the store sheet is recorded once, and the setup card counts it.
+func TestSheetPrinted(t *testing.T) {
+	e := newEnv(t)
+	store, _ := e.store()
+	printedAt := func() *time.Time {
+		var at *time.Time
+		require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT standee_printed_at FROM stores WHERE id = $1`, ids.UUID(store)).Scan(&at))
+		return at
+	}
+	require.Nil(t, printedAt())
+
+	e.clk.Advance(time.Hour)
+	require.NoError(t, e.svc.MarkSheetPrinted(e.ctx, store))
+	first := printedAt()
+	require.NotNil(t, first)
+	require.True(t, first.Equal(testNow.Add(time.Hour)))
+
+	// Printing again keeps the first time.
+	e.clk.Advance(time.Hour)
+	require.NoError(t, e.svc.MarkSheetPrinted(e.ctx, store))
+	require.True(t, printedAt().Equal(*first))
+}
+
 func TestNotConfigured(t *testing.T) {
 	s, err := New(Deps{Clock: clock.NewFake(testNow)})
 	require.NoError(t, err)
