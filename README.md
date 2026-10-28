@@ -2,7 +2,7 @@
 
 TodayZ is hyperlocal retail for India. Neighbourhood shops put their stock online. Customers search what is in stock near them, book it, and either pick it up or have it delivered. Shops run their counter (POS, which works offline), stock, offers, cashback credits and customers from one business app.
 
-> As built on main at 748eb5f6 (27 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
+> As built on main at 3954a599 (28 Oct 2026). Update this file when an app, command, feature area or deploy step changes.
 
 ## The apps
 
@@ -35,7 +35,7 @@ flowchart LR
     DB[(Postgres 16 + PostGIS<br/>RDS)]
   end
   R2[(Cloudflare R2<br/>images and map tiles)]
-  EXT[SMS via AWS,<br/>AI providers]
+  EXT[SMS via AWS or Firebase,<br/>AI providers]
   OBS[Grafana / OpenTelemetry]
   C --> CA
   S --> BA

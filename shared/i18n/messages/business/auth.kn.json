@@ -154,6 +154,16 @@
     "review": "reviewed",
     "enHash": "bc612d87"
   },
+  "auth.error.methodChanged": {
+    "message": "ಸೈನ್-ಇನ್ ಕೋಡ್ ಕಳುಹಿಸುವ ವಿಧಾನವನ್ನು ನಾವು ಬದಲಾಯಿಸಿದ್ದೇವೆ. ದಯವಿಟ್ಟು ಕೋಡ್ ಅನ್ನು ಮತ್ತೆ ಕಳುಹಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "7348da0e"
+  },
+  "auth.firebase.recaptchaNotice": {
+    "message": "ಈ ಸೈನ್-ಇನ್ ಅನ್ನು Google reCAPTCHA ರಕ್ಷಿಸುತ್ತದೆ. Google ನ ಗೌಪ್ಯತಾ ನೀತಿ ಮತ್ತು ಸೇವಾ ನಿಯಮಗಳು ಅನ್ವಯಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "a6c11ccb"
+  },
   "auth.signOut": {
     "message": "ಸೈನ್ ಔಟ್",
     "review": "reviewed",

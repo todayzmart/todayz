@@ -75,6 +75,9 @@ type Deps struct {
 	// SMS and Human override the providers built from Config (tests).
 	SMS   SMSSender
 	Human HumanVerifier
+	// Firebase overrides the Firebase ID token check built from Config
+	// (tests, D-275).
+	Firebase FirebaseVerifier
 	// Hooks seeds the account-deletion hooks (tests); domains register theirs
 	// with AddDeletionCheck and AddDeletionHook.
 	Hooks *Hooks
@@ -99,6 +102,9 @@ type Service struct {
 	storage  *storage.Client
 	sms      SMSSender
 	human    HumanVerifier
+	// firebase checks Firebase ID tokens (D-275); nil without
+	// FIREBASE_PROJECT_ID.
+	firebase FirebaseVerifier
 	seal     *pii.Sealer
 	hash     *pii.Hasher
 	audit    *audit.Writer
@@ -124,7 +130,7 @@ func New(d Deps) (*Service, error) {
 	}
 	s := &Service{
 		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens, settings: d.Settings, storage: d.Storage,
-		sms: d.SMS, human: d.Human,
+		sms: d.SMS, human: d.Human, firebase: d.Firebase,
 		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
 	}
 	if s.sms == nil || s.human == nil {
@@ -135,6 +141,9 @@ func New(d Deps) (*Service, error) {
 		if s.human == nil {
 			s.human = human
 		}
+	}
+	if s.firebase == nil && d.Config.Providers.Firebase.ProjectID != "" {
+		s.firebase = newFirebaseVerifier(d.Config, d.Clock)
 	}
 	if k := d.Config.Keys.PIIEncKey; k.IsSet() {
 		seal, err := pii.NewSealer(k.Bytes())
@@ -169,7 +178,9 @@ func New(d Deps) (*Service, error) {
 // Preflight is the start-up check of the API (02 §8: auth refuses to start
 // without its provider): in staging and prod the PII and JWT keys, the
 // SMS provider (AWS region, DLT sender, entity and OTP template, D-212),
-// and Turnstile must be configured. Turnstile
+// and Turnstile must be configured, and with OTP_PROVIDER=firebase the
+// Firebase project too (D-275; SMS stays required for the step-ups and the
+// fallback). Turnstile
 // is required too (lead decision on the W1-01 review), replacing 02 §8's
 // "stricter rate limits" fallback, which named no limits. It names
 // variables, never values. New does not run it, so a router can be built
@@ -200,6 +211,18 @@ func Preflight(cfg *config.Config) error {
 	}
 	if !p.TurnstileSecretKey.IsSet() {
 		missing = append(missing, "TURNSTILE_SECRET_KEY")
+	}
+	if p.OTPProvider == config.OTPProviderFirebase {
+		for _, v := range []struct{ name, value string }{
+			{"FIREBASE_PROJECT_ID", p.Firebase.ProjectID},
+			{"FIREBASE_WEB_API_KEY", p.Firebase.WebAPIKey},
+			{"FIREBASE_AUTH_DOMAIN", p.Firebase.AuthDomain},
+			{"FIREBASE_APP_ID", p.Firebase.AppID},
+		} {
+			if v.value == "" {
+				missing = append(missing, v.name)
+			}
+		}
 	}
 	if len(missing) > 0 {
 		return fmt.Errorf("identity: required in staging and prod: %s", strings.Join(missing, ", "))

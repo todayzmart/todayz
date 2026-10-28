@@ -19,6 +19,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@firebase/app": "0.16.3",
+    "@firebase/auth": "1.13.7",
     "@todayz/api-client": "workspace:*",
     "@todayz/ui": "workspace:*"
   },

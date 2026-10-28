@@ -2,7 +2,7 @@
 
 Where everything is in the repo, and how each folder is organised.
 
-> As built on main at 748eb5f6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 3954a599 (28 Oct 2026). Update this file in the same change as the code it describes.
 
 Use this page to find the file for a change. For how the pieces work together read [architecture.md](architecture.md), and for journeys read [flows.md](flows.md). Rules for each folder are in its own `CLAUDE.md`.
 
@@ -69,7 +69,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/democatalogue` | Open Facts local-demo product parsing and category mapping | `off.go` |
 | `backend/internal/coach` | The shop coach: detectors, feed, runs, templates | `coach.go`, `feed.go`, `runs.go` |
 | `backend/internal/credits` | The credits ledger: wallet, lots, holds, cashback, expiry, adjustments | `credits.go`, `adjustments.go`, `reads.go`, `jobs.go` |
-| `backend/internal/identity` | Sign-in (OTP), sessions, refresh rotation, admin SMS step-up, addresses, profile photo, accounts | `identity.go`, `otp.go`, `session.go`, `stepup.go` |
+| `backend/internal/identity` | Sign-in (OTP, or the Firebase ID-token swap, D-275), sessions, refresh rotation, admin SMS step-up, addresses, profile photo, accounts | `identity.go`, `otp.go`, `firebase.go`, `session.go`, `stepup.go` |
 | `backend/internal/imageimport` | Drafts product images from Open Food, Beauty and Products Facts; supports newest-first local demo imports; finds item-type candidates on Commons and applies saved picks | `imageimport.go`, `sources.go`, `types.go`, `picks.go` |
 | `backend/internal/insights` | Business Overview and Demand insights reads | `service.go`, `overview.go`, `analytics.go` |
 | `backend/internal/jobs` | Registry of every job kind, one file per domain | `jobs.go`, `orders.go`, `credits.go` |
@@ -106,6 +106,7 @@ Each name is a directory under `backend/internal`. "Main files" are where to sta
 | `backend/internal/platform/authn` | Who is calling: principal, token parsing and signing |
 | `backend/internal/platform/authz` | Permission engine, policies per domain (`policy/`), admin gate, staff scope |
 | `backend/internal/platform/awssms` | SMS through AWS End User Messaging |
+| `backend/internal/platform/firebaseauth` | Firebase ID-token verifier: Google's RS256 keys (cached by `Cache-Control`), project, phone sign-in and `auth_time` checks (D-275) |
 | `backend/internal/platform/buildinfo` | Version stamped at build time |
 | `backend/internal/platform/clock` | The only source of "now" |
 | `backend/internal/platform/config` | Process configuration read from the environment |
@@ -209,7 +210,7 @@ The three apps share one shape: React 19, Vite, TanStack Router (file based) and
 | `@todayz/tokens` | `shared/tokens` | Design tokens from `src/` per app, built to `generated/` (CSS, JSON, TS, fonts, icons); `generated/` is git-ignored |
 | `@todayz/ui` | `shared/ui` | React component kit (Button, Dialog, OtpInput, DataTable and more) with Storybook |
 | `@todayz/api-client` | `shared/api-client` | Typed client of the contract: `src/http.ts` by hand, `src/gen/` and `src/mocks/handlers.gen.ts` generated |
-| `@todayz/auth` | `shared/auth` | Session and token handling, phone OTP form, Turnstile, update prompt, shell pieces |
+| `@todayz/auth` | `shared/auth` | Session and token handling, phone OTP form, Turnstile, Firebase phone sign-in (lazy SDK chunk, D-275), update prompt, shell pieces |
 | `@todayz/config` | `shared/config` | Shared ESLint, Prettier, Stylelint, TypeScript, Vite, Vitest and Playwright presets |
 | `@todayz/i18n` | `shared/i18n` | Messages per app and language (`messages/`), compiler, lint, glossary |
 | `@todayz/realtime` | `shared/realtime` | SSE client, resume, backoff, polling fallback, query invalidation hook |

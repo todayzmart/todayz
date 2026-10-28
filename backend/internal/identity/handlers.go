@@ -20,6 +20,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/httpx/ifmatch"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -47,6 +48,9 @@ var (
 		"LogoutAll":      authz.Public,
 		"SendStepUp":     authz.Public,
 		"VerifyStepUp":   authz.Public,
+		// D-275: which service sends the code, and the Firebase token swap.
+		"GetAuthConfig":        authz.Public,
+		"VerifyFirebaseSignIn": authz.Public,
 	}
 	meOps = map[string]string{
 		"GetMe":    policy.MeView,
@@ -230,6 +234,56 @@ func (h authHandlers) VerifyOtp(ctx context.Context, req authapi.VerifyOtpReques
 	return authapi.VerifyOtp200JSONResponse{
 		Body: body,
 		Headers: authapi.VerifyOtp200ResponseHeaders{
+			CacheControl: ptr(noStore),
+			SetCookie:    ptr(refreshCookie(app, in.RefreshToken, in.RefreshExpiresAt, h.s.clock.Now())),
+		},
+	}, nil
+}
+
+// GetAuthConfig says who sends the sign-in code (D-275). The Firebase web
+// config is public; the emulator URL is set only in local and test (config
+// refuses it deployed).
+func (h authHandlers) GetAuthConfig(_ context.Context, _ authapi.GetAuthConfigRequestObject) (authapi.GetAuthConfigResponseObject, error) {
+	body := authapi.AuthConfigResponse{OtpProvider: authapi.Sms}
+	if h.s.OTPProvider() == config.OTPProviderFirebase {
+		f := h.s.FirebaseWebConfig()
+		body.OtpProvider = authapi.Firebase
+		body.Firebase = &authapi.FirebaseWebConfig{
+			ApiKey: f.WebAPIKey, AuthDomain: f.AuthDomain, ProjectId: f.ProjectID, AppId: f.AppID,
+		}
+		if f.AuthEmulatorURL != "" {
+			body.Firebase.EmulatorUrl = ptr(f.AuthEmulatorURL)
+		}
+	}
+	return authapi.GetAuthConfig200JSONResponse{
+		Body: body, Headers: authapi.GetAuthConfig200ResponseHeaders{CacheControl: ptr(noStore)},
+	}, nil
+}
+
+func (h authHandlers) VerifyFirebaseSignIn(ctx context.Context, req authapi.VerifyFirebaseSignInRequestObject) (authapi.VerifyFirebaseSignInResponseObject, error) {
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	app, err := parseApp(string(req.Body.App))
+	if err != nil {
+		return nil, err
+	}
+	var ua string
+	if r := requestFrom(ctx); r != nil {
+		ua = r.UserAgent()
+	}
+	in, err := h.s.VerifyFirebase(ctx, FirebaseInput{
+		App: app, IDToken: req.Body.IdToken, DeviceID: req.Body.DeviceId, UserAgent: ua,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return authapi.VerifyFirebaseSignIn200JSONResponse{
+		Body: authapi.OtpVerifyResponse{
+			AccessToken: in.AccessToken, ExpiresAt: in.ExpiresAt.UTC(), IsNewUser: in.IsNewUser,
+			TokenType: authapi.OtpVerifyResponseTokenTypeBearer, UserId: in.UserID.String(),
+		},
+		Headers: authapi.VerifyFirebaseSignIn200ResponseHeaders{
 			CacheControl: ptr(noStore),
 			SetCookie:    ptr(refreshCookie(app, in.RefreshToken, in.RefreshExpiresAt, h.s.clock.Now())),
 		},

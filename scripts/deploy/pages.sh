@@ -28,7 +28,8 @@ usage() {
 
 # Security headers for the Vite apps (the site writes its own, with a CSP, in scripts/headers.mjs).
 # The CSP is report-only for now (W4-03 F1): the apps load Turnstile, images and tiles from other
-# hosts and MapLibre runs blob: workers; it is enforced once prod shows no violations. No
+# hosts, Firebase phone sign-in (D-275) loads reCAPTCHA and calls Google's Identity Toolkit, and
+# MapLibre runs blob: workers; it is enforced once prod shows no violations. No
 # includeSubDomains on HSTS: not every todayz.in host is ours to commit.
 app_headers() {
   cat <<'EOF'
@@ -38,7 +39,7 @@ app_headers() {
   X-Frame-Options: DENY
   Strict-Transport-Security: max-age=31536000
   Permissions-Policy: camera=(self), geolocation=(self), microphone=(self), payment=()
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://api.todayz.in https://img.todayz.in https://tiles.todayz.in; img-src 'self' data: blob: https://img.todayz.in https://tiles.todayz.in; style-src 'self' 'unsafe-inline'; font-src 'self' data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src https://challenges.cloudflare.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; connect-src 'self' https://api.todayz.in https://img.todayz.in https://tiles.todayz.in https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; img-src 'self' data: blob: https://img.todayz.in https://tiles.todayz.in; style-src 'self' 'unsafe-inline'; font-src 'self' data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
 /sw.js
   Cache-Control: no-cache
 /assets/*

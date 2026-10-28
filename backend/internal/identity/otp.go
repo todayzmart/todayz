@@ -1,6 +1,7 @@
 package identity
 
 import (
+	"cmp"
 	"context"
 	"crypto/hmac"
 	"crypto/rand"
@@ -14,6 +15,7 @@ import (
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/identitydb"
 	"github.com/todayz/backend/internal/platform/authn"
+	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -50,6 +52,11 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 		// The admin step-up goes to the signed-in admin's own number
 		// (SendStepUp), never to a number a caller names (D-264).
 		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.purpose", "an admin step-up is POST /v1/auth/step-up/send")
+	}
+	if purpose == PurposeLogin && s.OTPProvider() == config.OTPProviderFirebase {
+		// D-275: Firebase sends the sign-in code; the app read a stale
+		// GET /v1/auth/config. A step_up code is still ours.
+		return SendResult{}, problem.New(genproblems.SignInMethodChanged, "")
 	}
 
 	clientIP := reqctx.ClientIP(ctx)
@@ -179,6 +186,9 @@ type VerifyInput struct {
 	Code      string
 	DeviceID  string
 	UserAgent string
+	// method is who checked the code, for the audit entry: "sms" (unset)
+	// or "firebase" (D-275).
+	method string
 }
 
 // SignIn is a successful verify or refresh.
@@ -421,7 +431,7 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		return signInResult{}, nil, err
 	}
 	if _, err := s.audit.Write(ctx, auditEntry(in.App, userID, "identity.sign_in", map[string]any{
-		"app": string(in.App), "newUser": isNew, "sessionId": family.String(),
+		"app": string(in.App), "newUser": isNew, "sessionId": family.String(), "method": cmp.Or(in.method, config.OTPProviderSMS),
 	})); err != nil {
 		return signInResult{}, nil, err
 	}

@@ -45,7 +45,7 @@ function sentHeaders(s: { calls: Call[] }): Headers {
 afterEach(() => configure({}));
 
 describe('request credentials and bearer on auth routes', () => {
-  const cookieRoutes = ['otp/send', 'otp/verify', 'refresh', 'logout', 'logout-all'];
+  const cookieRoutes = ['otp/send', 'otp/verify', 'refresh', 'logout', 'logout-all', 'config', 'firebase/verify'];
 
   it('sends the cookie to every /v1/auth/ route, and to nothing else by default', async () => {
     for (const r of [...cookieRoutes, 'step-up/send', 'step-up/verify']) {

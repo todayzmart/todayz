@@ -149,6 +149,16 @@
     "review": "reviewed",
     "enHash": "bc612d87"
   },
+  "auth.error.methodChanged": {
+    "message": "உள்நுழைவுக் குறியீடுகளை அனுப்பும் முறையை மாற்றியுள்ளோம். தயவுசெய்து குறியீட்டை மீண்டும் அனுப்பவும்.",
+    "review": "machine",
+    "enHash": "7348da0e"
+  },
+  "auth.firebase.recaptchaNotice": {
+    "message": "இந்த உள்நுழைவு Google reCAPTCHA மூலம் பாதுகாக்கப்படுகிறது. Google இன் தனியுரிமைக் கொள்கை மற்றும் சேவை விதிமுறைகள் பொருந்தும்.",
+    "review": "machine",
+    "enHash": "a6c11ccb"
+  },
   "auth.welcome.title": {
     "message": "TodayZ-க்கு வரவேற்கிறோம்",
     "review": "reviewed",

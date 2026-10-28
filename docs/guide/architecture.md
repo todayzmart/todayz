@@ -2,7 +2,7 @@
 
 How TodayZ is put together: the parts, how they talk, and why.
 
-> As built on main at a0402006 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on main at 3f7ebd09 (27 Oct 2026). Update this file in the same change as the code it describes.
 
 The plan lives in [docs/plan/02-architecture.md](../plan/02-architecture.md). This page describes what the code does today. When the two differ, the code wins and the plan file is fixed. Product numbers (timers, fees, limits) are never repeated here: they live in `platform_settings` and are listed in [01-product-rules.md](../plan/01-product-rules.md).
 
@@ -74,6 +74,7 @@ flowchart TB
 | Postgres | Docker, PostGIS 3.4 | RDS |
 | Images | MinIO | R2 behind Cloudflare |
 | SMS, WhatsApp, AI | `e2e/mocks` via `*_API_URL` variables | the real providers |
+| Firebase phone sign-in (D-275, `OTP_PROVIDER=firebase`) | `e2e/mocks` (Identity Toolkit stand-in and `/firebase/jwks`) via `FIREBASE_AUTH_EMULATOR_URL` and `FIREBASE_JWKS_API_URL` | Firebase Authentication and Google's public keys |
 | Telemetry | otel-lgtm (Grafana) | Grafana Cloud and Sentry |
 | Start | `infra/local/proc.sh` | Beanstalk platform hooks |
 
@@ -246,7 +247,7 @@ Migrations: goose, embedded in the binary, out-of-order allowed. Database change
 
 ## 9. Auth in one paragraph
 
-Sign-in is by phone and OTP (`/v1/auth/otp/send`, `/v1/auth/otp/verify`). The API returns a short-lived EdDSA access token in the body and a refresh token in an opaque, hashed, rotating cookie, one per app (`__Secure-tz_rt_c`, `_b`, `_a` for customer, business, admin) so the three apps never share a session. A refresh rotates the token inside a session family. If the same old token is replayed after a short grace window the whole family is revoked (reuse detection). Inside the grace window a repeat caller gets the same successor token again, derived from `sessions.successor_salt` (D-239), so two tabs or a lost response do not log the user out. Admins sign in the same way, with no second factor; a † action needs a fresh SMS code to the admin's own number (`/v1/auth/step-up/send` and `/verify`), which stamps the session for 10 minutes (D-264). SMS step-up does not protect against a SIM swap; the founder accepted that.
+Sign-in is by phone and OTP (`/v1/auth/otp/send`, `/v1/auth/otp/verify`). With `OTP_PROVIDER=firebase` (D-275) Firebase Authentication sends and checks the code in the page instead, and the app swaps the Firebase ID token at `/v1/auth/firebase/verify` (checked against Google's keys, at most 5 minutes after the phone sign-in, once); the apps learn the path from `GET /v1/auth/config`, and the rest of this paragraph is the same. The API returns a short-lived EdDSA access token in the body and a refresh token in an opaque, hashed, rotating cookie, one per app (`__Secure-tz_rt_c`, `_b`, `_a` for customer, business, admin) so the three apps never share a session. A refresh rotates the token inside a session family. If the same old token is replayed after a short grace window the whole family is revoked (reuse detection). Inside the grace window a repeat caller gets the same successor token again, derived from `sessions.successor_salt` (D-239), so two tabs or a lost response do not log the user out. Admins sign in the same way, with no second factor; a † action needs a fresh SMS code to the admin's own number (`/v1/auth/step-up/send` and `/verify`), which stamps the session for 10 minutes (D-264). SMS step-up does not protect against a SIM swap; the founder accepted that.
 
 ## 10. Key design choices
 

@@ -60,6 +60,10 @@ type Config struct {
 	// TurnstileHostname is the hostname a passing siteverify reports.
 	TurnstileHostname string
 
+	// FirebaseProjectID is the aud and iss of the ID tokens the Firebase Auth
+	// stand-in signs (D-275); it must match the API's FIREBASE_PROJECT_ID.
+	FirebaseProjectID string
+
 	Logger *slog.Logger
 	Now    func() time.Time
 }
@@ -85,6 +89,9 @@ func ConfigFromEnv(getenv func(string) string) Config {
 	if v := strings.TrimSpace(getenv("MOCK_TURNSTILE_HOSTNAME")); v != "" {
 		c.TurnstileHostname = v
 	}
+	if v := strings.TrimSpace(getenv("FIREBASE_PROJECT_ID")); v != "" {
+		c.FirebaseProjectID = v
+	}
 	if n, err := strconv.Atoi(getenv("MOCKS_CAPACITY")); err == nil && n > 0 {
 		c.Capacity = n
 	}
@@ -93,11 +100,12 @@ func ConfigFromEnv(getenv func(string) string) Config {
 
 // Server holds the capture store and config.
 type Server struct {
-	cfg   Config
-	store *capture.Store
-	otps  otpStore // MSG91 OTP state per mobile (verify is single-use)
-	log   *slog.Logger
-	mux   *http.ServeMux
+	cfg      Config
+	store    *capture.Store
+	otps     otpStore // MSG91 OTP state per mobile (verify is single-use)
+	firebase *firebaseAuth
+	log      *slog.Logger
+	mux      *http.ServeMux
 }
 
 // New builds the server.
@@ -118,10 +126,13 @@ func New(cfg Config) *Server {
 	if cfg.TurnstileHostname == "" {
 		cfg.TurnstileHostname = DefaultTurnstileHostname
 	}
+	if cfg.FirebaseProjectID == "" {
+		cfg.FirebaseProjectID = DefaultFirebaseProjectID
+	}
 	if cfg.UpstreamClient == nil {
 		cfg.UpstreamClient = &http.Client{Timeout: 120 * time.Second}
 	}
-	s := &Server{cfg: cfg, store: capture.NewStore(cfg.Capacity, cfg.Now), log: cfg.Logger, mux: http.NewServeMux()}
+	s := &Server{cfg: cfg, store: capture.NewStore(cfg.Capacity, cfg.Now), firebase: newFirebaseAuth(), log: cfg.Logger, mux: http.NewServeMux()}
 	s.routes()
 	return s
 }
@@ -154,6 +165,15 @@ func (s *Server) routes() {
 	m.HandleFunc("POST /whatsapp/api/v5/whatsapp/whatsapp-outbound-message", s.waMSG91Session)
 	m.HandleFunc("POST /whatsapp/wa/api/v1/msg", s.waGupshupMsg)
 	m.HandleFunc("POST /whatsapp/wa/api/v1/template/msg", s.waGupshupTemplate)
+
+	// Firebase Auth phone sign-in (D-275): the apps' emulatorUrl is this origin, the
+	// SDK adds /identitytoolkit.googleapis.com. FIREBASE_JWKS_API_URL=<origin>/firebase/jwks.
+	m.HandleFunc("OPTIONS "+firebaseIdentityPrefix+"/{path...}", firebaseCORS(nil))
+	m.HandleFunc("GET "+firebaseIdentityPrefix+"/v2/recaptchaConfig", firebaseCORS(s.firebaseRecaptchaConfig))
+	m.HandleFunc("POST "+firebaseIdentityPrefix+"/v1/accounts:sendVerificationCode", firebaseCORS(s.firebaseSendVerificationCode))
+	m.HandleFunc("POST "+firebaseIdentityPrefix+"/v1/accounts:signInWithPhoneNumber", firebaseCORS(s.firebaseSignInWithPhoneNumber))
+	m.HandleFunc("POST "+firebaseIdentityPrefix+"/v1/accounts:lookup", firebaseCORS(s.firebaseLookup))
+	m.HandleFunc("GET /firebase/jwks", s.firebaseJWKS)
 
 	// Web Push (the subscription endpoint becomes PUSH_API_URL/<id>).
 	m.HandleFunc("POST /push/{subscriptionId...}", s.push)

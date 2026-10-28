@@ -28,6 +28,7 @@ func registeridentity(r *Registry, d Deps) {
 			return platformjobs.Result{Summary: map[string]int64{
 				"otp_requests": res.OTPRequests, "sessions": res.Sessions,
 				"admin_signin_failures": res.AdminSigninFailures, "admin_signin_locks": res.AdminSigninLocks,
+				"firebase_sign_ins": res.FirebaseSignins,
 			}}, nil
 		},
 	})

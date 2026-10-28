@@ -1,7 +1,9 @@
 # Paths: domain "auth" (owner W1-01): sign-in, OTP, refresh, sign-out, admin step-up (04 §2.1).
 #
 # Phase A: OTP send and verify, refresh, logout. Phase B: logout-all. D-264: the
-# admin SMS step-up, step-up/send and step-up/verify (bearer, admin app). Every operation: `tags: [auth]`, an
+# admin SMS step-up, step-up/send and step-up/verify (bearer, admin app). D-275: the sign-in
+# code may come from Firebase Auth instead (`OTP_PROVIDER`): config tells the app which, and
+# firebase/verify swaps a Firebase ID token for the TodayZ session. Every operation: `tags: [auth]`, an
 # operationId unique across the API, an example per request and success response,
 # and `default: {$ref: ../common/responses.yaml#/Problem}`.
 /v1/auth/otp/send:
@@ -12,8 +14,11 @@
     description: |
       Checks Turnstile, then the limits (01 §2): resend after 30 s, at most 5 sends per number
       and 20 per IP an hour (`429 rate_limited` with `Retry-After`). The answer is the same for a
-      known and an unknown number (AU-06). The code is never logged (D-15).
+      known and an unknown number (AU-06). The code is never logged (D-15). While the sign-in code
+      comes from Firebase (`GET /v1/auth/config` says `otpProvider: firebase`, D-275), a `login`
+      code is `409 sign_in_method_changed` (the app reads the config again); `step_up` still sends.
     security: []
+    x-problems: [sign_in_method_changed]
     requestBody:
       required: true
       content:
@@ -88,6 +93,92 @@
               tokenType: Bearer
               expiresAt: "2026-10-22T09:45:00Z"
               isNewUser: true
+              userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/config:
+  get:
+    operationId: getAuthConfig
+    tags: [auth]
+    summary: Which service sends the sign-in code
+    description: |
+      D-275. `otpProvider` is `sms` (TodayZ sends the code, `otp/send` and `otp/verify`) or
+      `firebase` (Firebase Auth sends and checks the code in the page, then
+      `POST /v1/auth/firebase/verify`). With `firebase` it carries the Firebase web config: these
+      values are public (they are in every page that signs in), never a secret. The provider is
+      a deploy setting (`OTP_PROVIDER`), so the app reads this each time it shows sign-in and
+      again on `409 sign_in_method_changed`. The admin step-up, a customer's `step_up` code and
+      the field owner code are always SMS.
+    security: []
+    responses:
+      "200":
+        description: The sign-in code provider
+        headers:
+          Cache-Control:
+            description: Always `no-store`, so a changed provider is read at once.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/AuthConfigResponse
+            example:
+              otpProvider: firebase
+              firebase:
+                apiKey: AIzaSyEXAMPLE-public-web-key
+                authDomain: todayz-in.firebaseapp.com
+                projectId: todayz-in
+                appId: "1:123456789012:web:0123456789abcdef"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/firebase/verify:
+  post:
+    operationId: verifyFirebaseSignIn
+    tags: [auth]
+    summary: Sign in with a Firebase phone sign-in
+    description: |
+      D-275. After Firebase Auth has checked the SMS code in the page, the app sends the Firebase
+      ID token here. The API checks it (Google's signature, this project's `aud` and `iss`, not
+      expired, a phone sign-in with a phone number) and then signs in exactly as `otp/verify`
+      does: same users, sessions, refresh cookie, roles and audit. The phone sign-in must be at
+      most 5 minutes old and each one signs in once; an older or reused one is `401 otp_expired`
+      (ask for a new code). A bad token is `401 unauthorized`. A blocked account is
+      `403 account_blocked`; an admin-app sign-in of a number that is not an active admin is
+      `403 forbidden`, and of a locked number `429 signin_locked` (D-264). While the provider is
+      `sms` this is `409 sign_in_method_changed`. The token is never logged or stored.
+    security: []
+    x-problems: [otp_expired, account_blocked, signin_locked, sign_in_method_changed]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/FirebaseVerifyRequest
+          example:
+            idToken: EXAMPLE.FIREBASE.ID.TOKEN
+            app: customer
+            deviceId: 01JB0S1W6W8ZV7T1C3A6M9N4PR
+    responses:
+      "200":
+        description: Signed in
+        headers:
+          Set-Cookie:
+            description: The app's refresh cookie, as `otp/verify` sets it.
+            schema:
+              type: string
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/OtpVerifyResponse
+            example:
+              accessToken: EXAMPLE.ACCESS.TOKEN
+              tokenType: Bearer
+              expiresAt: "2026-10-22T09:45:00Z"
+              isNewUser: false
               userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
       default:
         $ref: ../common/responses.yaml#/Problem

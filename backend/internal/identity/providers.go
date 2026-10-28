@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/todayz/backend/internal/platform/awssms"
+	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
+	"github.com/todayz/backend/internal/platform/firebaseauth"
 	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -190,4 +192,13 @@ func providers(cfg *config.Config) (SMSSender, HumanVerifier) {
 		human = passHuman{reason: "TURNSTILE_API_URL unset"}
 	}
 	return sms, human
+}
+
+// newFirebaseVerifier checks Firebase ID tokens against Google's public keys
+// (in local and test, FIREBASE_JWKS_API_URL, the mocks server's), fetched
+// through the egress guard (D-275).
+func newFirebaseVerifier(cfg *config.Config, clk clock.Clock) *firebaseauth.Verifier {
+	client := httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: cfg.NoEgress, Timeout: 10 * time.Second})
+	f := cfg.Providers.Firebase
+	return firebaseauth.New(f.ProjectID, f.JWKSAPIURL, client, func() time.Time { return clk.Now().UTC() }, FirebaseMaxAuthAge)
 }

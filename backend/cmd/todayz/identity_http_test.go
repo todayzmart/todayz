@@ -44,8 +44,18 @@ const (
 
 func newIdentityAPI(t *testing.T) *identityAPI {
 	t.Helper()
+	return newIdentityAPIEnv(t, nil)
+}
+
+// newIdentityAPIEnv is newIdentityAPI with extra environment variables.
+func newIdentityAPIEnv(t *testing.T, extra map[string]string) *identityAPI {
+	t.Helper()
 	tdb := testkit.NewDB(t)
-	cfg, err := config.Load(env(localEnv(tdb)), nil)
+	e := localEnv(tdb)
+	for k, v := range extra {
+		e[k] = v
+	}
+	cfg, err := config.Load(env(e), nil)
 	require.NoError(t, err)
 	clk := clock.NewFake(time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC))
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))

@@ -315,3 +315,12 @@ SELECT photo_key FROM users WHERE users.id = @user_id::uuid AND photo_key IS NOT
 
 -- name: DeletePhotoUploads :exec
 DELETE FROM user_photo_uploads WHERE user_id = @user_id;
+
+-- name: ClaimFirebaseSignin :execrows
+-- D-275: one sign-in per Firebase phone verification; 0 rows means it was used.
+INSERT INTO firebase_sign_ins (key_hash, used_at, expires_at)
+VALUES (@key_hash, @used_at, @expires_at)
+ON CONFLICT (key_hash) DO NOTHING;
+
+-- name: PurgeFirebaseSignins :execrows
+DELETE FROM firebase_sign_ins WHERE expires_at < @before;

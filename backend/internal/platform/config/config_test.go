@@ -402,3 +402,34 @@ func TestNoAdminTOTPKey(t *testing.T) {
 	_, err := Load(get(env), nil)
 	require.NoError(t, err)
 }
+
+// D-275: OTP_PROVIDER defaults to sms; the Firebase overrides (key URL,
+// emulator) work in local and test and are refused when deployed.
+func TestFirebaseConfig(t *testing.T) {
+	env, _ := fullEnv(t, "local")
+	c, err := Load(get(env), nil)
+	require.NoError(t, err)
+	require.Equal(t, OTPProviderSMS, c.Providers.OTPProvider, "unset means sms")
+
+	env["OTP_PROVIDER"] = " Firebase "
+	env["FIREBASE_PROJECT_ID"] = "todayz-local"
+	env["FIREBASE_JWKS_API_URL"] = "http://127.0.0.1:4010/firebase/jwks/"
+	env["FIREBASE_AUTH_EMULATOR_URL"] = "https://mocks.todayz.localhost/firebase"
+	c, err = Load(get(env), nil)
+	require.NoError(t, err)
+	require.Equal(t, OTPProviderFirebase, c.Providers.OTPProvider)
+	require.Equal(t, "todayz-local", c.Providers.Firebase.ProjectID)
+	require.Equal(t, "http://127.0.0.1:4010/firebase/jwks", c.Providers.Firebase.JWKSAPIURL)
+
+	env["OTP_PROVIDER"] = "carrier-pigeon"
+	_, err = Load(get(env), nil)
+	require.ErrorContains(t, err, "OTP_PROVIDER")
+	require.NotContains(t, err.Error(), "carrier-pigeon")
+
+	prod, _ := fullEnv(t, "prod")
+	prod["FIREBASE_JWKS_API_URL"] = "https://keys.example.test/jwks"
+	prod["FIREBASE_AUTH_EMULATOR_URL"] = "https://emulator.example.test"
+	_, err = Load(get(prod), nil)
+	require.ErrorContains(t, err, "FIREBASE_JWKS_API_URL")
+	require.ErrorContains(t, err, "FIREBASE_AUTH_EMULATOR_URL")
+}
