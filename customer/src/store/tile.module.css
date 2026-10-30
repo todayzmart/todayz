@@ -1,5 +1,5 @@
 /* The item tile (ItemCard), quick-commerce style (D-273): a flat white card with a hairline,
-   the pack photo centred on a light well, the tag and saving on the photo, a green ADD on the
+   the pack photo centred on a light well, the tag and saving on the photo, a graphite Add on the
    corner, then price, name and pack. Every tile in a row is the same size. */
 
 .tile {
@@ -10,9 +10,10 @@
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--silver-edge);
+  border-radius: var(--radius-xl);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .media {
@@ -92,7 +93,7 @@
   color: var(--ink-2);
 }
 
-/* The green ADD sits on the photo's bottom-right; it becomes − n + in place. */
+/* The graphite Add sits on the photo's bottom-right; it becomes − n + in place. */
 .add {
   position: absolute;
   right: var(--space-2);
@@ -104,9 +105,9 @@
   height: 30px;
   padding: 0 var(--space-3);
   border: 1px solid var(--add);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--add);
+  border-radius: var(--radius-pill);
+  background: var(--add);
+  color: var(--on-brand);
   box-shadow: none;
   font: 800 12px/1 var(--font-sans);
   letter-spacing: 0.04em;
@@ -121,7 +122,7 @@
 
 .add :global(.tz-stepper) {
   height: 30px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   background: var(--add);
   color: var(--on-brand);
 }
@@ -213,4 +214,22 @@
 
 .alt {
   margin-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile {
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+  .img {
+  transition: transform 450ms ease;
+}
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tile:hover {
+  transform: translateY(-4px);
+}
+  .tile:hover .img {
+  transform: scale(1.035);
+}
 }

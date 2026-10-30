@@ -43,3 +43,9 @@ React 19, Vite, TanStack Router and Query, `@todayz/ui`, `@todayz/api-client`, `
 - [Features](../docs/features/README.md)
 - [Local development](../docs/guide/local-dev.md), [testing](../docs/guide/testing.md), [deployment](../docs/guide/deployment.md)
 - [Working rules for this folder](CLAUDE.md)
+
+## Liquid Silver customer design (30 Oct 2026)
+
+As built on base commit 7e831f7d; Liquid Silver change in this commit. The customer app now uses a light silver page, graphite actions and text, white product cards, and translucent search and floating navigation. The customer theme maps shared semantic tokens to opt-in `silver-*` palette tokens; other applications retain their palettes. Home has silver category wells, more section spacing and staggered entrance animation; product cards lift and images gently scale on hover. Buttons respond to presses and the cart bar animates into view. Motion is enabled only with `prefers-reduced-motion: no-preference`; navigation transitions are disabled for reduced motion. Glass surfaces have an opaque-enough fallback background when backdrop blur is unavailable. Product photography, translations and shopping flows use the existing implementation.
+
+Palette values live in `design/source/tokens.json`; presentation lives in `customer/src/app/theme.css` and the Home, shell and product tile CSS modules. The token generator output stays untracked. The floating nav retains safe-area padding and the cart bar remains above it.

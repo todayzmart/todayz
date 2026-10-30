@@ -13,7 +13,7 @@ Indian hyperlocal retail: shops digitise their stock; customers search what is n
 
 `docs/guide` and `docs/features` describe what is built; `docs/plan` describes intent. When they differ, the code wins: fix the guide or feature doc.
 
-Design source of truth: https://claude.ai/artifact/W91M8EtFX8zJc9SgMUygZF (copy in `design/source/`). White page, mint wash, pastel tints, Lucide icons, Anek + Figtree, light theme only.
+Design source of truth: https://claude.ai/artifact/W91M8EtFX8zJc9SgMUygZF (copy in `design/source/`). White page, mint wash, pastel tints, Lucide icons, Anek + Figtree, light theme only. Customer presentation uses the founder-selected Liquid Silver override (30 Oct 2026); see customer/CLAUDE.md.
 
 ## Folder map
 

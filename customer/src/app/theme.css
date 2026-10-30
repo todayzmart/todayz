@@ -1,132 +1,134 @@
-/* Customer app theme (D-273): the quick-commerce look the founder asked for, modelled on
-   the patterns of Zepto and drawn only on existing TodayZ tokens. The layout is denser and
-   flatter, but TodayZ green stays the brand; Add is the same green. Imported after the shared
-   tokens and UI CSS so the overrides win. Scoped to the customer app: business, admin and the
-   site are untouched. */
-
+/* Liquid Silver: customer-only palette and glass treatments. Colour values live in
+   design/source/tokens.json. Shared component defaults remain available to other apps. */
 :root {
+  --bg: var(--silver-page);
+  --page: var(--silver-page);
+  --brand: var(--silver-action);
+  --brand-strong: var(--silver-action);
+  --brand-soft: var(--silver-soft);
+  --ink: var(--silver-action);
+  --ink-2: var(--silver-ink);
+  --ink-3: var(--silver-muted);
+  --line: var(--silver-line);
+  --line-control: var(--silver-line);
+  --wash: var(--silver-soft);
+  --media: var(--silver-soft);
+  --surface-sunken: var(--silver-soft);
   --add: var(--brand);
   --add-strong: var(--brand-strong);
   --add-soft: var(--brand-soft);
-  --sale: var(--tint-green-ink);
-  --page: var(--bg);
+  --sale: var(--silver-ink);
+  --focus: var(--silver-ink);
   --font-display: figtree, "Noto Sans Devanagari", "Noto Sans Kannada", "Noto Sans Telugu", "Noto Sans Tamil", system-ui, sans-serif;
-  --shadow-card: var(--shadow-xs);
+  --shadow-card: 0 8px 24px var(--silver-shadow);
 }
 
-html,
-body,
-#root {
+html, body, #root {
   background: var(--page);
 }
 
-/* Search is a soft grey pill, as in the quick-commerce apps. */
-.tz-search {
-  height: 44px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  background: var(--surface-sunken);
-  box-shadow: none;
+[data-skin="bright"] :is(.tz-card, .tz-scard, .tz-pcard, .tz-ocard, .tz-map-card, .tz-list) {
+  border: 1px solid var(--silver-edge);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+[data-skin="bright"] .tz-search {
+  min-height: 48px;
+  border: 1px solid var(--silver-edge);
+  border-radius: var(--radius-pill);
+  background: var(--silver-glass);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(20px);
 }
 
 .tz-search:focus-within {
-  border-color: var(--brand);
-  background: var(--surface);
-  box-shadow: 0 0 0 2px var(--brand-soft);
-}
-
-.tz-search > svg {
-  color: var(--ink-3);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .tz-search input {
-  font: 500 14px/20px var(--font-sans);
   color: var(--ink);
 }
-
 .tz-search input::placeholder {
   color: var(--ink-3);
 }
 
-/* Cards are flat with a hairline, not elevated. */
-.tz-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: none;
+[data-skin="bright"] .tz-page-title {
+  font: 700 26px/32px var(--font-display);
+  letter-spacing: -0.03em;
 }
 
-.tz-page-title {
-  font: 800 20px/26px var(--font-display);
-  letter-spacing: -0.02em;
+.tz-btn, .tz-add, .tz-stepper {
+  border-radius: var(--radius-pill);
 }
-
-.tz-btn {
-  border-radius: var(--radius-md);
-  font-weight: 700;
-}
-
-/* `tz-btn-primary` is the ink button in the shared kit; in the customer app the main action is
-   the brand tone, as in the quick-commerce apps. */
-.tz-btn-primary {
+.tz-btn-primary, .tz-btn-buy, .tz-stepper {
   border-color: var(--brand);
   background: var(--brand);
   color: var(--on-brand);
 }
 
-.tz-btn-primary:hover {
-  border-color: var(--brand-strong);
-  background: var(--brand-strong);
-}
-
-/* A selected filter chip is a soft brand pill, not a black one. */
-.tz-chip[aria-pressed="true"] {
-  border-color: var(--brand);
-  background: var(--brand-soft);
-  color: var(--brand-strong);
-}
-
-/* Stock is a green dot, never the brand purple. */
-.tz-stock::before {
-  background: var(--add);
-}
-
-/* Quantity steppers are the green Add in the cart and on the product page too. */
-.tz-stepper {
-  background: var(--brand);
-  color: var(--on-brand);
-}
-
-/* The cart and checkout money action can opt into the green Add. */
-.tz-btn-buy {
-  border-color: var(--add);
-  background: var(--add);
-  color: var(--on-brand);
-}
-
-.tz-btn-buy:hover {
-  border-color: var(--add-strong);
-  background: var(--add-strong);
-}
-
-/* The floating cart bar is the brand tone, with a white CTA. */
 .tz-cartbar {
+  border: 1px solid var(--silver-ink);
+  border-radius: var(--radius-xl);
   background: var(--brand);
   color: var(--on-brand);
+  box-shadow: var(--shadow-card);
 }
 
 .tz-cartbar-cta {
-  background: var(--on-brand);
-  color: var(--brand-strong);
-}
-
-/* The bottom bar: white, the selected item in the brand tone. */
-.tz-bnav {
-  border-top: 1px solid var(--line);
   background: var(--surface);
+  color: var(--ink);
 }
 
-.tz-bnav [aria-current="page"],
-.tz-bnav .is-active {
-  color: var(--brand);
+[data-skin="bright"] .tz-bnav {
+  border: 1px solid var(--silver-edge);
+  background: var(--silver-glass);
+  box-shadow: 0 12px 40px var(--silver-shadow);
+  backdrop-filter: blur(24px);
+}
+
+[data-skin="bright"] .tz-bnav a {
+  border-radius: var(--radius-lg);
+  transition: background 220ms ease, color 220ms ease;
+}
+
+[data-skin="bright"] .tz-bnav a[aria-current="page"] {
+  background: var(--silver-soft);
+  color: var(--ink);
+}
+
+[data-skin="bright"] .tz-bnav a[aria-current="page"]::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tz-btn, .tz-add, .tz-chip {
+    transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  }
+
+  .tz-btn:active:not(:disabled), .tz-add:active:not(:disabled), .tz-chip:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  .tz-cartbar {
+  animation: silver-arrive 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skin="bright"] .tz-bnav a {
+  transition: none;
+}
+}
+
+@keyframes silver-arrive {
+  from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+  to {
+  opacity: 1;
+  transform: translateY(0);
+}
 }
