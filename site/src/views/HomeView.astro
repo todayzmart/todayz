@@ -2,7 +2,7 @@
 // S-01 Home, in any language: the bright landing (D-262, components/bright, styles/bright.css), ported
 // from design/trials/site-home-bright. The FAQ and the lead form (#join) keep the landing styles (.lp).
 import Cost from '../components/bright/Cost.astro';
-import Hero from '../components/bright/Hero.astro';
+import { SHELF } from '../components/bright/data.ts';
 import Journey from '../components/bright/Journey.astro';
 import Orbit from '../components/bright/Orbit.astro';
 import Owners from '../components/bright/Owners.astro';
@@ -14,7 +14,7 @@ import Week from '../components/bright/Week.astro';
 import Icon from '../components/Icon.astro';
 import Cta from '../components/home/Cta.astro';
 import FaqSection from '../components/home/FaqSection.astro';
-import { EM } from '../components/home/data.ts';
+import { EM, splitEm } from '../components/home/data.ts';
 import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company, links } from '../lib/company.ts';
 import { faqJsonLd, organizationJsonLd, websiteJsonLd } from '../lib/jsonld.ts';
@@ -22,6 +22,7 @@ import { pageById } from '../lib/pages.ts';
 import Base from '../layouts/Base.astro';
 import '../styles/landing.css';
 import '../styles/bright.css';
+
 
 interface Props {
   locale: Locale;
@@ -31,44 +32,61 @@ const { locale } = Astro.props;
 const page = pageById('home');
 const t = createT(locale);
 const faq = [1, 2, 3, 4].map((i) => ({ q: t(`home.faq.${i}.q` as MessageKey), a: t(`home.faq.${i}.a` as MessageKey) }));
+const [headlineBefore, headlineAfter] = splitEm(t('home.lede.title', EM));
 const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as MessageKey), label: t(`home.lede.stat.${i}.label` as MessageKey) }));
 ---
 
 <Base page={page} locale={locale} jsonLd={[organizationJsonLd(company), websiteJsonLd(locale), faqJsonLd(faq)]}>
-  <div class="bp">
-    <Hero
-      badge={t('home.lede.badge')}
-      title={t('home.lede.title', EM)}
-      titleEm={t('home.lede.title_em')}
-      body={t('home.lede.body')}
-    >
-      <a class="b-trig" href={`${links.customerApp}/search`} aria-label={t('home.lede.search_label')}>
-        <span class="i"><Icon name="search" size={20} /></span>
-        <span class="t">{t('home.lede.search_placeholder')}</span>
-        <span class="go">{t('home.lede.search_go')}</span>
-      </a>
-      <ul class="b-stats">
-        {
-          stats.map((s) => (
-            <li>
-              <b>{s.value}</b>
-              <span>{s.label}</span>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="b-hero-note">{t('home.hero.note')}</p>
-    </Hero>
+  <div class="bp editorial">
+    <section class="editorial-hero" aria-labelledby="home-title">
+      <div class="editorial-copy">
+        <p class="b-eyebrow">{t('home.lede.badge')}</p>
+        <h1 id="home-title">{headlineBefore}<span>{t('home.lede.title_em')}</span>{headlineAfter}</h1>
+        <p class="editorial-intro">{t('home.lede.body')}</p>
+        <form class="editorial-search" action="/" data-search-target={`${links.customerApp}/search`} method="get" role="search">
+          <label class="sr-only" for="home-search">{t('home.lede.search_label')}</label>
+          <Icon name="search" size={20} />
+          <input id="home-search" name="q" type="search" placeholder={t('home.lede.search_placeholder')} />
+          <button type="submit" aria-label={t('home.lede.search_go')}><Icon name="arrow" size={20} /></button>
+        </form>
+        <noscript><a href={`${links.customerApp}/search`}>{t('nav.search')}</a></noscript>
+        <div class="editorial-actions">
+          <a class="b-btn" href="#shelf">{t('home.shelf.find')}<Icon name="arrow" size={16} /></a>
+          <a href="#journey">{t('nav.how')}<Icon name="arrow" size={16} /></a>
+        </div>
+      </div>
+      <div class="editorial-stage">
+        <div class="editorial-stage-head"><span>TodayZ</span><Icon name="pin" size={20} /></div>
+        <p class="b-eyebrow">{t('home.shelf.eyebrow')}</p>
+        <div class="editorial-products">
+          {SHELF.slice(0, 3).map((item) => (
+            <a class="editorial-product" href={`${links.customerApp}/search?q=${encodeURIComponent(item.query)}`}>
+              <img src={item.photo.src} width={item.photo.width} height={item.photo.height} alt="" decoding="async" />
+              <div><small>{item.shop}</small><h2>{item.name}</h2><small>{t('home.shelf.stock', { minutes: item.confirmed })}</small></div>
+              <strong>₹{item.price}</strong>
+              <Icon name="arrow" size={18} />
+            </a>
+          ))}
+        </div>
+        <p class="editorial-example">{t('home.hero.note')}</p>
+      </div>
+    </section>
+    <div class="editorial-proof">
+      {stats.map((s, i) => <div><span class="editorial-index" aria-hidden="true">0{i + 1}</span><strong>{s.value}</strong><span>{s.label}</span></div>)}
+    </div>
+    <nav class="editorial-nav" aria-label={t('nav.label')}>
+      <a href="#shelf">{t('nav.search')}</a><a href="#journey">{t('nav.how')}</a><a href="#owners">{t('nav.retailers')}</a><a href="#join">{t('nav.start')}<Icon name="arrow" size={14} /></a>
+    </nav>
     <SearchStrip t={t} appUrl={links.customerApp} />
-    <Cost t={t} />
-    <Journey t={t} />
-    <Week t={t} />
-    <Orbit t={t} />
     <Shelf t={t} appUrl={links.customerApp} />
+    <Journey t={t} />
+    <Orbit t={t} />
+    <Cost t={t} />
+    <Week t={t} />
     <Savings t={t} appUrl={links.customerApp} />
     <Owners t={t} href="#join" />
   </div>
-  <div class="lp">
+  <div class="lp editorial-ending">
     <FaqSection t={t} title={t('home.faq.title')} items={faq} />
     <Cta t={t} locale={locale} source="home" />
   </div>
@@ -79,4 +97,14 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
 
 <script>
   import '../components/bright/bright.ts';
+  const search = document.querySelector<HTMLFormElement>('[data-search-target]');
+  if (search) search.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const target = search.dataset['searchTarget'];
+    if (!target) return;
+    const url = new URL(target);
+    const query = new FormData(search).get('q');
+    if (typeof query === 'string' && query.trim()) url.searchParams.set('q', query.trim());
+    window.location.assign(url.href);
+  });
 </script>
