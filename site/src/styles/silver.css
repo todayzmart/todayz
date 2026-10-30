@@ -1,0 +1,251 @@
+/* Liquid Silver for todayz.in. The opt-in silver palette is defined in the
+   design token source; semantic overrides apply only to the marketing site. */
+:root {
+  --page: var(--silver-page);
+  --brand: var(--silver-action);
+  --brand-strong: var(--silver-action);
+  --brand-soft: var(--silver-soft);
+  --brand-mark: var(--silver-ink);
+  --ink: var(--silver-action);
+  --ink-2: var(--silver-ink);
+  --ink-3: var(--silver-muted);
+  --line: var(--silver-line);
+  --line-control: var(--silver-line);
+  --surface-sunken: var(--silver-soft);
+  --wash: var(--silver-page);
+  --wash-strong: var(--silver-soft);
+  --wash-line: var(--silver-line);
+  --focus: var(--silver-ink);
+  --shadow-card: 0 12px 36px var(--silver-shadow);
+  --shadow-pop: 0 24px 64px var(--silver-shadow);
+}
+
+body[data-skin='bright'] {
+  background: var(--silver-page);
+}
+
+body .site-head {
+  border-bottom: 1px solid var(--silver-edge);
+  background: var(--silver-glass);
+  box-shadow: 0 8px 32px var(--silver-shadow);
+  backdrop-filter: blur(24px);
+}
+
+body .site-head .start {
+  border-radius: var(--radius-pill);
+  background: var(--silver-action);
+  color: var(--on-brand);
+}
+
+body .site-head .narrow ul {
+  border-color: var(--silver-edge);
+  background: var(--silver-glass);
+  backdrop-filter: blur(24px);
+}
+
+body .bp {
+  --b-mint: var(--silver-soft);
+  --b-hair: var(--silver-line);
+  --b-sunk: var(--silver-soft);
+}
+
+body .bp .b-hero,
+body .bp .b-page-head {
+  background: linear-gradient(155deg, var(--surface), var(--silver-page) 55%, var(--silver-soft));
+}
+
+body .bp .b-hero::after,
+body .bp .b-page-head::after {
+  pointer-events: none;
+  background: radial-gradient(ellipse 65% 80% at 70% 10%, var(--silver-edge), transparent 75%);
+}
+
+body .bp .b-hero h1 {
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+body .bp .b-hero h1 .b-acc {
+  color: var(--silver-muted);
+}
+
+body .bp .b-badge,
+body .bp .b-trig,
+body .bp .b-stats {
+  border: 1px solid var(--silver-edge);
+  background: var(--silver-glass);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(20px);
+}
+
+body .bp .b-trig {
+  padding: 10px;
+}
+
+body .bp .b-stats {
+  border-radius: 24px;
+}
+
+body .bp .b-btn,
+body .bp .b-trig .go {
+  background: var(--silver-action);
+  color: var(--on-brand);
+  box-shadow: 0 6px 16px var(--silver-shadow);
+}
+
+body .bp .b-btn.light {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+body .bp .b-band,
+body .bp .b-strip {
+  background: var(--silver-page);
+  border-color: var(--silver-line);
+}
+
+body .bp :is(.b-card, .b-item, .b-ins, .b-route, .b-week) {
+  border: 1px solid var(--silver-edge);
+  background: var(--silver-glass);
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+body .bp .b-item {
+  padding: 14px;
+}
+
+body .bp .b-thumb {
+  border-radius: 18px;
+  background: var(--silver-soft);
+}
+
+body .bp .b-block,
+body .bp .b-block.plum {
+  background: linear-gradient(135deg, var(--silver-action), var(--silver-ink));
+  box-shadow: var(--shadow-pop);
+}
+
+body .bp .b-block::before,
+body .bp .b-block.plum::before {
+  background: radial-gradient(ellipse at 80% 0%, var(--silver-shadow), transparent 65%);
+}
+
+body .bp .b-block.plum .b-acc {
+  color: var(--silver-line);
+}
+
+body .bp .b-tabs button {
+  border-color: var(--silver-edge);
+  background: var(--silver-glass);
+  box-shadow: 0 4px 12px var(--silver-shadow);
+}
+
+body .bp .b-tabs button[aria-pressed='true'] {
+  border-color: var(--silver-action);
+  background: var(--silver-action);
+  color: var(--on-brand);
+}
+
+body .lp .cta-card {
+  box-shadow: var(--shadow-pop);
+}
+
+body .site-foot {
+  border-top: 1px solid var(--silver-edge);
+  background: linear-gradient(180deg, var(--surface), var(--silver-page));
+}
+
+/* Bounded, compositor-friendly motion. All content remains usable without it. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body .bp .b-hero::after {
+    animation: silver-light 4s ease-out both;
+  }
+
+  body .bp .b-hero-in > * {
+    animation: silver-enter 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  body .bp .b-hero-in > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  body .bp .b-hero-in > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  body .bp .b-hero-in > :nth-child(4) {
+    animation-delay: 240ms;
+  }
+
+  body .bp .b-hero-in > :nth-child(n + 5) {
+    animation-delay: 320ms;
+  }
+
+  body .bp .rv {
+    transition-duration: 850ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body .bp :is(.b-item, .b-card),
+  body .site-head a {
+    transition: transform 250ms ease, box-shadow 250ms ease, background 250ms ease;
+  }
+
+  body .bp .b-thumb img {
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body :is(.b-btn, .start):active {
+    transform: scale(0.97);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  body .bp :is(.b-item, .b-card):hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-pop);
+  }
+
+  body .bp .b-item:hover .b-thumb img {
+    transform: scale(1.045);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body *,
+  body *::before,
+  body *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes silver-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes silver-light {
+  from {
+    opacity: 0.25;
+    transform: translateX(-12%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

@@ -2,7 +2,7 @@
 
 The public site at todayz.in: pages, languages, lead form, the demand marquee and the performance gates.
 
-> As built on main at d641cbe6 (27 Oct 2026). Update this file in the same change as the code it describes.
+> As built on base commit e986a157 (30 Oct 2026), with Liquid Silver in this change.
 
 ## What users can do
 
@@ -61,3 +61,9 @@ Live in code. Legal pages are English only (B6). The Kannada phone Lighthouse sc
 ## Decisions
 
 D-102, D-103, D-214, D-247, D-248, D-260, D-262, D-269.
+
+## Liquid Silver presentation — 30 Oct 2026
+
+As built on base commit e986a157, with this presentation change. The founder requested the customer app's selected Liquid Silver direction on todayz.in. Base.astro loads styles/silver.css on every route: silver page and neutral semantic tokens, graphite actions, frosted header and search, translucent cards, and silver image wells. Original product photos and semantic status/category colours remain available. Home's existing scroll reveals use a slower easing curve; hero elements enter in sequence, the hero light drifts once, and cards and photos respond to hover. All new motion respects reduced motion. No additional client script or dependency is added. Locale typography, content, forms, navigation and SEO use the existing implementation.
+
+The stylesheet uses the opt-in silver-* shared tokens introduced by the customer design. Deployment uses the existing main-branch Cloudflare Pages workflow; automatic CI remains paused as requested separately. Static token checks and whitespace validation are performed locally; production compilation is verified by the deployment workflow. Browser visual review remains pending.
