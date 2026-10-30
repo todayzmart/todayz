@@ -8,7 +8,6 @@ import { createT, type Locale } from '../i18n/index.ts';
 import { links } from '../lib/company.ts';
 import { pageById, pageLocales, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
-import mark from '../assets/landing/todayz-mark-96.png';
 import Icon from './Icon.astro';
 import LangSwitch from './LangSwitch.astro';
 
@@ -39,7 +38,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
 <header class="site-head">
   <div class="head-row">
     <a class="brand" href={home.href} aria-label={t('a11y.home')}>
-      <img src={mark.src} width="36" height="36" alt="" />
+      <span class="p-brand-symbol" aria-hidden="true">Z</span>
       <span class="brand-text">
         <span class="brand-word">Today<b>Z</b></span>
         <small>{t('brand.tagline')}</small>
@@ -48,7 +47,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
 
     <nav class="nav" aria-label={t('nav.label')}>
       {
-        nav.map((item) => (
+        nav.slice(0, 3).map((item) => (
           <a href={item.href} hreflang={item.hreflang} aria-current={item.id === page.id ? 'page' : undefined}>
             {item.label}
           </a>
@@ -76,6 +75,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
             ))
           }
           <li><a href={links.businessApp}>{t('nav.login')}</a></li>
+          <li><a href={start.href}>{t('nav.start')}</a></li>
         </ul>
       </details>
     </div>

@@ -1,0 +1,93 @@
+---
+// Errands, reimagined: three perks beside an example week of pickups (rings, daily distance bars and
+// two rows). Every number in the card is an example and the card says so. The rings fill when the
+// card scrolls into view (bright.ts adds .in); without JavaScript they show full.
+import Icon from '../Icon.astro';
+import type { IconName } from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { WEEK_KM } from '../bright/data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.week.title', EM));
+const perkIcons: IconName[] = ['route', 'coins', 'leaf'];
+const perks = perkIcons.map((icon, i) => ({
+  icon,
+  title: t(`home.week.perk.${i + 1}.title` as MessageKey),
+  body: t(`home.week.perk.${i + 1}.body` as MessageKey),
+}));
+const days = t('home.week.days').split(' ');
+const max = Math.max(...WEEK_KM);
+const bars = WEEK_KM.map((km, i) => ({ day: days[i] ?? '', height: Math.round((km / max) * 100), top: km === max }));
+const total = WEEK_KM.reduce((a, b) => a + b, 0).toFixed(1);
+---
+
+<section class="p-section b-sec">
+  <div class="b-w b-split">
+    <div>
+      <p class="b-eyebrow rv">{t('home.week.eyebrow')}</p>
+      <h2 class="rv">{before}<span class="b-acc">{t('home.week.title_em')}</span>{after}</h2>
+      <p class="b-sub rv">{t('home.week.sub')}</p>
+      <ul class="b-perks">
+        {
+          perks.map((p) => (
+            <li class="rv">
+              <span class="b-perk-ico"><Icon name={p.icon} size={22} /></span>
+              <div>
+                <b>{p.title}</b>
+                <span>{p.body}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="b-week b-card rv" data-rings>
+      <div class="b-week-top">
+        <h3>{t('home.week.card.title')}</h3>
+        <span>{t('home.week.card.tag')}</span>
+      </div>
+      <div class="b-rings">
+        <svg viewBox="0 0 180 180" width="170" height="170" role="img" aria-label={t('home.week.rings')}>
+          <g transform="rotate(-90 90 90)">
+            <circle class="track" cx="90" cy="90" r="76"></circle>
+            <circle class="ring r1" cx="90" cy="90" r="76"></circle>
+            <circle class="track" cx="90" cy="90" r="58"></circle>
+            <circle class="ring r2" cx="90" cy="90" r="58"></circle>
+            <circle class="track" cx="90" cy="90" r="40"></circle>
+            <circle class="ring r3" cx="90" cy="90" r="40"></circle>
+          </g>
+          <text class="big" x="90" y="95" text-anchor="middle">{total}</text>
+          <text class="small" x="90" y="109" text-anchor="middle">km</text>
+        </svg>
+        <ul class="b-ring-stats" aria-hidden="true">
+          <li><b class="c1">{total}</b> {t('home.week.km')}</li>
+          <li><b class="c2">58</b> {t('home.week.min')}</li>
+          <li><b class="c3">6</b> {t('home.week.pickups')}</li>
+        </ul>
+      </div>
+      <div class="b-bars" role="img" aria-label={t('home.week.bars')}>
+        {
+          bars.map((b) => (
+            <div>
+              <i class:list={{ on: b.top }} style={`height:${b.height}%`} />
+              <small>{b.day}</small>
+            </div>
+          ))
+        }
+      </div>
+      <div class="b-row">
+        <span class="b-row-ico green"><Icon name="rupee" size={20} /></span>
+        <div><b>{t('home.week.row.1.title')}</b><small>{t('home.week.row.1.body')}</small></div>
+      </div>
+      <div class="b-row">
+        <span class="b-row-ico amber"><Icon name="coins" size={20} /></span>
+        <div><b>{t('home.week.row.2.title')}</b><small>{t('home.week.row.2.body')}</small></div>
+      </div>
+    </div>
+  </div>
+</section>

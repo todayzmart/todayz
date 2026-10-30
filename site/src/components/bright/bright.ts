@@ -132,4 +132,4 @@ const io = new IntersectionObserver(
     }),
   { threshold: 0.15 },
 );
-document.querySelectorAll('.bp .rv').forEach((el) => (reduce ? el.classList.add('in') : io.observe(el)));
+document.querySelectorAll('.bp .rv, .premium .rv').forEach((el) => (reduce ? el.classList.add('in') : io.observe(el)));

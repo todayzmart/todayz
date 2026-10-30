@@ -1,0 +1,38 @@
+---
+// Your 2 km: a radar of example shops around "you" (rings at 500 m, 1 km and 2 km, the default search
+// radius). Each shop has an inspector card; the first shows by default. bright.ts makes the dots
+// buttons (hover, click, Enter or Space shows that shop) and hides the other cards. Without
+// JavaScript the dots are a picture and the first card stays.
+import type { Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { SHOPS, formatDistance, walkMinutes, type Category } from '../bright/data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.orbit.title', EM));
+const C = 300;
+const R_MAX = 285;
+const scale = (m: number) => (m / 2000) * R_MAX;
+const catLabel: Record<Category, string> = {
+  grocery: t('home.shelf.cat.grocery'),
+  pharmacy: t('home.shelf.cat.pharmacy'),
+  electronics: t('home.shelf.cat.electronics'),
+};
+const nodes = SHOPS.map((s, i) => {
+  const r = scale(s.distance);
+  const a = (s.angle * Math.PI) / 180;
+  const x = Math.round(C + r * Math.sin(a));
+  const y = Math.round(C - r * Math.cos(a));
+  const distance = formatDistance(s.distance);
+  return { ...s, i, x, y, distance, minutes: walkMinutes(s.distance), short: s.name.split(' ')[0] ?? s.name, label: t('home.orbit.shop', { shop: s.name, distance }) };
+});
+const rings = [
+  { m: 500, label: '500 m' },
+  { m: 1000, label: '1 km' },
+  { m: 2000, label: '2 km' },
+];
+---
+<section class="p-section p-explorer"><div class="p-explorer-title"><p class="b-eyebrow">{t('home.orbit.eyebrow')}</p><h2>{before}<span>{t('home.orbit.title_em')}</span>{after}</h2><p>{t('home.orbit.sub')}</p></div><div class="p-shop-browser"><div class="p-shop-list" role="group" aria-label={t('home.orbit.label')}>{nodes.map(n=><button type="button" data-shop-choice={n.i} aria-pressed={n.i===0}><span><strong>{n.name}</strong><small>{catLabel[n.category]}</small></span><span>{n.distance} ↗</span></button>)}</div><div class="p-shop-details" aria-live="polite">{nodes.map(n=><article data-shop-detail={n.i} hidden={n.i!==0}><span class="p-kicker">{catLabel[n.category]}</span><div class="p-distance">{n.distance}<span>↗</span></div><h3>{n.name}</h3><p>{t('home.orbit.away',{distance:n.distance,minutes:n.minutes})}</p><dl><div><dt>{n.item}</dt><dd>₹{n.price}</dd></div><div><dt>{t('home.orbit.confirmed')}</dt><dd>{t('home.orbit.confirmed_value',{minutes:n.confirmed})}</dd></div><div><dt>{t('home.orbit.cashback')}</dt><dd>{n.cashback}%</dd></div></dl></article>)}</div></div></section>

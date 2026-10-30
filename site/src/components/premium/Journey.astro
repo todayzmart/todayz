@@ -1,0 +1,77 @@
+---
+// The journey: a walking route from "you" to a shop 600 m away. The green line and the walker play
+// once when the map scrolls into view (bright.ts), and "Play the walk again" replays it. Without
+// JavaScript, or with reduced motion, the walk shows finished. Numbers: 600 m at about 5 km an hour.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { walkMinutes } from '../bright/data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.walk.title', EM));
+const METRES = 600;
+const MINUTES = walkMinutes(METRES);
+const ROUTE = 'M90 340 C200 340 230 245 340 245 S520 315 640 255 S820 130 930 100';
+const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as MessageKey), body: t(`home.walk.step.${i}.body` as MessageKey) }));
+---
+
+<section class="p-section b-sec b-band" id="journey">
+  <div class="b-w">
+    <div class="b-head c rv">
+      <p class="b-eyebrow">{t('home.walk.eyebrow')}</p>
+      <h2>{before}<span class="b-acc">{t('home.walk.title_em')}</span>{after}</h2>
+      <p class="b-sub">{t('home.walk.sub')}</p>
+    </div>
+    <div class="b-route rv" data-journey data-metres={METRES} data-minutes={MINUTES}>
+      <div class="b-route-scroll" tabindex="0" role="region" aria-label={t('home.walk.scroll')}>
+        <svg class="b-route-map" viewBox="0 0 1040 400" role="img" aria-label={t('home.walk.map')}>
+          <g class="blocks">
+            <rect x="40" y="40" width="200" height="120" rx="18"></rect>
+            <rect x="270" y="40" width="250" height="150" rx="18"></rect>
+            <rect x="560" y="30" width="170" height="130" rx="18"></rect>
+            <rect x="40" y="190" width="260" height="90" rx="18"></rect>
+            <rect x="330" y="290" width="220" height="90" rx="18"></rect>
+            <rect x="600" y="300" width="180" height="80" rx="18"></rect>
+            <rect x="780" y="200" width="220" height="80" rx="18"></rect>
+            <rect x="800" y="30" width="200" height="110" rx="18"></rect>
+          </g>
+          <path class="path" d={ROUTE} data-route></path>
+          <path class="done" d={ROUTE} data-route-done></path>
+          <circle class="you" cx="90" cy="340" r="14"></circle>
+          <text class="lbl" x="90" y="378" text-anchor="middle">{t('home.walk.you').toUpperCase()}</text>
+          <circle class="shop-halo" cx="930" cy="100" r="22"></circle>
+          <circle class="shop" cx="930" cy="100" r="12"></circle>
+          <rect class="tag" x="680" y="128" width="262" height="60" rx="16"></rect>
+          <text class="tag-name" x="700" y="153">Sharma General Store</text>
+          <text class="tag-sub" x="700" y="174">{t('home.walk.tag')}</text>
+          <circle class="halo" r="22" cx="930" cy="100" data-walker></circle>
+          <circle class="walker" r="9" cx="930" cy="100" data-walker></circle>
+        </svg>
+      </div>
+      <div class="b-route-ctl">
+        <button class="b-ghost" type="button" data-journey-replay hidden><Icon name="replay" size={16} />{t('home.walk.replay')}</button>
+      </div>
+      <dl class="b-hud">
+        <div><dt>{t('home.walk.hud.1')}</dt><dd data-count="metres">{METRES}</dd></div>
+        <div><dt>{t('home.walk.hud.2')}</dt><dd data-count="minutes">{MINUTES}</dd></div>
+        <div><dt>{t('home.walk.hud.3')}</dt><dd>₹0</dd></div>
+        <div><dt>{t('home.walk.hud.4')}</dt><dd class="small">{t('home.walk.hud.4.value')}</dd></div>
+      </dl>
+      <ol class="b-pipe">
+        {
+          steps.map((s) => (
+            <li>
+              <b>{s.title}</b>
+              <span>{s.body}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="b-note">{t('home.walk.note')}</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,66 @@
+---
+// See what one walk is worth: five sliders and a year's result. The figures are rendered for the
+// starting values, so the card reads right without JavaScript; bright.ts recomputes on input with the
+// same formula (data.ts savings). Cashback is the shop's own rate, 0 to 20%, paid as credits.
+import Icon from '../Icon.astro';
+import type { Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { SAVINGS, inr, savings } from '../bright/data.ts';
+
+interface Props {
+  t: Translate;
+  appUrl: string;
+}
+
+const { t, appUrl } = Astro.props;
+const [before, after] = splitEm(t('home.save.title', EM));
+const s = SAVINGS;
+const r = savings(s.orders.value, s.fee.value, s.basket.value, s.cashback.value, s.walk.value);
+const sliders = [
+  { id: 'orders', label: t('home.save.orders'), ...s.orders, show: String(s.orders.value), fmt: '{v}' },
+  { id: 'fee', label: t('home.save.fee'), ...s.fee, show: `₹${s.fee.value}`, fmt: '₹{v}' },
+  { id: 'basket', label: t('home.save.basket'), ...s.basket, show: `₹${inr(s.basket.value)}`, fmt: '₹{v}' },
+  { id: 'cashback', label: t('home.save.cashback'), ...s.cashback, show: `${s.cashback.value}%`, fmt: '{v}%' },
+  { id: 'walk', label: t('home.save.walk'), ...s.walk, show: `${s.walk.value.toFixed(1)} km`, fmt: '{v} km' },
+];
+const kmTpl = t('home.save.km_value', { km: '{v}' });
+const hoursTpl = t('home.save.hours_value', { hours: '{v}' });
+const fill = (tpl: string, v: string) => tpl.replace('{v}', v);
+---
+
+<section class="p-section b-sec b-sec-tight">
+  <div class="b-w">
+    <div class="b-head c rv">
+      <p class="b-eyebrow">{t('home.save.eyebrow')}</p>
+      <h2>{before}<span class="b-acc">{t('home.save.title_em')}</span>{after}</h2>
+      <p class="b-sub">{t('home.save.sub')}</p>
+    </div>
+    <div class="b-block rv" data-savings>
+      <div class="b-sliders">
+        {
+          sliders.map((sl) => (
+            <div class="b-slider">
+              <div class="b-slider-head">
+                <label for={`save-${sl.id}`}>{sl.label}</label>
+                <output for={`save-${sl.id}`} data-out={sl.id} data-fmt={sl.fmt}>{sl.show}</output>
+              </div>
+              <input type="range" id={`save-${sl.id}`} name={sl.id} min={sl.min} max={sl.max} step={sl.step} value={sl.value} aria-valuetext={sl.show} />
+            </div>
+          ))
+        }
+      </div>
+      <div class="b-result">
+        <small>{t('home.save.keep')}</small>
+        <b class="b-total" data-res="total" data-fmt="₹{v}">₹{inr(r.total)}</b>
+        <dl>
+          <div><dt>{t('home.save.fees')}</dt><dd data-res="fees" data-fmt="₹{v}">₹{inr(r.fees)}</dd></div>
+          <div><dt>{t('home.save.credits')}</dt><dd data-res="credits">{inr(r.credits)}</dd></div>
+          <div><dt>{t('home.save.km')}</dt><dd data-res="km" data-fmt={kmTpl}>{fill(kmTpl, inr(r.km))}</dd></div>
+          <div><dt>{t('home.save.hours')}</dt><dd data-res="hours" data-fmt={hoursTpl}>{fill(hoursTpl, r.hours.toFixed(1))}</dd></div>
+        </dl>
+        <a class="b-btn" href={appUrl}>{t('home.save.cta')}<Icon name="arrow" size={16} /></a>
+      </div>
+    </div>
+    <p class="b-note">{t('home.save.note')}</p>
+  </div>
+</section>

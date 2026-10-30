@@ -4,7 +4,6 @@
 // Turnstile script on pages that hold the form.
 import '@todayz/tokens/styles.css';
 import '../styles/silver.css';
-import '../styles/editorial.css';
 import head from 'virtual:todayz-head';
 import anekLatin from '@todayz/tokens/fonts/anek-latin-latin-wght-normal.woff2?url';
 import anekDevanagari from '@todayz/tokens/fonts/anek-devanagari-devanagari-wght-normal.woff2?url';
@@ -18,7 +17,7 @@ import notoTelugu from '@todayz/tokens/fonts/noto-sans-telugu-telugu-wght-normal
 import notoTamil from '@todayz/tokens/fonts/noto-sans-tamil-tamil-wght-normal.woff2?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import TopBar from '../components/bright/TopBar.astro';
+import '../styles/premium-frame.css';
 import { LOCALE_INFO, createT, isMachineDraft, type Locale } from '../i18n/index.ts';
 import { alternates, pagePath, pageUrl, SITE_ORIGIN, type PageDef } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
@@ -92,7 +91,6 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
   </head>
   <body data-skin="bright">
     <a class="skip" href="#main">{t('a11y.skip')}</a>
-    <TopBar locale={locale} />
     <Header page={page} locale={locale} />
     {
       draft && (

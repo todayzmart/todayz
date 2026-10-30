@@ -1,0 +1,19 @@
+---
+// "Things you can search for": two rows of chips moving in opposite directions, each a link to that
+// search in the customer app. A curated list, not live searches (01-product-rules.md §11.3). Each row
+// is drawn twice for a seamless loop; the copy is hidden from assistive tech and the tab order. The
+// pause checkbox works without JavaScript (WCAG 2.2.2); motion stops under prefers-reduced-motion.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { STRIP } from '../bright/data.ts';
+
+interface Props {
+  t: Translate;
+  appUrl: string;
+}
+
+const { t, appUrl } = Astro.props;
+const chips = STRIP.map((c, i) => ({ ...c, label: t(`home.strip.${i + 1}` as MessageKey), href: `${appUrl}/search?q=${encodeURIComponent(c.query)}` }));
+
+---
+<section class="p-directory" aria-labelledby="strip-title"><h2 id="strip-title">{t('home.strip.title')}</h2><div>{chips.map((c,i)=><a href={c.href}><small>0{i+1}</small><span>{c.label}</span><Icon name="arrow" size={18}/></a>)}</div></section>
