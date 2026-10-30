@@ -110,7 +110,7 @@ body .editorial {
   border-radius: 10px;
   object-fit: cover;
 }
-.editorial-product h2 {
+body .editorial .editorial-product h2 {
   font: 650 15px/1.4 var(--font-sans);
   letter-spacing: 0;
 }
