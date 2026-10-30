@@ -21,3 +21,7 @@ Live artifact (source of truth for visuals): https://claude.ai/artifact/W91M8EtF
   - **Share sheet and share card preview:** a small sheet (WhatsApp first, More, Copy link) and the link preview image with item, shop, price and area, never a distance.
   - **Demand (A-23):** an admin table of demand gaps per city, and the site strip approval list with Approve.
   - **Site sections (S-01, S-07):** the rotating "Just ask and find {item}" hero line, the "What people near you are searching for" strip with a city picker, and the comparison section; the dot-grid background and black pill CTA are optional accents inside the system.
+
+## Liquid Silver palette
+
+As built on base commit 7e831f7d (30 Oct 2026), the founder-selected customer design extends `source/tokens.json` with opt-in `silver-*` colours. This is a deliberate local extension to the artifact snapshot. Existing semantic token defaults remain intact; the customer theme applies the mapping.

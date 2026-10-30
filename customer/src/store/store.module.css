@@ -238,7 +238,7 @@
 .cartbar {
   position: fixed;
   inset-inline: var(--space-4);
-  inset-block-end: calc(var(--bottom-nav) + env(safe-area-inset-bottom) + var(--space-3));
+  inset-block-end: calc(var(--bottom-nav) + env(safe-area-inset-bottom) + var(--space-6));
   z-index: var(--z-sticky);
   max-width: calc(min(var(--column, 560px), 560px) - 2 * var(--space-4));
   margin-inline: auto;
