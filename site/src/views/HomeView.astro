@@ -74,7 +74,7 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
     <div class="editorial-proof">
       {stats.map((s, i) => <div><span class="editorial-index" aria-hidden="true">0{i + 1}</span><strong>{s.value}</strong><span>{s.label}</span></div>)}
     </div>
-    <nav class="editorial-nav" aria-label={t('nav.label')}>
+    <nav class="editorial-nav" aria-labelledby="home-title">
       <a href="#shelf">{t('nav.search')}</a><a href="#journey">{t('nav.how')}</a><a href="#owners">{t('nav.retailers')}</a><a href="#join">{t('nav.start')}<Icon name="arrow" size={14} /></a>
     </nav>
     <SearchStrip t={t} appUrl={links.customerApp} />
