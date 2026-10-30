@@ -1,14 +1,12 @@
-# make check on every pull request and push (W0-06).
+# make check on manual workflow dispatch (automatic checks paused, 30 Oct 2026).
 # Written in Wave 0, run locally with `scripts/ci/act.sh`; it runs on GitHub only
 # after the user splits the repos. Until then the local `make check` is the gate.
 # Workflows call canonical make targets only (D-56), so this stays correct as
 # packages register their own steps in mk/*.mk. scripts/ci/wflint enforces the policy.
 name: ci
 
+# Automatic push and pull-request checks paused by the founder (30 Oct 2026).
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

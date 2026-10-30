@@ -9,10 +9,8 @@
 # Reports: the paths in scripts/ci/paths.env, through .github/actions/upload-reports.
 name: e2e
 
+# Automatic push and pull-request checks paused by the founder (30 Oct 2026).
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

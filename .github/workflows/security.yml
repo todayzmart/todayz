@@ -2,7 +2,7 @@
 # gitleaks (git history), Trivy (filesystem), checkov (infra/) and a ZAP baseline that
 # runs only when the local stack answers its health check.
 #
-#   static   every pull request and push: make setup, make security (ZAP skips: no stack)
+#   static   weekly and by hand: make setup, make security (ZAP skips: no stack)
 #   dynamic  weekly and by hand: make setup, make dev, make security (ZAP runs), make stop
 #
 # gitleaks needs the whole history (fetch-depth: 0; scan.sh fails on a shallow clone).
@@ -13,10 +13,8 @@
 # artifacts only (no code-scanning upload, so every permission stays read-only).
 name: security
 
+# Automatic push and pull-request checks paused by the founder (30 Oct 2026).
 on:
-  pull_request:
-  push:
-    branches: [main]
   schedule:
     - cron: "30 21 * * 0" # Mondays 03:00 IST
   workflow_dispatch:

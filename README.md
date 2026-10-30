@@ -122,3 +122,7 @@ There is one environment, prod (D-210). **A push to `main` deploys it.** GitHub 
 Read [CLAUDE.md](CLAUDE.md) for the rules ([AGENTS.md](AGENTS.md) points other AI tools to the same rules). Then read [working-on-todayz.md](docs/guide/working-on-todayz.md). **Every change updates the docs it affects, in the same commit.** `make check` and the commit-msg hook enforce part of this.
 
 Never print or commit secret values, OTPs, phone numbers or tokens. Refer to env vars by name and use `make env-check`.
+
+## Automatic check runs (30 Oct 2026)
+
+As built on base commit ae676c2d with this trigger change: the founder paused push and pull-request triggers for CI, security and end-to-end workflows. Run them manually from GitHub Actions when needed. The weekly security schedule and automatic deployment on pushes to `main` remain enabled. See [testing](docs/guide/testing.md#automatic-checks-paused--30-oct-2026).

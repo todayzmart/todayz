@@ -2,7 +2,7 @@
 
 Every test layer in TodayZ, where it lives, how to run it, and how to add a test for a new feature.
 
-> As built on main at d641cbe6 (27 Oct 2026). Counts are rough, from reading the source (not from a run). Update this file in the same change as the code it describes.
+> As built on main at ae676c2d (30 Oct 2026), with automatic-check trigger changes in this commit.
 
 The plan behind this is [docs/plan/08-testing.md](../plan/08-testing.md). The Definition of done is in [docs/plan/README.md](../plan/README.md). Product numbers come from [01-product-rules.md](../plan/01-product-rules.md); tests read configurable ones from `platform_settings`, never hard-code them.
 
@@ -150,3 +150,7 @@ A change is done when the plan's checklist in [docs/plan/README.md](../plan/READ
 ## Next
 
 [local-dev.md](local-dev.md), [deployment.md](deployment.md), [docs/plan/08-testing.md](../plan/08-testing.md).
+
+## Automatic checks paused — 30 Oct 2026
+
+The founder requested that upcoming pushes stop starting CI, security and end-to-end checks. `ci.yml`, `e2e.yml` and `security.yml` no longer subscribe to `push` or `pull_request`. All three retain `workflow_dispatch` for manual runs in GitHub Actions. The existing weekly security schedule remains enabled. Deployment workflows continue to run on pushes to `main`; build-time validation inside deployment still applies. This trigger change does not cancel existing runs or alter branch-protection settings. Local make commands remain available.
