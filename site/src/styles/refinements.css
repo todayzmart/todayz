@@ -148,3 +148,8 @@ html .premium .p-shop-details dt { overflow-wrap: anywhere; }
 html .premium .p-discovery-info,html .premium .b-item h3 { overflow-wrap: anywhere; }
 html .premium .b-result dl>div { align-items: baseline; }
 html .premium .b-result dd { text-align: end; flex: none; }
+
+/* Keep inverse CTA hover states readable in both themes. */
+html .premium .b-block.plum .b-btn:hover { background: color-mix(in srgb,var(--on-brand) 92%,var(--brand)); color: var(--site-forest)!important; }
+/* Scroll navigation should never expose temporarily invisible sections. */
+html.b-js .premium .rv,html .premium .rv.in { opacity: 1; transform: none; transition: none; }

@@ -73,3 +73,5 @@ The homepage now imports `premium.css` and `components/premium`, without bright.
 ## Page-wide refinement
 
 `styles/refinements.css` provides a consistent density and readability pass: compact original-logo badges without changing the artwork, stable light text on the dark shop-owner panel in either theme, larger metadata, three-column desktop product listings, a more compact shop browser, and a 300px desktop / 240px phone map beside the pickup steps. The footer, forms, FAQ and calculator use consistent spacing and readable text. The original SVG map route, replay, search handoff, calculator and signup logic are retained.
+
+The final footer review removes its radial glow and fixes the primary app-entry button and inverted CTA hover colours in both themes. Scroll-reveal wrappers remain visible so anchor navigation does not reveal temporarily transparent sections.
