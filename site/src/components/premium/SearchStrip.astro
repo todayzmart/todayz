@@ -16,4 +16,4 @@ const { t, appUrl } = Astro.props;
 const chips = STRIP.map((c, i) => ({ ...c, label: t(`home.strip.${i + 1}` as MessageKey), href: `${appUrl}/search?q=${encodeURIComponent(c.query)}` }));
 
 ---
-<section class="p-directory" aria-labelledby="strip-title"><h2 id="strip-title">{t('home.strip.title')}</h2><div>{chips.map((c,i)=><a href={c.href}><small>0{i+1}</small><span>{c.label}</span><Icon name="arrow" size={18}/></a>)}</div></section>
+<section class="p-directory" aria-labelledby="strip-title"><h2 id="strip-title">{t('home.strip.title')}</h2><div>{chips.map((c,i)=><a href={c.href}><small>{String(i+1).padStart(2,'0')}</small><span>{c.label}</span><Icon name="arrow" size={18}/></a>)}</div></section>

@@ -56,12 +56,22 @@ const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as
       <p class="b-eyebrow">{t('home.walk.eyebrow')}</p>
       <h2>{before}<span class="b-acc">{t('home.walk.title_em')}</span>{after}</h2>
       <p class="b-sub">{t('home.walk.sub')}</p>
+      <ol class="b-pipe">
+        {
+          steps.map((s) => (
+            <li>
+              <b>{s.title}</b>
+              <span>{s.body}</span>
+            </li>
+          ))
+        }
+      </ol>
     </div>
     <div class="b-route rv" data-journey data-metres={METRES} data-minutes={MINUTES}>
       <div class="p-neighbourhood">
         <div class="p-map-toolbar"><span><Icon name="route" size={16}/>{t('home.walk.eyebrow')}</span><span>{t('home.week.card.tag')} · {t('home.lede.stat.3.value')}</span></div>
-        <div class="b-route-scroll" tabindex="0" role="region" aria-label={t('home.walk.scroll')}>
-          <svg class="b-route-map" viewBox="0 0 960 540" role="img" aria-label={t('home.walk.map')}>
+        <div class="b-route-scroll" role="region" aria-label={t('home.walk.map')}>
+          <svg class="b-route-map" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" role="img" aria-label={t('home.walk.map')}>
             <rect class="p-map-land" width="960" height="540"/>
             <path class="p-map-park" d="M18 22 H270 V50 H130 V147 H18 Z"/>
             <path class="p-map-park" d="M30 482 H119 V524 H30 Z"/>
@@ -90,8 +100,8 @@ const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as
               <path d="M755 181 C750 174 729 158 729 142 A26 26 0 1 1 781 142 C781 158 760 174 755 181 Z"/>
               <g transform="translate(744 131)"><Icon name="store" size={22}/></g>
             </g>
-            <rect class="p-map-place-label" x="586" y="65" width="307" height="38" rx="9"/>
-            <text class="tag-name" x="740" y="90" text-anchor="middle">Sharma General Store</text>
+            <rect class="p-map-place-label" x="586" y="85" width="307" height="38" rx="9"/>
+            <text class="tag-name" x="740" y="110" text-anchor="middle">Sharma General Store</text>
             <circle class="halo" r="21" cx="755" cy="174" data-walker/>
             <circle class="walker" r="7" cx="755" cy="174" data-walker/>
           </svg>
@@ -111,16 +121,6 @@ const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as
         <div><dt>{t('home.walk.hud.3')}</dt><dd>₹0</dd></div>
         <div><dt>{t('home.walk.hud.4')}</dt><dd class="small">{t('home.walk.hud.4.value')}</dd></div>
       </dl>
-      <ol class="b-pipe">
-        {
-          steps.map((s) => (
-            <li>
-              <b>{s.title}</b>
-              <span>{s.body}</span>
-            </li>
-          ))
-        }
-      </ol>
       <p class="b-note">{t('home.walk.note')}</p>
     </div>
   </div>

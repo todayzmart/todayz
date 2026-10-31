@@ -1,0 +1,150 @@
+/* Page-wide readability and density pass. Glass is reserved for navigation and search. */
+html body .site-head { border-radius: 14px; }
+html body .site-head .head-row { height: 68px; gap: 28px; }
+html body .site-head .brand, html body .site-foot .brand { position: relative; display: block; width: 152px; height: 48px; flex: none; overflow: hidden; padding: 0; border-radius: 9px; background: var(--on-brand); }
+html body .site-head .brand .brand-logo, html body .site-foot .brand .brand-logo { position: absolute; top: -9px; left: -24px; width: 200px; height: auto; max-width: none; border-radius: 0; background: transparent; }
+html body .site-head .nav a, html body .site-head .login, html body .site-head .start { font-size: 13px; }
+html .premium .p-section { padding-block: 64px; }
+html .premium h2 { font-size: clamp(28px,3.2vw,42px); line-height: 1.18; letter-spacing: -.04em; }
+html .premium p { font-size: 14px; }
+html .premium .p-hero { padding-top: 28px; gap: 28px 48px; background: none; }
+html .premium .p-hero-links { margin-top: 16px; gap: 24px; }
+html .premium .p-metrics { padding-block: 24px; }
+html .premium .p-metrics span, html .premium .p-metrics small { font-size: 12px; }
+html .premium .p-metrics strong { font-size: 24px; }
+html .premium .p-discovery { padding: 24px; border-radius: 18px; transform: none; }
+html .premium .p-discovery::before, html .premium .p-discovery::after { display: none; }
+html .premium .p-discovery h2 { font-size: 28px; margin-bottom: 20px; }
+html .premium .p-discovery-head { margin-bottom: 20px; }
+html .premium .p-discovery-head>span:first-child { font-size: 10px; }
+html .premium .p-discovery-item { min-height: 100px; padding: 12px; grid-template-columns: 54px minmax(0,1fr) auto; background: color-mix(in srgb,var(--on-brand) 5%,transparent); box-shadow: none; }
+html .premium .p-discovery-photo { width: 54px; height: 66px; box-shadow: none; background: color-mix(in srgb,var(--on-brand) 6%,transparent); }
+html .premium .p-discovery-info { gap: 5px; }
+html .premium .p-discovery-info>small, html .premium .p-discovery-stock, html .premium .p-discovery-walk { font-size: 11px; }
+html .premium .p-discovery-info>strong { font-size: 14px; }
+html .premium .p-discovery-bottom { padding-top: 16px; }
+html .premium .p-discovery-bottom>span, html .premium .p-discovery-bottom a { font-size: 12px; }
+html .premium .p-example { font-size: 12px; line-height: 1.6; }
+html .premium .p-directory { padding-block: 32px; }
+html .premium .p-directory h2 { font-size: 14px; }
+html .premium .p-directory a { font-size: 13px; min-height: 44px; padding-block: 12px; }
+html .premium .b-shelf-head { margin-bottom: 28px; }
+html .premium .b-tabs button { font-size: 13px; min-height: 44px; }
+html .premium .b-shelf { gap: 12px; }
+html .premium .b-item { grid-template-columns: 52px minmax(0,1fr); gap: 5px 14px; padding: 20px; border-radius: 14px; }
+html .premium .p-product-icon { width: 52px; height: 64px; }
+html .premium .b-item h3 { font-size: 16px; line-height: 1.4; }
+html .premium .b-item small { font-size: 12px; line-height: 1.6; }
+html .premium .b-item-foot { padding-top: 10px; margin-top: 6px; }
+html .premium .b-item-foot a { min-height: 36px; font-size: 13px; }
+html .premium .b-item-foot b { font-size: 19px; }
+html .premium .p-explorer { border: 1px solid var(--line); border-radius: 20px; }
+html .premium .p-explorer-title { margin-bottom: 28px; gap: 16px 40px; }
+html .premium .p-shop-browser { grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: start; }
+html .premium .p-shop-list { grid-template-columns: 1fr 1fr; gap: 8px; }
+html .premium .p-shop-list button { padding: 14px 12px; border: 1px solid var(--line); gap: 10px; min-height: 80px; }
+html .premium .p-shop-list strong { font-size: 13px; line-height: 1.5; }
+html .premium .p-shop-list small { font-size: 12px; }
+html .premium .p-shop-details { padding: 24px; border-radius: 14px; }
+html .premium .p-distance { font-size: 48px; padding: 8px 0 20px; }
+html .premium .p-distance>span { font-size: 34px; }
+html .premium .p-shop-details h3 { font-size: 22px; }
+html .premium .p-shop-details dl { margin-top: 20px; }
+html .premium .p-shop-details dl>div { font-size: 13px; gap: 12px; }
+html .premium #journey .b-w { display: grid; grid-template-columns: .8fr 1.3fr; gap: 40px; align-items: start; }
+html .premium #journey .b-head { display: block; margin: 0; }
+html .premium #journey .b-eyebrow { margin-bottom: 20px!important; }
+html .premium #journey h2 { font-size: clamp(28px,3vw,38px); }
+html .premium #journey .b-sub { margin-top: 20px!important; }
+html .premium #journey .b-pipe { grid-template-columns: 1fr; gap: 18px; margin-top: 28px; }
+html .premium #journey .b-pipe li { padding-top: 12px; }
+html .premium #journey .b-pipe b { font-size: 12px; }
+html .premium #journey .b-pipe span { font-size: 13px; margin-top: 6px; }
+html .premium .p-neighbourhood { border-radius: 16px; box-shadow: none; }
+html .premium .p-map-toolbar { padding: 14px 18px; }
+html .premium .p-neighbourhood .b-route-map { width: 100%; height: 300px; min-width: 0; max-height: 300px; }
+html .premium .p-map-destination { padding: 16px; flex-wrap: wrap; gap: 10px; }
+html .premium .p-map-store-icon { width: 40px; height: 40px; }
+html .premium .p-map-destination strong { font-size: 14px; }
+html .premium .p-map-destination>div>span { font-size: 12px; }
+html .premium .p-map-arrival { margin-left: 50px; padding: 0; border: 0; font-size: 12px; }
+html .premium #journey .b-hud { padding: 18px; gap: 12px; margin-bottom: 12px; }
+html .premium .b-hud dt { font-size: 10px; line-height: 1.6; }
+html .premium .b-hud dd { font-size: 24px; }
+html .premium .b-hud dd.small { font-size: 13px; }
+html .premium .b-note { font-size: 12px!important; line-height: 1.7; margin-top: 16px!important; }
+html .premium .b-split { gap: 40px; }
+html .premium .b-week { padding: 24px; border-radius: 16px; }
+html .premium .b-week-top>span, html .premium .b-row small { font-size: 12px; }
+html .premium .b-rings { margin-block: 24px; }
+html .premium .b-ring-stats { font-size: 13px; }
+html .premium .b-ring-stats b { font-size: 22px; }
+html .premium .b-perks { gap: 20px; }
+html .premium .b-perks li div>span { font-size: 13px; }
+html .premium .b-sliders { padding: 28px; gap: 20px; }
+html .premium .b-result { padding: 28px; }
+html .premium .b-slider-head { font-size: 13px; }
+html .premium .b-result>small { font-size: 12px; }
+html .premium .b-result dl>div { font-size: 13px; }
+html .premium .b-total { font-size: clamp(36px,4.4vw,60px); }
+/* Inverted sections always use stable light foregrounds, independently of theme surfaces. */
+html .premium .b-block.plum { padding: 40px; gap: 40px; border-radius: 18px; color: var(--on-brand); box-shadow: none; }
+html .premium .b-block.plum :is(h2,.b-acc,.b-panels b) { color: var(--on-brand); }
+html .premium .b-block.plum :is(p,.b-eyebrow,.b-panels span) { color: var(--site-glass-muted); }
+html .premium .b-block.plum .b-btn { background: var(--on-brand); color: var(--site-forest)!important; box-shadow: none; }
+html .premium .b-block.plum .b-panels li { border-color: color-mix(in srgb,var(--on-brand) 22%,transparent); padding-top: 18px; }
+html .premium .b-block.plum .b-panels b { font-size: 18px; }
+html .premium .b-block.plum .b-panels span { font-size: 14px; }
+html .premium .p-faq, html .premium .p-join { gap: 40px; }
+html .premium .p-faq summary { min-height: 44px; font-size: 16px; }
+html .premium .p-faq details { padding-block: 16px; }
+html .premium .p-faq details[open] summary>span { transform: rotate(45deg); }
+html .premium .p-faq details p { padding: 14px 0 0; }
+html .premium .p-join .cta-form { padding: 24px; border-radius: 16px; }
+html .premium .tz-field>label { font-size: 14px; }
+html .premium .consent { font-size: 12px; line-height: 1.7; }
+html body .site-foot { padding: 40px; border-radius: 20px; }
+html body .foot-invite { padding-bottom: 28px; }
+html body .foot-invite h2 { max-width: 550px; font-size: clamp(26px,3vw,38px); }
+html body .foot-grid { padding-top: 28px; gap: 40px; }
+html body .foot-brand p { font-size: 14px; }
+html body .site-foot nav a { font-size: 14px; }
+html body .site-foot .foot-base { margin-top: 28px; padding-top: 18px; font-size: 12px; }
+@media (width >= 1200px) { html .premium .b-shelf { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (width <= 1000px) { html .premium #journey .b-w { grid-template-columns: 1fr; } html .premium #journey .b-pipe { grid-template-columns: 1fr 1fr; margin-bottom: 8px; } html .premium .p-shop-list { grid-template-columns: 1fr; } }
+@media (width <= 760px) {
+  html body .site-head { margin: 8px 10px 0; top: 6px; }
+  html body .site-head .head-row { height: 60px; gap: 10px; }
+  html body .site-head .brand,html body .site-foot .brand { width: 116px; height: 38px; border-radius: 7px; }
+  html body .site-head .brand .brand-logo,html body .site-foot .brand .brand-logo { width: 158px; height: auto; left: -19px; top: -7px; }
+  html .premium .p-section { padding-block: 40px; }
+  html .premium .p-hero { padding-top: 24px; }
+  html .premium .p-hero h1 { font-size: clamp(38px,7.5vw,54px); }
+  html .premium .p-metrics { grid-template-columns: 1fr; gap: 12px; padding-block: 20px; }
+  html .premium .p-metrics>div { grid-template-columns: 22px 80px 1fr; }
+  html .premium .p-metrics span { grid-column: 3; }
+  html .premium .p-shop-browser,html .premium .p-explorer-title,html .premium .b-split,html .premium [data-savings],html .premium .b-block.plum,html .premium .p-faq,html .premium .p-join { grid-template-columns: 1fr; }
+  html .premium .p-shop-list { grid-template-columns: 1fr 1fr; max-height: 250px; }
+  html .premium .p-shop-list button { min-height: 82px; }
+  html .premium .p-explorer { padding-inline: 20px; }
+  html .premium .p-neighbourhood .b-route-map { height: 240px; max-height: 240px; }
+  html .premium .b-hud { grid-template-columns: 1fr 1fr; }
+  html .premium .b-block.plum { padding: 28px; gap: 28px; }
+  html .premium .b-discovery { padding: 20px; }
+  html body .site-foot { margin: 12px; padding: 28px 24px; }
+  html body .site-foot nav a { min-height: 32px; padding-block: 7px; }
+}
+@media (width <= 400px) {
+  html .premium .p-discovery { padding: 18px; }
+  html .premium .p-discovery-item { grid-template-columns: 42px minmax(0,1fr) auto; gap: 8px; padding: 10px; }
+  html .premium .p-discovery-photo { width: 42px; height: 60px; }
+  html .premium .p-discovery-info>strong { font-size: 13px; }
+  html .premium .p-discovery-stock,html .premium .p-discovery-walk { font-size: 10px; }
+  html .premium .p-shop-list { grid-template-columns: 1fr; }
+}
+html body .site-foot { backdrop-filter: none; background: linear-gradient(135deg,var(--site-forest-raised),var(--site-forest)); }
+html .premium .p-map-toolbar { backdrop-filter: none; }
+html .premium .p-shop-details dt { overflow-wrap: anywhere; }
+html .premium .p-discovery-info,html .premium .b-item h3 { overflow-wrap: anywhere; }
+html .premium .b-result dl>div { align-items: baseline; }
+html .premium .b-result dd { text-align: end; flex: none; }

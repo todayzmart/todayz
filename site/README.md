@@ -22,7 +22,7 @@ pnpm --filter @todayz/site e2e:smoke  # Playwright, then Lighthouse
 
 Run `make gen` first on a fresh checkout. Production builds need `PUBLIC_API_URL` and `PUBLIC_TURNSTILE_SITE_KEY`.
 
-> As built on main at 722244ba (31 Oct 2026).
+> As built on main at 627ff4d0 (31 Oct 2026).
 
 ## Branding
 
@@ -30,7 +30,7 @@ The header and footer keep the original primary logo unchanged. `src/styles/bran
 
 ## Theme, typography and glass
 
-The header theme button follows the system theme initially and saves an explicit light/dark choice in browser storage. `scripts/theme-init.js` is a small same-origin blocking asset that sets the theme before body paint; `scripts/presentation.ts` handles the toggle, system-theme changes and bounded pointer reflections. `styles/experience.css` supplies both palettes, top-aligns the hero closer to navigation, and adds translucent layers and pointer-driven light to the glass. Motion is disabled with reduced motion and on coarse pointers. Sora headings and Manrope body text are self-hosted variable fonts under `assets/fonts`, with their SIL Open Font Licenses retained.
+The header theme button follows the system theme initially and saves an explicit light/dark choice in browser storage. `scripts/theme-init.js` is a small same-origin blocking asset that sets the theme before body paint; `scripts/presentation.ts` handles the toggle, system-theme changes and system-theme changes. `styles/experience.css` supplies both palettes, top-aligns the hero closer to navigation, and keeps a restrained glass treatment on navigation and search. Pointer tilt and moving reflections have been removed after the founder requested a calmer interface. Sora headings and Manrope body text are self-hosted variable fonts under `assets/fonts`, with their SIL Open Font Licenses retained.
 
 ## Layout
 
@@ -69,3 +69,7 @@ Validation: all eleven homepage feature components remain present, CSS token ref
 ## Independent premium homepage — 31 Oct 2026
 
 The homepage now imports `premium.css` and `components/premium`, without bright.css or landing.css. It replaces the ticker and floating secondary navigation with a finite category directory, replaces the radar with a keyboard-operable shop list/detail explorer, and rebuilds product presentation, comparison disclosures, journey layout, calculator, FAQ and lead-form layout. Shared navigation uses a compact wordmark frame; the announcement bar is removed. Existing translations, example data, walking replay, filtering, savings math, lead endpoint and app URLs remain. Motion is bounded and respects reduced motion. The original bright components remain for other routes. Production build and live review are required for this change.
+
+## Page-wide refinement
+
+`styles/refinements.css` provides a consistent density and readability pass: compact original-logo badges without changing the artwork, stable light text on the dark shop-owner panel in either theme, larger metadata, three-column desktop product listings, a more compact shop browser, and a 300px desktop / 240px phone map beside the pickup steps. The footer, forms, FAQ and calculator use consistent spacing and readable text. The original SVG map route, replay, search handoff, calculator and signup logic are retained.
