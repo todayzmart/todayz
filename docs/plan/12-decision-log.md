@@ -1790,3 +1790,8 @@ The questions are in `docs/qa/go-live-gaps/LIST.md`. The founder delegated them;
 ## Liquid Silver customer theme — founder, 30 Oct 2026
 
 As built on base commit 7e831f7d. The founder selected Liquid Silver from the customer mockups and requested implementation and push. Supersedes D-273’s green customer presentation: graphite actions, silver page, frosted search/navigation, rounded cards and reduced-motion-aware animation. Scope is customer presentation; business, admin and marketing retain their design. Palette additions are opt-in shared tokens.
+
+
+### Site brand preservation — founder, 31 Oct 2026
+
+Keep the original TodayZ logo unchanged in the redesigned website. Restore the primary artwork in the header and footer and use the original green design tokens for actions, selection and restrained accents over the silver glass base. Do not replace the logo with a monochrome letter or typeset substitute. Search and leads endpoints remain unchanged. Based on main at e8758ba1.

@@ -1,0 +1,73 @@
+/* Original TodayZ greens, reserved for action, selection and gentle light. */
+body .site-head .start:hover,
+.premium .p-search button:hover,
+.premium .b-btn:hover,
+.premium .p-join button[type='submit']:hover {
+  background: var(--brand-strong);
+}
+
+.premium .p-hero {
+  background: radial-gradient(ellipse at 85% 35%, color-mix(in srgb, var(--brand-soft) 65%, transparent), transparent 60%);
+}
+
+.premium .p-hero h1 em,
+.premium .p-hero-links a:first-child,
+.premium .b-item-foot a,
+.premium .b-total {
+  color: var(--brand-strong);
+}
+
+.premium .p-kicker > span:empty,
+.premium .p-search button,
+.premium .b-btn,
+.premium .p-join button[type='submit'] {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.premium .p-halo > div {
+  border-color: color-mix(in srgb, var(--brand-mark) 18%, var(--silver-line));
+  background: linear-gradient(130deg, var(--surface), var(--brand-soft));
+  box-shadow: inset 15px 10px 30px var(--surface), inset -20px -20px 36px color-mix(in srgb, var(--brand-mark) 35%, var(--silver-muted)), 25px 40px 80px var(--silver-shadow);
+}
+
+.premium .p-halo > span,
+.premium .p-directory a:hover,
+.premium .b-tabs button[aria-pressed='true'] {
+  color: var(--brand-strong);
+}
+
+.premium .b-tabs button[aria-pressed='true'] {
+  border-color: var(--brand);
+}
+
+.premium .p-shop-list button[aria-pressed='true'] {
+  background: var(--brand-soft);
+  box-shadow: inset 3px 0 var(--brand);
+}
+
+.premium .p-shop-details,
+.premium .b-result {
+  background: linear-gradient(135deg, var(--brand-soft), var(--silver-page));
+}
+
+.premium .b-route-map .done { stroke: var(--brand); }
+.premium .b-route-map :is(.you, .shop, .walker) { fill: var(--brand); }
+.premium .b-route-map :is(.halo, .shop-halo) { fill: var(--brand-mark); }
+.premium .b-rings .ring { stroke: var(--brand); }
+.premium .b-rings .r2 { stroke: color-mix(in srgb, var(--brand-mark) 45%, var(--silver-line)); }
+.premium .b-bars i.on { background: var(--brand); }
+.premium .b-slider input { accent-color: var(--brand); }
+.premium :focus-visible { outline-color: var(--brand-strong); }
+
+.premium .b-block.plum {
+  background: linear-gradient(135deg, var(--brand-strong), color-mix(in srgb, var(--brand-strong) 70%, var(--ink)));
+}
+
+.premium .b-block.plum .b-btn:hover {
+  background: var(--brand-soft);
+}
+
+body .site-foot {
+  background: linear-gradient(155deg, var(--surface), color-mix(in srgb, var(--brand-soft) 45%, var(--silver-soft)));
+}

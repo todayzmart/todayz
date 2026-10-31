@@ -2,10 +2,6 @@
    design token source; semantic overrides apply only to the marketing site. */
 :root {
   --page: var(--silver-page);
-  --brand: var(--silver-action);
-  --brand-strong: var(--silver-action);
-  --brand-soft: var(--silver-soft);
-  --brand-mark: var(--silver-ink);
   --ink: var(--silver-action);
   --ink-2: var(--silver-ink);
   --ink-3: var(--silver-muted);
@@ -15,7 +11,7 @@
   --wash: var(--silver-page);
   --wash-strong: var(--silver-soft);
   --wash-line: var(--silver-line);
-  --focus: var(--silver-ink);
+  --focus: var(--brand-strong);
   --shadow-card: 0 12px 36px var(--silver-shadow);
   --shadow-pop: 0 24px 64px var(--silver-shadow);
 }
@@ -33,7 +29,7 @@ body .site-head {
 
 body .site-head .start {
   border-radius: var(--radius-pill);
-  background: var(--silver-action);
+  background: var(--brand);
   color: var(--on-brand);
 }
 

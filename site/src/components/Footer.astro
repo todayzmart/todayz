@@ -1,7 +1,7 @@
 ---
 // Footer: wordmark and tagline, company and legal links, languages, and the giant wordmark.
 import { LOCALE_INFO, createT, type Locale } from '../i18n/index.ts';
-import mark from '../assets/landing/todayz-mark-96.png';
+import logo from '../../../design/source/assets/Logos/todayz-logo.jpg';
 import { pageById, pageLocales, pagePath, type PageId } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
 
@@ -36,7 +36,7 @@ const languages = pageLocales(home, SITE_LOCALES).map((l) => ({ locale: l, href:
 <footer class="site-foot">
   <div class="foot-grid">
     <div class="foot-brand">
-      <a class="brand" href={link('home').href}><img src={mark.src} width="32" height="32" alt="" /><span>Today<b>Z</b></span></a>
+      <a class="brand" href={link('home').href}><img class="brand-logo" src={logo.src} width="240" height="80" alt="TodayZ" loading="lazy" /></a>
       <p>{t('footer.tagline')}</p>
     </div>
     <nav aria-label={t('footer.company')}>

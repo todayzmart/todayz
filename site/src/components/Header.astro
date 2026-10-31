@@ -8,6 +8,7 @@ import { createT, type Locale } from '../i18n/index.ts';
 import { links } from '../lib/company.ts';
 import { pageById, pageLocales, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
+import logo from '../../../design/source/assets/Logos/todayz-logo.jpg';
 import Icon from './Icon.astro';
 import LangSwitch from './LangSwitch.astro';
 
@@ -38,11 +39,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
 <header class="site-head">
   <div class="head-row">
     <a class="brand" href={home.href} aria-label={t('a11y.home')}>
-      <span class="p-brand-symbol" aria-hidden="true">Z</span>
-      <span class="brand-text">
-        <span class="brand-word">Today<b>Z</b></span>
-        <small>{t('brand.tagline')}</small>
-      </span>
+      <img class="brand-logo" src={logo.src} width="180" height="60" alt="TodayZ" fetchpriority="high" />
     </a>
 
     <nav class="nav" aria-label={t('nav.label')}>
