@@ -2,7 +2,7 @@
 
 The public site at todayz.in: pages, languages, lead form, the demand marquee and the performance gates.
 
-> As built on base commit e986a157 (30 Oct 2026), with Liquid Silver in this change.
+> As built on main at e8758ba1 (31 Oct 2026), with original branding restored in this change.
 
 ## What users can do
 
@@ -21,6 +21,10 @@ The public site at todayz.in: pages, languages, lead form, the demand marquee an
 | `/legal/privacy/`, `/legal/terms-for-shoppers/`, `/legal/terms-for-shops/`, `/legal/refunds-and-credits/` | privacy, terms-shoppers, terms-shops, refunds | English |
 
 The page registry is [site/src/lib/pages.ts](../../site/src/lib/pages.ts). Views are in [site/src/views](../../site/src/views/) (Home, Retailers, Info, Legal, NotFound); components in [site/src/components](../../site/src/components/); styles in `site/src/styles/bright.css`. Pages render from `src/pages/[...slug].astro`, plus `robots.txt` and `sitemap.xml` endpoints.
+
+## Visual identity
+
+The rebuilt homepage uses `site/src/styles/premium.css` and `premium-frame.css`. The original primary TodayZ logo artwork appears unchanged in the shared header and footer. `brand-accents.css` brings its original green tokens into primary buttons, selected categories and shops, savings, journey and activity indicators, with pale mint light on neutral silver surfaces. Search, calculator logic and form endpoints are unchanged.
 
 ## Rules
 

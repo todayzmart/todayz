@@ -22,6 +22,12 @@ pnpm --filter @todayz/site e2e:smoke  # Playwright, then Lighthouse
 
 Run `make gen` first on a fresh checkout. Production builds need `PUBLIC_API_URL` and `PUBLIC_TURNSTILE_SITE_KEY`.
 
+> As built on main at e8758ba1 (31 Oct 2026).
+
+## Branding
+
+The header and footer use the original primary logo from `design/source/assets/Logos/todayz-logo.jpg`, unchanged. `src/styles/brand-accents.css` applies the original brand tokens to primary actions, selected shops and tabs, progress graphics, and restrained mint glows over the silver glass presentation.
+
 ## Layout
 
 | Folder under `src/` | What |

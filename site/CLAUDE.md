@@ -14,6 +14,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 
 - Real HTML per route (no iframe wrapper); sitemap, robots, Open Graph, JSON-LD.
 - Tokens only, no raw hex; light theme only.
+- Keep the original TodayZ primary logo artwork in the header and footer; never replace it with a letter, redraw it or hide it. `brand-accents.css` uses the existing green tokens for actions, selection and subtle mint light on the silver base.
 - The lead form posts to `POST /v1/public/leads` (Turnstile protected).
 
 ## Layout (W1-09)
