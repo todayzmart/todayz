@@ -1,8 +1,9 @@
 ---
-// Shelf inspector: example items with photo, shop, freshness, walk and price; "Find it" opens that
+// Shelf inspector: example items with product icons, shop, freshness, walk and price; "Find it" opens that
 // search in the customer app. The category buttons are revealed and wired by bright.ts; without
 // JavaScript every item shows.
 import Icon from '../Icon.astro';
+import { productIcon } from './product-icons.ts';
 import type { Translate } from '../../i18n/index.ts';
 import { EM, splitEm } from '../home/data.ts';
 import { CATEGORIES, SHELF, formatDistance, walkMinutes, type Category } from '../bright/data.ts';
@@ -42,7 +43,7 @@ const items = SHELF.map((s) => ({
       {
         items.map((s) => (
           <li class="b-item b-card" data-cat={s.category}>
-            <span class="p-product-icon"><img src={s.photo.src} width="80" height="96" alt="" loading="lazy" decoding="async" /></span>
+            <span class="p-product-icon" aria-hidden="true"><Icon name={productIcon(s.query)} size={32} /></span>
             <small class="b-shop"><Icon name="pin" size={14} />{s.shop}</small>
             <h3>{s.name}</h3>
             <small class="b-fresh"><i aria-hidden="true" />{t('home.shelf.stock', { minutes: s.confirmed })}</small>

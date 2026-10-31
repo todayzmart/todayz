@@ -22,11 +22,11 @@ pnpm --filter @todayz/site e2e:smoke  # Playwright, then Lighthouse
 
 Run `make gen` first on a fresh checkout. Production builds need `PUBLIC_API_URL` and `PUBLIC_TURNSTILE_SITE_KEY`.
 
-> As built on main at a40f889d (31 Oct 2026).
+> As built on main at 34257849 (31 Oct 2026).
 
 ## Branding
 
-The header and footer keep the original primary logo unchanged. `src/styles/brand-accents.css` derives green-black glass tones from the original green and silver tokens. The homepage replaces the decorative circle with `DiscoveryPreview.astro`: example product photos, stock freshness, shop names, prices and walking distances, linked to customer-app searches. Shelf rows also show their existing product imagery. The compact dark-glass footer has shopper and retailer entry points, company/legal navigation and language links; the oversized decorative wordmark is removed. All existing forms, search destinations and calculator behavior are retained.
+The header and footer keep the original primary logo unchanged. `src/styles/brand-accents.css` derives green-black glass tones from the original green and silver tokens. The homepage replaces the decorative circle with `DiscoveryPreview.astro`: product-specific outline icons, stock freshness, shop names, prices and walking distances, linked to customer-app searches. Shelf rows use the same shared product-icon mapping. The walking journey uses a detailed illustrative street network with buildings, parks, water, shop pins, and a route that follows connected roads. The existing route replay and reduced-motion behavior are retained; no map provider, geolocation or new API is used. The compact dark-glass footer has shopper and retailer entry points, company/legal navigation and language links; the oversized decorative wordmark is removed. All existing forms, search destinations and calculator behavior are retained.
 
 ## Layout
 

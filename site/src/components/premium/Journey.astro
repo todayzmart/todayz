@@ -15,7 +15,38 @@ const { t } = Astro.props;
 const [before, after] = splitEm(t('home.walk.title', EM));
 const METRES = 600;
 const MINUTES = walkMinutes(METRES);
-const ROUTE = 'M90 340 C200 340 230 245 340 245 S520 315 640 255 S820 130 930 100';
+// An illustrative connected street network: the pickup path follows the street centres.
+const ROUTE = 'M150 410 L150 345 Q150 330 165 330 L430 330 Q450 330 450 310 L450 194 Q450 174 470 174 L755 174';
+const roads = [
+  'M-20 330 H980',
+  'M450 -20 V560',
+  'M-20 174 H980',
+  'M750 -20 V330',
+];
+const lanes = [
+  'M150 174 V560', 'M310 -20 V330', 'M600 174 V560',
+  'M-20 460 H450', 'M600 442 H980', 'M890 174 V560',
+  'M20 64 H310', 'M450 70 H750', 'M40 174 V330',
+  'M150 260 H450', 'M600 262 H890',
+];
+const buildings = [
+  [65,91,52,50], [135,93,65,42], [218,94,58,48],
+  [185,203,42,31], [241,200,38,35], [184,282,92,24],
+  [338,40,80,45], [337,102,82,42], [338,203,81,36], [339,281,78,24],
+  [479,96,44,45], [538,96,73,45], [629,97,86,44],
+  [484,207,84,47], [482,270,84,35], [630,206,45,30], [688,207,38,28],
+  [632,285,78,20], [786,205,73,30], [785,280,72,25],
+  [40,360,76,58], [181,365,46,62], [244,359,37,68],
+  [337,358,78,62], [338,485,80,33], [182,485,98,33],
+  [481,361,85,49], [480,430,87,73], [637,362,42,50],
+  [698,363,48,51], [769,361,84,53], [636,470,85,43], [742,469,115,46],
+  [916,211,35,90], [917,366,34,53],
+];
+const mapShops = [
+  { x: 640, y: 330, name: 'Green Kirana Market' },
+  { x: 450, y: 445, name: 'Sri Sai Medicals' },
+  { x: 210, y: 174, name: 'Vijay Electronics' },
+];
 const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as MessageKey), body: t(`home.walk.step.${i}.body` as MessageKey) }));
 ---
 
@@ -27,30 +58,49 @@ const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as
       <p class="b-sub">{t('home.walk.sub')}</p>
     </div>
     <div class="b-route rv" data-journey data-metres={METRES} data-minutes={MINUTES}>
-      <div class="b-route-scroll" tabindex="0" role="region" aria-label={t('home.walk.scroll')}>
-        <svg class="b-route-map" viewBox="0 0 1040 400" role="img" aria-label={t('home.walk.map')}>
-          <g class="blocks">
-            <rect x="40" y="40" width="200" height="120" rx="18"></rect>
-            <rect x="270" y="40" width="250" height="150" rx="18"></rect>
-            <rect x="560" y="30" width="170" height="130" rx="18"></rect>
-            <rect x="40" y="190" width="260" height="90" rx="18"></rect>
-            <rect x="330" y="290" width="220" height="90" rx="18"></rect>
-            <rect x="600" y="300" width="180" height="80" rx="18"></rect>
-            <rect x="780" y="200" width="220" height="80" rx="18"></rect>
-            <rect x="800" y="30" width="200" height="110" rx="18"></rect>
-          </g>
-          <path class="path" d={ROUTE} data-route></path>
-          <path class="done" d={ROUTE} data-route-done></path>
-          <circle class="you" cx="90" cy="340" r="14"></circle>
-          <text class="lbl" x="90" y="378" text-anchor="middle">{t('home.walk.you').toUpperCase()}</text>
-          <circle class="shop-halo" cx="930" cy="100" r="22"></circle>
-          <circle class="shop" cx="930" cy="100" r="12"></circle>
-          <rect class="tag" x="680" y="128" width="262" height="60" rx="16"></rect>
-          <text class="tag-name" x="700" y="153">Sharma General Store</text>
-          <text class="tag-sub" x="700" y="174">{t('home.walk.tag')}</text>
-          <circle class="halo" r="22" cx="930" cy="100" data-walker></circle>
-          <circle class="walker" r="9" cx="930" cy="100" data-walker></circle>
-        </svg>
+      <div class="p-neighbourhood">
+        <div class="p-map-toolbar"><span><Icon name="route" size={16}/>{t('home.walk.eyebrow')}</span><span>{t('home.week.card.tag')} · {t('home.lede.stat.3.value')}</span></div>
+        <div class="b-route-scroll" tabindex="0" role="region" aria-label={t('home.walk.scroll')}>
+          <svg class="b-route-map" viewBox="0 0 960 540" role="img" aria-label={t('home.walk.map')}>
+            <rect class="p-map-land" width="960" height="540"/>
+            <path class="p-map-park" d="M18 22 H270 V50 H130 V147 H18 Z"/>
+            <path class="p-map-park" d="M30 482 H119 V524 H30 Z"/>
+            <path class="p-map-park" d="M781 16 H944 V141 H781 Z"/>
+            <path class="p-map-water" d="M818 30 C855 12 889 38 930 30 L942 114 C904 100 886 136 848 112 S799 63 818 30 Z"/>
+            <g class="p-map-buildings">{buildings.map(([x,y,w,h])=><rect x={x} y={y} width={w} height={h} rx="3"/>)}</g>
+            <g class="p-map-lane-edges">{lanes.map(d=><path d={d}/>)}</g>
+            <g class="p-map-lanes">{lanes.map(d=><path d={d}/>)}</g>
+            <g class="p-map-road-edges">{roads.map(d=><path d={d}/>)}</g>
+            <g class="p-map-roads">{roads.map(d=><path d={d}/>)}</g>
+            <g class="p-map-street-labels" lang="en" aria-hidden="true">
+              <text x="70" y="177">Station Road</text><text x="745" y="334">Market Road</text>
+              <text x="454" y="480" transform="rotate(-90 454 480)">Temple Road</text>
+              <text x="154" y="518" transform="rotate(-90 154 518)">Park Lane</text>
+              <text x="607" y="402" transform="rotate(-90 607 402)">Lake Road</text>
+            </g>
+            <path class="p-route-casing" d={ROUTE}/>
+            <path class="path" d={ROUTE} data-route/>
+            <path class="done" d={ROUTE} data-route-done/>
+            <g class="p-map-shop-pins">{mapShops.map(shop=><g transform={`translate(${shop.x} ${shop.y})`}><title>{shop.name}</title><circle r="15"/><g transform="translate(-8 -8)"><Icon name="store" size={16}/></g></g>)}</g>
+            <circle class="p-map-start-halo" cx="150" cy="410" r="24"/>
+            <circle class="you" cx="150" cy="410" r="9"/>
+            <rect class="p-map-you-label" x="84" y="428" width="132" height="31" rx="8"/>
+            <text class="lbl" x="150" y="448" text-anchor="middle">{t('home.walk.you')}</text>
+            <g class="p-map-destination-pin">
+              <path d="M755 181 C750 174 729 158 729 142 A26 26 0 1 1 781 142 C781 158 760 174 755 181 Z"/>
+              <g transform="translate(744 131)"><Icon name="store" size={22}/></g>
+            </g>
+            <rect class="p-map-place-label" x="586" y="65" width="307" height="38" rx="9"/>
+            <text class="tag-name" x="740" y="90" text-anchor="middle">Sharma General Store</text>
+            <circle class="halo" r="21" cx="755" cy="174" data-walker/>
+            <circle class="walker" r="7" cx="755" cy="174" data-walker/>
+          </svg>
+        </div>
+        <div class="p-map-destination">
+          <span class="p-map-store-icon"><Icon name="store" size={26}/></span>
+          <div><strong>Sharma General Store</strong><span>{t('home.walk.tag')}</span></div>
+          <span class="p-map-arrival"><Icon name="footprints" size={18}/>{t('home.shelf.walk',{distance:'600 m',minutes:MINUTES})}</span>
+        </div>
       </div>
       <div class="b-route-ctl">
         <button class="b-ghost" type="button" data-journey-replay hidden><Icon name="replay" size={16} />{t('home.walk.replay')}</button>

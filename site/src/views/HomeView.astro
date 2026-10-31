@@ -6,7 +6,6 @@ import DiscoveryPreview from '../components/premium/DiscoveryPreview.astro';
 import Journey from '../components/premium/Journey.astro';
 import Orbit from '../components/premium/Orbit.astro';
 import Owners from '../components/premium/Owners.astro';
-import PhotoCredits from '../components/bright/PhotoCredits.astro';
 import Savings from '../components/premium/Savings.astro';
 import SearchStrip from '../components/premium/SearchStrip.astro';
 import Shelf from '../components/premium/Shelf.astro';
@@ -22,6 +21,7 @@ import { pageById } from '../lib/pages.ts';
 import Base from '../layouts/Base.astro';
 
 import '../styles/premium.css';
+import '../styles/discovery-map.css';
 
 
 interface Props {
@@ -65,7 +65,6 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
   <Owners t={t} href="#join"/>
   <section class="p-faq p-section" id="faq"><div><p class="p-kicker">{t('home.faq.eyebrow')}</p><h2>{t('home.faq.title')}</h2><p>{t('home.faq.intro')}</p></div><div>{faq.map((f,i)=><details><summary><small>0{i+1}</small>{f.q}<span aria-hidden="true">+</span></summary><p>{f.a}</p></details>)}</div></section>
   <section class="p-join p-section" id="join"><div><p class="p-kicker">{t('cta.eyebrow')}</p><h2 id="join-title">{t('cta.title')}</h2><p>{t('cta.body')}</p><ul>{[1,2,3].map(i=><li><Icon name="check" size={16}/>{t(`cta.tick.${i}` as MessageKey)}</li>)}</ul></div><LeadForm locale={locale} source="home" id="lead" variant="cta" labelledBy="join-title"/></section>
-  <PhotoCredits t={t}/>
 </div>
 </Base>
 <script>

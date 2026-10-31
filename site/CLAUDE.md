@@ -14,7 +14,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 
 - Real HTML per route (no iframe wrapper); sitemap, robots, Open Graph, JSON-LD.
 - Tokens only, no raw hex; light theme only.
-- Keep the original TodayZ primary logo artwork in the header and footer; never replace it with a letter, redraw it or hide it. `brand-accents.css` derives green-black glass tones from existing tokens for actions, the product-led discovery preview and the compact footer. Do not restore the decorative hero circle or giant footer wordmark.
+- Keep the original TodayZ primary logo artwork in the header and footer; never replace it with a letter, redraw it or hide it. `brand-accents.css` derives green-black glass tones from existing tokens for actions, the product-led discovery preview and the compact footer. Product listings use Lucide icons via `premium/product-icons.ts`; the original logo remains an image. `discovery-map.css` styles the illustrative street map, whose route follows its roads and keeps the existing replay hooks. Do not restore the decorative hero circle or giant footer wordmark.
 - The lead form posts to `POST /v1/public/leads` (Turnstile protected).
 
 ## Layout (W1-09)

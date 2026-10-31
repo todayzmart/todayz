@@ -3,6 +3,7 @@ import type { Translate } from '../../i18n/index.ts';
 import { SHELF, formatDistance, walkMinutes } from '../bright/data.ts';
 import { EM, splitEm } from '../home/data.ts';
 import Icon from '../Icon.astro';
+import { productIcon } from './product-icons.ts';
 
 interface Props { t: Translate; appUrl: string }
 const { t, appUrl } = Astro.props;
@@ -19,7 +20,7 @@ const items = [SHELF[0]!, SHELF[3]!, SHELF[4]!];
   <div class="p-discovery-items">
     {items.map((item) => (
       <a class="p-discovery-item" href={`${appUrl}/search?q=${encodeURIComponent(item.query)}`} aria-label={t('home.shelf.find_label', { item: item.name })}>
-        <span class="p-discovery-photo"><img src={item.photo.src} width="96" height="112" alt="" decoding="async" /></span>
+        <span class="p-discovery-photo" aria-hidden="true"><Icon name={productIcon(item.query)} size={34} /></span>
         <span class="p-discovery-info">
           <small>{item.shop}</small>
           <strong>{item.name}</strong>
