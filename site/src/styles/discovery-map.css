@@ -72,3 +72,7 @@
   .p-map-arrival { margin-left: 56px; font-size: 11px; }
   .premium #journey .b-hud { padding: 20px; }
 }
+
+/* Product glyphs need explicit CSS dimensions: the shared icon class sets 18px. */
+.premium .p-discovery-photo .tz-ico { width: 34px; height: 34px; stroke-width: 1.5; }
+.premium .p-product-icon .tz-ico { width: 32px; height: 32px; stroke-width: 1.5; }

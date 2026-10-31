@@ -5,7 +5,7 @@
 import Icon from '../Icon.astro';
 import type { MessageKey, Translate } from '../../i18n/index.ts';
 import { EM, splitEm } from '../home/data.ts';
-import { walkMinutes } from '../bright/data.ts';
+import { SHOPS, walkMinutes } from '../bright/data.ts';
 
 interface Props {
   t: Translate;
@@ -98,7 +98,7 @@ const steps = [1, 2, 3, 4].map((i) => ({ title: t(`home.walk.step.${i}.title` as
         </div>
         <div class="p-map-destination">
           <span class="p-map-store-icon"><Icon name="store" size={26}/></span>
-          <div><strong>Sharma General Store</strong><span>{t('home.walk.tag')}</span></div>
+          <div><strong>Sharma General Store</strong><span>{t('home.shelf.stock',{minutes:SHOPS[0]!.confirmed})}</span></div>
           <span class="p-map-arrival"><Icon name="footprints" size={18}/>{t('home.shelf.walk',{distance:'600 m',minutes:MINUTES})}</span>
         </div>
       </div>
