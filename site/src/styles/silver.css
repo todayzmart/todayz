@@ -147,10 +147,7 @@ body .lp .cta-card {
   box-shadow: var(--shadow-pop);
 }
 
-body .site-foot {
-  border-top: 1px solid var(--silver-edge);
-  background: linear-gradient(180deg, var(--surface), var(--silver-page));
-}
+
 
 /* Bounded, compositor-friendly motion. All content remains usable without it. */
 @media (prefers-reduced-motion: no-preference) {

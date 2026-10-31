@@ -2,7 +2,7 @@
 // S-01 Home, in any language: the bright landing (D-262, components/bright, styles/bright.css), ported
 // from design/trials/site-home-bright. The FAQ and the lead form (#join) keep the landing styles (.lp).
 import Cost from '../components/premium/Cost.astro';
-import { SHELF } from '../components/bright/data.ts';
+import DiscoveryPreview from '../components/premium/DiscoveryPreview.astro';
 import Journey from '../components/premium/Journey.astro';
 import Orbit from '../components/premium/Orbit.astro';
 import Owners from '../components/premium/Owners.astro';
@@ -39,7 +39,7 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
 <Base page={page} locale={locale} jsonLd={[organizationJsonLd(company), websiteJsonLd(locale), faqJsonLd(faq)]}>
 <div class="premium">
   <section class="p-hero" aria-labelledby="home-title">
-    <div class="p-halo" aria-hidden="true"><div></div><span>TodayZ</span></div>
+
     <div class="p-hero-copy">
       <p class="p-kicker"><span></span>{t('home.lede.badge')}</p>
       <h1 id="home-title">{headlineBefore}<em>{t('home.lede.title_em')}</em>{headlineAfter}</h1>
@@ -52,6 +52,7 @@ const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as Me
       <noscript><a href={`${links.customerApp}/search`}>{t('nav.search')}</a></noscript>
       <div class="p-hero-links"><a href="#shelf">{t('home.shelf.find')} <Icon name="arrow" size={16}/></a><a href="#journey">{t('nav.how')} <Icon name="arrow" size={16}/></a></div>
     </div>
+    <DiscoveryPreview t={t} appUrl={links.customerApp}/>
     <div class="p-metrics">{stats.map((s,i)=><div><small>0{i+1}</small><strong>{s.value}</strong><span>{s.label}</span></div>)}</div>
   </section>
   <p class="p-example">{t('home.hero.note')}</p>

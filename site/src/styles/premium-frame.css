@@ -3,9 +3,8 @@ body .site-head{margin:16px 24px 0;border:1px solid var(--silver-edge);border-ra
 body .site-head .head-row{max-width:1440px;height:72px;padding-inline:24px;gap:48px}
 body .site-head .brand small{display:none}body .site-head .brand-word{font-family:var(--font-sans);font-size:24px;font-weight:600;letter-spacing:-.06em}
 body .site-head .nav a{font-size:12px}body .site-head .start{border-radius:8px;font-size:12px;padding:12px 18px}body .site-head .head-cta{gap:20px}body .site-head .login{font-size:12px}
-body .site-foot{margin:32px 24px 24px;border:1px solid var(--line);border-radius:24px;padding:56px 24px 0;background:var(--silver-soft)}body .site-foot .foot-grid{grid-template-columns:2fr 1fr 1fr;gap:56px;max-width:1280px}body .site-foot .foot-brand .brand img{display:block;width:240px;height:80px;border-radius:0}body .site-foot .foot-brand .brand{font:500 36px var(--font-sans);letter-spacing:-.06em}body .site-foot .foot-brand p{font-size:14px;max-width:250px}body .site-foot nav a{font-size:12px}body .site-foot .foot-base{font-size:11px;max-width:1280px}body .site-foot .foot-word{font-family:var(--font-sans);font-size:22vw;font-weight:500;letter-spacing:-.08em;margin-top:50px}
 body .bp .b-page-head{background:transparent;text-align:left;padding:96px 6vw 64px}body .bp .b-page-head h1{font-family:var(--font-sans);font-weight:500;letter-spacing:-.05em}
-@media(width<=760px){body .site-head{margin:10px 12px 0;top:8px}body .site-head .head-row{height:64px;padding-inline:14px;gap:12px}body .site-head .head-cta{gap:8px}body .site-head .start{display:none}body .site-foot{margin:16px 12px;padding:40px 8px 0}body .site-foot .foot-grid{grid-template-columns:1fr 1fr;gap:32px}body .site-foot .foot-brand{grid-column:1/-1}}
+@media(width<=760px){body .site-head{margin:10px 12px 0;top:8px}body .site-head .head-row{height:64px;padding-inline:14px;gap:12px}body .site-head .head-cta{gap:8px}body .site-head .start{display:none}}
 
 /* Original primary lockup, unchanged with its built-in clear space. */
 body .site-head .brand .brand-logo{display:block;width:180px;height:60px;border-radius:0;object-fit:contain}

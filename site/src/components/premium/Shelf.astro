@@ -42,7 +42,7 @@ const items = SHELF.map((s) => ({
       {
         items.map((s) => (
           <li class="b-item b-card" data-cat={s.category}>
-            <span class="p-product-icon"><Icon name={s.category === 'electronics' ? 'search' : s.category === 'pharmacy' ? 'check' : 'pin'} size={28}/></span>
+            <span class="p-product-icon"><img src={s.photo.src} width="80" height="96" alt="" loading="lazy" decoding="async" /></span>
             <small class="b-shop"><Icon name="pin" size={14} />{s.shop}</small>
             <h3>{s.name}</h3>
             <small class="b-fresh"><i aria-hidden="true" />{t('home.shelf.stock', { minutes: s.confirmed })}</small>

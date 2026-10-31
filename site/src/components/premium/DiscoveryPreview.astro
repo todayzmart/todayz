@@ -1,0 +1,34 @@
+---
+import type { Translate } from '../../i18n/index.ts';
+import { SHELF, formatDistance, walkMinutes } from '../bright/data.ts';
+import { EM, splitEm } from '../home/data.ts';
+import Icon from '../Icon.astro';
+
+interface Props { t: Translate; appUrl: string }
+const { t, appUrl } = Astro.props;
+const [before, after] = splitEm(t('home.shelf.title', EM));
+const items = [SHELF[0]!, SHELF[3]!, SHELF[4]!];
+---
+
+<aside class="p-discovery" aria-labelledby="discovery-title">
+  <div class="p-discovery-head">
+    <span><Icon name="pin" size={16} />{t('home.lede.badge')}</span>
+    <span class="p-discovery-radius">{t('home.lede.stat.3.value')}</span>
+  </div>
+  <h2 id="discovery-title">{before}<span>{t('home.shelf.title_em')}</span>{after}</h2>
+  <div class="p-discovery-items">
+    {items.map((item) => (
+      <a class="p-discovery-item" href={`${appUrl}/search?q=${encodeURIComponent(item.query)}`} aria-label={t('home.shelf.find_label', { item: item.name })}>
+        <span class="p-discovery-photo"><img src={item.photo.src} width="96" height="112" alt="" decoding="async" /></span>
+        <span class="p-discovery-info">
+          <small>{item.shop}</small>
+          <strong>{item.name}</strong>
+          <span class="p-discovery-stock"><i aria-hidden="true" />{t('home.shelf.stock', { minutes: item.confirmed })}</span>
+          <span class="p-discovery-walk"><Icon name="footprints" size={13} />{t('home.shelf.walk', { distance: formatDistance(item.distance), minutes: walkMinutes(item.distance) })}</span>
+        </span>
+        <span class="p-discovery-price">₹{item.price}<Icon name="arrow" size={16} /></span>
+      </a>
+    ))}
+  </div>
+  <div class="p-discovery-bottom"><span>{t('home.week.card.tag')}</span><a href={`${appUrl}/search`}>{t('nav.search')}<Icon name="arrow" size={16} /></a></div>
+</aside>
