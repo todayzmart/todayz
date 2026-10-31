@@ -12,3 +12,7 @@
 .p-example{max-width:1440px;margin:auto!important;padding:0 var(--p-space);font-size:10px;}
 
 .premium .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
+.premium .p-join button[type='submit']{display:flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:14px 24px;border:0;border-radius:10px;background:var(--ink);color:var(--surface);font:500 14px var(--font-sans)}
+.premium .p-join button[type='submit']:disabled{opacity:.55;cursor:wait}
+.premium .p-join .cta-form{box-shadow:0 16px 48px var(--silver-shadow)}
