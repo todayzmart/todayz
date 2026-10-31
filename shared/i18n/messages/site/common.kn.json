@@ -283,5 +283,10 @@
     "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
     "review": "reviewed",
     "enHash": "e27265ba"
+  },
+  "theme.toggle": {
+    "message": "ಡಾರ್ಕ್ ಮೋಡ್ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2dda3c18"
   }
 }

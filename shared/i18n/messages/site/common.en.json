@@ -172,5 +172,8 @@
   },
   "nav.search": {
     "defaultMessage": "Search shops near you"
+  },
+  "theme.toggle": {
+    "defaultMessage": "Toggle dark mode"
   }
 }

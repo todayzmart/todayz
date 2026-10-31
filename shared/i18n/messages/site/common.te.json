@@ -283,5 +283,10 @@
     "message": "మీ దగ్గరి దుకాణాలను వెతకండి",
     "review": "reviewed",
     "enHash": "e27265ba"
+  },
+  "theme.toggle": {
+    "message": "డార్క్ మోడ్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "2dda3c18"
   }
 }

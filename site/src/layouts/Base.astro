@@ -5,12 +5,12 @@
 import '@todayz/tokens/styles.css';
 import '../styles/silver.css';
 import head from 'virtual:todayz-head';
-import anekLatin from '@todayz/tokens/fonts/anek-latin-latin-wght-normal.woff2?url';
+import manropeLatin from '../assets/fonts/manrope-variable.woff2?url';
+import soraLatin from '../assets/fonts/sora-variable.woff2?url';
 import anekDevanagari from '@todayz/tokens/fonts/anek-devanagari-devanagari-wght-normal.woff2?url';
 import anekKannada from '@todayz/tokens/fonts/anek-kannada-kannada-wght-normal.woff2?url';
 import anekTelugu from '@todayz/tokens/fonts/anek-telugu-telugu-wght-normal.woff2?url';
 import anekTamil from '@todayz/tokens/fonts/anek-tamil-tamil-wght-normal.woff2?url';
-import figtreeLatin from '@todayz/tokens/fonts/figtree-latin-wght-normal.woff2?url';
 import notoDevanagari from '@todayz/tokens/fonts/noto-sans-devanagari-devanagari-wght-normal.woff2?url';
 import notoKannada from '@todayz/tokens/fonts/noto-sans-kannada-kannada-wght-normal.woff2?url';
 import notoTelugu from '@todayz/tokens/fonts/noto-sans-telugu-telugu-wght-normal.woff2?url';
@@ -19,6 +19,8 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import '../styles/premium-frame.css';
 import '../styles/brand-accents.css';
+import '../styles/experience.css';
+import themeInit from '../scripts/theme-init.js?url';
 import { LOCALE_INFO, createT, isMachineDraft, type Locale } from '../i18n/index.ts';
 import { alternates, pagePath, pageUrl, SITE_ORIGIN, type PageDef } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
@@ -49,7 +51,7 @@ const englishPath = pagePath(page, 'en');
 // CLS on the localised heroes): Latin display and body on every page (Indic headings still use Anek
 // Latin for punctuation and digits, and the mock screens are English), plus the page script's display
 // and body faces. Same files as @todayz/tokens' @font-face rules, so the browser reuses the response.
-const LATIN = [anekLatin, figtreeLatin];
+const LATIN = [manropeLatin, soraLatin];
 const SCRIPT_FONTS: Record<Locale, string[]> = {
   en: [],
   hi: [anekDevanagari, notoDevanagari],
@@ -66,6 +68,7 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
+    <script is:inline src={themeInit}></script>
     <title>{title}</title>
     {preloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <meta name="description" content={description} />
@@ -104,6 +107,7 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
       <slot />
     </main>
     <Footer locale={locale} />
+    <script>import '../scripts/presentation.ts';</script>
   </body>
 </html>
 

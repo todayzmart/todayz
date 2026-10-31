@@ -55,6 +55,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
     <div class="head-cta">
       <a class="search" href={`${links.customerApp}/search`} aria-label={t('nav.search')}><Icon name="search" size={20} /></a>
       <a class="login" href={links.businessApp}>{t('nav.login')}</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label={t('theme.toggle')} title={t('theme.toggle')} aria-pressed="false" hidden><span class="theme-moon"><Icon name="moon" size={20}/></span><span class="theme-sun"><Icon name="sun" size={20}/></span></button>
       <LangSwitch page={page} locale={locale} />
       <a class="tz-btn tz-btn-brand start" href={start.href} hreflang={start.hreflang}>
         {t('nav.start')}<Icon name="arrow" size={18} />

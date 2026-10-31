@@ -283,5 +283,10 @@
     "message": "अपने पास की दुकानें खोजें",
     "review": "reviewed",
     "enHash": "e27265ba"
+  },
+  "theme.toggle": {
+    "message": "डार्क मोड बदलें",
+    "review": "reviewed",
+    "enHash": "2dda3c18"
   }
 }

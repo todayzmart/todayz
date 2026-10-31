@@ -283,5 +283,10 @@
     "message": "உங்கள் அருகிலுள்ள கடைகளைத் தேடுங்கள்",
     "review": "reviewed",
     "enHash": "e27265ba"
+  },
+  "theme.toggle": {
+    "message": "இருண்ட பயன்முறையை மாற்று",
+    "review": "reviewed",
+    "enHash": "2dda3c18"
   }
 }

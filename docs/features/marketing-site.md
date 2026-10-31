@@ -2,7 +2,7 @@
 
 The public site at todayz.in: pages, languages, lead form, the demand marquee and the performance gates.
 
-> As built on main at 34257849 (31 Oct 2026), with product icons and the street-based journey map in this change.
+> As built on main at 722244ba (31 Oct 2026), with persistent light/dark mode, typography and interactive glass in this change.
 
 ## What users can do
 
@@ -25,6 +25,8 @@ The page registry is [site/src/lib/pages.ts](../../site/src/lib/pages.ts). Views
 ## Visual identity
 
 The rebuilt homepage uses `site/src/styles/premium.css` and `premium-frame.css`. The original primary TodayZ artwork stays unchanged in the shared header and footer. `brand-accents.css` derives near-black green glass tones from existing tokens. The hero's `DiscoveryPreview.astro` replaces the decorative circle with clearly labelled example products, outline icons, prices, shop names, stock freshness and walking distances; each product opens its customer-app search. Shelf rows use the same product-specific Lucide icons. The journey now shows an illustrative neighbourhood street map with building footprints, parks, water, nearby shop pins, a destination card and a pickup route aligned with the road network. The original replay hooks and reduced-motion fallback remain; it is an example, not a live geographic map. The homepage no longer renders product photos or their unused photo-credits section. The rebuilt compact footer removes the giant wordmark and groups shopper/retailer entry points, company/legal navigation and language links. Search, calculator logic and form endpoints are unchanged.
+
+The header now offers a persistent light/dark toggle, initially following the operating-system preference. Both themes cover the page, forms, product listings and map. The original logo stays unchanged on a light plate. Self-hosted Sora and Manrope fonts replace the Latin display/body faces, retaining the Indic fallbacks. The hero is top-aligned closer to navigation; layered glass uses real backdrop blur and pointer-driven reflection with reduced-motion and coarse-pointer fallbacks. The theme scripts remain same-origin hashed assets under the existing CSP.
 
 ## Rules
 
