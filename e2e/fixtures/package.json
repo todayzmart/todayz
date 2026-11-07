@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Shared fixtures for the cross-app journeys (e2e/journeys): seed ids, principals, API helpers. Its own package so the fixtures resolve @playwright/test from here.",
   "devDependencies": {
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "26.6.4"
   }
 }
